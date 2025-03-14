@@ -1,0 +1,17 @@
+<!-- The toolbar of our app -->
+<mat-toolbar color="primary">
+  <img class="brand-logo" src="logo.jpg" alt="logo" aria-hidden="true" />
+  <span>SAM | Sheet Archive - Music</span>
+  <span class="example-spacer"></span>
+  <button mat-raised-button color="accent" (click)="openAddEditSheetDialog()">ADD SHEET</button>
+</mat-toolbar>
+<!-- The body of our app -->
+<div class="main-body">
+  @defer {
+   <sheetMusic-list />
+  } @loading (minimum 1s; after 300ms) {
+    <p>loading sheet music ...</p>
+  }
+</div>
+
+<router-outlet />

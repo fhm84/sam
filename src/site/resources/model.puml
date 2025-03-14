@@ -1,0 +1,87 @@
+@startuml
+
+class SheetMusic {
+  +id: UUID
+  +title: String
+  +composer_id: UUID
+  +arranger_id: UUID [0..1]
+  +genre: String
+  +difficulty_level: String
+  +time_signature: String
+  +year_of_composition: Integer
+  +publisher: String
+  +edition: String
+  +license: String
+  +audio_reference_url: String
+  +preview_image_path: String
+  +performance_notes: String
+}
+
+class Instrumentation {
+  +id: UUID
+  +sheet_music_id: UUID
+  +instrument_name: String
+  +key_signature: String
+  +clef: String
+  +notation_type: String
+  +pdf_file_path: String
+  +midi_file_path: String [0..1]
+}
+
+class Composer {
+  +id: UUID
+  +name: String
+  +birth_year: Integer
+  +death_year: Integer [0..1]
+}
+
+class Band {
+  +id: UUID
+  +name: String
+  +description: String
+}
+
+class Band_Member {
+  +id: UUID
+  +band_id: UUID
+  +user_id: UUID
+  +role: String
+}
+
+class Collection {
+  +id: UUID
+  +name: String
+  +description: String
+}
+
+class SheetMusic_Collection {
+  +sheet_music_id: UUID
+  +collection_id: UUID
+}
+
+class Tag {
+  +id: UUID
+  +name: String
+}
+
+class SheetMusic_Tag {
+  +sheet_music_id: UUID
+  +tag_id: UUID
+}
+
+SheetMusic --|> Composer : "composer"
+SheetMusic --|> Composer : "arranger"
+SheetMusic --o Instrumentation : "has multiple"
+SheetMusic --o SheetMusic_Collection
+SheetMusic --o SheetMusic_Tag
+
+Instrumentation --> SheetMusic : "belongs to"
+
+Band --o Band_Member : "has members"
+Band_Member --> Band
+
+Collection --o SheetMusic_Collection
+
+Tag --o SheetMusic_Tag
+
+@enduml

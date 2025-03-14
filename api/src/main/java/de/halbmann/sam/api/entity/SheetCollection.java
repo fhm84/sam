@@ -1,0 +1,42 @@
+package de.halbmann.sam.api.entity;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+/**
+ * Groups multiple pieces of sheet music.
+ */
+@Data
+@EqualsAndHashCode
+public class SheetCollection {
+
+    /**
+     * Unique identifier of the collection
+     */
+    UUID id;
+    /**
+     * The name to find the collection (like e.g. "Blaue Mappe", or "Programm Dorfplatzfest")
+     */
+    String name;
+
+    /**
+     * (Optional) description for the sheet collection
+     */
+    String description;
+
+    /**
+     * (Optional) date of the collection (e.g. in case of a program for a gig)
+     */
+    LocalDate date;
+
+    /**
+     * The list of sheets (wrapped in a collection sheet adding an identifier in context of the collection)
+     */
+    List<CollectionSheet> sheets = new ArrayList<>();
+
+}

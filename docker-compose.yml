@@ -1,0 +1,14 @@
+services:
+
+  database:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: sam
+      POSTGRES_PASSWORD: s4mP@ssword
+      POSTGRES_DB: sam_music
+    #  PGDATA: /data/postgres
+    #volumes:
+    #  - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    restart: unless-stopped

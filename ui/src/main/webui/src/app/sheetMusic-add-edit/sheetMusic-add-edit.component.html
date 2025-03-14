@@ -1,0 +1,66 @@
+<div mat-dialog-title>
+    <h1>{{data ? 'Edit': 'Add'}} Sheet Form</h1>
+</div>
+<form [formGroup]="sheetForm" (ngSubmit)="onSubmit()">
+    <div mat-dialog-content class="content">
+        <div class="row">
+            <mat-form-field appearance="outline">
+                <mat-label>Title:</mat-label>
+                <input matInput type="text" placeholder="i.e Kuschelpolka" formControlName="title">
+            </mat-form-field>
+        </div>
+        <div class="row">
+            <mat-form-field appearance="outline">
+                <mat-label>Publisher:</mat-label>
+                <input matInput type="text" placeholder="i.e Ewoton Verlag" formControlName="publisher">
+            </mat-form-field>
+        <!--
+            <mat-form-field appearance="outline">
+                <mat-label>Date of birth:</mat-label>
+                <input matInput [matDatepicker]="picker" formControlName="dob">
+                <mat-hint>MM/DD/YYYY</mat-hint>
+                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+        -->
+        </div>
+        <div class="row">
+            <mat-form-field appearance="outline">
+                <mat-label>Composer:</mat-label>
+                <input matInput type="text" placeholder="i.e Frank Bernaerts" formControlName="composer">
+            </mat-form-field>
+        </div>
+        <div class="row">
+            <mat-form-field appearance="outline">
+                <mat-label>Genre:</mat-label>
+                <mat-select formControlName="genre">
+                    <mat-option *ngFor="let val of genre" [value]="val">{{val}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <div class="row">
+            <mat-form-field appearance="outline">
+                <mat-label>Type:</mat-label>
+                <input matInput placeholder="i.e 5" type="text" formControlName="type">
+                <mat-hint>In dollar</mat-hint>
+            </mat-form-field>
+        </div>
+<!--
+        <div class="row">
+            <div formArrayName="aliases">
+                <h2>Aliases</h2>
+                <button type="button" (click)="addAlias()">+ Add another alias</button>
+                <div *ngFor="let alias of aliases.controls; let i=index">
+                    <mat-label>Alias:</mat-label>
+                    <input matInput type="text" [formControlName]="i">
+                </div>
+            </div>
+        </div>
+    -->
+    </div>
+    <div mat-dialog-actions class="action-btns">
+        <button style="margin: 10px;" mat-raised-button color="accent" type="submit">{{data ? 'Update': 'Save'}}</button>
+        <button mat-raised-button type="button" mat-dialog-close color="warn" (click)="cancel()">Cancel</button>
+    </div>
+</form>
