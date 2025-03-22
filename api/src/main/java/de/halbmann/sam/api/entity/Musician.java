@@ -29,4 +29,9 @@ public class Musician {
      */
     Integer deathYear;
 
+    /**
+     * Interested Party Information (IPI)-Nummer
+     */
+    String ipi;
+
 }

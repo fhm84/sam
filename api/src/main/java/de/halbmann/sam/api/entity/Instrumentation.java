@@ -27,16 +27,16 @@ public class Instrumentation {
     /**
      * Specific key signature for this instrument (e.g., Bb Major, C Major)
      */
-    String keySignature;
+    InstrumentTransposing keySignature;
     /**
      * Clef type (e.g., Treble, Bass, Alto, Tenor)
      */
-    String clef;
+    Clef clef;
 
     /**
      * Type of notation (Standard, Tablature, Percussion)
      */
-    String notationType;
+    NotationType notationType;
 
     // FIXME: how to store pdf/MIDI-File?
     /**

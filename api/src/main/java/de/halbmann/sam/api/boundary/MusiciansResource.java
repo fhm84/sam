@@ -5,10 +5,12 @@ import de.halbmann.sam.api.entity.MusicianFilterRequest;
 import de.halbmann.sam.api.entity.PaginatedResponse;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 @Path("musicians")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@RegisterRestClient
 public interface MusiciansResource {
 
     @GET

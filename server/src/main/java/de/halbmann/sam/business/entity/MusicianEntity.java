@@ -31,4 +31,9 @@ public class MusicianEntity extends AbstractEntity {
      */
     Integer deathYear;
 
+    /**
+     * Interested Party Information (IPI)-Nummer
+     */
+    String ipi;
+
 }

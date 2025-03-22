@@ -26,10 +26,16 @@ public class SheetMusicEntity extends AbstractEntity {
      * (Optional) Subtitle of the piece.
      */
     String subtitle;
+
     /**
      * The publisher of the music sheet.
      */
     String publisher;
+    /**
+     * Interested Party Information (IPI)-Number of the publisher.
+     */
+    String publisherIpi;
+
     /**
      * The composer of the music sheet.
      */
@@ -71,6 +77,16 @@ public class SheetMusicEntity extends AbstractEntity {
      * Rating for the piece/music sheet.
      */
     Integer rating;
+
+    /**
+     * International Standard Musical Work Code
+     */
+    String iswc;
+
+    /**
+     * Identification number of GEMA (GEMA-Werk Nr.)
+     */
+    String gemaWorkNumber;
 
     /**
      * Additional notes.

@@ -1,5 +1,8 @@
 package de.halbmann.sam.business.entity;
 
+import de.halbmann.sam.api.entity.Clef;
+import de.halbmann.sam.api.entity.InstrumentTransposing;
+import de.halbmann.sam.api.entity.NotationType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,26 +31,30 @@ public class InstrumentationEntity extends AbstractEntity {
     /**
      * Specific key signature for this instrument (e.g., Bb Major, C Major)
      */
-    String keySignature;
+    @Enumerated(EnumType.STRING)
+    InstrumentTransposing keySignature;
     /**
      * Clef type (e.g., Treble, Bass, Alto, Tenor)
      */
-    String clef;
+    @Enumerated(EnumType.STRING)
+    Clef clef;
 
     /**
      * Type of notation (Standard, Tablature, Percussion)
      */
-    String notationType;
+    @Enumerated(EnumType.STRING)
+    NotationType notationType;
 
-    // FIXME: how to store pdf/MIDI-File?
     /**
-     * Location of the sheet music file
+     * Metadata of the sheet music file (including location, mime-type, fileSize, ...)
      */
-    String pdfFile;
+    @OneToOne(fetch = FetchType.LAZY)
+    Document pdfFile;
     /**
      * (Optional) MIDI file location
      */
-    String midiFile;
+    @OneToOne(fetch = FetchType.LAZY)
+    Document midiFile;
 
     /**
      * Sheet music entity, the instrumentation belongs to.

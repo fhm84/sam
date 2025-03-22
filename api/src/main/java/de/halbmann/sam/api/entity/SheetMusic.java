@@ -31,6 +31,10 @@ public class SheetMusic {
      */
     String publisher;
     /**
+     * Interested Party Information (IPI)-Number of the publisher.
+     */
+    String publisherIpi;
+    /**
      * The composer of the music sheet.
      */
     Musician composer;
@@ -68,6 +72,16 @@ public class SheetMusic {
      * Rating for the piece/music sheet.
      */
     Integer rating;
+
+    /**
+     * International Standard Musical Work Code
+     */
+    String iswc;
+
+    /**
+     * Identification number of GEMA (GEMA-Werk Nr.)
+     */
+    String gemaWorkNumber;
 
     /**
      * Additional notes.
