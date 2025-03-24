@@ -33,6 +33,28 @@
                     <skip>true</skip>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>cz.habarta.typescript-generator</groupId>
+                <artifactId>typescript-generator-maven-plugin</artifactId>
+                <version>3.2.1263</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <jsonLibrary>jsonb</jsonLibrary>
+                    <classPatterns>
+                        <classPattern>de.halbmann.sam.api.entity.*</classPattern>
+                    </classPatterns>
+                    <outputFile>${project.basedir}/../ui/src/main/webui/src/app/model/datamodels.d.ts</outputFile>
+                    <outputKind>module</outputKind>
+                    <requiredAnnotations>jakarta.validation.constraints.NotBlank,jakarta.validation.constraints.NotEmpty,jakarta.validation.constraints.NotNull</requiredAnnotations>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 

@@ -1,7 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-import { SheetMusic } from '../model/sheetMusic';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -16,8 +14,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
-import { SheetMusicService } from '../services/sheetMusic.service';
-import { SheetMusicAddEditComponent } from '../sheetMusic-add-edit/sheetMusic-add-edit.component';
+import { SheetMusicService } from '../../services/sheetMusic.service';
+import { RouterLink } from '@angular/router';
+import { SheetMusic } from '../../model/datamodels';
 
 @Component({
   selector: 'sheetMusic-list',
@@ -37,10 +36,12 @@ import { SheetMusicAddEditComponent } from '../sheetMusic-add-edit/sheetMusic-ad
     MatTableModule,
     MatPaginatorModule,
     MatSortModule,
-    FormsModule
+    FormsModule,
+    RouterLink
   ],
   templateUrl: './sheetMusic-list.component.html',
-  styleUrls: ['./sheetMusic-list.component.css']
+  styleUrls: ['./sheetMusic-list.component.scss'],
+  providers: [SheetMusicService]
 })
 export class SheetMusicListComponent implements OnInit {
 
@@ -69,7 +70,7 @@ export class SheetMusicListComponent implements OnInit {
     private dialog: MatDialog,
     private sheetMusicService: SheetMusicService) { }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.loadData(0, this.pageSize);
   }
 
@@ -114,20 +115,6 @@ export class SheetMusicListComponent implements OnInit {
         },
       });
     }
-  }
-
-  openEditForm(data: any) {
-    const dialogRef = this.dialog.open(SheetMusicAddEditComponent, {
-      data,
-    });
-
-    dialogRef.afterClosed().subscribe({
-      next: (val) => {
-        if (val) {
-          this.loadData(0, this.pageSize);
-        }
-      }
-    });
   }
 
 }

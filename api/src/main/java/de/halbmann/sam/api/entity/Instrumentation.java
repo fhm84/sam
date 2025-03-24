@@ -1,5 +1,6 @@
 package de.halbmann.sam.api.entity;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -19,6 +20,7 @@ public class Instrumentation {
     /**
      * Instrument name (e.g. Trumpet, Violin, Bass)
      */
+    @NotBlank
     String instrumentName;
     /**
      * The key (for example: 2 for 2. Bass)

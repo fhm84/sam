@@ -1,5 +1,7 @@
 package de.halbmann.sam.api.entity;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -22,6 +24,7 @@ public class SheetCollection {
     /**
      * The name to find the collection (like e.g. "Blaue Mappe", or "Programm Dorfplatzfest")
      */
+    @NotBlank
     String name;
 
     /**
@@ -37,6 +40,7 @@ public class SheetCollection {
     /**
      * The list of sheets (wrapped in a collection sheet adding an identifier in context of the collection)
      */
+    @Valid
     List<CollectionSheet> sheets = new ArrayList<>();
 
 }

@@ -1,5 +1,7 @@
 package de.halbmann.sam.api.entity;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -21,6 +23,7 @@ public class SheetMusic {
     /**
      * The title of the music sheet/piece.
      */
+    @NotBlank
     String title;
     /**
      * (Optional) Subtitle of the piece.
@@ -37,10 +40,12 @@ public class SheetMusic {
     /**
      * The composer of the music sheet.
      */
+    @Valid
     Musician composer;
     /**
      * The arranger of the music sheet.
      */
+    @Valid
     Musician arranger;
 
     /**
@@ -88,6 +93,10 @@ public class SheetMusic {
      */
     String additionalNotes;
 
+    /**
+     * Individual instrument parts for a piece of sheet music.
+     */
+    @Valid
     List<Instrumentation> instrumentations = new ArrayList<>();
 
 }

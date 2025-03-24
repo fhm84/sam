@@ -1,9 +1,10 @@
 import { Routes } from '@angular/router';
-import { SheetMusicAddEditComponent } from './sheetMusic-add-edit/sheetMusic-add-edit.component';
+import { SheetMusicAddEditComponent } from './components/sheetMusic-add-edit/sheetMusic-add-edit.component';
+import { SheetMusicListComponent } from './components/sheetMusic-list/sheetMusic-list.component';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'sheets', pathMatch: 'full' },
+  { path: 'sheets', component: SheetMusicListComponent },
   { path: 'sheets/add', component: SheetMusicAddEditComponent },
-  { path: 'sheets/:id/edit', component: SheetMusicAddEditComponent }
-  //{ path: 'add', component: AddSheetComponent }
+  { path: 'sheets/:id/edit', component: SheetMusicAddEditComponent },
+  { path: '', redirectTo: 'sheets', pathMatch: 'full' }
 ];

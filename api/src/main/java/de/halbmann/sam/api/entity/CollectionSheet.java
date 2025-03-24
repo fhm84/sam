@@ -1,5 +1,8 @@
 package de.halbmann.sam.api.entity;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -19,8 +22,11 @@ public class CollectionSheet {
     /**
      * Identifier (e.g. the number within the collection)
      */
+    @NotBlank
     String identifier;
 
+    @NotNull
+    @Valid
     SheetMusic sheetMusic;
 
 }
