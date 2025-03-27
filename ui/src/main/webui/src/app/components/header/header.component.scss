@@ -1,9 +1,16 @@
+mat-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000; /* Ensure it stays above other content */
+}
+
 .spacer {
     flex: 1 1 auto;
 }
 
 .app-title {
     font-weight: bold;
+
     small {
         font-weight: normal;
     }

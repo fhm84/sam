@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { AsyncPipe, CommonModule } from '@angular/common';
-import { FormControl, FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { SheetMusicService } from '../../services/sheetMusic.service';
@@ -8,11 +8,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { MatRadioModule } from '@angular/material/radio';
-import { MatDatepickerModule } from '@angular/material/datepicker';
 import { ActivatedRoute, Router } from '@angular/router';
-import { map, Observable, startWith } from 'rxjs';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { Musician, SheetMusic } from '../../model/datamodels';
+import { SheetMusic } from '../../model/datamodels';
+import { MusicianAutocompleteComponent } from '../musician-autocomplete/musician-autocomplete.component';
+import { MatCardModule } from '@angular/material/card';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 @Component({
   selector: 'app-sheetmusic-add-edit',
@@ -21,14 +21,14 @@ import { Musician, SheetMusic } from '../../model/datamodels';
     MatInputModule,
     MatSelectModule,
     MatRadioModule,
-    MatDatepickerModule,
+    MatCardModule,
+    MatExpansionModule,
     MatFormFieldModule,
-    MatAutocompleteModule,
     MatButtonModule,
     MatIconModule,
     FormsModule,
     ReactiveFormsModule,
-    AsyncPipe
+    MusicianAutocompleteComponent
   ],
   templateUrl: './sheetMusic-add-edit.component.html',
   styleUrl: './sheetMusic-add-edit.component.scss'
@@ -37,18 +37,8 @@ export class SheetMusicAddEditComponent implements OnInit {
 
   sheetForm: FormGroup;
   @Input() data!: SheetMusic;
-
-  composerOptions: Musician[] = [
-    { id: '1', name: 'Hans Zimmer' },
-    { id: '2', name: 'Frank Bernaerts' },
-    { id: '3', name: 'Anton Gälle' }
-  ];
-
-  filteredComposers!: Observable<Musician[]>;
-
-  composerControl = new FormControl<string | Musician>('', {
-    nonNullable: true,
-  });
+  initialComposer?: string;
+  initialArranger?: string;
 
   // TODO: this should be loaded from backend!
   genre: string[] = [
@@ -66,10 +56,20 @@ export class SheetMusicAddEditComponent implements OnInit {
   ) {
     this.sheetForm = this.formBuilder.group({
       title: ['', Validators.required],
-      publisher: ['', Validators.required],
-      composer: this.composerControl,
-      genre: ['', Validators.required],
-      type: ['']
+      subtitle: [''],
+      publisher: [''],
+      publisherIpi: [''],
+      composer: [''],
+      arranger: [''],
+      genre: [''],
+      difficultyLevel: [''],
+      yearOfComposition: [''],
+      edition: [''],
+      license: [''],
+      rating: [''],
+      iswc: [''],
+      gemaWorkNumber: [''],
+      additionalNotes: ['']
     });
   }
 
@@ -80,24 +80,17 @@ export class SheetMusicAddEditComponent implements OnInit {
         next: (val: any) => {
           this.data = val;
 
+          // Patch the form with the loaded data
           this.sheetForm.patchValue(this.data);
 
-          var preselectedComposer = this._filter(this.data.composer?.name).pop();
-          if (preselectedComposer) {
-            this.composerControl.setValue(preselectedComposer);
-          }
+          // Set the initial composer value (auto-complete component)
+          this.initialComposer = this.data.composer?.name;
+
+          // Set the initial arranger value (auto-complete component)
+          this.initialArranger = this.data.arranger?.name;
         }
       });
     }
-
-    this.filteredComposers = this.composerControl.valueChanges.pipe(
-      startWith(''),
-      map(value => {
-        const name = typeof value === 'string' ? value : value?.name;
-        return name ? this._filter(name as string) : this.composerOptions.slice();
-      }),
-    );
-
   }
 
   onSubmit() {
@@ -133,20 +126,6 @@ export class SheetMusicAddEditComponent implements OnInit {
 
   cancel(): void {
     this.router.navigate(['/sheets']);
-  }
-
-  private _filter(name?: string): Musician[] {
-    if (name) {
-      const filterValue = name.toLowerCase();
-
-      return this.composerOptions.filter(option => option.name.toLowerCase().includes(filterValue));
-    } else {
-      return this.composerOptions;
-    }
-  }
-
-  displayFn(musician: Musician): string {
-    return musician && musician.name ? musician.name : '';
   }
 
 }

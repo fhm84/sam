@@ -67,7 +67,6 @@ export class SheetMusicListComponent implements OnInit {
   @ViewChild(MatSort) sort!: MatSort;
 
   constructor(
-    private dialog: MatDialog,
     private sheetMusicService: SheetMusicService) { }
 
   async ngOnInit(): Promise<void> {

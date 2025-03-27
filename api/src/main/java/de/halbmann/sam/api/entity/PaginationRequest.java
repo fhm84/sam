@@ -22,4 +22,9 @@ public class PaginationRequest {
     @QueryParam("sortBy")
     private String[] sortBy;
 
+    public int getSize() {
+        // to "disable" paging, we just simply set the size to a negative value -> this is then mapped to Integer.MAX_VALUE
+        return size < 0 ? Integer.MAX_VALUE : size;
+    }
+
 }

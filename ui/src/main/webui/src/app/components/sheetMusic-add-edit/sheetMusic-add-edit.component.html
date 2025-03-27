@@ -1,46 +1,143 @@
 <h1>{{data ? 'Edit': 'Add'}} Sheet</h1>
 <form [formGroup]="sheetForm" (ngSubmit)="onSubmit()">
     <div class="content">
-        <div class="row">
-            <mat-form-field appearance="outline">
-                <mat-label>Title:</mat-label>
-                <input matInput type="text" placeholder="i.e Kuschelpolka" formControlName="title">
-            </mat-form-field>
-        </div>
-        <div class="row">
-            <mat-form-field appearance="outline">
-                <mat-label>Publisher:</mat-label>
-                <input matInput type="text" placeholder="i.e Ewoton Verlag" formControlName="publisher">
-            </mat-form-field>
+        <mat-accordion multi>
+            <mat-expansion-panel hideToggle expanded="true">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>Base data</mat-panel-title>
+                    <mat-panel-description>
+                        Basic information about the sheet music
+                        <mat-icon>app_registration</mat-icon>
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+                <div class="row">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Title:</mat-label>
+                        <input matInput type="text" placeholder="i.e Kuschelpolka" formControlName="title">
+                    </mat-form-field>
+                </div>
+                <div class="row">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Subtitle:</mat-label>
+                        <input matInput type="text" formControlName="subtitle">
+                    </mat-form-field>
+                </div>
+                <div class="row">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Publisher:</mat-label>
+                        <input matInput type="text" placeholder="i.e Ewoton Verlag" formControlName="publisher">
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Publisher IPI:</mat-label>
+                        <input matInput type="text" formControlName="publisherIpi">
+                    </mat-form-field>
+                </div>
+                <div class="row">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Composer:</mat-label>
+                        <app-musician-autocomplete [placeholder]="'i.e Frank Bernaerts'"
+                            [initialValue]="initialComposer" formControlName="composer">
+                        </app-musician-autocomplete>
+                        <mat-error *ngIf="sheetForm.get('composer')?.hasError('required')">
+                            Composer is required.
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="row">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Arranger:</mat-label>
+                        <app-musician-autocomplete [placeholder]="'i.e Frank Bernaerts'"
+                            [initialValue]="initialArranger" formControlName="arranger">
+                        </app-musician-autocomplete>
+                        <mat-error *ngIf="sheetForm.get('arranger')?.hasError('required')">
+                            Arranger is required.
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="row">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Genre:</mat-label>
+                        <mat-select formControlName="genre">
+                            <mat-option *ngFor="let val of genre" [value]="val">{{val}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>Year of composition:</mat-label>
+                        <input matInput type="number" placeholder="i.e 1978" formControlName="yearOfComposition">
+                    </mat-form-field>
+                </div>
+            </mat-expansion-panel>
+
+            <mat-expansion-panel hideToggle>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>Misc</mat-panel-title>
+                    <mat-panel-description>
+                        Miscellaneous information about the sheet music
+                        <mat-icon>miscellaneous_services</mat-icon>
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+                <div class="row">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Difficulty level:</mat-label>
+                        <input matInput placeholder="i.e Beginner, Intermediate, Advanced" type="text"
+                            formControlName="difficultyLevel">
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>Edition:</mat-label>
+                        <input matInput type="text" formControlName="edition">
+                    </mat-form-field>
+                </div>
+                <div class="row">
+                    <mat-form-field appearance="outline">
+                        <mat-label>License:</mat-label>
+                        <input matInput type="text" formControlName="license">
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Rating:</mat-label>
+                        <input matInput type="number" formControlName="rating">
+                    </mat-form-field>
+                </div>
+            </mat-expansion-panel>
+
+            <mat-expansion-panel hideToggle>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>Registration data</mat-panel-title>
+                    <mat-panel-description>
+                        Information about the registration of the sheet music
+                        <mat-icon>grading</mat-icon>
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+                <div class="row">
+                    <mat-form-field appearance="outline">
+                        <mat-label>International Standard Musical Work Code (ISWC):</mat-label>
+                        <input matInput type="text" formControlName="iswc">
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label>GEMA Work Number:</mat-label>
+                        <input matInput type="text" formControlName="gemaWorkNumber">
+                    </mat-form-field>
+                </div>
+            </mat-expansion-panel>
+
+            <mat-expansion-panel hideToggle>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>Additional notes</mat-panel-title>
+                    <mat-panel-description>
+                        Additional notes about the sheet music
+                        <mat-icon>inventory</mat-icon>
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+                <div class="row">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Additional Notes:</mat-label>
+                        <textarea matInput type="text" formControlName="additionalNotes"></textarea>
+                    </mat-form-field>
+                </div>
+            </mat-expansion-panel>
+        </mat-accordion>
         <!--
-            <mat-form-field appearance="outline">
-                <mat-label>Date of birth:</mat-label>
-                <input matInput [matDatepicker]="picker" formControlName="dob">
-                <mat-hint>MM/DD/YYYY</mat-hint>
-                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-                <mat-datepicker #picker></mat-datepicker>
-            </mat-form-field>
-        -->
-        </div>
-        <div class="row">
-            <mat-form-field appearance="outline">
-                <mat-label>Composer:</mat-label>
-                <input matInput type="text" placeholder="i.e Frank Bernaerts" [formControl]="composerControl" [matAutocomplete]="auto">
-                <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
-                    @for (composer of filteredComposers | async ; track composer) {
-                        <mat-option [value]="composer">{{composer.name}}</mat-option>
-                    }
-                </mat-autocomplete>
-            </mat-form-field>
-        </div>
-        <div class="row">
-            <mat-form-field appearance="outline">
-                <mat-label>Genre:</mat-label>
-                <mat-select formControlName="genre">
-                    <mat-option *ngFor="let val of genre" [value]="val">{{val}}</mat-option>
-                </mat-select>
-            </mat-form-field>
-        </div>
         <div class="row">
             <mat-form-field appearance="outline">
                 <mat-label>Type:</mat-label>
@@ -48,7 +145,6 @@
                 <mat-hint>In dollar</mat-hint>
             </mat-form-field>
         </div>
-<!--
         <div class="row">
             <div formArrayName="aliases">
                 <h2>Aliases</h2>
@@ -62,7 +158,8 @@
     -->
     </div>
     <div class="action-btns">
-        <button style="margin: 10px;" mat-raised-button color="accent" type="submit">{{data ? 'Update': 'Save'}}</button>
+        <button style="margin: 10px;" mat-raised-button color="accent" type="submit">{{data ? 'Update':
+            'Save'}}</button>
         <button mat-raised-button type="button" color="warn" (click)="cancel()">Cancel</button>
     </div>
 </form>

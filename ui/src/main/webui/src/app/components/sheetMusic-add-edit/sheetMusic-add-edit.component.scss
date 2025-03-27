@@ -4,16 +4,37 @@
     gap: 20px;
     margin-bottom: 10px;
 }
+
 mat-form-field {
     width: 100%;
 }
+
 mat-hint {
     margin: 5px;
 }
+
 .action-btns {
     float: right;
     margin-right: 10px;
 }
+
 .action-btns button {
     padding: 20px;
+}
+
+app-musician-autocomplete {
+    width: 100%;
+}
+
+.mat-accordion .mat-expansion-panel-header-description {
+    justify-content: space-between;
+    align-items: center;
+}
+
+.mat-accordion .mat-mdc-form-field+.mat-mdc-form-field {
+    margin-left: 8px;
+}
+
+.mat-expansion-panel-header .mat-expansion-panel-header-description {
+    font-weight: normal;
 }

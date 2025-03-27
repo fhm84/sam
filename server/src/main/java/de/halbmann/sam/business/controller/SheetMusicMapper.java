@@ -7,7 +7,7 @@ import org.mapstruct.*;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.JAKARTA_CDI,
         uses = {
-                ComposerMapper.class,
+                MusicianMapper.class,
                 GenreMapper.class,
                 InstrumentationMapper.class,
                 GenreRepository.class

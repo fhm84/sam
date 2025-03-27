@@ -9,7 +9,7 @@ import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.JAKARTA_CDI,
         unmappedTargetPolicy = ReportingPolicy.ERROR)
-public interface ComposerMapper {
+public interface MusicianMapper {
 
     Musician toDto(final MusicianEntity entity);
 

@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 3.2.1263 on 2025-03-24 21:21:29.
+// Generated using typescript-generator version 3.2.1263 on 2025-03-26 15:57:08.
 
 export interface CollectionSheet {
     id?: string;

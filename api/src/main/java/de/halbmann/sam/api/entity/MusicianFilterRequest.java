@@ -11,5 +11,4 @@ public class MusicianFilterRequest extends PaginationRequest {
     @QueryParam("name")
     private String name;
 
-
 }

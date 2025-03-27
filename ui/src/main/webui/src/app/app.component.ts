@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
+import { MatIconRegistry } from '@angular/material/icon';
 
 import { HeaderComponent } from './components/header/header.component';
 
@@ -17,5 +18,10 @@ import { HeaderComponent } from './components/header/header.component';
 export class AppComponent {
 
   title = 'sam';
+
+  constructor(private matIconRegistry: MatIconRegistry) {
+    // Set the default font set class for all icons
+    this.matIconRegistry.setDefaultFontSetClass('material-icons-outlined');
+  }
 
 }
