@@ -49,6 +49,11 @@ public class SheetMusic {
     Musician arranger;
 
     /**
+     * Optional (e.g., original band or composer)
+     */
+    String originalBy;
+
+    /**
      * Classification (e.g., Classical, Jazz)
      */
     String genre;
@@ -69,9 +74,9 @@ public class SheetMusic {
     String edition;
 
     /**
-     * License information.
+     * Copyright information.
      */
-    String license;
+    String copyright;
 
     /**
      * Rating for the piece/music sheet.

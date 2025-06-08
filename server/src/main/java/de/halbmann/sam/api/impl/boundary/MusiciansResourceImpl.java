@@ -25,22 +25,24 @@ public class MusiciansResourceImpl implements MusiciansResource {
 
     @Override
     public Musician add(Musician musician) {
+        // FIXME: implement!
         return null;
     }
 
     @Override
     public Musician load(String musicianId) {
+        // FIXME: implement!
         return null;
     }
 
     @Override
     public void update(String musicianId, Musician musician) {
-
+        // FIXME: implement!
     }
 
     @Override
     public void delete(String musicianId) {
-
+        // FIXME: implement!
     }
 
 }

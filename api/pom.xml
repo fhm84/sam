@@ -15,12 +15,32 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.jboss.resteasy.microprofile</groupId>
-            <artifactId>microprofile-rest-client</artifactId>
+            <groupId>org.eclipse.microprofile.rest.client</groupId>
+            <artifactId>microprofile-rest-client-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.microprofile.config</groupId>
+            <artifactId>microprofile-config-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus.resteasy.reactive</groupId>
+            <artifactId>resteasy-reactive-common</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>jakarta.json</groupId>
             <artifactId>jakarta.json-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
@@ -52,7 +72,9 @@
                     </classPatterns>
                     <outputFile>${project.basedir}/../ui/src/main/webui/src/app/model/datamodels.d.ts</outputFile>
                     <outputKind>module</outputKind>
-                    <requiredAnnotations>jakarta.validation.constraints.NotBlank,jakarta.validation.constraints.NotEmpty,jakarta.validation.constraints.NotNull</requiredAnnotations>
+                    <requiredAnnotations>
+                        jakarta.validation.constraints.NotBlank,jakarta.validation.constraints.NotEmpty,jakarta.validation.constraints.NotNull
+                    </requiredAnnotations>
                 </configuration>
             </plugin>
         </plugins>

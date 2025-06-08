@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { NullifyService } from './nullify.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,16 +10,24 @@ export class SheetMusicService {
 
   baseUrl: string = "/api";
 
-  constructor(private httpClient: HttpClient) { }
+  constructor(private nullifyService: NullifyService, private httpClient: HttpClient) { }
 
   addSheet(data: any): Observable<any> {
     console.log("adding new sheetMusic (" + data.title + ")");
     // FIXME: this should NOT be done here!?!
     var composer = data.composer;
     data.composer = {
-      name: composer
+      name: composer?.name || composer
     };
-    return this.httpClient.post(`${this.baseUrl}/sheets`, data);
+    // FIXME: this should NOT be done here!?!
+    var arranger = data.arranger;
+    data.arranger = {
+      name: arranger?.name || arranger
+    };
+
+    const cleaned = this.nullifyService.convertEmptyStringsToNull(data);
+    console.log(cleaned);
+    return this.httpClient.post(`${this.baseUrl}/sheets`, cleaned);
   }
 
   updateSheet(id: string, data: any): Observable<any> {
@@ -40,6 +49,10 @@ export class SheetMusicService {
 
   deleteSheet(id: string): Observable<any> {
     return this.httpClient.delete(`${this.baseUrl}/sheets/${id}`);
+  }
+
+  getInstrumentationsForSheet(sheetId: string): Observable<any> {
+    return this.httpClient.get(`${this.baseUrl}/sheets/${sheetId}/instrumentations`);
   }
 
 }

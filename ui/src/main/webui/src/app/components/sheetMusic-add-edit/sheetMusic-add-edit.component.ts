@@ -9,10 +9,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { MatRadioModule } from '@angular/material/radio';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SheetMusic } from '../../model/datamodels';
+import { Instrumentation, SheetMusic } from '../../model/datamodels';
 import { MusicianAutocompleteComponent } from '../musician-autocomplete/musician-autocomplete.component';
 import { MatCardModule } from '@angular/material/card';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { InstrumentationListComponent } from '../instrumentation-list/instrumentation-list.component';
 
 @Component({
   selector: 'app-sheetmusic-add-edit',
@@ -28,7 +29,8 @@ import { MatExpansionModule } from '@angular/material/expansion';
     MatIconModule,
     FormsModule,
     ReactiveFormsModule,
-    MusicianAutocompleteComponent
+    MusicianAutocompleteComponent,
+    InstrumentationListComponent
   ],
   templateUrl: './sheetMusic-add-edit.component.html',
   styleUrl: './sheetMusic-add-edit.component.scss'
@@ -39,6 +41,7 @@ export class SheetMusicAddEditComponent implements OnInit {
   @Input() data!: SheetMusic;
   initialComposer?: string;
   initialArranger?: string;
+  instrumentations: Instrumentation[] = [];
 
   // TODO: this should be loaded from backend!
   genre: string[] = [
@@ -65,7 +68,7 @@ export class SheetMusicAddEditComponent implements OnInit {
       difficultyLevel: [''],
       yearOfComposition: [''],
       edition: [''],
-      license: [''],
+      copyright: [''],
       rating: [''],
       iswc: [''],
       gemaWorkNumber: [''],
@@ -88,6 +91,16 @@ export class SheetMusicAddEditComponent implements OnInit {
 
           // Set the initial arranger value (auto-complete component)
           this.initialArranger = this.data.arranger?.name;
+
+          // Load instrumentations for the sheet music
+          this.sheetMusicService.getInstrumentationsForSheet(id).subscribe({
+            next: (instrumentations: Instrumentation[]) => {
+              this.instrumentations = instrumentations;
+            },
+            error: (err: any) => {
+              console.error('Error loading instrumentations:', err);
+            }
+          });
         }
       });
     }

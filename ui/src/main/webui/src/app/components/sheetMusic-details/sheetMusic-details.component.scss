@@ -1,0 +1,33 @@
+.content {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  /* Ensure the container adjusts to the content */
+}
+
+mat-grid-tile {
+  display: flex;
+  align-items: flex-start;
+  /* Align content to the top */
+  justify-content: flex-start;
+  /* Align content to the left */
+  padding: 8px;
+  /* Add padding for better spacing */
+  box-sizing: border-box;
+  /* Ensure padding doesn't affect layout */
+}
+
+mat-grid-tile p {
+  margin: 0;
+  /* Remove default margin for paragraphs */
+}
+
+:host ::ng-deep .mat-grid-tile-content {
+  justify-content: flex-start !important;
+}
+
+.action-btns {
+  margin-top: 16px;
+  text-align: right;
+}

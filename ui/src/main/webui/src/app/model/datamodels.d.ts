@@ -1,6 +1,17 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 3.2.1263 on 2025-03-26 15:57:08.
+// Generated using typescript-generator version 3.2.1263 on 2025-06-07 17:46:48.
+
+export interface Attachment {
+    checksum?: number;
+    displayName?: string;
+    docIdentifier?: string;
+    fileSize?: number;
+    id?: string;
+    mimeType?: string;
+    type?: AttachmentType;
+    uploadedAt?: Date;
+}
 
 export interface CollectionSheet {
     id?: string;
@@ -13,14 +24,14 @@ export interface Genre {
 }
 
 export interface Instrumentation {
+    attachments?: Attachment[];
     clef?: Clef;
     id?: string;
     instrumentName: string;
-    key?: number;
-    keySignature?: InstrumentTransposing;
-    midiFile?: string;
     notationType?: NotationType;
-    pdfFile?: string;
+    notes?: string;
+    partLabel?: string;
+    transposition?: InstrumentTransposing;
 }
 
 export interface Musician {
@@ -64,6 +75,7 @@ export interface SheetMusic {
     additionalNotes?: string;
     arranger?: Musician;
     composer?: Musician;
+    copyright?: string;
     difficultyLevel?: string;
     edition?: string;
     gemaWorkNumber?: string;
@@ -71,7 +83,7 @@ export interface SheetMusic {
     id?: string;
     instrumentations?: Instrumentation[];
     iswc?: string;
-    license?: string;
+    originalBy?: string;
     publisher?: string;
     publisherIpi?: string;
     rating?: number;
@@ -79,6 +91,10 @@ export interface SheetMusic {
     title: string;
     yearOfComposition?: number;
 }
+
+export type AttachmentType = "FULL_SCORE" | "PART" | "COVER" | "LYRICS" | "MIDI" | "AUDIO" | "ANNOTATIONS" | "IMAGE" | "ANALYSIS" | "TRANSCRIPTION" | "EXTERNAL_LINK" | "MUSIC_XML" | "OTHER" | "UNSPECIFIED";
+
+export type ClassificationStatus = "PENDING" | "CLASSIFIED" | "REJECTED";
 
 export type Clef = "TREBLE" | "ALTO" | "TENOR" | "BASS";
 

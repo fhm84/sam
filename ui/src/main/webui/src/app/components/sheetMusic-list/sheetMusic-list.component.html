@@ -34,10 +34,14 @@
     <ng-container matColumnDef="action">
       <th mat-header-cell *matHeaderCellDef mat-sort-header> Action </th>
       <td mat-cell *matCellDef="let row">
-        <a [routerLink]="['/sheets', row.id, 'edit']"><span class="action-icon" style="margin-right: 5px;">
-          <mat-icon color="primary">edit</mat-icon>
+        <a [routerLink]="['/sheets', row.id]"><span class="action-icon" style="margin-right: 5px;">
+          <mat-icon color="primary">search</mat-icon>
         </span>
       </a>
+        <a [routerLink]="['/sheets', row.id, 'edit']"><span class="action-icon" style="margin-right: 5px;">
+            <mat-icon color="primary">edit</mat-icon>
+          </span>
+        </a>
         <span (click)="deleteSheet(row.id)" class="action-icon">
           <mat-icon color="warn">delete</mat-icon>
         </span>

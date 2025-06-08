@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -23,13 +24,13 @@ public class Instrumentation {
     @NotBlank
     String instrumentName;
     /**
-     * The key (for example: 2 for 2. Bass)
+     * The part number/label (for example: '2' for 2. Bass, or even '3rd' or 'Solo')
      */
-    Integer key;
+    String partLabel;
     /**
      * Specific key signature for this instrument (e.g., Bb Major, C Major)
      */
-    InstrumentTransposing keySignature;
+    InstrumentTransposing transposition;
     /**
      * Clef type (e.g., Treble, Bass, Alto, Tenor)
      */
@@ -40,14 +41,14 @@ public class Instrumentation {
      */
     NotationType notationType;
 
-    // FIXME: how to store pdf/MIDI-File?
     /**
-     * Location of the sheet music file
+     * (Optional) notes for the part
      */
-    String pdfFile;
+    String notes;
+
     /**
-     * (Optional) MIDI file location
+     * Metadata of the sheet music files (including location, mime-type, fileSize, ...)
      */
-    String midiFile;
+    Set<Attachment> attachments;
 
 }

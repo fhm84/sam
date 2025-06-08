@@ -55,21 +55,21 @@ public class ObjectMother {
     public static Instrumentation flute1C() {
         final Instrumentation flute = new Instrumentation();
         flute.setInstrumentName("Flute");
-        flute.setKey(1);
-        flute.setKeySignature(InstrumentTransposing.C);
+        flute.setPartLabel("1");
+        flute.setTransposition(InstrumentTransposing.C);
         flute.setNotationType(NotationType.STANDARD);
         flute.setClef(Clef.TREBLE);
         return flute;
     }
 
     public static Instrumentation trumpet2Bb() {
-        final Instrumentation flute = new Instrumentation();
-        flute.setInstrumentName("Trumpet");
-        flute.setKey(2);
-        flute.setKeySignature(InstrumentTransposing.Bb);
-        flute.setNotationType(NotationType.STANDARD);
-        flute.setClef(Clef.TREBLE);
-        return flute;
+        final Instrumentation trumpet = new Instrumentation();
+        trumpet.setInstrumentName("Trumpet");
+        trumpet.setPartLabel("2");
+        trumpet.setTransposition(InstrumentTransposing.Bb);
+        trumpet.setNotationType(NotationType.STANDARD);
+        trumpet.setClef(Clef.TREBLE);
+        return trumpet;
     }
 
 }

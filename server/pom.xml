@@ -13,6 +13,16 @@
     <groupId>de.halbmann.sam</groupId>
     <artifactId>server</artifactId>
 
+    <properties>
+        <tika-core.version>3.1.0</tika-core.version>
+
+        <commons-vfs2.version>2.10.0</commons-vfs2.version>
+        <vfs-s3.version>4.4.0</vfs-s3.version>
+        <s3.version>2.31.0</s3.version>
+        <quarkus-langchain4j.version>0.26.1</quarkus-langchain4j.version>
+        <pdfbox-tools.version>3.0.4</pdfbox-tools.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>de.halbmann.sam</groupId>
@@ -53,9 +63,62 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox-tools</artifactId>
+            <version>${pdfbox-tools.version}</version>
+        </dependency>
+
+        <!--
+        <dependency>
+            <groupId>io.quarkiverse.langchain4j</groupId>
+            <artifactId>quarkus-langchain4j-ollama</artifactId>
+            <version>${quarkus-langchain4j.version}</version>
+        </dependency>
+        -->
+        <dependency>
+            <groupId>io.quarkiverse.langchain4j</groupId>
+            <artifactId>quarkus-langchain4j-openai</artifactId>
+            <version>${quarkus-langchain4j.version}</version>
+        </dependency>
+<!--
+        <dependency>
+            <groupId>io.quarkiverse.langchain4j</groupId>
+            <artifactId>quarkus-langchain4j-vertex-ai-gemini</artifactId>
+            <version>${quarkus-langchain4j.version}</version>
+        </dependency>
+-->
+        <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
             <version>${org.mapstruct.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-core</artifactId>
+            <version>${tika-core.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-vfs2</artifactId>
+            <version>${commons-vfs2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.abashev</groupId>
+            <artifactId>vfs-s3</artifactId>
+            <version>${vfs-s3.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
+            <version>${s3.version}</version>
         </dependency>
 
         <!-- test dependencies -->

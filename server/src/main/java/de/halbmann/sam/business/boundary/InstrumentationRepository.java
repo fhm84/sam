@@ -26,8 +26,8 @@ public class InstrumentationRepository implements PanacheRepositoryBase<Instrume
 
     public List<Instrumentation> getInstrumentations(final String sheetId) {
         Sort sort = Sort.ascending("instrumentName",
-                "key",
-                "keySignature",
+                "partLabel",
+                "transposition",
                 "clef");
         return find("sheet_id = :sheet_id", sort, Parameters.with("sheet_id", UUID.fromString(sheetId))).list()
                 .stream()

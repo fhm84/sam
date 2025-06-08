@@ -37,11 +37,17 @@ public class InstrumentationsResourceImpl implements InstrumentationsResource {
     }
 
     public void update(final String instrumentationId, final Instrumentation instrumentation) {
+        // FIXME: implement!
         //part.persist();
     }
 
     public void delete(final String instrumentationId) {
-        // fixme: implement!
+        // FIXME: implement!
+    }
+
+    @Override
+    public DocumentsResource documents(String instrumentationId) {
+        return resourceContext.getResource(DocumentsResource.class);
     }
 
 }

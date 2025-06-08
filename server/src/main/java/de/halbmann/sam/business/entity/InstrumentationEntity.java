@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.envers.Audited;
 
+import java.util.Set;
+
 /**
  * Defines individual instrument parts for a piece of sheet music.
  */
@@ -17,7 +19,7 @@ import org.hibernate.envers.Audited;
 @Audited
 @Cacheable
 @Table(name = "instrumentations",
-        uniqueConstraints = @UniqueConstraint(name = "uc_instrumentation", columnNames = {"sheet_id", "instrumentName", "key", "keySignature", "clef"}))
+        uniqueConstraints = @UniqueConstraint(name = "uc_instrumentation", columnNames = {"sheet_id", "instrumentName", "partLabel", "transposition", "clef"}))
 public class InstrumentationEntity extends AbstractEntity {
 
     /**
@@ -25,14 +27,14 @@ public class InstrumentationEntity extends AbstractEntity {
      */
     String instrumentName;
     /**
-     * The key (for example: 2 for 2. Bass)
+     * The part number/label (for example: '2' for 2. Bass, or even '3rd' or 'Solo')
      */
-    Integer key;
+    String partLabel;
     /**
-     * Specific key signature for this instrument (e.g., Bb Major, C Major)
+     * Specific partLabel signature for this instrument (e.g., Bb Major, C Major)
      */
     @Enumerated(EnumType.STRING)
-    InstrumentTransposing keySignature;
+    InstrumentTransposing transposition;
     /**
      * Clef type (e.g., Treble, Bass, Alto, Tenor)
      */
@@ -46,15 +48,16 @@ public class InstrumentationEntity extends AbstractEntity {
     NotationType notationType;
 
     /**
-     * Metadata of the sheet music file (including location, mime-type, fileSize, ...)
+     * Metadata of the sheet music files (including location, mime-type, fileSize, ...)
      */
-    @OneToOne(fetch = FetchType.LAZY)
-    Document pdfFile;
+    @OneToMany(fetch = FetchType.LAZY)
+    Set<AttachmentEntity> attachments;
+
     /**
-     * (Optional) MIDI file location
+     * (Optional) notes for the part
      */
-    @OneToOne(fetch = FetchType.LAZY)
-    Document midiFile;
+    @Column(columnDefinition = "text")
+    String notes;
 
     /**
      * Sheet music entity, the instrumentation belongs to.

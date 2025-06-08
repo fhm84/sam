@@ -17,8 +17,6 @@ public interface InstrumentationsResource {
     @Path("{instrumentationId}")
     Instrumentation get(final @PathParam("instrumentationId") String instrumentationId);
 
-    // FIXME: add endpoint to load file (pdf)
-
     @POST
     void add(final Instrumentation instrumentation);
 
@@ -26,10 +24,11 @@ public interface InstrumentationsResource {
     @Path("{instrumentationId}")
     void update(final @PathParam("instrumentationId") String instrumentationId, final Instrumentation instrumentation);
 
-    // FIXME: add file-upload!
-
     @DELETE
     @Path("{instrumentationId}")
     void delete(final @PathParam("instrumentationId") String instrumentationId);
+
+    @Path("{instrumentationId}/documents")
+    DocumentsResource documents(final @PathParam("instrumentationId") String instrumentationId);
 
 }

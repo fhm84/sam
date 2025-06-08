@@ -48,6 +48,11 @@ public class SheetMusicEntity extends AbstractEntity {
     MusicianEntity arranger;
 
     /**
+     * Optional (e.g., original band or composer)
+     */
+    String originalBy;
+
+    /**
      * Classification (e.g., Classical, Jazz)
      */
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
@@ -69,9 +74,9 @@ public class SheetMusicEntity extends AbstractEntity {
     String edition;
 
     /**
-     * License information.
+     * Copyright information.
      */
-    String license;
+    String copyright;
 
     /**
      * Rating for the piece/music sheet.
@@ -91,6 +96,7 @@ public class SheetMusicEntity extends AbstractEntity {
     /**
      * Additional notes.
      */
+    @Column(columnDefinition = "text")
     String additionalNotes;
 
     /**

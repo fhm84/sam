@@ -4,6 +4,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.tika.config.TikaConfig;
 import org.apache.tika.detect.Detector;
 import org.apache.tika.io.TikaInputStream;
+import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.mime.MediaType;
 
@@ -12,7 +13,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Utility class to detect mime type.
+ * Utility class to detect a mime type.
+ *
+ * @author FabianHalbmann
  */
 @ApplicationScoped
 public class MimeTypeController {
@@ -31,12 +34,11 @@ public class MimeTypeController {
      * @return detected mime type
      */
     public String detectMimeType(final BufferedInputStream inputStream, final String filename) {
-        final org.apache.tika.metadata.Metadata tikaMetaData = new org.apache.tika.metadata.Metadata();
-
+        final Metadata tikaMetaData = new Metadata();
         tikaMetaData.set(TikaCoreProperties.RESOURCE_NAME_KEY, filename);
 
         if (tikaMetaData.get(TikaCoreProperties.RESOURCE_NAME_KEY) == null) {
-            throw new RuntimeException("TIKA was not able to get the files metadata!");
+            throw new IllegalStateException("Tika was not able to set the metadata");
         }
 
         final InputStream tikaStream = TikaInputStream.get(inputStream);
@@ -48,7 +50,7 @@ public class MimeTypeController {
 
             return mimeTypeByDetector.toString();
         } catch (final IOException e) {
-            throw new RuntimeException("TIKA was not able to analyse the files mimetype", e);
+            throw new RuntimeException("Tika was not able to analyse mimetype");
         }
     }
 

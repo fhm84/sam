@@ -21,9 +21,9 @@
 
         <compiler-plugin.version>3.13.0</compiler-plugin.version>
         <surefire-plugin.version>3.5.2</surefire-plugin.version>
-        <jandex-maven-plugin.version>3.2.7</jandex-maven-plugin.version>
+        <jandex-maven-plugin.version>3.3.0</jandex-maven-plugin.version>
 
-        <quarkus.platform.version>3.18.4</quarkus.platform.version>
+        <quarkus.platform.version>3.21.2</quarkus.platform.version>
         <lombok.version>1.18.36</lombok.version>
         <org.mapstruct.version>1.6.3</org.mapstruct.version>
 

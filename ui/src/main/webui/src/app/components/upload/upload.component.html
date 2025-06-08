@@ -1,0 +1,30 @@
+<h2>Upload Sheet Music Part</h2>
+<div class="upload-wrapper">
+    <label for="type">Attachment Type:</label>
+    
+  
+    <div class="drop-area" (drop)="onDrop($event)" (dragover)="allowDrop($event)">
+      <p *ngIf="!selectedFile">Drag & drop a file here or click to select</p>
+      <p *ngIf="selectedFile">Selected: {{ selectedFile.name }}</p>
+      <input type="file" hidden #fileInput (change)="onFileSelected($event)" />
+      <button mat-fab extended color="accent" type="button" (click)="fileInput.click()"><mat-icon>attach_file</mat-icon>Browse</button>
+    </div>
+  
+    <button mat-fab extended color="primary" class="upload-btn"
+      [disabled]="!selectedFile" (click)="upload()">
+      <mat-icon>file_upload</mat-icon>
+      <span>Upload</span>
+    </button>
+    
+    <div class="progress">
+      <mat-progress-bar class="progress-bar" mode="determinate"
+                        [value]="uploadProgress" *ngIf="uploadProgress">
+      </mat-progress-bar>
+    
+      <mat-icon class="cancel-upload" (click)="cancelUpload()" 
+                *ngIf="uploadProgress">delete_forever</mat-icon>
+
+      <mat-icon *ngIf="uploadDone">file_download_done</mat-icon>
+    </div>
+  </div>
+  
