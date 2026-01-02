@@ -11,14 +11,18 @@ import org.mapstruct.ReportingPolicy;
         unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface AttachmentMapper {
 
+    @Mapping(target = "mimeType", source = "document.mimeType")
+    @Mapping(target = "fileSize", source = "document.size")
+    @Mapping(target = "checksum", source = "document.sha256")
     Attachment toDto(AttachmentEntity entity);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "created", ignore = true)
     @Mapping(target = "lastUpdate", ignore = true)
-    @Mapping(target = "referencePath", ignore = true)
+    @Mapping(target = "uploadedBy", ignore = true)
     @Mapping(target = "uploadedAt", ignore = true)
+    @Mapping(target = "document", ignore = true)
     AttachmentEntity fromDto(Attachment dto);
 
 }

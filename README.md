@@ -147,9 +147,11 @@ Many-to-many relationship between SheetMusic and Tag.
 This model provides a structured way to manage sheetMusic music with instrument-specific transpositions, bands, collections, and tagging for efficient organization.
 
 
-TODO:
-musicians -> unique name!?
-instrumentation templates
+TODO:  
+musicians -> unique name!?  
+instrumentation templates  
+directory structure for storing documents!  
+add another "type": booklet (or something like this representing a collection like christmas collection of songs)  
 
 TODOs (features):
 - security (keycloak)
@@ -157,11 +159,11 @@ TODOs (features):
 - file-upload (pdf, midi?)
 - AI for automatically link pdf to correct sheet music and instrumentation!?
 - system-info (api/info)?
-- search
+- search -> integrated postgresql search feature -> https://www.the-main-thread.com/p/quarkus-postgresql-full-text-search-tutorial
 - extended revinfo
 - download multiple (selected) pdfs at once (as single, merged pdf or as zip-file)
 - generate table of content (for sheet collections) - different sorting/grouping
 - export(s) e.g. for GEMA
-- Dashboard/statistics (number of sheets by composer/arranger/genre)
+- Dashboard/statistics (number of sheets by composer/arranger/genre) -> "Statistical ListResult"
 - manage ensemble(s) (to also double-check availabilities?)
 - (auto) convert to Music XML file format(s) - to maybe also transpose?

@@ -5,15 +5,14 @@ import de.halbmann.sam.business.controller.MusicianMapper;
 import de.halbmann.sam.business.entity.MusicianEntity;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
+import io.quarkus.panache.common.Parameters;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.persistence.NoResultException;
 import jakarta.transaction.Transactional;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
@@ -25,6 +24,26 @@ public class MusicianRepository implements PanacheRepositoryBase<MusicianEntity,
 
     public PaginatedResponse<Musician> getAllMusicians(final PaginationRequest paginationRequest) {
         return findMusicians(paginationRequest, Map.of());
+    }
+
+    public Optional<MusicianEntity> findMusicianByName(final String name) {
+        try {
+            return Optional.ofNullable(find("name = :name", Parameters.with("name", name)).singleResult());
+        } catch (final NoResultException e) {
+            return Optional.empty();
+        }
+    }
+
+    public MusicianEntity resolveMusician(final Musician dto) {
+        if (dto == null || dto.getId() == null) {
+            return null;
+        }
+
+        try {
+            return findById(dto.getId());
+        } catch (final NoResultException e) {
+            return null;
+        }
     }
 
     public PaginatedResponse<Musician> findMusicians(final MusicianFilterRequest filterRequest) {

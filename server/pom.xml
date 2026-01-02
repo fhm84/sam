@@ -7,27 +7,47 @@
         <groupId>de.halbmann</groupId>
         <artifactId>sam</artifactId>
         <version>1.0.0-SNAPSHOT</version>
-        <relativePath>../</relativePath>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <groupId>de.halbmann.sam</groupId>
     <artifactId>server</artifactId>
 
     <properties>
-        <tika-core.version>3.1.0</tika-core.version>
-
-        <commons-vfs2.version>2.10.0</commons-vfs2.version>
-        <vfs-s3.version>4.4.0</vfs-s3.version>
-        <s3.version>2.31.0</s3.version>
-        <quarkus-langchain4j.version>0.26.1</quarkus-langchain4j.version>
+        <tika-core.version>3.2.3</tika-core.version>
+        <aws-java-nio-spi-s3.version>2.2.1</aws-java-nio-spi-s3.version>
+        <quarkus-langchain4j.version>1.0.2</quarkus-langchain4j.version>
         <pdfbox-tools.version>3.0.4</pdfbox-tools.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>de.halbmann</groupId>
+                <artifactId>storage</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
             <groupId>de.halbmann.sam</groupId>
             <artifactId>api</artifactId>
             <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>de.halbmann</groupId>
+            <artifactId>core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>de.halbmann</groupId>
+            <artifactId>storage-local</artifactId>
         </dependency>
 
         <dependency>
@@ -104,23 +124,6 @@
             <version>${tika-core.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-vfs2</artifactId>
-            <version>${commons-vfs2.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.abashev</groupId>
-            <artifactId>vfs-s3</artifactId>
-            <version>${vfs-s3.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>software.amazon.awssdk</groupId>
-            <artifactId>s3</artifactId>
-            <version>${s3.version}</version>
-        </dependency>
-
         <!-- test dependencies -->
         <dependency>
             <groupId>io.quarkus</groupId>
@@ -130,6 +133,23 @@
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-rest-client</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

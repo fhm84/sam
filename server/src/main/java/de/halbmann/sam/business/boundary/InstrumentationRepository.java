@@ -29,7 +29,7 @@ public class InstrumentationRepository implements PanacheRepositoryBase<Instrume
                 "partLabel",
                 "transposition",
                 "clef");
-        return find("sheet_id = :sheet_id", sort, Parameters.with("sheet_id", UUID.fromString(sheetId))).list()
+        return find("sheet.id = :sheet_id", sort, Parameters.with("sheet_id", UUID.fromString(sheetId))).list()
                 .stream()
                 .map(instrumentationMapper::toDto)
                 .toList();

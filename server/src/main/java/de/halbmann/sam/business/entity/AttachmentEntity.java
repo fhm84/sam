@@ -22,10 +22,6 @@ import java.time.ZoneOffset;
 public class AttachmentEntity extends AbstractEntity {
 
     /**
-     * Unique identifier for the document.
-     */
-    String docIdentifier;
-    /**
      * Human-readable name for the attachment.
      */
     String displayName;
@@ -37,32 +33,25 @@ public class AttachmentEntity extends AbstractEntity {
     AttachmentType type;
 
     /**
-     * The MIME type of the attachment.
+     * optional link to physical storage
      */
-    String mimeType;
-    /**
-     * Size of the file in bytes.
-     */
-    long fileSize;
-
-    /**
-     * Path to the file's storage location.
-     */
-    String referencePath;
-    /**
-     * Checksum for file integrity verification.
-     */
-    long checksum;
+    @ManyToOne
+    @JoinColumn(name = "document_id")
+    private DocumentEntity document;
 
     /**
      * Timestamp of when the attachment was uploaded or updated.
      */
     LocalDateTime uploadedAt;
 
+    String uploadedBy;
+
     @PrePersist
     @PreUpdate
     void updateUploaded() {
         uploadedAt = LocalDateTime.now(ZoneOffset.UTC);
     }
+
+    // FIXME: auto-"apply" uploadedBy!?
 
 }

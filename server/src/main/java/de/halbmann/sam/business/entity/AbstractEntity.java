@@ -24,10 +24,8 @@ public abstract class AbstractEntity implements Serializable {
     @Version
     int version;
 
-    @Temporal(TemporalType.TIMESTAMP)
     LocalDateTime created;
 
-    @Temporal(TemporalType.TIMESTAMP)
     LocalDateTime lastUpdate;
 
     @PrePersist

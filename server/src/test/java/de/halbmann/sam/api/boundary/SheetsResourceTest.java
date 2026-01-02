@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @QuarkusTest
 class SheetsResourceTest {
@@ -57,17 +59,22 @@ class SheetsResourceTest {
                 }
                 """;
 
-        given()
+        SheetMusic sheetResponse = given()
                 .contentType(ContentType.JSON)
                 .body(testJson)
                 .post("/api/sheets")
                 .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("title", equalTo("Kuschelpolka"))
-                .body("genre", equalTo("Polka"))
-                .body("publisher", equalTo("Ewoton Verlag"))
-                .body("composer.name", equalTo("Frank Bernaerts"));
+                .extract()
+                .body()
+                .as(SheetMusic.class);
+
+        assertNotNull(sheetResponse);
+        assertEquals("Kuschelpolka", sheetResponse.getTitle());
+        assertEquals("Polka", sheetResponse.getGenre());
+        assertEquals("Ewoton Verlag", sheetResponse.getPublisher());
+        assertEquals("Frank Bernaerts", sheetResponse.getComposer().getName());
 
         given()
                 .get("/api/sheets")
@@ -76,7 +83,7 @@ class SheetsResourceTest {
                 .contentType(ContentType.JSON)
                 .body("size", greaterThanOrEqualTo(1))
                 .body("totalCount", greaterThanOrEqualTo(1))
-                .body("data", contains("Kuschelpolka"));
+                .body("data.title", hasItem("Kuschelpolka"));
     }
 
 }

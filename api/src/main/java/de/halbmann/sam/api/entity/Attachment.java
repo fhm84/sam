@@ -15,10 +15,6 @@ public class Attachment {
      */
     UUID id;
     /**
-     * Unique identifier for the document.
-     */
-    String docIdentifier;
-    /**
      * Human-readable name for the attachment.
      */
     String displayName;
@@ -38,9 +34,9 @@ public class Attachment {
     long fileSize;
 
     /**
-     * Checksum for file integrity verification.
+     * Checksum for file integrity verification (sha256)
      */
-    long checksum;
+    String checksum;
 
     /**
      * Timestamp of when the attachment was uploaded or updated.

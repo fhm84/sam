@@ -1,0 +1,56 @@
+@startuml
+title Dedup-enabled Upload Pipeline with Local/S3 Backends
+
+actor User
+participant "HTTP Multipart" as HTTP
+participant "DedupUploadService" as Service
+participant "VirusScanner" as Scanner
+participant "CountingOutputStream" as Counter
+participant "DigestInputStream (SHA-256)" as Digest
+participant "Temp Storage" as Temp
+participant "UploadPolicies" as Policies
+participant "DocumentRepository" as Repo
+
+' Use box to group storage backends
+box "Storage Backends" #LightBlue
+    participant "FileSystemWrapper" as FS
+    participant "Local FS" as Local
+    participant "S3" as S3
+end box
+
+FS --> Local : writes/moves/deletes
+FS --> S3 : writes/moves/deletes
+
+User -> HTTP : upload file
+HTTP -> Service : InputStream + metadata
+
+Service -> Scanner : scan(InputStream)
+Scanner --> Service : scanned InputStream
+
+Service -> Digest : wrap scanned InputStream
+Service -> Counter : wrap OutputStream
+Digest -> Counter : transfer bytes
+Counter -> Temp : write temp file
+Digest -> Service : SHA-256 digest updated
+Counter -> Service : file size counted
+
+Service -> Temp : get temp file path
+Service -> Tika : detect MIME type
+Tika --> Service : MIME type
+
+Service -> Policies : for each policy: verify(UploadContext)
+Policies --> Service : throws if invalid
+
+Service -> Repo : findBySha256(SHA-256)
+alt File exists
+    Repo --> Service : existing Document
+    Service -> FS : delete(tempPath)
+    Service -> Repo : createReference(existingId, metadata)
+else File does not exist
+    Service -> FS : move(tempPath -> finalPath)
+    Service -> Repo : save(Document)
+    Service -> Repo : createReference(documentId, metadata)
+end
+
+Service --> User : success or exception
+@enduml

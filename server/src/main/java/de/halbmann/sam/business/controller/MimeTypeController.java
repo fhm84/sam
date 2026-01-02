@@ -28,7 +28,7 @@ public class MimeTypeController {
      * search engine indexing, content analysis, translation, and much more.
      * <p>
      * The current implementation allows Tika to search for a magic header of the file. However, according to own
-     * research, Tika analyses the content of the file, checks whether an identifier of the mime type is given in the
+     * research, Tika analyzes the content of the file, checks whether an identifier of the mime type is given in the
      * first bytes of the stream and then makes a precise "guess" as to which one is most likely.
      *
      * @return detected mime type

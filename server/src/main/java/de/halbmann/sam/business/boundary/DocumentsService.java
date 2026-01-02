@@ -1,29 +1,36 @@
 package de.halbmann.sam.business.boundary;
 
 import de.halbmann.sam.api.entity.Attachment;
+import de.halbmann.sam.api.entity.AttachmentType;
+import de.halbmann.sam.api.entity.DocumentDownload;
 import de.halbmann.sam.business.controller.AttachmentMapper;
-import de.halbmann.sam.business.controller.CountingInputStream;
-import de.halbmann.sam.business.controller.DocumentStorageController;
-import de.halbmann.sam.business.controller.MimeTypeController;
 import de.halbmann.sam.business.entity.AbstractEntity;
 import de.halbmann.sam.business.entity.AttachmentEntity;
-import de.halbmann.sam.business.entity.AttachmentWrapper;
+import de.halbmann.sam.business.entity.DocumentEntity;
 import de.halbmann.sam.business.entity.InstrumentationEntity;
-import de.halbmann.sam.classification.boundary.SheetAnalyzer;
-import de.halbmann.sam.classification.controller.DocumentUtils;
-import de.halbmann.sam.classification.entity.SheetAnalyzerResult;
-import dev.langchain4j.data.image.Image;
+import de.halbmann.sam.storage.MimeTypeUtils;
+import de.halbmann.sam.storage.malware.VirusScanner;
+import de.halbmann.sam.storage.upload.UploadContext;
+import de.halbmann.sam.storage.upload.UploadPolicy;
+import de.halbmann.storage.api.FileSystemWrapper;
+import de.halbmann.storage.util.CountingOutputStream;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Instance;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
+import org.apache.tika.Tika;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.util.Base64;
+import java.io.OutputStream;
+import java.nio.file.Path;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HexFormat;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,28 +39,28 @@ import java.util.UUID;
 @Transactional
 public class DocumentsService {
 
-    private final MimeTypeController mimeTypeController;
-    private final DocumentStorageController documentStorageController;
-    private final InstrumentationRepository instrumentationRepository;
-    private final AttachmentRepository attachmentRepository;
-    private final AttachmentMapper attachmentMapper;
-    private final SheetAnalyzer analyzer;
+    private static final Tika TIKA = new Tika();
 
-    private final boolean debug = true;
+    @Inject
+    FileSystemWrapper filesystem;
 
-    public DocumentsService(MimeTypeController mimeTypeController,
-                            DocumentStorageController documentStorageController,
-                            InstrumentationRepository instrumentationRepository,
-                            AttachmentRepository attachmentRepository,
-                            AttachmentMapper attachmentMapper,
-                            SheetAnalyzer sheetAnalyzer) {
-        this.mimeTypeController = mimeTypeController;
-        this.documentStorageController = documentStorageController;
-        this.instrumentationRepository = instrumentationRepository;
-        this.attachmentRepository = attachmentRepository;
-        this.attachmentMapper = attachmentMapper;
-        this.analyzer = sheetAnalyzer;
-    }
+    @Inject
+    VirusScanner virusScanner;
+
+    @Inject
+    Instance<UploadPolicy> policies;
+
+    @Inject
+    DocumentRepository documentRepository;
+
+    @Inject
+    InstrumentationRepository instrumentationRepository;
+
+    @Inject
+    AttachmentRepository attachmentRepository;
+
+    @Inject
+    AttachmentMapper attachmentMapper;
 
     /**
      * Save incoming document. This will also directly check the file-/content-type of and automatically add related metadata.
@@ -64,68 +71,172 @@ public class DocumentsService {
      * @param filename    the (final/display filename)
      * @param inputStream the file content
      */
-    public Attachment save(String filename, InputStream inputStream) {
-        final AttachmentEntity attachment = new AttachmentEntity();
-        attachment.setDisplayName(filename);
-        attachment.setDocIdentifier(UUID.randomUUID().toString());
-        // Write the input stream into a buffered input stream so that Tika won't mess up with the file size
-        final BufferedInputStream bufferedInputStream = new BufferedInputStream(new CountingInputStream(attachment, inputStream));
-        attachment.setMimeType(mimeTypeController.detectMimeType(bufferedInputStream, attachment.getDisplayName()));
-        // FIXME: set documentIdentifier and referencePath
-        attachment.setReferencePath(attachment.getDocIdentifier());
-        // upload/store the file and directly set/update the file size and checksum
-        documentStorageController.save(attachment, bufferedInputStream);
-        // store document to database
-        return attachmentRepository.addAttachment(attachment);
+    public Attachment save(String filename, InputStream inputStream) throws IOException, NoSuchAlgorithmException {
+        // TODO: what about attachmentType here?!
+        AttachmentEntity uploaded = upload(filename, inputStream, AttachmentType.UNSPECIFIED);
+        return attachmentMapper.toDto(uploaded);
     }
 
-    public AttachmentWrapper loadAttachment(String instrumentationId, String docIdentifier) throws IOException {
-        InstrumentationEntity instrumentation = instrumentationRepository.findById(UUID.fromString(instrumentationId));
-        if (instrumentation != null) {
-            Optional<UUID> attachmentId = instrumentation.getAttachments().stream()
-                    .filter(a -> a.getDocIdentifier().equals(docIdentifier))
-                    .map(AbstractEntity::getId)
-                    .findFirst();
+    public DocumentDownload loadAttachment(String instrumentationId, String docIdentifier) throws IOException {
+        if (instrumentationId != null) {
+            InstrumentationEntity instrumentation = instrumentationRepository.findById(UUID.fromString(instrumentationId));
+            if (instrumentation != null) {
+                Optional<UUID> attachmentId = instrumentation.getAttachments().stream()
+                        .map(AbstractEntity::getId)
+                        .filter(id -> id.toString().equals(docIdentifier))
+                        .findFirst();
 
-            if (attachmentId.isPresent()) {
-                AttachmentEntity attachment = attachmentRepository.findById(attachmentId.get());
-                InputStream fileStream = documentStorageController.load(attachment);
-                return new AttachmentWrapper(attachmentMapper.toDto(attachment), fileStream);
+                if (attachmentId.isPresent()) {
+                    AttachmentEntity attachment = attachmentRepository.findById(attachmentId.get());
+                    if (attachment.getDocument() != null) {
+                        return load(attachment.getDocument().getId());
+                    }
+                }
+            }
+        } else {
+            AttachmentEntity attachment = attachmentRepository.findById(UUID.fromString(docIdentifier));
+            if (attachment.getDocument() != null) {
+                return load(attachment.getDocument().getId());
             }
         }
         return null;
     }
 
-    public SheetAnalyzerResult analyzePdf(InputStream fileInputStream) {
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            // in case of a pdf sheet, we first "prepare" the pdf for analyzing (we just need the top and bottom parts
-            // of the file ... and delegate to image analyzation then)
-            DocumentUtils.pdfToImage(fileInputStream, baos);
-            // in case of debugging, we write out the (temporary) generated image file
-            // TODO: write out generated image file in case of debugging
-            if (debug) {
-                Files.write(Files.createTempFile("sam-sheet-upload", ".png"), baos.toByteArray());
-            }
+    /**
+     * Uploads a file with deduplication by SHA-256.
+     */
+    AttachmentEntity upload(String filename, InputStream uploadStream, AttachmentType attachmentType)
+            throws IOException, NoSuchAlgorithmException {
+        // Prepare streaming digest
+        MessageDigest sha256Digest = MessageDigest.getInstance("SHA-256");
+        Path tempPath = Path.of(filename + ".tmp");
+        long fileSize;
 
-            return analyzeImage(IOUtils.copy(baos));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        try (
+                InputStream scanned = virusScanner.scan(uploadStream);
+                DigestInputStream digestIn = new DigestInputStream(scanned, sha256Digest);
+                OutputStream rawOut = filesystem.openForWrite(tempPath.toString());
+                CountingOutputStream countingOut = new CountingOutputStream(rawOut)
+        ) {
+            digestIn.transferTo(countingOut);
+            fileSize = countingOut.getBytesWritten();
         }
+
+        // Detect MIME type using Tika (from temp file)
+        String mimeType = TIKA.detect(filesystem.resolve(tempPath.toString()).toFile());
+
+        // Build UploadContext
+        UploadContext context = new UploadContext(
+                uploadStream,
+                filename,
+                fileSize,
+                tempPath,
+                mimeType
+        );
+
+        // Run all policies
+        for (UploadPolicy policy : policies) {
+            policy.verify(context);
+        }
+
+        // Compute SHA-256 hex
+        String sha256Hex = HexFormat.of().formatHex(sha256Digest.digest());
+
+        // Deduplication check
+        DocumentEntity document = documentRepository.findBySha256(sha256Hex)
+                .orElseGet(() -> {
+                    try {
+                        String extension = MimeTypeUtils.resolveExtension(mimeType, filename);
+
+                        String finalPath = String.format(
+                                "%s/%s/%s/%s.%s",
+                                sha256Hex.substring(0, 2),
+                                sha256Hex.substring(2, 4),
+                                sha256Hex.substring(4, 6),
+                                sha256Hex,
+                                extension
+                        );
+
+                        filesystem.move(tempPath.toString(), finalPath);
+
+                        DocumentEntity doc = new DocumentEntity();
+                        doc.setFilename(filename);
+                        doc.setPath(finalPath);
+                        doc.setSize(fileSize);
+                        doc.setMimeType(mimeType);
+                        doc.setSha256(sha256Hex);
+                        doc.setRefCount(1);
+                        documentRepository.persist(doc);
+                        return doc;
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+
+        if (document.getRefCount() > 0 && document.getId() != null) {
+            documentRepository.incrementRefCount(document);
+        }
+
+        // Create Attachment linked to SheetMusic
+        AttachmentEntity attachment = new AttachmentEntity();
+        attachment.setType(attachmentType);
+        attachment.setDisplayName(filename);
+
+        // Link to document only if this type is file-based
+        if (attachmentType != AttachmentType.EXTERNAL_LINK) {
+            attachment.setDocument(document);
+        }
+
+        attachmentRepository.persistAndFlush(attachment);
+        return attachment;
     }
 
-    public SheetAnalyzerResult analyzeImage(InputStream fileInputStream) {
-        return analyzer.analyze(Image.builder()
-                .base64Data(encodeFileToBase64(fileInputStream))
-                .mimeType("image/png")
-                .build());
-    }
+    DocumentDownload load(UUID documentId) {
+        // FIXME: JAX-RS exception!
+        DocumentEntity doc = documentRepository.findByIdOptional(documentId)
+                .orElseThrow(() -> new NotFoundException("Document not found"));
 
-    String encodeFileToBase64(InputStream fileInputStream) {
+        if (!filesystem.exists(doc.getPath())) {
+            throw new IllegalStateException("Physical file missing: " + doc.getPath());
+        }
+
+        InputStream stream;
         try {
-            return Base64.getEncoder().encodeToString(fileInputStream.readAllBytes());
+            stream = filesystem.openForRead(doc.getPath());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to open document stream", e);
         }
+
+        return new DocumentDownload(
+                stream,
+                doc.getId(),
+                doc.getFilename(),
+                doc.getSize(),
+                doc.getMimeType(),
+                doc.getSha256()
+        );
+    }
+
+    public List<DocumentEntity> listUnlinkedDocuments() {
+        return documentRepository.findUnlinked();
+    }
+
+    @Transactional
+    void deleteIfUnlinked(UUID documentId) {
+        DocumentEntity doc = documentRepository.findByIdOptional(documentId)
+                .orElseThrow(NotFoundException::new);
+
+        if (doc.getRefCount() > 0) {
+            throw new IllegalStateException("Document is still linked");
+        }
+
+        try {
+            filesystem.delete(doc.getPath());
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to delete physical file", e);
+        }
+
+        documentRepository.delete(doc);
     }
 
 }

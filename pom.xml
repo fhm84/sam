@@ -12,6 +12,8 @@
         <module>api</module>
         <module>server</module>
         <module>ui</module>
+        <module>storage</module>
+        <module>core</module>
     </modules>
 
     <properties>
@@ -23,8 +25,8 @@
         <surefire-plugin.version>3.5.2</surefire-plugin.version>
         <jandex-maven-plugin.version>3.3.0</jandex-maven-plugin.version>
 
-        <quarkus.platform.version>3.21.2</quarkus.platform.version>
-        <lombok.version>1.18.36</lombok.version>
+        <quarkus.platform.version>3.24.4</quarkus.platform.version>
+        <lombok.version>1.18.42</lombok.version>
         <org.mapstruct.version>1.6.3</org.mapstruct.version>
 
         <skipITs>true</skipITs>
