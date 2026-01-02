@@ -19,7 +19,7 @@ public interface DocumentsResource {
     @GET
     @Path("{docIdentifier}")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    Response load(@PathParam("docIdentifier") String docIdentifier);
+    Response load(@PathParam("docIdentifier") String docIdentifier, @HeaderParam("If-None-Match") String ifNoneMatch);
 
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)

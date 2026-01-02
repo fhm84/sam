@@ -22,6 +22,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -49,7 +50,7 @@ public class DocumentsResourceImpl implements DocumentsResource {
     }
 
     @Override
-    public Response load(String docIdentifier) {
+    public Response load(String docIdentifier, String ifNoneMatch) {
         DocumentDownload attachment;
         try {
             attachment = documentsService.loadAttachment(instrumentationId, docIdentifier);
@@ -59,6 +60,15 @@ public class DocumentsResourceImpl implements DocumentsResource {
         if (attachment == null) {
             log.info(String.format("Document (%s) not found", docIdentifier));
             return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        String etagValue = "\"sha256:" + attachment.checksumSha256() + "\"";
+
+        // If-None-Match handling
+        if (etagMatches(ifNoneMatch, etagValue)) {
+            return Response.notModified()
+                    .tag(etagValue)
+                    .build();
         }
 
         try {
@@ -72,8 +82,10 @@ public class DocumentsResourceImpl implements DocumentsResource {
                     .type(attachment.mimeType())
                     .header("Content-Length", attachment.size())
                     .header("X-Checksum-SHA256", attachment.checksumSha256())
+                    .header("Cache-Control", "private, max-age=3600")
                     .header("Content-Disposition",
                             "inline; filename*=utf-8''" + encodedFilename.replaceAll("\\+", "%20"))
+                    .tag(etagValue)
                     .build();
         } catch (final Exception ex) {
             log.atInfo().setCause(ex).log(() -> String.format("Loading document (%s) resulted in", docIdentifier));
@@ -93,6 +105,23 @@ public class DocumentsResourceImpl implements DocumentsResource {
             log.atWarn().setCause(e).log(() -> "Failed to upload file " + file.fileName());
             return "{\"error\":\"Failed to save file\"}";
         }
+    }
+
+    private boolean etagMatches(String ifNoneMatch, String currentEtag) {
+        if (ifNoneMatch == null || ifNoneMatch.isBlank()) {
+            return false;
+        }
+
+        if ("*".equals(ifNoneMatch.trim())) {
+            return true;
+        }
+
+        return Arrays.stream(ifNoneMatch.split(","))
+                .map(String::trim)
+                .anyMatch(tag ->
+                        tag.equals(currentEtag) ||
+                                tag.equals("W/" + currentEtag)
+                );
     }
 
 }
