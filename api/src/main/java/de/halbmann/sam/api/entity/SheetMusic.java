@@ -2,11 +2,11 @@ package de.halbmann.sam.api.entity;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -14,6 +14,8 @@ import java.util.UUID;
  */
 @Data
 @EqualsAndHashCode
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class SheetMusic {
 
     /**
@@ -103,5 +105,10 @@ public class SheetMusic {
      */
     @Valid
     List<Instrumentation> instrumentations = new ArrayList<>();
+
+    /**
+     * Metadata of the sheet music files (including location, mime-type, fileSize, ...)
+     */
+    Set<Attachment> attachments;
 
 }

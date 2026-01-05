@@ -6,6 +6,9 @@ import lombok.EqualsAndHashCode;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * An attachment (can be added to either SheetMusic or Instrumentation). This represents a file or an external link.
+ */
 @Data
 @EqualsAndHashCode
 public class Attachment {

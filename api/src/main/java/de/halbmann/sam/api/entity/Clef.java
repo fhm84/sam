@@ -27,6 +27,6 @@ public enum Clef {
     /**
      * Bass (de: Bassschlüssel) - 𝄢
      */
-    BASS;
+    BASS
 
 }

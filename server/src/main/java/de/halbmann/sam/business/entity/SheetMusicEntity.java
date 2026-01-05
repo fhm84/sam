@@ -105,4 +105,10 @@ public class SheetMusicEntity extends AbstractEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sheet", orphanRemoval = true)
     List<InstrumentationEntity> instrumentations = new ArrayList<>();
 
+    /**
+     * Metadata of the sheet music files (including location, mime-type, fileSize, ...)
+     */
+    @OneToMany(fetch = FetchType.LAZY)
+    Set<AttachmentEntity> attachments;
+
 }

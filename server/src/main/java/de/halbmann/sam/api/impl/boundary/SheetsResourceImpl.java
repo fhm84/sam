@@ -1,10 +1,12 @@
 package de.halbmann.sam.api.impl.boundary;
 
+import de.halbmann.sam.api.boundary.DocumentsResource;
 import de.halbmann.sam.api.boundary.InstrumentationsResource;
 import de.halbmann.sam.api.boundary.SheetsResource;
 import de.halbmann.sam.api.entity.PaginatedResponse;
 import de.halbmann.sam.api.entity.SheetFilterRequest;
 import de.halbmann.sam.api.entity.SheetMusic;
+import de.halbmann.sam.api.entity.SheetMusicSearchResult;
 import de.halbmann.sam.business.boundary.SheetRepository;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
@@ -24,24 +26,34 @@ public class SheetsResourceImpl implements SheetsResource {
         return sheetRepository.findSheets(filterRequest);
     }
 
+    @Override
     public SheetMusic add(final SheetMusic sheetMusic) {
         return sheetRepository.addSheet(sheetMusic);
     }
 
+    @Override
     public SheetMusic load(final String sheetId) {
         return sheetRepository.getSheet(sheetId);
     }
 
+    @Override
     public void update(final String sheetId, final SheetMusic sheetMusic) {
         sheetRepository.updateSheet(sheetId, sheetMusic);
     }
 
+    @Override
     public void delete(final String sheetId) {
         sheetRepository.deleteSheet(sheetId);
     }
 
+    @Override
     public InstrumentationsResource instrumentations(final String sheetId) {
         return resourceContext.getResource(InstrumentationsResourceImpl.class);
+    }
+
+    @Override
+    public DocumentsResource documents(String sheetId) {
+        return resourceContext.getResource(DocumentsResourceImpl.class);
     }
 
 }

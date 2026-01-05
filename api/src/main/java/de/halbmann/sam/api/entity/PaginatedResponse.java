@@ -4,6 +4,11 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * Generic wrapper for a paginated response (data list) including some metadata like size and totalCount.
+ *
+ * @param <T>
+ */
 @Data
 public class PaginatedResponse<T> {
 

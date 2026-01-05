@@ -24,23 +24,28 @@ public class InstrumentationsResourceImpl implements InstrumentationsResource {
     @Inject
     InstrumentationRepository instrumentationRepository;
 
+    @Override
     public List<Instrumentation> listAll() {
         return instrumentationRepository.getInstrumentations(sheetId);
     }
 
+    @Override
     public Instrumentation get(final String instrumentationId) {
         return instrumentationRepository.getInstrumentation(instrumentationId);
     }
 
+    @Override
     public void add(final Instrumentation instrumentation) {
         instrumentationRepository.addInstrumentation(sheetId, instrumentation);
     }
 
+    @Override
     public void update(final String instrumentationId, final Instrumentation instrumentation) {
         // FIXME: implement!
         //part.persist();
     }
 
+    @Override
     public void delete(final String instrumentationId) {
         // FIXME: implement!
     }

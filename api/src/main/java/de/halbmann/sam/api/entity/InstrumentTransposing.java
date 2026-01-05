@@ -37,6 +37,6 @@ public enum InstrumentTransposing {
     /**
      * B♭
      */
-    Bb;
+    Bb
 
 }

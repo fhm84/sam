@@ -1,0 +1,194 @@
+@startuml
+' Brief class diagram of the datamodel (entities)
+class Attachment {
+    +id
+    +displayName
+    +type
+    +mimeType
+    +fileSize
+    +checksum
+    +uploadedAt
+}
+
+enum AttachmentType {
+    FULL_SCORE
+    PART
+    COVER
+    LYRICS
+    MIDI
+    AUDIO
+    ANNOTATIONS
+    IMAGE
+    ANALYSIS
+    TRANSCRIPTION
+    EXTERNAL_LINK
+    MUSIC_XML
+    OTHER
+    UNSPECIFIED
+}
+
+class Booklet {
+    +id
+    +name
+    +description
+    +sheets : List<CollectionSheet>
+}
+
+enum ClassificationStatus {
+    PENDING
+    CLASSIFIED
+    REJECTED
+}
+
+enum Clef {
+    TREBLE
+    ALTO
+    TENOR
+    BASS
+}
+
+class CollectionSheet {
+    +id
+    +identifier
+    +sheetMusic : SheetMusic
+}
+
+class DocumentDownload {
+    +id
+    +filename
+    +size
+    +mimeType
+    +checksumSha256
+}
+
+class Genre {
+    +name
+}
+
+class Instrumentation {
+    +id
+    +instrumentName
+    +partLabel
+    +transposition : InstrumentTransposing
+    +clef : Clef
+    +notationType : NotationType
+    +notes
+    +attachments : Set<Attachment>
+}
+
+enum InstrumentTransposing {
+    C
+    D
+    Eb
+    F
+    G
+    A
+    Ab
+    Bb
+}
+
+class Musician {
+    +id
+    +name
+    +birthYear
+    +deathYear
+    +ipi
+}
+
+enum NotationType {
+    STANDARD
+    TABLATURE
+    PERCUSSION
+    LEAD_SHEET
+    GRAPHIC
+}
+
+class SheetCollection {
+    +id
+    +name
+    +description
+    +sheets : List<CollectionSheet>
+}
+
+class SheetMusic {
+    +id
+    +title
+    +subtitle
+    +publisher
+    +publisherIpi
+    +composer : Musician
+    +arranger : Musician
+    +originalBy
+    +genre
+    +difficultyLevel
+    +yearOfComposition
+    +edition
+    +copyright
+    +rating
+    +iswc
+    +gemaWorkNumber
+    +additionalNotes
+    +instrumentations : List<Instrumentation>
+    +attachments : Set<Attachment>
+}
+
+class PaginatedResponse<T> {
+    +data : List<T>
+    +size
+    +totalCount
+}
+
+class SheetMusicSearchResult extends SheetMusic {
+    +rank
+    +matchPercentage
+}
+
+class PaginationRequest {
+    +page
+    +size
+    +sortOrder
+    +sortBy
+}
+
+class DocumentFilterRequest extends PaginationRequest
+
+class MusicianFilterRequest extends PaginationRequest {
+    +name
+}
+
+class SheetFilterRequest extends PaginationRequest {
+    +query
+    +title
+    +composer
+}
+
+enum SortOrder {
+    ASC
+    DESC
+}
+
+' Associations
+AttachmentType <-- Attachment
+
+SheetCollection "1" *-- "*" CollectionSheet
+CollectionSheet "*" -- "1" SheetMusic : sheet
+
+SheetMusic "1" -- "*" Attachment : attachments
+SheetMusic "1" -- "*" Instrumentation : instrumentations
+SheetMusic "*" -- "1" Musician : composer
+SheetMusic "*" -- "1" Musician : arranger
+SheetMusic --> Genre
+
+Instrumentation "1" -- "*" Attachment : attachments
+Instrumentation --> InstrumentTransposing
+Instrumentation --> Clef
+Instrumentation --> NotationType
+
+Booklet "*" -- "*" SheetMusic : sheets
+
+DocumentDownload --> Attachment : source
+
+' Requests/Responses/Filter types
+PaginationRequest "0..1" -- "*" SortOrder : sort
+
+@enduml

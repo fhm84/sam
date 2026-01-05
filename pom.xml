@@ -10,10 +10,10 @@
 
     <modules>
         <module>api</module>
-        <module>server</module>
-        <module>ui</module>
         <module>storage</module>
         <module>core</module>
+        <module>server</module>
+        <module>ui</module>
     </modules>
 
     <properties>

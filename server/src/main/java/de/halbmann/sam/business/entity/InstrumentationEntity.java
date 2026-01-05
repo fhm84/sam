@@ -48,7 +48,7 @@ public class InstrumentationEntity extends AbstractEntity {
     NotationType notationType;
 
     /**
-     * Metadata of the sheet music files (including location, mime-type, fileSize, ...)
+     * Metadata of the sheet music/instrumentation files (including location, mime-type, fileSize, ...)
      */
     @OneToMany(fetch = FetchType.LAZY)
     Set<AttachmentEntity> attachments;

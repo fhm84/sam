@@ -48,7 +48,7 @@ public interface SheetsResource {
     /**
      * Updates an existing sheet music entry.
      *
-     * @param sheetId the ID of the sheet music to update
+     * @param sheetId    the ID of the sheet music to update
      * @param sheetMusic the updated sheet music data
      */
     @PUT
@@ -72,5 +72,14 @@ public interface SheetsResource {
      */
     @Path("{sheetId}/instrumentations")
     InstrumentationsResource instrumentations(final @PathParam("sheetId") String sheetId);
+
+    /**
+     * Provides access to the documents resource for a speciic sheet music.
+     *
+     * @param sheetId the ID of the sheet music
+     * @return the documents resource
+     */
+    @Path("{sheetId}/documents")
+    DocumentsResource documents(final @PathParam("sheetId") String sheetId);
 
 }

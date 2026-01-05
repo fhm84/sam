@@ -1,10 +1,7 @@
 package de.halbmann.sam.business.entity;
 
 import de.halbmann.sam.api.entity.ClassificationStatus;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.envers.Audited;
@@ -29,6 +26,8 @@ public class Classification extends AbstractEntity {
     /**
      * Status of the classification
      */
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
     ClassificationStatus status;
 
 }

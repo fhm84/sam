@@ -9,7 +9,7 @@ import lombok.EqualsAndHashCode;
 import java.util.UUID;
 
 /**
- * Wrapper entity for a sheet in context of a collection, adding an order number/identifier.
+ * Wrapper entity for a sheet in context of a collection or a booklet, adding an order number/identifier.
  */
 @Data
 @EqualsAndHashCode
@@ -19,8 +19,9 @@ public class CollectionSheet {
      * Unique identifier of the music sheet/piece.
      */
     UUID id;
+
     /**
-     * Identifier (e.g. the number within the collection)
+     * Identifier (e.g. the number within the collection or booklet)
      */
     @NotBlank
     String identifier;

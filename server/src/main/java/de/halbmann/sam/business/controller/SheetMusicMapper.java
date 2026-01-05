@@ -10,6 +10,7 @@ import org.mapstruct.*;
                 MusicianMapper.class,
                 GenreMapper.class,
                 InstrumentationMapper.class,
+                AttachmentMapper.class,
                 GenreRepository.class
         },
         unmappedTargetPolicy = ReportingPolicy.ERROR)
@@ -22,16 +23,18 @@ public interface SheetMusicMapper {
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "created", ignore = true)
     @Mapping(target = "lastUpdate", ignore = true)
-    @Mapping(target = "instrumentations", ignore = true)
     @Mapping(target = "genre", source = "genre")
+    @Mapping(target = "instrumentations", ignore = true)
+    @Mapping(target = "attachments", ignore = true)
     SheetMusicEntity fromDto(final SheetMusic dto);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "created", ignore = true)
     @Mapping(target = "lastUpdate", ignore = true)
-    @Mapping(target = "instrumentations", ignore = true)
     @Mapping(target = "genre", source = "genre")
+    @Mapping(target = "instrumentations", ignore = true)
+    @Mapping(target = "attachments", ignore = true)
     void update(@MappingTarget final SheetMusicEntity entity, final SheetMusic dto);
 
 }

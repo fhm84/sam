@@ -4,10 +4,7 @@ import de.halbmann.sam.api.entity.Attachment;
 import de.halbmann.sam.api.entity.AttachmentType;
 import de.halbmann.sam.api.entity.DocumentDownload;
 import de.halbmann.sam.business.controller.AttachmentMapper;
-import de.halbmann.sam.business.entity.AbstractEntity;
-import de.halbmann.sam.business.entity.AttachmentEntity;
-import de.halbmann.sam.business.entity.DocumentEntity;
-import de.halbmann.sam.business.entity.InstrumentationEntity;
+import de.halbmann.sam.business.entity.*;
 import de.halbmann.sam.storage.MimeTypeUtils;
 import de.halbmann.sam.storage.malware.VirusScanner;
 import de.halbmann.sam.storage.upload.UploadContext;
@@ -54,6 +51,9 @@ public class DocumentsService {
     DocumentRepository documentRepository;
 
     @Inject
+    SheetRepository sheetRepository;
+
+    @Inject
     InstrumentationRepository instrumentationRepository;
 
     @Inject
@@ -77,23 +77,42 @@ public class DocumentsService {
         return attachmentMapper.toDto(uploaded);
     }
 
-    public DocumentDownload loadAttachment(String instrumentationId, String docIdentifier) throws IOException {
-        if (instrumentationId != null) {
-            InstrumentationEntity instrumentation = instrumentationRepository.findById(UUID.fromString(instrumentationId));
-            if (instrumentation != null) {
-                Optional<UUID> attachmentId = instrumentation.getAttachments().stream()
-                        .map(AbstractEntity::getId)
-                        .filter(id -> id.toString().equals(docIdentifier))
-                        .findFirst();
+    public DocumentDownload loadAttachmentByInstrumentation(String instrumentationId, String docId) throws IOException {
+        if (instrumentationId == null) {
+            return null;
+        }
 
-                if (attachmentId.isPresent()) {
-                    AttachmentEntity attachment = attachmentRepository.findById(attachmentId.get());
-                    if (attachment.getDocument() != null) {
-                        return load(attachment.getDocument().getId());
-                    }
-                }
-            }
-        } else {
+        InstrumentationEntity instrumentation = instrumentationRepository.findById(UUID.fromString(instrumentationId));
+        if (instrumentation != null) {
+            Optional<UUID> attachmentId = instrumentation.getAttachments().stream()
+                    .map(AbstractEntity::getId)
+                    .filter(id -> id.toString().equals(docId))
+                    .findFirst();
+
+            return loadAttachment(attachmentId.map(String::valueOf).orElse(null));
+        }
+        return null;
+    }
+
+    public DocumentDownload loadAttachmentBySheet(String sheetId, String docId) throws IOException {
+        if (sheetId == null) {
+            return null;
+        }
+
+        SheetMusicEntity sheetMusic = sheetRepository.findById(UUID.fromString(sheetId));
+        if (sheetMusic != null) {
+            Optional<UUID> attachmentId = sheetMusic.getAttachments().stream()
+                    .map(AbstractEntity::getId)
+                    .filter(id -> id.toString().equals(docId))
+                    .findFirst();
+
+            return loadAttachment(attachmentId.map(String::valueOf).orElse(null));
+        }
+        return null;
+    }
+
+    public DocumentDownload loadAttachment(String docIdentifier) throws IOException {
+        if (docIdentifier != null) {
             AttachmentEntity attachment = attachmentRepository.findById(UUID.fromString(docIdentifier));
             if (attachment.getDocument() != null) {
                 return load(attachment.getDocument().getId());

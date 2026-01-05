@@ -35,6 +35,9 @@ public class DocumentsResourceImpl implements DocumentsResource {
     @PathParam("instrumentationId")
     String instrumentationId;
 
+    @PathParam("sheetId")
+    String sheetId;
+
     @Override
     public PaginatedResponse<DocumentDownload> list(DocumentFilterRequest filterRequest) {
         // TODO: maybe we could/should also implement the filter to not only show unlinked documents?
@@ -52,10 +55,24 @@ public class DocumentsResourceImpl implements DocumentsResource {
     @Override
     public Response load(String docIdentifier, String ifNoneMatch) {
         DocumentDownload attachment;
-        try {
-            attachment = documentsService.loadAttachment(instrumentationId, docIdentifier);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (instrumentationId != null) {
+            try {
+                attachment = documentsService.loadAttachmentByInstrumentation(instrumentationId, docIdentifier);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else if (sheetId != null) {
+            try {
+                attachment = documentsService.loadAttachmentBySheet(sheetId, docIdentifier);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            try {
+                attachment = documentsService.loadAttachment(docIdentifier);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
         if (attachment == null) {
             log.info(String.format("Document (%s) not found", docIdentifier));
@@ -97,13 +114,18 @@ public class DocumentsResourceImpl implements DocumentsResource {
     public String uploadDocument(FileUpload file) {
         log.atLevel(Level.INFO).log(() -> "File-Upload ... filename: " + file.fileName());
 
-        // TODO: if instrumentationId is set, we have to directly add/link it!!!
+        // TODO: if instrumentationId or sheetId is set, we have to directly add/link it!!!
         try (InputStream inputStream = Files.newInputStream(file.uploadedFile())) {
             Attachment attachment = documentsService.save(file.fileName(), inputStream);
-            return "{\"fileName\":\"" + attachment.getDisplayName() + "\", \"id\":\"" + attachment.getId() + "\"}";
+            return """
+                    "filename": "%s",
+                    "id": "%s"
+                    """.formatted(attachment.getDisplayName(), attachment.getId());
         } catch (IOException | NoSuchAlgorithmException e) {
             log.atWarn().setCause(e).log(() -> "Failed to upload file " + file.fileName());
-            return "{\"error\":\"Failed to save file\"}";
+            return """
+                    "error": "Failed to save file"
+                    """;
         }
     }
 
@@ -118,10 +140,7 @@ public class DocumentsResourceImpl implements DocumentsResource {
 
         return Arrays.stream(ifNoneMatch.split(","))
                 .map(String::trim)
-                .anyMatch(tag ->
-                        tag.equals(currentEtag) ||
-                                tag.equals("W/" + currentEtag)
-                );
+                .anyMatch(tag -> tag.equals(currentEtag) || tag.equals("W/" + currentEtag));
     }
 
 }
