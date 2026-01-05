@@ -22,7 +22,8 @@ public class SheetsResourceImpl implements SheetsResource {
     @Inject
     SheetRepository sheetRepository;
 
-    public PaginatedResponse<SheetMusic> findSheets(final SheetFilterRequest filterRequest) {
+    @Override
+    public PaginatedResponse<SheetMusicSearchResult> findSheets(final SheetFilterRequest filterRequest) {
         return sheetRepository.findSheets(filterRequest);
     }
 

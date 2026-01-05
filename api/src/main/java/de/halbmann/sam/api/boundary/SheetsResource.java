@@ -3,6 +3,7 @@ package de.halbmann.sam.api.boundary;
 import de.halbmann.sam.api.entity.PaginatedResponse;
 import de.halbmann.sam.api.entity.SheetFilterRequest;
 import de.halbmann.sam.api.entity.SheetMusic;
+import de.halbmann.sam.api.entity.SheetMusicSearchResult;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
@@ -24,7 +25,7 @@ public interface SheetsResource {
      * @return a paginated response containing the list of sheet music
      */
     @GET
-    PaginatedResponse<SheetMusic> findSheets(final @BeanParam SheetFilterRequest filterRequest);
+    PaginatedResponse<SheetMusicSearchResult> findSheets(final @BeanParam SheetFilterRequest filterRequest);
 
     /**
      * Adds a new sheet music entry.

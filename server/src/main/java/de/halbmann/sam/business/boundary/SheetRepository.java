@@ -27,11 +27,87 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
         return findSheets(paginationRequest, Map.of());
     }
 
-    public PaginatedResponse<SheetMusic> findSheets(final SheetFilterRequest filterRequest) {
-        final Map<String, Object> parameters = new HashMap<>();
-        parameters.put("title", filterRequest.getTitle());
+    public PaginatedResponse<SheetMusicSearchResult> findSheets(final SheetFilterRequest filterRequest) {
+        if (filterRequest.getQuery() != null) {
+            String sql = """
+                    WITH q AS (
+                        SELECT
+                            plainto_tsquery('simple', :query) AS tsq,
+                            :query AS raw,
+                            dmetaphone(:query) AS phonetic
+                    )
+                    SELECT s.*,
+                           -- metrics
+                           ts_rank(s.search_vector, q.tsq)    AS fts_rank,
+                           similarity(s.title, q.raw)         AS title_similarity,
+                           similarity(s.composer_name, q.raw) AS composer_similarity,
+                           (s.composer_phonetic = q.phonetic) AS phonetic_match,
+                    
+                           -- final score
+                           (
+                               ts_rank(s.search_vector, q.tsq) * 0.70
+                             + similarity(s.title, q.raw) * 0.20
+                             + similarity(s.composer_name, q.raw) * 0.10
+                             + CASE
+                                   WHEN s.composer_phonetic = q.phonetic THEN 0.05
+                                   ELSE 0
+                               END
+                           ) AS final_rank
+                    FROM sheets s, q
+                    WHERE
+                          s.search_vector @@ q.tsq
+                       OR s.title % q.raw
+                       OR s.composer_name % q.raw
+                       OR s.composer_phonetic = q.phonetic
+                    ORDER BY
+                        (
+                            ts_rank(s.search_vector, q.tsq) * 0.70
+                          + similarity(s.title, q.raw) * 0.20
+                          + similarity(s.composer_name, q.raw) * 0.10
+                          + CASE
+                                WHEN s.composer_phonetic = q.phonetic THEN 0.05
+                                ELSE 0
+                            END
+                        ) DESC
+                    """;
 
-        return findSheets(filterRequest, parameters);
+            List<Object[]> results = getEntityManager().createNativeQuery(sql, "SheetWithMetrics")
+                    .setParameter("query", filterRequest.getQuery())
+                    .setFirstResult(filterRequest.getPage() * filterRequest.getSize())
+                    .setMaxResults(filterRequest.getSize())
+                    .getResultList();
+
+            PaginatedResponse<SheetMusicSearchResult> response = new PaginatedResponse<>();
+            response.setData(results.stream()
+                    .map(r -> new SheetMusicSearchResult(
+                            sheetMusicMapper.toDto((SheetMusicEntity) r[0]),
+                            ((Number) r[1]).doubleValue(),
+                            ((Number) r[2]).doubleValue(),
+                            ((Number) r[3]).doubleValue(),
+                            (Boolean) r[4],
+                            ((Number) r[5]).doubleValue()
+                    ))
+                    .toList());
+            response.setSize(response.getData().size());
+            return response;
+        } else {
+            final Map<String, Object> parameters = new HashMap<>();
+            if (filterRequest.getTitle() != null) {
+                parameters.put("title", filterRequest.getTitle());
+            }
+            if (filterRequest.getComposer() != null) {
+                parameters.put("composer.name", filterRequest.getComposer());
+            }
+
+            PaginatedResponse<SheetMusic> sheets = findSheets(filterRequest, parameters);
+            PaginatedResponse<SheetMusicSearchResult> response = new PaginatedResponse<>();
+            response.setSize(sheets.getSize());
+            response.setTotalCount(sheets.getTotalCount());
+            response.setData(sheets.getData().stream()
+                    .map(SheetMusicSearchResult::new)
+                    .toList());
+            return response;
+        }
     }
 
     private Sort prepareSort(PaginationRequest paginationRequest) {

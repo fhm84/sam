@@ -7,6 +7,7 @@ import org.hibernate.envers.Audited;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Represents a piece of music.
@@ -16,6 +17,17 @@ import java.util.List;
 @Entity
 @Audited
 @Table(name = "sheets")
+@SqlResultSetMapping(
+        name = "SheetWithMetrics",
+        entities = @EntityResult(entityClass = SheetMusicEntity.class),
+        columns = {
+                @ColumnResult(name = "fts_rank", type = Double.class),
+                @ColumnResult(name = "title_similarity", type = Double.class),
+                @ColumnResult(name = "composer_similarity", type = Double.class),
+                @ColumnResult(name = "phonetic_match", type = Boolean.class),
+                @ColumnResult(name = "final_rank", type = Double.class)
+        }
+)
 public class SheetMusicEntity extends AbstractEntity {
 
     /**
