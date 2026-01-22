@@ -1,11 +1,10 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 3.2.1263 on 2025-06-07 17:46:48.
+// Generated using typescript-generator version 3.2.1263 on 2026-01-22 22:34:54.
 
 export interface Attachment {
-    checksum?: number;
+    checksum?: string;
     displayName?: string;
-    docIdentifier?: string;
     fileSize?: number;
     id?: string;
     mimeType?: string;
@@ -13,10 +12,23 @@ export interface Attachment {
     uploadedAt?: Date;
 }
 
+export interface Booklet {
+    description?: string;
+    id?: string;
+    name: string;
+    sheets?: CollectionSheet[];
+}
+
 export interface CollectionSheet {
     id?: string;
     identifier: string;
     sheetMusic: SheetMusic;
+}
+
+export interface DocumentDownload {
+}
+
+export interface DocumentFilterRequest extends PaginationRequest {
 }
 
 export interface Genre {
@@ -59,6 +71,14 @@ export interface PaginationRequest {
     sortOrder?: SortOrder;
 }
 
+export interface SearchResultMetrics {
+    composerSimilarity?: number;
+    finalRank?: number;
+    ftsRank?: number;
+    phoneticMatch?: boolean;
+    titleSimilarity?: number;
+}
+
 export interface SheetCollection {
     date?: Date;
     description?: string;
@@ -68,12 +88,15 @@ export interface SheetCollection {
 }
 
 export interface SheetFilterRequest extends PaginationRequest {
+    composer?: string;
+    query?: string;
     title?: string;
 }
 
 export interface SheetMusic {
     additionalNotes?: string;
     arranger?: Musician;
+    attachments?: Attachment[];
     composer?: Musician;
     copyright?: string;
     difficultyLevel?: string;
@@ -90,6 +113,10 @@ export interface SheetMusic {
     subtitle?: string;
     title: string;
     yearOfComposition?: number;
+}
+
+export interface SheetMusicSearchResult extends SheetMusic {
+    metrics?: SearchResultMetrics;
 }
 
 export type AttachmentType = "FULL_SCORE" | "PART" | "COVER" | "LYRICS" | "MIDI" | "AUDIO" | "ANNOTATIONS" | "IMAGE" | "ANALYSIS" | "TRANSCRIPTION" | "EXTERNAL_LINK" | "MUSIC_XML" | "OTHER" | "UNSPECIFIED";

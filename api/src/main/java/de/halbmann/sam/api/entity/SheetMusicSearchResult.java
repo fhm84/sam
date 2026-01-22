@@ -9,11 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SheetMusicSearchResult extends SheetMusic {
 
-    double ftsRank;
-    double titleSimilarity;
-    double composerSimilarity;
-    boolean phoneticMatch;
-    double finalRank;
+    SearchResultMetrics metrics;
 
     public SheetMusicSearchResult(SheetMusic sheetMusic) {
         super(sheetMusic.getId(),
@@ -37,18 +33,9 @@ public class SheetMusicSearchResult extends SheetMusic {
                 sheetMusic.getAttachments());
     }
 
-    public SheetMusicSearchResult(SheetMusic sheetMusic,
-                                  double ftsRank,
-                                  double titleSimilarity,
-                                  double composerSimilarity,
-                                  boolean phoneticMatch,
-                                  double finalRank) {
+    public SheetMusicSearchResult(SheetMusic sheetMusic, SearchResultMetrics metrics) {
         this(sheetMusic);
-        this.ftsRank = ftsRank;
-        this.titleSimilarity = titleSimilarity;
-        this.composerSimilarity = composerSimilarity;
-        this.phoneticMatch = phoneticMatch;
-        this.finalRank = finalRank;
+        this.metrics = metrics;
     }
 
 }

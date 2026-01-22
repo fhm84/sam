@@ -81,11 +81,13 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
             response.setData(results.stream()
                     .map(r -> new SheetMusicSearchResult(
                             sheetMusicMapper.toDto((SheetMusicEntity) r[0]),
-                            ((Number) r[1]).doubleValue(),
-                            ((Number) r[2]).doubleValue(),
-                            ((Number) r[3]).doubleValue(),
-                            (Boolean) r[4],
-                            ((Number) r[5]).doubleValue()
+                            new SearchResultMetrics(
+                                    ((Number) r[1]).doubleValue(),
+                                    ((Number) r[2]).doubleValue(),
+                                    ((Number) r[3]).doubleValue(),
+                                    (Boolean) r[4],
+                                    ((Number) r[5]).doubleValue()
+                            )
                     ))
                     .toList());
             response.setSize(response.getData().size());
