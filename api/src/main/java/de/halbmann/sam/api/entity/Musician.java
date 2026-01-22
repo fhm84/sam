@@ -32,7 +32,7 @@ public class Musician {
     Integer deathYear;
 
     /**
-     * Interested Party Information (IPI)-Nummer
+     * Interested Party Information (IPI)-Number
      */
     String ipi;
 

@@ -115,6 +115,7 @@ public class DocumentsResourceImpl implements DocumentsResource {
         log.atLevel(Level.INFO).log(() -> "File-Upload ... filename: " + file.fileName());
 
         // TODO: if instrumentationId or sheetId is set, we have to directly add/link it!!!
+        // TODO: what about the attachmentType?
         try (InputStream inputStream = Files.newInputStream(file.uploadedFile())) {
             Attachment attachment = documentsService.save(file.fileName(), inputStream);
             return """

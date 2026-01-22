@@ -72,8 +72,21 @@ public class DocumentsService {
      * @param inputStream the file content
      */
     public Attachment save(String filename, InputStream inputStream) throws IOException, NoSuchAlgorithmException {
-        // TODO: what about attachmentType here?!
-        AttachmentEntity uploaded = upload(filename, inputStream, AttachmentType.UNSPECIFIED);
+        return save(filename, inputStream, AttachmentType.UNSPECIFIED);
+    }
+
+    /**
+     * Save incoming document. This will also directly check the file-/content-type of and automatically add related metadata.
+     * <p>
+     * Future features:
+     * - antivirus/malware checks!?
+     *
+     * @param filename       the (final/display filename)
+     * @param inputStream    the file content
+     * @param attachmentType specifies the type of the attachment
+     */
+    public Attachment save(String filename, InputStream inputStream, AttachmentType attachmentType) throws IOException, NoSuchAlgorithmException {
+        AttachmentEntity uploaded = upload(filename, inputStream, attachmentType);
         return attachmentMapper.toDto(uploaded);
     }
 

@@ -184,7 +184,7 @@ Instrumentation --> InstrumentTransposing
 Instrumentation --> Clef
 Instrumentation --> NotationType
 
-Booklet "*" -- "*" SheetMusic : sheets
+Booklet "*" -- "1" SheetMusic : sheets
 
 DocumentDownload --> Attachment : source
 
