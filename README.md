@@ -159,7 +159,6 @@ TODOs (features):
 - file-upload (pdf, midi?)
 - AI for automatically link pdf to correct sheet music and instrumentation!?
 - system-info (api/info)?
-- search -> integrated postgresql search feature -> https://www.the-main-thread.com/p/quarkus-postgresql-full-text-search-tutorial
 - extended revinfo
 - download multiple (selected) pdfs at once (as single, merged pdf or as zip-file)
 - generate table of content (for sheet collections) - different sorting/grouping
@@ -167,3 +166,4 @@ TODOs (features):
 - Dashboard/statistics (number of sheets by composer/arranger/genre) -> "Statistical ListResult"
 - manage ensemble(s) (to also double-check availabilities?)
 - (auto) convert to Music XML file format(s) - to maybe also transpose?
+- log events (like e.g. document downloads)

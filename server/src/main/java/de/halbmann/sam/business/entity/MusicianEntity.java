@@ -7,9 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.envers.Audited;
 
-/**
- * Stores information about musicians (composers and arrangers).
- */
+/** Stores information about musicians (composers and arrangers). */
 @Getter
 @Setter
 @Entity
@@ -18,22 +16,15 @@ import org.hibernate.envers.Audited;
 @Table(name = "musicians")
 public class MusicianEntity extends AbstractEntity {
 
-    /**
-     * Full name
-     */
-    String name;
-    /**
-     * Year of birth
-     */
-    Integer birthYear;
-    /**
-     * Year of death
-     */
-    Integer deathYear;
+  /** Full name */
+  String name;
 
-    /**
-     * Interested Party Information (IPI)-Nummer
-     */
-    String ipi;
+  /** Year of birth */
+  Integer birthYear;
 
+  /** Year of death */
+  Integer deathYear;
+
+  /** Interested Party Information (IPI)-Nummer */
+  String ipi;
 }

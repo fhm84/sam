@@ -6,26 +6,25 @@ import java.io.OutputStream;
 
 public final class CountingOutputStream extends FilterOutputStream {
 
-    private long bytesWritten = 0;
+  private long bytesWritten = 0;
 
-    public CountingOutputStream(OutputStream out) {
-        super(out);
-    }
+  public CountingOutputStream(OutputStream out) {
+    super(out);
+  }
 
-    @Override
-    public void write(int b) throws IOException {
-        out.write(b);
-        bytesWritten++;
-    }
+  @Override
+  public void write(int b) throws IOException {
+    out.write(b);
+    bytesWritten++;
+  }
 
-    @Override
-    public void write(byte[] b, int off, int len) throws IOException {
-        out.write(b, off, len);
-        bytesWritten += len;
-    }
+  @Override
+  public void write(byte[] b, int off, int len) throws IOException {
+    out.write(b, off, len);
+    bytesWritten += len;
+  }
 
-    public long getBytesWritten() {
-        return bytesWritten;
-    }
-
+  public long getBytesWritten() {
+    return bytesWritten;
+  }
 }

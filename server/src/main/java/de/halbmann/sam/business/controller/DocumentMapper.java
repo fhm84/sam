@@ -7,12 +7,12 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.JAKARTA_CDI,
-        unmappedTargetPolicy = ReportingPolicy.ERROR)
+@Mapper(
+    componentModel = MappingConstants.ComponentModel.JAKARTA_CDI,
+    unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface DocumentMapper {
 
-    @Mapping(target = "stream", ignore = true)
-    @Mapping(target = "checksumSha256", source = "sha256")
-    DocumentDownload toDto(DocumentEntity documentEntity);
-
+  @Mapping(target = "stream", ignore = true)
+  @Mapping(target = "checksumSha256", source = "sha256")
+  DocumentDownload toDto(DocumentEntity documentEntity);
 }

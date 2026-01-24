@@ -16,45 +16,43 @@ import jakarta.ws.rs.core.Context;
 @RequestScoped
 public class SheetsResourceImpl implements SheetsResource {
 
-    @Context
-    ResourceContext resourceContext;
+  @Context ResourceContext resourceContext;
 
-    @Inject
-    SheetRepository sheetRepository;
+  @Inject SheetRepository sheetRepository;
 
-    @Override
-    public PaginatedResponse<SheetMusicSearchResult> findSheets(final SheetFilterRequest filterRequest) {
-        return sheetRepository.findSheets(filterRequest);
-    }
+  @Override
+  public PaginatedResponse<SheetMusicSearchResult> findSheets(
+      final SheetFilterRequest filterRequest) {
+    return sheetRepository.findSheets(filterRequest);
+  }
 
-    @Override
-    public SheetMusic add(final SheetMusic sheetMusic) {
-        return sheetRepository.addSheet(sheetMusic);
-    }
+  @Override
+  public SheetMusic add(final SheetMusic sheetMusic) {
+    return sheetRepository.addSheet(sheetMusic);
+  }
 
-    @Override
-    public SheetMusic load(final String sheetId) {
-        return sheetRepository.getSheet(sheetId);
-    }
+  @Override
+  public SheetMusic load(final String sheetId) {
+    return sheetRepository.getSheet(sheetId);
+  }
 
-    @Override
-    public void update(final String sheetId, final SheetMusic sheetMusic) {
-        sheetRepository.updateSheet(sheetId, sheetMusic);
-    }
+  @Override
+  public void update(final String sheetId, final SheetMusic sheetMusic) {
+    sheetRepository.updateSheet(sheetId, sheetMusic);
+  }
 
-    @Override
-    public void delete(final String sheetId) {
-        sheetRepository.deleteSheet(sheetId);
-    }
+  @Override
+  public void delete(final String sheetId) {
+    sheetRepository.deleteSheet(sheetId);
+  }
 
-    @Override
-    public InstrumentationsResource instrumentations(final String sheetId) {
-        return resourceContext.getResource(InstrumentationsResourceImpl.class);
-    }
+  @Override
+  public InstrumentationsResource instrumentations(final String sheetId) {
+    return resourceContext.getResource(InstrumentationsResourceImpl.class);
+  }
 
-    @Override
-    public DocumentsResource documents(String sheetId) {
-        return resourceContext.getResource(DocumentsResourceImpl.class);
-    }
-
+  @Override
+  public DocumentsResource documents(String sheetId) {
+    return resourceContext.getResource(DocumentsResourceImpl.class);
+  }
 }

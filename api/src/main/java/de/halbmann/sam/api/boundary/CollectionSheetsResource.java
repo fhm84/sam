@@ -10,19 +10,18 @@ import jakarta.ws.rs.core.MediaType;
 @Consumes(MediaType.APPLICATION_JSON)
 public interface CollectionSheetsResource {
 
-    @GET
-    PaginatedResponse<CollectionSheet> listAll(final @BeanParam PaginationRequest paginationRequest);
+  @GET
+  PaginatedResponse<CollectionSheet> listAll(final @BeanParam PaginationRequest paginationRequest);
 
-    @POST
-    void addSheet(final CollectionSheet collectionSheet);
+  @POST
+  void addSheet(final CollectionSheet collectionSheet);
 
-    @PUT
-    @Path("{sheetId}")
-    void updateSheet(final @PathParam("sheetId") String sheetId, final CollectionSheet collectionSheet);
+  @PUT
+  @Path("{sheetId}")
+  void updateSheet(
+      final @PathParam("sheetId") String sheetId, final CollectionSheet collectionSheet);
 
-    @DELETE
-    @Path("{sheetId}")
-    void removeSheet(final @PathParam("sheetId") String sheetId);
-
-
+  @DELETE
+  @Path("{sheetId}")
+  void removeSheet(final @PathParam("sheetId") String sheetId);
 }

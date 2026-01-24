@@ -1,126 +1,91 @@
 package de.halbmann.sam.business.entity;
 
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.envers.Audited;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-/**
- * Represents a piece of music.
- */
+/** Represents a piece of music. */
 @Getter
 @Setter
 @Entity
 @Audited
 @Table(name = "sheets")
 @SqlResultSetMapping(
-        name = "SheetWithMetrics",
-        entities = @EntityResult(entityClass = SheetMusicEntity.class),
-        columns = {
-                @ColumnResult(name = "fts_rank", type = Double.class),
-                @ColumnResult(name = "title_similarity", type = Double.class),
-                @ColumnResult(name = "composer_similarity", type = Double.class),
-                @ColumnResult(name = "phonetic_match", type = Boolean.class),
-                @ColumnResult(name = "final_rank", type = Double.class)
-        }
-)
+    name = "SheetWithMetrics",
+    entities = @EntityResult(entityClass = SheetMusicEntity.class),
+    columns = {
+      @ColumnResult(name = "fts_rank", type = Double.class),
+      @ColumnResult(name = "title_similarity", type = Double.class),
+      @ColumnResult(name = "composer_similarity", type = Double.class),
+      @ColumnResult(name = "phonetic_match", type = Boolean.class),
+      @ColumnResult(name = "final_rank", type = Double.class)
+    })
 public class SheetMusicEntity extends AbstractEntity {
 
-    /**
-     * The title of the music sheet/piece.
-     */
-    String title;
-    /**
-     * (Optional) Subtitle of the piece.
-     */
-    String subtitle;
+  /** The title of the music sheet/piece. */
+  String title;
 
-    /**
-     * The publisher of the music sheet.
-     */
-    String publisher;
-    /**
-     * Interested Party Information (IPI)-Number of the publisher.
-     */
-    String publisherIpi;
+  /** (Optional) Subtitle of the piece. */
+  String subtitle;
 
-    /**
-     * The composer of the music sheet.
-     */
-    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    MusicianEntity composer;
-    /**
-     * The arranger of the music sheet.
-     */
-    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    MusicianEntity arranger;
+  /** The publisher of the music sheet. */
+  String publisher;
 
-    /**
-     * Optional (e.g., original band or composer)
-     */
-    String originalBy;
+  /** Interested Party Information (IPI)-Number of the publisher. */
+  String publisherIpi;
 
-    /**
-     * Classification (e.g., Classical, Jazz)
-     */
-    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    GenreEntity genre;
+  /** The composer of the music sheet. */
+  @ManyToOne(
+      cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+  MusicianEntity composer;
 
-    /**
-     * Level (Beginner, Intermediate, Advanced).
-     */
-    String difficultyLevel;
+  /** The arranger of the music sheet. */
+  @ManyToOne(
+      cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+  MusicianEntity arranger;
 
-    /**
-     * Year of composition.
-     */
-    Integer yearOfComposition;
+  /** Optional (e.g., original band or composer) */
+  String originalBy;
 
-    /**
-     * Edition name.
-     */
-    String edition;
+  /** Classification (e.g., Classical, Jazz) */
+  @ManyToOne(
+      cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+  GenreEntity genre;
 
-    /**
-     * Copyright information.
-     */
-    String copyright;
+  /** Level (Beginner, Intermediate, Advanced). */
+  String difficultyLevel;
 
-    /**
-     * Rating for the piece/music sheet.
-     */
-    Integer rating;
+  /** Year of composition. */
+  Integer yearOfComposition;
 
-    /**
-     * International Standard Musical Work Code
-     */
-    String iswc;
+  /** Edition name. */
+  String edition;
 
-    /**
-     * Identification number of GEMA (GEMA-Werk Nr.)
-     */
-    String gemaWorkNumber;
+  /** Copyright information. */
+  String copyright;
 
-    /**
-     * Additional notes.
-     */
-    @Column(columnDefinition = "text")
-    String additionalNotes;
+  /** Rating for the piece/music sheet. */
+  Integer rating;
 
-    /**
-     * Individual instrument parts.
-     */
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "sheet", orphanRemoval = true)
-    List<InstrumentationEntity> instrumentations = new ArrayList<>();
+  /** International Standard Musical Work Code */
+  String iswc;
 
-    /**
-     * Metadata of the sheet music files (including location, mime-type, fileSize, ...)
-     */
-    @OneToMany(fetch = FetchType.LAZY)
-    Set<AttachmentEntity> attachments;
+  /** Identification number of GEMA (GEMA-Werk Nr.) */
+  String gemaWorkNumber;
 
+  /** Additional notes. */
+  @Column(columnDefinition = "text")
+  String additionalNotes;
+
+  /** Individual instrument parts. */
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "sheet", orphanRemoval = true)
+  List<InstrumentationEntity> instrumentations = new ArrayList<>();
+
+  /** Metadata of the sheet music files (including location, mime-type, fileSize, ...) */
+  @OneToMany(fetch = FetchType.LAZY)
+  Set<AttachmentEntity> attachments;
 }

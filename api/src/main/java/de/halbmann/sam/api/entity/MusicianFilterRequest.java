@@ -8,7 +8,6 @@ import lombok.Setter;
 @Setter
 public class MusicianFilterRequest extends PaginationRequest {
 
-    @QueryParam("name")
-    private String name;
-
+  @QueryParam("name")
+  private String name;
 }

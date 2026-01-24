@@ -9,7 +9,6 @@ import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,16 +19,17 @@ import java.util.stream.Collectors;
 @Transactional
 public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, UUID> {
 
-    @Inject
-    SheetMusicMapper sheetMusicMapper;
+  @Inject SheetMusicMapper sheetMusicMapper;
 
-    public PaginatedResponse<SheetMusic> getAllSheets(final PaginationRequest paginationRequest) {
-        return findSheets(paginationRequest, Map.of());
-    }
+  public PaginatedResponse<SheetMusic> getAllSheets(final PaginationRequest paginationRequest) {
+    return findSheets(paginationRequest, Map.of());
+  }
 
-    public PaginatedResponse<SheetMusicSearchResult> findSheets(final SheetFilterRequest filterRequest) {
-        if (filterRequest.getQuery() != null) {
-            String sql = """
+  public PaginatedResponse<SheetMusicSearchResult> findSheets(
+      final SheetFilterRequest filterRequest) {
+    if (filterRequest.getQuery() != null) {
+      String sql =
+          """
                     WITH q AS (
                         SELECT
                             plainto_tsquery('simple', :query) AS tsq,
@@ -42,7 +42,7 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
                            similarity(s.title, q.raw)         AS title_similarity,
                            similarity(s.composer_name, q.raw) AS composer_similarity,
                            (s.composer_phonetic = q.phonetic) AS phonetic_match,
-                    
+
                            -- final score
                            (
                                ts_rank(s.search_vector, q.tsq) * 0.70
@@ -71,116 +71,116 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
                         ) DESC
                     """;
 
-            List<Object[]> results = getEntityManager().createNativeQuery(sql, "SheetWithMetrics")
-                    .setParameter("query", filterRequest.getQuery())
-                    .setFirstResult(filterRequest.getPage() * filterRequest.getSize())
-                    .setMaxResults(filterRequest.getSize())
-                    .getResultList();
+      List<Object[]> results =
+          getEntityManager()
+              .createNativeQuery(sql, "SheetWithMetrics")
+              .setParameter("query", filterRequest.getQuery())
+              .setFirstResult(filterRequest.getPage() * filterRequest.getSize())
+              .setMaxResults(filterRequest.getSize())
+              .getResultList();
 
-            PaginatedResponse<SheetMusicSearchResult> response = new PaginatedResponse<>();
-            response.setData(results.stream()
-                    .map(r -> new SheetMusicSearchResult(
-                            sheetMusicMapper.toDto((SheetMusicEntity) r[0]),
-                            new SearchResultMetrics(
-                                    ((Number) r[1]).doubleValue(),
-                                    ((Number) r[2]).doubleValue(),
-                                    ((Number) r[3]).doubleValue(),
-                                    (Boolean) r[4],
-                                    ((Number) r[5]).doubleValue()
-                            )
-                    ))
-                    .toList());
-            response.setSize(response.getData().size());
-            return response;
-        } else {
-            final Map<String, Object> parameters = new HashMap<>();
-            if (filterRequest.getTitle() != null) {
-                parameters.put("title", filterRequest.getTitle());
-            }
-            if (filterRequest.getComposer() != null) {
-                parameters.put("composer.name", filterRequest.getComposer());
-            }
+      PaginatedResponse<SheetMusicSearchResult> response = new PaginatedResponse<>();
+      response.setData(
+          results.stream()
+              .map(
+                  r ->
+                      new SheetMusicSearchResult(
+                          sheetMusicMapper.toDto((SheetMusicEntity) r[0]),
+                          new SearchResultMetrics(
+                              ((Number) r[1]).doubleValue(),
+                              ((Number) r[2]).doubleValue(),
+                              ((Number) r[3]).doubleValue(),
+                              (Boolean) r[4],
+                              ((Number) r[5]).doubleValue())))
+              .toList());
+      response.setSize(response.getData().size());
+      return response;
+    } else {
+      final Map<String, Object> parameters = new HashMap<>();
+      if (filterRequest.getTitle() != null) {
+        parameters.put("title", filterRequest.getTitle());
+      }
+      if (filterRequest.getComposer() != null) {
+        parameters.put("composer.name", filterRequest.getComposer());
+      }
 
-            PaginatedResponse<SheetMusic> sheets = findSheets(filterRequest, parameters);
-            PaginatedResponse<SheetMusicSearchResult> response = new PaginatedResponse<>();
-            response.setSize(sheets.getSize());
-            response.setTotalCount(sheets.getTotalCount());
-            response.setData(sheets.getData().stream()
-                    .map(SheetMusicSearchResult::new)
-                    .toList());
-            return response;
-        }
+      PaginatedResponse<SheetMusic> sheets = findSheets(filterRequest, parameters);
+      PaginatedResponse<SheetMusicSearchResult> response = new PaginatedResponse<>();
+      response.setSize(sheets.getSize());
+      response.setTotalCount(sheets.getTotalCount());
+      response.setData(sheets.getData().stream().map(SheetMusicSearchResult::new).toList());
+      return response;
     }
+  }
 
-    private Sort prepareSort(PaginationRequest paginationRequest) {
-        final Sort sort;
-        if (paginationRequest.getSortBy() != null) {
-            if (SortOrder.DESC == paginationRequest.getSortOrder()) {
-                sort = Sort.descending(paginationRequest.getSortBy());
-            } else {
-                // default/fallback: ASC
-                sort = Sort.ascending(paginationRequest.getSortBy());
-            }
-        } else {
-            sort = Sort.ascending("title");
-        }
-        return sort;
+  private Sort prepareSort(PaginationRequest paginationRequest) {
+    final Sort sort;
+    if (paginationRequest.getSortBy() != null) {
+      if (SortOrder.DESC == paginationRequest.getSortOrder()) {
+        sort = Sort.descending(paginationRequest.getSortBy());
+      } else {
+        // default/fallback: ASC
+        sort = Sort.ascending(paginationRequest.getSortBy());
+      }
+    } else {
+      sort = Sort.ascending("title");
     }
+    return sort;
+  }
 
-    PaginatedResponse<SheetMusic> findSheets(final PaginationRequest paginationRequest, final Map<String, Object> parameters) {
-        final Map<String, Object> nonNullParams = parameters.entrySet().stream()
-                .filter(entry -> entry.getValue() != null)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+  PaginatedResponse<SheetMusic> findSheets(
+      final PaginationRequest paginationRequest, final Map<String, Object> parameters) {
+    final Map<String, Object> nonNullParams =
+        parameters.entrySet().stream()
+            .filter(entry -> entry.getValue() != null)
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        final String filter = nonNullParams.keySet().stream()
-                .map(o -> o + "=:" + o)
-                .collect(Collectors.joining(" and "));
+    final String filter =
+        nonNullParams.keySet().stream().map(o -> o + "=:" + o).collect(Collectors.joining(" and "));
 
-        final Sort sort = prepareSort(paginationRequest);
+    final Sort sort = prepareSort(paginationRequest);
 
-        // get the total count
-        long totalItems;
-        PanacheQuery<SheetMusicEntity> sheetQuery;
-        if (nonNullParams.isEmpty()) {
-            sheetQuery = findAll(sort);
-            totalItems = count();
-        } else {
-            sheetQuery = find(filter, nonNullParams);
-            totalItems = count(filter, nonNullParams);
-        }
-        final List<SheetMusicEntity> sheets = sheetQuery
-                .page(paginationRequest.getPage(), paginationRequest.getSize())
-                .list();
-
-        // Wrap the result into a PaginatedResponse
-        PaginatedResponse<SheetMusic> response = new PaginatedResponse<>();
-        response.setData(sheets.stream().map(sheetMusicMapper::toDto).toList());
-        response.setSize(response.getData().size());
-        response.setTotalCount(totalItems);
-
-        return response;
+    // get the total count
+    long totalItems;
+    PanacheQuery<SheetMusicEntity> sheetQuery;
+    if (nonNullParams.isEmpty()) {
+      sheetQuery = findAll(sort);
+      totalItems = count();
+    } else {
+      sheetQuery = find(filter, nonNullParams);
+      totalItems = count(filter, nonNullParams);
     }
+    final List<SheetMusicEntity> sheets =
+        sheetQuery.page(paginationRequest.getPage(), paginationRequest.getSize()).list();
 
-    public SheetMusic getSheet(final String sheetId) {
-        final SheetMusicEntity sheetMusicEntity = findById(UUID.fromString(sheetId));
+    // Wrap the result into a PaginatedResponse
+    PaginatedResponse<SheetMusic> response = new PaginatedResponse<>();
+    response.setData(sheets.stream().map(sheetMusicMapper::toDto).toList());
+    response.setSize(response.getData().size());
+    response.setTotalCount(totalItems);
 
-        return sheetMusicMapper.toDto(sheetMusicEntity);
-    }
+    return response;
+  }
 
-    public SheetMusic addSheet(final SheetMusic sheetMusic) {
-        final SheetMusicEntity sheetMusicEntity = sheetMusicMapper.fromDto(sheetMusic);
-        persistAndFlush(sheetMusicEntity);
-        return sheetMusicMapper.toDto(sheetMusicEntity);
-    }
+  public SheetMusic getSheet(final String sheetId) {
+    final SheetMusicEntity sheetMusicEntity = findById(UUID.fromString(sheetId));
 
-    public void updateSheet(final String sheetId, final SheetMusic sheetMusic) {
-        final SheetMusicEntity sheetMusicEntity = findById(UUID.fromString(sheetId));
-        sheetMusicMapper.update(sheetMusicEntity, sheetMusic);
-    }
+    return sheetMusicMapper.toDto(sheetMusicEntity);
+  }
 
-    public void deleteSheet(final String sheetId) {
-        final SheetMusicEntity sheetMusicEntity = findById(UUID.fromString(sheetId));
-        delete(sheetMusicEntity);
-    }
+  public SheetMusic addSheet(final SheetMusic sheetMusic) {
+    final SheetMusicEntity sheetMusicEntity = sheetMusicMapper.fromDto(sheetMusic);
+    persistAndFlush(sheetMusicEntity);
+    return sheetMusicMapper.toDto(sheetMusicEntity);
+  }
 
+  public void updateSheet(final String sheetId, final SheetMusic sheetMusic) {
+    final SheetMusicEntity sheetMusicEntity = findById(UUID.fromString(sheetId));
+    sheetMusicMapper.update(sheetMusicEntity, sheetMusic);
+  }
+
+  public void deleteSheet(final String sheetId) {
+    final SheetMusicEntity sheetMusicEntity = findById(UUID.fromString(sheetId));
+    delete(sheetMusicEntity);
+  }
 }

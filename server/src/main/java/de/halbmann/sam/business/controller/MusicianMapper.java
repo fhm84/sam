@@ -7,15 +7,15 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.JAKARTA_CDI,
-        unmappedTargetPolicy = ReportingPolicy.ERROR)
+@Mapper(
+    componentModel = MappingConstants.ComponentModel.JAKARTA_CDI,
+    unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface MusicianMapper {
 
-    Musician toDto(final MusicianEntity entity);
+  Musician toDto(final MusicianEntity entity);
 
-    @Mapping(target = "version", ignore = true)
-    @Mapping(target = "created", ignore = true)
-    @Mapping(target = "lastUpdate", ignore = true)
-    MusicianEntity fromDto(final Musician dto);
-
+  @Mapping(target = "version", ignore = true)
+  @Mapping(target = "created", ignore = true)
+  @Mapping(target = "lastUpdate", ignore = true)
+  MusicianEntity fromDto(final Musician dto);
 }

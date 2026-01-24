@@ -7,9 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.envers.Audited;
 
-/**
- * Stores information about publishers.
- */
+/** Stores information about publishers. */
 @Getter
 @Setter
 @Entity
@@ -18,17 +16,12 @@ import org.hibernate.envers.Audited;
 @Table(name = "publishers")
 public class Publisher extends AbstractEntity {
 
-    /**
-     * Name
-     */
-    String name;
-    /**
-     * Contact
-     */
-    String contact;
-    /**
-     * Address
-     */
-    String address;
+  /** Name */
+  String name;
 
+  /** Contact */
+  String contact;
+
+  /** Address */
+  String address;
 }

@@ -4,6 +4,5 @@ import java.io.IOException;
 
 public interface UploadPolicy {
 
-    void verify(UploadContext context) throws IOException;
-
+  void verify(UploadContext context) throws IOException;
 }

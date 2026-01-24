@@ -2,113 +2,73 @@ package de.halbmann.sam.api.entity;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import lombok.*;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import lombok.*;
 
-/**
- * Represents a piece of music.
- */
+/** Represents a piece of music. */
 @Data
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class SheetMusic {
 
-    /**
-     * Unique identifier of the music sheet/piece.
-     */
-    UUID id;
-    /**
-     * The title of the music sheet/piece.
-     */
-    @NotBlank
-    String title;
-    /**
-     * (Optional) Subtitle of the piece.
-     */
-    String subtitle;
-    /**
-     * The publisher of the music sheet.
-     */
-    String publisher;
-    /**
-     * Interested Party Information (IPI)-Number of the publisher.
-     */
-    String publisherIpi;
-    /**
-     * The composer of the music sheet.
-     */
-    @Valid
-    Musician composer;
-    /**
-     * The arranger of the music sheet.
-     */
-    @Valid
-    Musician arranger;
+  /** Unique identifier of the music sheet/piece. */
+  UUID id;
 
-    /**
-     * Optional (e.g., original band or composer)
-     */
-    String originalBy;
+  /** The title of the music sheet/piece. */
+  @NotBlank String title;
 
-    /**
-     * Classification (e.g., Classical, Jazz)
-     */
-    String genre;
+  /** (Optional) Subtitle of the piece. */
+  String subtitle;
 
-    /**
-     * Level (Beginner, Intermediate, Advanced).
-     */
-    String difficultyLevel;
+  /** The publisher of the music sheet. */
+  String publisher;
 
-    /**
-     * Year of composition.
-     */
-    Integer yearOfComposition;
+  /** Interested Party Information (IPI)-Number of the publisher. */
+  String publisherIpi;
 
-    /**
-     * Edition name.
-     */
-    String edition;
+  /** The composer of the music sheet. */
+  @Valid Musician composer;
 
-    /**
-     * Copyright information.
-     */
-    String copyright;
+  /** The arranger of the music sheet. */
+  @Valid Musician arranger;
 
-    /**
-     * Rating for the piece/music sheet.
-     */
-    Integer rating;
+  /** Optional (e.g., original band or composer) */
+  String originalBy;
 
-    /**
-     * International Standard Musical Work Code
-     */
-    String iswc;
+  /** Classification (e.g., Classical, Jazz) */
+  String genre;
 
-    /**
-     * Identification number of GEMA (GEMA-Werk Nr.)
-     */
-    String gemaWorkNumber;
+  /** Level (Beginner, Intermediate, Advanced). */
+  String difficultyLevel;
 
-    /**
-     * Additional notes.
-     */
-    String additionalNotes;
+  /** Year of composition. */
+  Integer yearOfComposition;
 
-    /**
-     * Individual instrument parts for a piece of sheet music.
-     */
-    @Valid
-    List<Instrumentation> instrumentations = new ArrayList<>();
+  /** Edition name. */
+  String edition;
 
-    /**
-     * Metadata of the sheet music files (including location, mime-type, fileSize, ...)
-     */
-    Set<Attachment> attachments;
+  /** Copyright information. */
+  String copyright;
 
+  /** Rating for the piece/music sheet. */
+  Integer rating;
+
+  /** International Standard Musical Work Code */
+  String iswc;
+
+  /** Identification number of GEMA (GEMA-Werk Nr.) */
+  String gemaWorkNumber;
+
+  /** Additional notes. */
+  String additionalNotes;
+
+  /** Individual instrument parts for a piece of sheet music. */
+  @Valid List<Instrumentation> instrumentations = new ArrayList<>();
+
+  /** Metadata of the sheet music files (including location, mime-type, fileSize, ...) */
+  Set<Attachment> attachments;
 }

@@ -11,10 +11,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SearchResultMetrics {
 
-    double ftsRank;
-    double titleSimilarity;
-    double composerSimilarity;
-    boolean phoneticMatch;
-    double finalRank;
-
+  double ftsRank;
+  double titleSimilarity;
+  double composerSimilarity;
+  boolean phoneticMatch;
+  double finalRank;
 }
