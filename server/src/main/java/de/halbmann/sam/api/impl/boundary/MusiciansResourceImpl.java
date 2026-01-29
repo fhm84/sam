@@ -24,8 +24,7 @@ public class MusiciansResourceImpl implements MusiciansResource {
 
   @Override
   public Musician add(Musician musician) {
-    // FIXME: implement!
-    return null;
+    return musicianRepository.addMusician(musician);
   }
 
   @Override
@@ -35,7 +34,7 @@ public class MusiciansResourceImpl implements MusiciansResource {
 
   @Override
   public void update(String musicianId, Musician musician) {
-    // FIXME: implement!
+    musicianRepository.updateMusician(musicianId, musician);
   }
 
   @Override

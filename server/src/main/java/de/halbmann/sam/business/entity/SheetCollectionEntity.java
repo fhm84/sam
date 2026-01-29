@@ -1,8 +1,8 @@
 package de.halbmann.sam.business.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import de.halbmann.sam.api.entity.CollectionType;
+import jakarta.persistence.*;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +23,10 @@ public class SheetCollectionEntity extends AbstractEntity {
 
   /** (Optional) description for the sheet collection */
   String description;
+
+  /** The type of the collection (a folder or a program/setlist) */
+  @Enumerated(EnumType.STRING)
+  CollectionType type;
 
   /** (Optional) date of the collection (e.g. in case of a program for a gig) */
   LocalDate date;

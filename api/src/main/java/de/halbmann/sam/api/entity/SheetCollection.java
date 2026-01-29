@@ -23,6 +23,9 @@ public class SheetCollection {
   /** (Optional) description for the sheet collection */
   String description;
 
+  /** The type of the collection (a folder or a program/setlist) */
+  CollectionType type;
+
   /** (Optional) date of the collection (e.g. in case of a program for a gig) */
   LocalDate date;
 

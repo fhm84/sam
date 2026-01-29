@@ -20,6 +20,14 @@ public class MusicianRepository implements PanacheRepositoryBase<MusicianEntity,
 
   @Inject MusicianMapper musicianMapper;
 
+  public Musician addMusician(Musician musician) {
+    // FIXME: implement!
+    // we don't want to duplicate musicians, so first search for already existing one ...
+    MusicianEntity musicianEntity = musicianMapper.fromDto(musician);
+    persistAndFlush(musicianEntity);
+    return musicianMapper.toDto(musicianEntity);
+  }
+
   public PaginatedResponse<Musician> getAllMusicians(final PaginationRequest paginationRequest) {
     return findMusicians(paginationRequest, Map.of());
   }
@@ -104,6 +112,11 @@ public class MusicianRepository implements PanacheRepositoryBase<MusicianEntity,
       sort = Sort.ascending("name");
     }
     return sort;
+  }
+
+  public void updateMusician(String musicianId, Musician musician) {
+    final MusicianEntity musicianEntity = findById(UUID.fromString(musicianId));
+    musicianMapper.update(musicianEntity, musician);
   }
 
   public void deleteMusician(final String musicianId) {

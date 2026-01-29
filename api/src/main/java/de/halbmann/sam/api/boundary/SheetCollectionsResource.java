@@ -2,7 +2,7 @@ package de.halbmann.sam.api.boundary;
 
 import de.halbmann.sam.api.entity.PaginatedResponse;
 import de.halbmann.sam.api.entity.SheetCollection;
-import de.halbmann.sam.api.entity.SheetFilterRequest;
+import de.halbmann.sam.api.entity.SheetCollectionFilterRequest;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
@@ -15,7 +15,7 @@ public interface SheetCollectionsResource {
 
   @GET
   PaginatedResponse<SheetCollection> findSheetCollections(
-      final @BeanParam SheetFilterRequest filterRequest);
+      final @BeanParam SheetCollectionFilterRequest filterRequest);
 
   @POST
   SheetCollection add(final SheetCollection sheetCollection);
