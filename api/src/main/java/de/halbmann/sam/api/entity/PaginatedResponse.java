@@ -14,6 +14,7 @@ public class PaginatedResponse<T> {
 
   private List<T> data;
 
+  private int page;
   private int size;
   private long totalCount;
 }

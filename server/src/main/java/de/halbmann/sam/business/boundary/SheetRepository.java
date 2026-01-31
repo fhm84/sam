@@ -93,6 +93,7 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
                               (Boolean) r[4],
                               ((Number) r[5]).doubleValue())))
               .toList());
+      response.setPage(filterRequest.getPage());
       response.setSize(response.getData().size());
       return response;
     } else {
@@ -106,6 +107,7 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
 
       PaginatedResponse<SheetMusic> sheets = findSheets(filterRequest, parameters);
       PaginatedResponse<SheetMusicSearchResult> response = new PaginatedResponse<>();
+      response.setPage(filterRequest.getPage());
       response.setSize(sheets.getSize());
       response.setTotalCount(sheets.getTotalCount());
       response.setData(sheets.getData().stream().map(SheetMusicSearchResult::new).toList());
@@ -156,6 +158,7 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
     // Wrap the result into a PaginatedResponse
     PaginatedResponse<SheetMusic> response = new PaginatedResponse<>();
     response.setData(sheets.stream().map(sheetMusicMapper::toDto).toList());
+    response.setPage(paginationRequest.getPage());
     response.setSize(response.getData().size());
     response.setTotalCount(totalItems);
 

@@ -93,6 +93,7 @@ public class MusicianRepository implements PanacheRepositoryBase<MusicianEntity,
     // Wrap the result into a PaginatedResponse
     PaginatedResponse<Musician> response = new PaginatedResponse<>();
     response.setData(musicians.stream().map(musicianMapper::toDto).toList());
+    response.setPage(paginationRequest.getPage());
     response.setSize(response.getData().size());
     response.setTotalCount(totalItems);
 

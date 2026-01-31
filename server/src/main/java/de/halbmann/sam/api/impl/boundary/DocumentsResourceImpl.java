@@ -49,6 +49,7 @@ public class DocumentsResourceImpl implements DocumentsResource {
                         d.getMimeType(),
                         d.getSha256()))
             .toList());
+    response.setPage(filterRequest.getPage());
     response.setSize(response.getData().size());
     response.setTotalCount(response.getData().size());
     return response;
