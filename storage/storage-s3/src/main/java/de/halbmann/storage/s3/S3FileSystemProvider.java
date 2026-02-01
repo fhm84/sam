@@ -10,17 +10,18 @@ import software.amazon.awssdk.services.s3.S3Client;
 @ApplicationScoped
 public class S3FileSystemProvider implements FileSystemProvider {
 
-  @Inject S3Client s3;
+    @Inject
+    S3Client s3;
 
-  @Override
-  public boolean supports(StorageLocation location) {
-    return "s3".equalsIgnoreCase(location.scheme());
-  }
+    @Override
+    public boolean supports(StorageLocation location) {
+        return "s3".equalsIgnoreCase(location.scheme());
+    }
 
-  @Override
-  public FileSystemWrapper create(StorageLocation location) {
-    String bucket = location.authority();
-    String prefix = location.path().replaceFirst("^/", "");
-    return new S3FileSystemWrapper(s3, bucket, prefix);
-  }
+    @Override
+    public FileSystemWrapper create(StorageLocation location) {
+        String bucket = location.authority();
+        String prefix = location.path().replaceFirst("^/", "");
+        return new S3FileSystemWrapper(s3, bucket, prefix);
+    }
 }

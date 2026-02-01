@@ -11,6 +11,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.NoResultException;
 import jakarta.transaction.Transactional;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -18,111 +19,112 @@ import java.util.stream.Collectors;
 @Transactional
 public class MusicianRepository implements PanacheRepositoryBase<MusicianEntity, UUID> {
 
-  @Inject MusicianMapper musicianMapper;
+    @Inject
+    MusicianMapper musicianMapper;
 
-  public Musician addMusician(Musician musician) {
-    // FIXME: implement!
-    // we don't want to duplicate musicians, so first search for already existing one ...
-    MusicianEntity musicianEntity = musicianMapper.fromDto(musician);
-    persistAndFlush(musicianEntity);
-    return musicianMapper.toDto(musicianEntity);
-  }
-
-  public PaginatedResponse<Musician> getAllMusicians(final PaginationRequest paginationRequest) {
-    return findMusicians(paginationRequest, Map.of());
-  }
-
-  public Musician getMusician(final String musicianId) {
-    MusicianEntity musician = findById(UUID.fromString(musicianId));
-    return musicianMapper.toDto(musician);
-  }
-
-  public Optional<MusicianEntity> findMusicianByName(final String name) {
-    try {
-      return Optional.ofNullable(
-          find("name = :name", Parameters.with("name", name)).singleResult());
-    } catch (final NoResultException e) {
-      return Optional.empty();
-    }
-  }
-
-  public MusicianEntity resolveMusician(final Musician dto) {
-    if (dto == null || dto.getId() == null) {
-      return null;
+    public Musician addMusician(Musician musician) {
+        // FIXME: implement!
+        // we don't want to duplicate musicians, so first search for already existing one ...
+        MusicianEntity musicianEntity = musicianMapper.fromDto(musician);
+        persistAndFlush(musicianEntity);
+        return musicianMapper.toDto(musicianEntity);
     }
 
-    try {
-      return findById(dto.getId());
-    } catch (final NoResultException e) {
-      return null;
+    public PaginatedResponse<Musician> getAllMusicians(final PaginationRequest paginationRequest) {
+        return findMusicians(paginationRequest, Map.of());
     }
-  }
 
-  public PaginatedResponse<Musician> findMusicians(final MusicianFilterRequest filterRequest) {
-    final Map<String, Object> parameters = new HashMap<>();
-    parameters.put("name", filterRequest.getName());
-
-    return findMusicians(filterRequest, parameters);
-  }
-
-  PaginatedResponse<Musician> findMusicians(
-      final PaginationRequest paginationRequest, final Map<String, Object> parameters) {
-    final Map<String, Object> nonNullParams =
-        parameters.entrySet().stream()
-            .filter(entry -> entry.getValue() != null)
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-    final String filter =
-        nonNullParams.keySet().stream().map(o -> o + "=:" + o).collect(Collectors.joining(" and "));
-
-    final Sort sort = prepareSort(paginationRequest);
-
-    // get the total count
-    long totalItems;
-    PanacheQuery<MusicianEntity> musicianQuery;
-    if (nonNullParams.isEmpty()) {
-      musicianQuery = findAll(sort);
-      totalItems = count();
-    } else {
-      musicianQuery = find(filter, nonNullParams);
-      totalItems = count(filter, nonNullParams);
+    public Musician getMusician(final String musicianId) {
+        MusicianEntity musician = findById(UUID.fromString(musicianId));
+        return musicianMapper.toDto(musician);
     }
-    final List<MusicianEntity> musicians =
-        musicianQuery.page(paginationRequest.getPage(), paginationRequest.getSize()).list();
 
-    // Wrap the result into a PaginatedResponse
-    PaginatedResponse<Musician> response = new PaginatedResponse<>();
-    response.setData(musicians.stream().map(musicianMapper::toDto).toList());
-    response.setPage(paginationRequest.getPage());
-    response.setSize(response.getData().size());
-    response.setTotalCount(totalItems);
-
-    return response;
-  }
-
-  private Sort prepareSort(PaginationRequest paginationRequest) {
-    final Sort sort;
-    if (paginationRequest.getSortBy() != null) {
-      if (SortOrder.DESC == paginationRequest.getSortOrder()) {
-        sort = Sort.descending(paginationRequest.getSortBy());
-      } else {
-        // default/fallback: ASC
-        sort = Sort.ascending(paginationRequest.getSortBy());
-      }
-    } else {
-      sort = Sort.ascending("name");
+    public Optional<MusicianEntity> findMusicianByName(final String name) {
+        try {
+            return Optional.ofNullable(
+                    find("name = :name", Parameters.with("name", name)).singleResult());
+        } catch (final NoResultException e) {
+            return Optional.empty();
+        }
     }
-    return sort;
-  }
 
-  public void updateMusician(String musicianId, Musician musician) {
-    final MusicianEntity musicianEntity = findById(UUID.fromString(musicianId));
-    musicianMapper.update(musicianEntity, musician);
-  }
+    public MusicianEntity resolveMusician(final Musician dto) {
+        if (dto == null || dto.getId() == null) {
+            return null;
+        }
 
-  public void deleteMusician(final String musicianId) {
-    final MusicianEntity musicianEntity = findById(UUID.fromString(musicianId));
-    // TODO: check for links -> if the musician is still in use -> do NOT delete!
-    delete(musicianEntity);
-  }
+        try {
+            return findById(dto.getId());
+        } catch (final NoResultException e) {
+            return null;
+        }
+    }
+
+    public PaginatedResponse<Musician> findMusicians(final MusicianFilterRequest filterRequest) {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("name", filterRequest.getName());
+
+        return findMusicians(filterRequest, parameters);
+    }
+
+    PaginatedResponse<Musician> findMusicians(
+            final PaginationRequest paginationRequest, final Map<String, Object> parameters) {
+        final Map<String, Object> nonNullParams = parameters.entrySet().stream()
+                .filter(entry -> entry.getValue() != null)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        final String filter =
+                nonNullParams.keySet().stream().map(o -> o + "=:" + o).collect(Collectors.joining(" and "));
+
+        final Sort sort = prepareSort(paginationRequest);
+
+        // get the total count
+        long totalItems;
+        PanacheQuery<MusicianEntity> musicianQuery;
+        if (nonNullParams.isEmpty()) {
+            musicianQuery = findAll(sort);
+            totalItems = count();
+        } else {
+            musicianQuery = find(filter, nonNullParams);
+            totalItems = count(filter, nonNullParams);
+        }
+        final List<MusicianEntity> musicians = musicianQuery
+                .page(paginationRequest.getPage(), paginationRequest.getSize())
+                .list();
+
+        // Wrap the result into a PaginatedResponse
+        PaginatedResponse<Musician> response = new PaginatedResponse<>();
+        response.setData(musicians.stream().map(musicianMapper::toDto).toList());
+        response.setPage(paginationRequest.getPage());
+        response.setSize(response.getData().size());
+        response.setTotalCount(totalItems);
+
+        return response;
+    }
+
+    private Sort prepareSort(PaginationRequest paginationRequest) {
+        final Sort sort;
+        if (paginationRequest.getSortBy() != null) {
+            if (SortOrder.DESC == paginationRequest.getSortOrder()) {
+                sort = Sort.descending(paginationRequest.getSortBy());
+            } else {
+                // default/fallback: ASC
+                sort = Sort.ascending(paginationRequest.getSortBy());
+            }
+        } else {
+            sort = Sort.ascending("name");
+        }
+        return sort;
+    }
+
+    public void updateMusician(String musicianId, Musician musician) {
+        final MusicianEntity musicianEntity = findById(UUID.fromString(musicianId));
+        musicianMapper.update(musicianEntity, musician);
+    }
+
+    public void deleteMusician(final String musicianId) {
+        final MusicianEntity musicianEntity = findById(UUID.fromString(musicianId));
+        // TODO: check for links -> if the musician is still in use -> do NOT delete!
+        delete(musicianEntity);
+    }
 }

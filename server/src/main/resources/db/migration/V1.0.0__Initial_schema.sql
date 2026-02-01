@@ -580,13 +580,18 @@ ALTER TABLE sheets
 
 -- synchronize musician names
 CREATE OR REPLACE FUNCTION sync_sheet_musicians()
-    RETURNS trigger AS $$
+    RETURNS trigger AS
+$$
 BEGIN
-    SELECT name INTO NEW.composer_name
-    FROM musicians WHERE id = NEW.composer_id;
+    SELECT name
+    INTO NEW.composer_name
+    FROM musicians
+    WHERE id = NEW.composer_id;
 
-    SELECT name INTO NEW.arranger_name
-    FROM musicians WHERE id = NEW.arranger_id;
+    SELECT name
+    INTO NEW.arranger_name
+    FROM musicians
+    WHERE id = NEW.arranger_id;
 
     RETURN NEW;
 END;
@@ -600,7 +605,8 @@ EXECUTE FUNCTION sync_sheet_musicians();
 
 -- on update of musician name
 CREATE OR REPLACE FUNCTION propagate_musician_name()
-    RETURNS trigger AS $$
+    RETURNS trigger AS
+$$
 BEGIN
     UPDATE sheets
     SET composer_name = NEW.name
@@ -622,7 +628,8 @@ EXECUTE FUNCTION propagate_musician_name();
 
 -- phonetic code (DMetaphone)
 CREATE OR REPLACE FUNCTION update_phonetics()
-    RETURNS trigger AS $$
+    RETURNS trigger AS
+$$
 BEGIN
     NEW.composer_phonetic :=
             dmetaphone(coalesce(NEW.composer_name, ''));

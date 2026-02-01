@@ -8,6 +8,9 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode
 public class Genre {
 
-  /** The name of the genre. */
-  @NotBlank String name;
+    /**
+     * The name of the genre.
+     */
+    @NotBlank
+    String name;
 }

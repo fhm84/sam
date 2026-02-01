@@ -7,7 +7,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.envers.Audited;
 
-/** Wrapper entity for a sheet in context of a collection, adding an order number/identifier. */
+/**
+ * Wrapper entity for a sheet in context of a collection, adding an order number/identifier.
+ */
 @Getter
 @Setter
 @Entity
@@ -15,8 +17,11 @@ import org.hibernate.envers.Audited;
 @Table(name = "collection_sheets")
 public class CollectionSheetEntity extends AbstractEntity {
 
-  /** Identifier (e.g. the number within the collection) */
-  String identifier;
+    /**
+     * Identifier (e.g. the number within the collection)
+     */
+    String identifier;
 
-  @ManyToOne SheetMusicEntity sheet;
+    @ManyToOne
+    SheetMusicEntity sheet;
 }

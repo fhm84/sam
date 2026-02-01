@@ -13,21 +13,21 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 @RegisterRestClient(configKey = "musicians-api")
 public interface MusiciansResource {
 
-  @GET
-  PaginatedResponse<Musician> findMusicians(final @BeanParam MusicianFilterRequest filterRequest);
+    @GET
+    PaginatedResponse<Musician> findMusicians(final @BeanParam MusicianFilterRequest filterRequest);
 
-  @POST
-  Musician add(final Musician musician);
+    @POST
+    Musician add(final Musician musician);
 
-  @GET
-  @Path("{musicianId}")
-  Musician load(final @PathParam("musicianId") String musicianId);
+    @GET
+    @Path("{musicianId}")
+    Musician load(final @PathParam("musicianId") String musicianId);
 
-  @PUT
-  @Path("{musicianId}")
-  void update(final @PathParam("musicianId") String musicianId, final Musician musician);
+    @PUT
+    @Path("{musicianId}")
+    void update(final @PathParam("musicianId") String musicianId, final Musician musician);
 
-  @DELETE
-  @Path("{musicianId}")
-  void delete(final @PathParam("musicianId") String musicianId);
+    @DELETE
+    @Path("{musicianId}")
+    void delete(final @PathParam("musicianId") String musicianId);
 }

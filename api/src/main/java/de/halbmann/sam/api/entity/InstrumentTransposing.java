@@ -10,20 +10,36 @@ package de.halbmann.sam.api.entity;
  */
 public enum InstrumentTransposing {
 
-  /** C */
-  C,
-  /** D */
-  D,
-  /** E♭ */
-  Eb,
-  /** F */
-  F,
-  /** G */
-  G,
-  /** A */
-  A,
-  /** A♭ */
-  Ab,
-  /** B♭ */
-  Bb
+    /**
+     * C
+     */
+    C,
+    /**
+     * D
+     */
+    D,
+    /**
+     * E♭
+     */
+    Eb,
+    /**
+     * F
+     */
+    F,
+    /**
+     * G
+     */
+    G,
+    /**
+     * A
+     */
+    A,
+    /**
+     * A♭
+     */
+    Ab,
+    /**
+     * B♭
+     */
+    Bb
 }

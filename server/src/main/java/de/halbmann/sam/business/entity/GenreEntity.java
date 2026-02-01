@@ -16,7 +16,9 @@ import org.hibernate.envers.Audited;
 @Table(name = "genres")
 public class GenreEntity extends AbstractEntity {
 
-  /** The name of the genre. */
-  @Column(unique = true)
-  String name;
+    /**
+     * The name of the genre.
+     */
+    @Column(unique = true)
+    String name;
 }

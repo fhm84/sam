@@ -7,21 +7,21 @@ import java.nio.file.Path;
 
 public interface FileSystemWrapper {
 
-  Path resolve(String relativePath);
+    Path resolve(String relativePath);
 
-  OutputStream openForWrite(String relativePath) throws IOException;
+    OutputStream openForWrite(String relativePath) throws IOException;
 
-  InputStream openForRead(String relativePath) throws IOException;
+    InputStream openForRead(String relativePath) throws IOException;
 
-  boolean exists(String relativePath);
+    boolean exists(String relativePath);
 
-  default void save(String relativePath, InputStream in) throws IOException {
-    try (OutputStream out = openForWrite(relativePath)) {
-      in.transferTo(out);
+    default void save(String relativePath, InputStream in) throws IOException {
+        try (OutputStream out = openForWrite(relativePath)) {
+            in.transferTo(out);
+        }
     }
-  }
 
-  void move(String sourceRelativePath, String targetRelativePath) throws IOException;
+    void move(String sourceRelativePath, String targetRelativePath) throws IOException;
 
-  void delete(String relativePath) throws IOException;
+    void delete(String relativePath) throws IOException;
 }

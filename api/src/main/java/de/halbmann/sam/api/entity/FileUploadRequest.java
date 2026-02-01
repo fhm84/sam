@@ -9,9 +9,9 @@ import org.jboss.resteasy.reactive.multipart.FileUpload;
 @Setter
 public class FileUploadRequest {
 
-  @FormParam("file")
-  FileUpload file;
+    @FormParam("file")
+    FileUpload file;
 
-  @FormParam("type")
-  AttachmentType type;
+    @FormParam("type")
+    AttachmentType type;
 }

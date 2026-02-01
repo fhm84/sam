@@ -13,24 +13,24 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 @RegisterRestClient(configKey = "booklets-api")
 public interface BookletsResource {
 
-  @GET
-  PaginatedResponse<Booklet> findBooklets(final @BeanParam BookletFilterRequest filterRequest);
+    @GET
+    PaginatedResponse<Booklet> findBooklets(final @BeanParam BookletFilterRequest filterRequest);
 
-  @POST
-  Booklet add(final Booklet booklet);
+    @POST
+    Booklet add(final Booklet booklet);
 
-  @GET
-  @Path("{bookletId}")
-  Booklet load(final @PathParam("bookletId") String bookletId);
+    @GET
+    @Path("{bookletId}")
+    Booklet load(final @PathParam("bookletId") String bookletId);
 
-  @PUT
-  @Path("{bookletId}")
-  void update(final @PathParam("bookletId") String bookletId, final Booklet booklet);
+    @PUT
+    @Path("{bookletId}")
+    void update(final @PathParam("bookletId") String bookletId, final Booklet booklet);
 
-  @DELETE
-  @Path("{bookletId}")
-  void delete(final @PathParam("bookletId") String bookletId);
+    @DELETE
+    @Path("{bookletId}")
+    void delete(final @PathParam("bookletId") String bookletId);
 
-  @Path("{bookletId}/sheets")
-  CollectionSheetsResource sheets(final @PathParam("bookletId") String bookletId);
+    @Path("{bookletId}/sheets")
+    CollectionSheetsResource sheets(final @PathParam("bookletId") String bookletId);
 }

@@ -8,7 +8,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.envers.Audited;
 
-/** Represents a document (physical storage) entity with metadata and auditing capabilities. */
+/**
+ * Represents a document (physical storage) entity with metadata and auditing capabilities.
+ */
 @Getter
 @Setter
 @Entity
@@ -16,21 +18,23 @@ import org.hibernate.envers.Audited;
 @Table(name = "documents", uniqueConstraints = @UniqueConstraint(columnNames = "sha256"))
 public class DocumentEntity extends AbstractEntity {
 
-  @Column(nullable = false)
-  private String filename;
+    @Column(nullable = false)
+    private String filename;
 
-  @Column(nullable = false)
-  private String path;
+    @Column(nullable = false)
+    private String path;
 
-  @Column(nullable = false)
-  private long size;
+    @Column(nullable = false)
+    private long size;
 
-  /** The MIME type of the document. */
-  private String mimeType;
+    /**
+     * The MIME type of the document.
+     */
+    private String mimeType;
 
-  @Column(length = 64, nullable = false, unique = true)
-  private String sha256;
+    @Column(length = 64, nullable = false, unique = true)
+    private String sha256;
 
-  @Column(nullable = false)
-  private int refCount = 1;
+    @Column(nullable = false)
+    private int refCount = 1;
 }

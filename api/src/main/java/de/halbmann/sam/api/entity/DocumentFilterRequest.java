@@ -5,4 +5,5 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class DocumentFilterRequest extends PaginationRequest {}
+public class DocumentFilterRequest extends PaginationRequest {
+}

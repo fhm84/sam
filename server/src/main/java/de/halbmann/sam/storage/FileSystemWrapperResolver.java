@@ -13,25 +13,23 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 @ApplicationScoped
 public class FileSystemWrapperResolver {
 
-  private final FileSystemWrapper resolved;
+    private final FileSystemWrapper resolved;
 
-  @Inject
-  public FileSystemWrapperResolver(
-      @ConfigProperty(name = EnvConsts.FILESYSTEM_BASE_PATH) String basePath,
-      Instance<FileSystemProvider> providers) {
-    StorageLocation location = StorageLocation.parse(basePath);
+    @Inject
+    public FileSystemWrapperResolver(
+            @ConfigProperty(name = EnvConsts.FILESYSTEM_BASE_PATH) String basePath,
+            Instance<FileSystemProvider> providers) {
+        StorageLocation location = StorageLocation.parse(basePath);
 
-    this.resolved =
-        providers.stream()
-            .filter(p -> p.supports(location))
-            .findFirst()
-            .orElseThrow(
-                () -> new IllegalStateException("No FileSystemProvider for " + location.scheme()))
-            .create(location);
-  }
+        this.resolved = providers.stream()
+                .filter(p -> p.supports(location))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No FileSystemProvider for " + location.scheme()))
+                .create(location);
+    }
 
-  @Produces
-  public FileSystemWrapper filesystem() {
-    return resolved;
-  }
+    @Produces
+    public FileSystemWrapper filesystem() {
+        return resolved;
+    }
 }

@@ -1,7 +1,8 @@
 package de.halbmann.sam.api.entity;
 
-import java.util.List;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * Generic wrapper for a paginated response (data list) including some metadata like size and
@@ -12,9 +13,9 @@ import lombok.Data;
 @Data
 public class PaginatedResponse<T> {
 
-  private List<T> data;
+    private List<T> data;
 
-  private int page;
-  private int size;
-  private long totalCount;
+    private int page;
+    private int size;
+    private long totalCount;
 }

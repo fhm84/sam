@@ -10,15 +10,23 @@ package de.halbmann.sam.api.entity;
  */
 public enum Clef {
 
-  /** Treble (de: Violinschüssel) - 𝄞 */
-  TREBLE,
+    /**
+     * Treble (de: Violinschüssel) - 𝄞
+     */
+    TREBLE,
 
-  /** Alto (de: Altschlüssel) - 𝄡 */
-  ALTO,
+    /**
+     * Alto (de: Altschlüssel) - 𝄡
+     */
+    ALTO,
 
-  /** Tenor (de: Tenorschlüssel) - 𝄡 */
-  TENOR,
+    /**
+     * Tenor (de: Tenorschlüssel) - 𝄡
+     */
+    TENOR,
 
-  /** Bass (de: Bassschlüssel) - 𝄢 */
-  BASS
+    /**
+     * Bass (de: Bassschlüssel) - 𝄢
+     */
+    BASS
 }

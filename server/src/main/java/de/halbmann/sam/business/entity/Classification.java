@@ -17,12 +17,16 @@ import org.hibernate.envers.Audited;
 @Table(name = "classifications")
 public class Classification extends AbstractEntity {
 
-  /** The document to classify. */
-  @OneToOne(fetch = FetchType.LAZY)
-  AttachmentEntity attachment;
+    /**
+     * The document to classify.
+     */
+    @OneToOne(fetch = FetchType.LAZY)
+    AttachmentEntity attachment;
 
-  /** Status of the classification */
-  @Enumerated(EnumType.STRING)
-  @Column(length = 20)
-  ClassificationStatus status;
+    /**
+     * Status of the classification
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    ClassificationStatus status;
 }

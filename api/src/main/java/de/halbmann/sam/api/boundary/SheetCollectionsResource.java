@@ -13,26 +13,25 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 @RegisterRestClient(configKey = "sheet-collections-api")
 public interface SheetCollectionsResource {
 
-  @GET
-  PaginatedResponse<SheetCollection> findSheetCollections(
-      final @BeanParam SheetCollectionFilterRequest filterRequest);
+    @GET
+    PaginatedResponse<SheetCollection> findSheetCollections(
+            final @BeanParam SheetCollectionFilterRequest filterRequest);
 
-  @POST
-  SheetCollection add(final SheetCollection sheetCollection);
+    @POST
+    SheetCollection add(final SheetCollection sheetCollection);
 
-  @GET
-  @Path("{collectionId}")
-  SheetCollection load(final @PathParam("collectionId") String collectionId);
+    @GET
+    @Path("{collectionId}")
+    SheetCollection load(final @PathParam("collectionId") String collectionId);
 
-  @PUT
-  @Path("{collectionId}")
-  void update(
-      final @PathParam("collectionId") String collectionId, final SheetCollection sheetCollection);
+    @PUT
+    @Path("{collectionId}")
+    void update(final @PathParam("collectionId") String collectionId, final SheetCollection sheetCollection);
 
-  @DELETE
-  @Path("{collectionId}")
-  void delete(final @PathParam("collectionId") String collectionId);
+    @DELETE
+    @Path("{collectionId}")
+    void delete(final @PathParam("collectionId") String collectionId);
 
-  @Path("{collectionId}/sheets")
-  CollectionSheetsResource sheets(final @PathParam("collectionId") String collectionId);
+    @Path("{collectionId}/sheets")
+    CollectionSheetsResource sheets(final @PathParam("collectionId") String collectionId);
 }

@@ -8,11 +8,15 @@ import lombok.Setter;
 @Setter
 public class SheetCollectionFilterRequest extends PaginationRequest {
 
-  /** For "generic" search/query */
-  @QueryParam("q")
-  private String query;
+    /**
+     * For "generic" search/query
+     */
+    @QueryParam("q")
+    private String query;
 
-  /** Search by name */
-  @QueryParam("name")
-  private String name;
+    /**
+     * Search by name
+     */
+    @QueryParam("name")
+    private String name;
 }

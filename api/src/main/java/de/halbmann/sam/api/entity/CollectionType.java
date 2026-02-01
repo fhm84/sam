@@ -13,5 +13,4 @@ public enum CollectionType {
      * Concrete program/setlist for a (special) gig.
      */
     SETLIST
-
 }
