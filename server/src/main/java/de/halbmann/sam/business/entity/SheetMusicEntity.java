@@ -1,6 +1,8 @@
 package de.halbmann.sam.business.entity;
 
+import de.halbmann.sam.business.controller.FingerprintFactory;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.envers.Audited;
@@ -16,7 +18,10 @@ import java.util.Set;
 @Setter
 @Entity
 @Audited
-@Table(name = "sheets")
+@Table(name = "sheets",
+        uniqueConstraints = @UniqueConstraint(
+                columnNames = {"fingerprint"}
+        ))
 @SqlResultSetMapping(
         name = "SheetWithMetrics",
         entities = @EntityResult(entityClass = SheetMusicEntity.class),
@@ -32,6 +37,7 @@ public class SheetMusicEntity extends AbstractEntity {
     /**
      * The title of the music sheet/piece.
      */
+    @NotBlank
     String title;
 
     /**
@@ -124,4 +130,13 @@ public class SheetMusicEntity extends AbstractEntity {
      */
     @OneToMany(fetch = FetchType.LAZY)
     Set<AttachmentEntity> attachments;
+
+    @Embedded
+    FingerprintEntity fingerprint;
+
+    @PrePersist
+    void onSheetCreate() {
+        this.fingerprint = FingerprintFactory.forSheet(this);
+    }
+
 }

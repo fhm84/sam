@@ -1,5 +1,6 @@
 package de.halbmann.sam.business.controller;
 
+import de.halbmann.sam.api.entity.CreateSheetMusic;
 import de.halbmann.sam.api.entity.SheetMusic;
 import de.halbmann.sam.business.boundary.GenreRepository;
 import de.halbmann.sam.business.entity.SheetMusicEntity;
@@ -27,7 +28,7 @@ public interface SheetMusicMapper {
     @Mapping(target = "genre", source = "genre")
     @Mapping(target = "instrumentations", ignore = true)
     @Mapping(target = "attachments", ignore = true)
-    SheetMusicEntity fromDto(final SheetMusic dto);
+    SheetMusicEntity fromDto(final CreateSheetMusic dto);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)

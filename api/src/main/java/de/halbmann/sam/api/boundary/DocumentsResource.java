@@ -10,7 +10,6 @@ import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 @Path("documents")
-@RegisterRestClient(configKey = "documents-api")
 public interface DocumentsResource {
 
     @GET

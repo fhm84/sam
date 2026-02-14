@@ -1,5 +1,6 @@
 package de.halbmann.sam.api.boundary;
 
+import de.halbmann.sam.api.entity.CreateInstrumentation;
 import de.halbmann.sam.api.entity.Instrumentation;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -9,7 +10,6 @@ import java.util.List;
 
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-@RegisterRestClient(configKey = "instrumentations-api")
 public interface InstrumentationsResource {
 
     @GET
@@ -20,7 +20,11 @@ public interface InstrumentationsResource {
     Instrumentation get(final @PathParam("instrumentationId") String instrumentationId);
 
     @POST
-    void add(final Instrumentation instrumentation);
+    void add(final CreateInstrumentation instrumentation);
+
+    @POST
+    @Path("bulk")
+    void add(final List<CreateInstrumentation> instrumentations);
 
     @PUT
     @Path("{instrumentationId}")

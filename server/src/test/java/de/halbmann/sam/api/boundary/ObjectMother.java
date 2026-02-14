@@ -7,8 +7,8 @@ import de.halbmann.sam.api.entity.*;
  */
 public class ObjectMother {
 
-    public static SheetMusic createSimpleSheetMusic() {
-        final SheetMusic sheetMusic = new SheetMusic();
+    public static CreateSheetMusic createSimpleSheetMusic() {
+        final CreateSheetMusic sheetMusic = new CreateSheetMusic();
         sheetMusic.setTitle("Music from Pirates of the Caribbean");
         sheetMusic.setPublisher("Disney Music Corp");
         sheetMusic.setGenre("Movie");
@@ -29,31 +29,31 @@ public class ObjectMother {
         return arranger;
     }
 
-    public static SheetMusic createFullSheetMusic() {
+    public static CreateSheetMusic createFullSheetMusic() {
         return createSheetMusicWithComposerAndArranger(createComposer(), createArranger());
     }
 
-    public static SheetMusic createSheetMusicWithComposer(final Musician composer) {
-        final SheetMusic sheetMusic = createSimpleSheetMusic();
+    public static CreateSheetMusic createSheetMusicWithComposer(final Musician composer) {
+        final CreateSheetMusic sheetMusic = createSimpleSheetMusic();
         sheetMusic.setComposer(composer);
         return sheetMusic;
     }
 
-    public static SheetMusic createSheetMusicWithArranger(final Musician arranger) {
-        final SheetMusic sheetMusic = createSimpleSheetMusic();
+    public static CreateSheetMusic createSheetMusicWithArranger(final Musician arranger) {
+        final CreateSheetMusic sheetMusic = createSimpleSheetMusic();
         sheetMusic.setArranger(arranger);
         return sheetMusic;
     }
 
-    public static SheetMusic createSheetMusicWithComposerAndArranger(final Musician composer, final Musician arranger) {
-        final SheetMusic sheetMusic = createSimpleSheetMusic();
+    public static CreateSheetMusic createSheetMusicWithComposerAndArranger(final Musician composer, final Musician arranger) {
+        final CreateSheetMusic sheetMusic = createSimpleSheetMusic();
         sheetMusic.setComposer(composer);
         sheetMusic.setArranger(arranger);
         return sheetMusic;
     }
 
-    public static Instrumentation flute1C() {
-        final Instrumentation flute = new Instrumentation();
+    public static CreateInstrumentation flute1C() {
+        final CreateInstrumentation flute = new CreateInstrumentation();
         flute.setInstrumentName("Flute");
         flute.setPartLabel("1");
         flute.setTransposition(InstrumentTransposing.C);
@@ -62,8 +62,8 @@ public class ObjectMother {
         return flute;
     }
 
-    public static Instrumentation trumpet2Bb() {
-        final Instrumentation trumpet = new Instrumentation();
+    public static CreateInstrumentation trumpet2Bb() {
+        final CreateInstrumentation trumpet = new CreateInstrumentation();
         trumpet.setInstrumentName("Trumpet");
         trumpet.setPartLabel("2");
         trumpet.setTransposition(InstrumentTransposing.Bb);

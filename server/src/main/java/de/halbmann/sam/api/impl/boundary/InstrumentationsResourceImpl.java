@@ -2,6 +2,7 @@ package de.halbmann.sam.api.impl.boundary;
 
 import de.halbmann.sam.api.boundary.DocumentsResource;
 import de.halbmann.sam.api.boundary.InstrumentationsResource;
+import de.halbmann.sam.api.entity.CreateInstrumentation;
 import de.halbmann.sam.api.entity.Instrumentation;
 import de.halbmann.sam.business.boundary.InstrumentationRepository;
 import jakarta.enterprise.context.RequestScoped;
@@ -35,8 +36,13 @@ public class InstrumentationsResourceImpl implements InstrumentationsResource {
     }
 
     @Override
-    public void add(final Instrumentation instrumentation) {
+    public void add(final CreateInstrumentation instrumentation) {
         instrumentationRepository.addInstrumentation(sheetId, instrumentation);
+    }
+
+    @Override
+    public void add(List<CreateInstrumentation> instrumentations) {
+        instrumentationRepository.addInstrumentations(sheetId, instrumentations);
     }
 
     @Override

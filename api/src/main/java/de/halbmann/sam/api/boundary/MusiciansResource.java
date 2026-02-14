@@ -10,7 +10,6 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 @Path("musicians")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-@RegisterRestClient(configKey = "musicians-api")
 public interface MusiciansResource {
 
     @GET

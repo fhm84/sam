@@ -169,7 +169,7 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
         return sheetMusicMapper.toDto(sheetMusicEntity);
     }
 
-    public SheetMusic addSheet(final SheetMusic sheetMusic) {
+    public SheetMusic addSheet(final CreateSheetMusic sheetMusic) {
         final SheetMusicEntity sheetMusicEntity = sheetMusicMapper.fromDto(sheetMusic);
         persistAndFlush(sheetMusicEntity);
         return sheetMusicMapper.toDto(sheetMusicEntity);

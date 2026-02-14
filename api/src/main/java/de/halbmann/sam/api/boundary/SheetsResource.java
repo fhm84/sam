@@ -1,9 +1,6 @@
 package de.halbmann.sam.api.boundary;
 
-import de.halbmann.sam.api.entity.PaginatedResponse;
-import de.halbmann.sam.api.entity.SheetFilterRequest;
-import de.halbmann.sam.api.entity.SheetMusic;
-import de.halbmann.sam.api.entity.SheetMusicSearchResult;
+import de.halbmann.sam.api.entity.*;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
@@ -15,7 +12,6 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 @Path("sheets")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-@RegisterRestClient(configKey = "sheets-api")
 public interface SheetsResource {
 
     /**
@@ -34,7 +30,7 @@ public interface SheetsResource {
      * @return the added sheet music
      */
     @POST
-    SheetMusic add(final SheetMusic sheetMusic);
+    SheetMusic add(final CreateSheetMusic sheetMusic);
 
     /**
      * Loads a specific sheet music by its ID.

@@ -1,5 +1,6 @@
 package de.halbmann.sam.business.boundary;
 
+import de.halbmann.sam.api.entity.CreateInstrumentation;
 import de.halbmann.sam.api.entity.Instrumentation;
 import de.halbmann.sam.business.controller.InstrumentationMapper;
 import de.halbmann.sam.business.entity.InstrumentationEntity;
@@ -36,12 +37,21 @@ public class InstrumentationRepository implements PanacheRepositoryBase<Instrume
         return instrumentationMapper.toDto(instrumentationEntity);
     }
 
-    public Instrumentation addInstrumentation(final String sheetId, final Instrumentation instrumentation) {
+    public Instrumentation addInstrumentation(final String sheetId, final CreateInstrumentation instrumentation) {
         final SheetMusicEntity sheet = sheetRepository.findById(UUID.fromString(sheetId));
         final InstrumentationEntity instrumentationEntity = instrumentationMapper.fromDto(instrumentation);
         instrumentationEntity.setSheet(sheet);
         persistAndFlush(instrumentationEntity);
         return instrumentationMapper.toDto(instrumentationEntity);
+    }
+
+    public void addInstrumentations(final String sheetId, final List<CreateInstrumentation> instrumentations) {
+        final SheetMusicEntity sheet = sheetRepository.findById(UUID.fromString(sheetId));
+        List<InstrumentationEntity> instrumentationEntities = instrumentations.stream()
+                .map(instrumentationMapper::fromDto)
+                .peek(instrumentationEntity -> instrumentationEntity.setSheet(sheet))
+                .toList();
+        sheet.getInstrumentations().addAll(instrumentationEntities);
     }
 
     public void updateInstrumentation(final String instrumentationId, final Instrumentation instrumentation) {

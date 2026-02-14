@@ -1,5 +1,6 @@
 package de.halbmann.sam.business.controller;
 
+import de.halbmann.sam.api.entity.CreateInstrumentation;
 import de.halbmann.sam.api.entity.Instrumentation;
 import de.halbmann.sam.business.entity.InstrumentationEntity;
 import org.mapstruct.*;
@@ -12,13 +13,15 @@ public interface InstrumentationMapper {
 
     Instrumentation toDto(final InstrumentationEntity entity);
 
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "created", ignore = true)
     @Mapping(target = "lastUpdate", ignore = true)
     @Mapping(target = "sheet", ignore = true)
     @Mapping(target = "attachments", ignore = true)
-    InstrumentationEntity fromDto(final Instrumentation dto);
+    InstrumentationEntity fromDto(final CreateInstrumentation dto);
 
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "created", ignore = true)
     @Mapping(target = "lastUpdate", ignore = true)

@@ -3,10 +3,7 @@ package de.halbmann.sam.api.impl.boundary;
 import de.halbmann.sam.api.boundary.DocumentsResource;
 import de.halbmann.sam.api.boundary.InstrumentationsResource;
 import de.halbmann.sam.api.boundary.SheetsResource;
-import de.halbmann.sam.api.entity.PaginatedResponse;
-import de.halbmann.sam.api.entity.SheetFilterRequest;
-import de.halbmann.sam.api.entity.SheetMusic;
-import de.halbmann.sam.api.entity.SheetMusicSearchResult;
+import de.halbmann.sam.api.entity.*;
 import de.halbmann.sam.business.boundary.SheetRepository;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
@@ -28,7 +25,7 @@ public class SheetsResourceImpl implements SheetsResource {
     }
 
     @Override
-    public SheetMusic add(final SheetMusic sheetMusic) {
+    public SheetMusic add(final CreateSheetMusic sheetMusic) {
         return sheetRepository.addSheet(sheetMusic);
     }
 
