@@ -4,11 +4,10 @@ import de.halbmann.sam.EnvConsts;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-
 import java.io.IOException;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 /**
  * FileType/Extension validator. Based on the (optional) configuration ({@link EnvConsts#FILETYPES})

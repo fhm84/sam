@@ -11,23 +11,16 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode
 public class CreateInstrumentation {
 
-    // TODO: remove instrumentName and transposition -> link Instrument (id) instead!
-
     /**
-     * Instrument name (e.g. Trumpet, Violin, Bass)
+     * Reference to the instrument by canonical ID (e.g. "TENORHORN_BB").
      */
     @NotBlank
-    String instrumentName;
+    String instrumentId;
 
     /**
      * The part number/label (for example: '2' for 2. Bass, or even '3rd' or 'Solo')
      */
     String partLabel;
-
-    /**
-     * Specific key signature for this instrument (e.g., Bb Major, C Major)
-     */
-    InstrumentTransposing transposition;
 
     /**
      * Clef type (e.g., Treble, Bass, Alto, Tenor)
@@ -43,5 +36,4 @@ public class CreateInstrumentation {
      * (Optional) notes for the part
      */
     String notes;
-
 }

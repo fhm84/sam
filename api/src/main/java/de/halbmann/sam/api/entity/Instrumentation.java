@@ -1,11 +1,10 @@
 package de.halbmann.sam.api.entity;
 
-import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
+import jakarta.validation.constraints.NotNull;
 import java.util.Set;
 import java.util.UUID;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * Defines individual instrument parts for a piece of sheet music.
@@ -20,20 +19,15 @@ public class Instrumentation {
     UUID id;
 
     /**
-     * Instrument name (e.g. Trumpet, Violin, Bass)
+     * The linked instrument.
      */
-    @NotBlank
-    String instrumentName;
+    @NotNull
+    Instrument instrument;
 
     /**
      * The part number/label (for example: '2' for 2. Bass, or even '3rd' or 'Solo')
      */
     String partLabel;
-
-    /**
-     * Specific key signature for this instrument (e.g., Bb Major, C Major)
-     */
-    InstrumentTransposing transposition;
 
     /**
      * Clef type (e.g., Treble, Bass, Alto, Tenor)

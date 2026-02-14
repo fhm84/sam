@@ -4,8 +4,6 @@ import de.halbmann.sam.api.entity.CreateInstrumentation;
 import de.halbmann.sam.api.entity.Instrumentation;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
-import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
-
 import java.util.List;
 
 @Produces(MediaType.APPLICATION_JSON)

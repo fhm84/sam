@@ -10,7 +10,6 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.container.ResourceContext;
 import jakarta.ws.rs.core.Context;
-
 import java.util.List;
 
 @RequestScoped

@@ -40,6 +40,5 @@ public record SheetAnalyzerResult(
             String partNumber,
             String transposition,
             Clef clef,
-            NotationType notationType) {
-    }
+            NotationType notationType) {}
 }

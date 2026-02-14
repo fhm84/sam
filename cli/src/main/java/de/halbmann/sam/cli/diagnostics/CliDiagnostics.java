@@ -4,11 +4,10 @@ import io.quarkus.runtime.StartupEvent;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-import picocli.CommandLine;
-
 import java.util.Arrays;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
+import picocli.CommandLine;
 
 @ApplicationScoped
 public class CliDiagnostics {
@@ -34,7 +33,9 @@ public class CliDiagnostics {
             String[] args = argsHolder.getArgs();
             if (args.length == 0) {
                 args = StaticArgsBridge.getArgs();
-                LOG.debugf("CliDiagnostics: no args in ArgsHolder, falling back to StaticArgsBridge: %s", Arrays.toString(args));
+                LOG.debugf(
+                        "CliDiagnostics: no args in ArgsHolder, falling back to StaticArgsBridge: %s",
+                        Arrays.toString(args));
             }
             LOG.infof("CliDiagnostics: subcommands=%s args=%s", subcommands, Arrays.toString(args));
 

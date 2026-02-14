@@ -3,10 +3,9 @@ package de.halbmann.sam.api.entity;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.UUID;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import java.util.UUID;
 
 /**
  * Wrapper entity for a sheet in context of a collection or a booklet, adding an order

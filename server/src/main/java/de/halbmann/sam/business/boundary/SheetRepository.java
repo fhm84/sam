@@ -9,7 +9,6 @@ import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +42,7 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
                                    similarity(s.title, q.raw)         AS title_similarity,
                                    similarity(s.composer_name, q.raw) AS composer_similarity,
                                    (s.composer_phonetic = q.phonetic) AS phonetic_match,
-                            
+
                                    -- final score
                                    (
                                        ts_rank(s.search_vector, q.tsq) * 0.70

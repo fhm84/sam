@@ -1,11 +1,9 @@
 package de.halbmann.sam.cli.controller;
 
 import de.halbmann.sam.api.boundary.SamResources;
-import de.halbmann.sam.api.entity.CreateInstrumentation;
-import de.halbmann.sam.api.entity.Instrumentation;
-import de.halbmann.sam.api.entity.SheetMusic;
+import de.halbmann.sam.api.entity.CreateInstrument;
+import de.halbmann.sam.api.entity.Instrument;
 import de.halbmann.sam.cli.entity.ImportResult;
-import de.halbmann.sam.cli.mapper.DataMapper;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.json.bind.Jsonb;
@@ -13,11 +11,10 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.List;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 @Singleton
-public class SheetImporter {
+public class InstrumentImporter {
 
     @Inject
     @RestClient
@@ -26,9 +23,6 @@ public class SheetImporter {
     @Inject
     Jsonb jsonb;
 
-    @Inject
-    DataMapper dataMapper;
-
     public ImportResult importFile(final File file, final boolean dryRun) {
         if (!file.exists()) {
             System.err.println("File not found: " + file.getPath());
@@ -36,24 +30,14 @@ public class SheetImporter {
         }
 
         try {
-            SheetMusic sheet = parseJsonFile(file);
+            CreateInstrument instrument = parseJsonFile(file);
             System.out.println("Processing " + file.getName() + " ...");
 
             if (dryRun) {
-                System.out.println("  [DRY RUN] Would import: " + sheet.getTitle());
+                System.out.println("  [DRY RUN] Would import: " + instrument.getDisplayName());
             } else {
-                final SheetMusic created = client.sheets().add(dataMapper.createFromSheet(sheet));
-                System.out.println("  ✓ Imported: " + created.getTitle() + " (ID: " + created.getId() + ")");
-                if (sheet.getInstrumentations() != null
-                        && !sheet.getInstrumentations().isEmpty()) {
-                    List<CreateInstrumentation> createInstrumentations = sheet.getInstrumentations().stream()
-                            .map(dataMapper::createFromInstrumentation)
-                            .toList();
-                    client.sheets().instrumentations(created.getId().toString()).add(createInstrumentations);
-                    for (Instrumentation i : sheet.getInstrumentations()) {
-                        System.out.println("      ✓ Imported: " + i);
-                    }
-                }
+                Instrument created = client.instruments().add(instrument);
+                System.out.println("  ✓ Imported: " + created.getDisplayName() + " (ID: " + created.getId() + ")");
             }
             return new ImportResult(file, true);
         } catch (IOException e) {
@@ -65,10 +49,10 @@ public class SheetImporter {
         }
     }
 
-    private SheetMusic parseJsonFile(File file) throws IOException {
+    private CreateInstrument parseJsonFile(File file) throws IOException {
         // Try to parse as array first
         try (var bis = new BufferedInputStream(Files.newInputStream(file.toPath()))) {
-            return jsonb.fromJson(bis, SheetMusic.class);
+            return jsonb.fromJson(bis, CreateInstrument.class);
         }
     }
 }

@@ -5,7 +5,6 @@ import de.halbmann.sam.api.entity.SheetCollection;
 import de.halbmann.sam.api.entity.SheetCollectionFilterRequest;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
-import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 @Path("sheet-collections")
 @Produces(MediaType.APPLICATION_JSON)

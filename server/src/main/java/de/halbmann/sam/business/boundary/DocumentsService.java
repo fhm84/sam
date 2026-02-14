@@ -16,9 +16,6 @@ import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.tika.Tika;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -30,6 +27,8 @@ import java.util.HexFormat;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.tika.Tika;
 
 @Slf4j
 @ApplicationScoped
@@ -147,9 +146,9 @@ public class DocumentsService {
         long fileSize;
 
         try (InputStream scanned = virusScanner.scan(uploadStream);
-             DigestInputStream digestIn = new DigestInputStream(scanned, sha256Digest);
-             OutputStream rawOut = filesystem.openForWrite(tempPath.toString());
-             CountingOutputStream countingOut = new CountingOutputStream(rawOut)) {
+                DigestInputStream digestIn = new DigestInputStream(scanned, sha256Digest);
+                OutputStream rawOut = filesystem.openForWrite(tempPath.toString());
+                CountingOutputStream countingOut = new CountingOutputStream(rawOut)) {
             digestIn.transferTo(countingOut);
             fileSize = countingOut.getBytesWritten();
         }

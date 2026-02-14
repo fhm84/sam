@@ -15,8 +15,7 @@ import picocli.CommandLine;
 @CommandLine.Command(
         name = "show",
         description = "Show details of a specific music sheet",
-        mixinStandardHelpOptions = true
-)
+        mixinStandardHelpOptions = true)
 public class ShowSheetCommand implements Runnable {
 
     @Inject
@@ -26,16 +25,12 @@ public class ShowSheetCommand implements Runnable {
     @Inject
     Jsonb jsonb;
 
-    @CommandLine.Parameters(
-            index = "0",
-            description = "ID of the music sheet to show"
-    )
+    @CommandLine.Parameters(index = "0", description = "ID of the music sheet to show")
     String id;
 
     @CommandLine.Option(
             names = {"-j", "--json"},
-            description = "Output as JSON"
-    )
+            description = "Output as JSON")
     boolean jsonOutput;
 
     @Override
@@ -51,17 +46,10 @@ public class ShowSheetCommand implements Runnable {
             }
         } catch (NotFoundException e) {
             System.err.println("Sheet with ID " + id + " not found.");
-            throw new CommandLine.ExecutionException(
-                    new CommandLine(this),
-                    "Sheet not found"
-            );
+            throw new CommandLine.ExecutionException(new CommandLine(this), "Sheet not found");
         } catch (Exception e) {
             System.err.println("Error retrieving sheet: " + e.getMessage());
-            throw new CommandLine.ExecutionException(
-                    new CommandLine(this),
-                    "Failed to retrieve sheet",
-                    e
-            );
+            throw new CommandLine.ExecutionException(new CommandLine(this), "Failed to retrieve sheet", e);
         }
     }
 

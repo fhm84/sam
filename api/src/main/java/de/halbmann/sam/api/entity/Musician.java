@@ -1,10 +1,9 @@
 package de.halbmann.sam.api.entity;
 
 import jakarta.validation.constraints.NotBlank;
+import java.util.UUID;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import java.util.UUID;
 
 /**
  * Stores information about musicians (composers and arrangers).

@@ -4,7 +4,6 @@ import de.halbmann.storage.api.FileSystemWrapper;
 import de.halbmann.storage.spi.FileSystemProvider;
 import de.halbmann.storage.spi.StorageLocation;
 import jakarta.enterprise.context.ApplicationScoped;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 

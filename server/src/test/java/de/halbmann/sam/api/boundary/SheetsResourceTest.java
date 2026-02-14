@@ -1,5 +1,10 @@
 package de.halbmann.sam.api.boundary;
 
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import de.halbmann.sam.api.entity.Musician;
 import de.halbmann.sam.api.entity.SheetMusic;
 import io.quarkus.test.junit.QuarkusTest;
@@ -7,11 +12,6 @@ import io.restassured.http.ContentType;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import org.junit.jupiter.api.Test;
-
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @QuarkusTest
 class SheetsResourceTest {

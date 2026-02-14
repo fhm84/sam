@@ -1,8 +1,4 @@
-import de.halbmann.sam.api.entity.Clef;
-import de.halbmann.sam.api.entity.InstrumentTransposing;
-import de.halbmann.sam.api.entity.Instrumentation;
-import de.halbmann.sam.api.entity.NotationType;
-
+import de.halbmann.sam.api.entity.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -33,8 +29,7 @@ public class InstrumentationParser {
 
     private static Instrumentation parseInstrument(String part) {
         // Pattern to match: "1. Instrument in key" or just "Instrument"
-        Pattern pattern = Pattern.compile("^(?:(\\d+)\\.\\s+)?(.+?)(?:\\s+in\\s+([a-z]+))?$",
-                Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile("^(?:(\\d+)\\.\\s+)?(.+?)(?:\\s+in\\s+([a-z]+))?$", Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(part);
 
         if (!matcher.matches()) {
@@ -52,12 +47,21 @@ public class InstrumentationParser {
         Clef clef = determineClef(instrumentName, key);
         NotationType notationType = determineNotationType(instrumentName);
 
+        // Build the Instrument reference
+        String trimmedName = instrumentName.trim();
+        String instrumentId =
+                DataConversion.cleanUp(trimmedName) + "_" + (transposition != null ? transposition.name() : "C");
+
+        Instrument instrument = new Instrument();
+        instrument.setId(instrumentId.toUpperCase());
+        instrument.setName(trimmedName);
+        instrument.setTransposition(transposition);
+
         Instrumentation instrumentation = new Instrumentation();
-        instrumentation.setInstrumentName(instrumentName.trim());
-        instrumentation.setTransposition(transposition);
-        instrumentation.setClef(clef);
+        instrumentation.setInstrument(instrument);
         instrumentation.setNotationType(notationType);
         instrumentation.setPartLabel(partLabel);
+        instrumentation.setClef(clef);
         return instrumentation;
     }
 
@@ -93,9 +97,7 @@ public class InstrumentationParser {
         String lower = instrumentName.toLowerCase();
 
         // Bass clef instruments
-        if (lower.contains("bass") ||
-                lower.contains("posaune") ||
-                lower.contains("bariton")) {
+        if (lower.contains("bass") || lower.contains("posaune") || lower.contains("bariton")) {
             // Exception: in Bb they often use treble clef in German brass bands
             if ("b".equalsIgnoreCase(key)) {
                 return Clef.TREBLE;
@@ -105,7 +107,7 @@ public class InstrumentationParser {
 
         // Alto clef instruments
         if (lower.contains("horn") && !"b".equalsIgnoreCase(key)) {
-            // F horns typically use treble clef in modern scores, 
+            // F horns typically use treble clef in modern scores,
             // but can use alto/bass. Assuming treble for simplicity.
             return Clef.TREBLE;
         }
@@ -136,5 +138,4 @@ public class InstrumentationParser {
 
         return NotationType.STANDARD;
     }
-
 }

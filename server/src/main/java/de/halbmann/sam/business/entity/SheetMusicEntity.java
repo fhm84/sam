@@ -3,13 +3,12 @@ package de.halbmann.sam.business.entity;
 import de.halbmann.sam.business.controller.FingerprintFactory;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.envers.Audited;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.envers.Audited;
 
 /**
  * Represents a piece of music.
@@ -18,19 +17,16 @@ import java.util.Set;
 @Setter
 @Entity
 @Audited
-@Table(name = "sheets",
-        uniqueConstraints = @UniqueConstraint(
-                columnNames = {"fingerprint"}
-        ))
+@Table(name = "sheets", uniqueConstraints = @UniqueConstraint(columnNames = {"fingerprint"}))
 @SqlResultSetMapping(
         name = "SheetWithMetrics",
         entities = @EntityResult(entityClass = SheetMusicEntity.class),
         columns = {
-                @ColumnResult(name = "fts_rank", type = Double.class),
-                @ColumnResult(name = "title_similarity", type = Double.class),
-                @ColumnResult(name = "composer_similarity", type = Double.class),
-                @ColumnResult(name = "phonetic_match", type = Boolean.class),
-                @ColumnResult(name = "final_rank", type = Double.class)
+            @ColumnResult(name = "fts_rank", type = Double.class),
+            @ColumnResult(name = "title_similarity", type = Double.class),
+            @ColumnResult(name = "composer_similarity", type = Double.class),
+            @ColumnResult(name = "phonetic_match", type = Boolean.class),
+            @ColumnResult(name = "final_rank", type = Double.class)
         })
 public class SheetMusicEntity extends AbstractEntity {
 
@@ -138,5 +134,4 @@ public class SheetMusicEntity extends AbstractEntity {
     void onSheetCreate() {
         this.fingerprint = FingerprintFactory.forSheet(this);
     }
-
 }

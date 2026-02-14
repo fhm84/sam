@@ -3,6 +3,7 @@ package de.halbmann.sam.business.boundary;
 import de.halbmann.sam.api.entity.CreateInstrumentation;
 import de.halbmann.sam.api.entity.Instrumentation;
 import de.halbmann.sam.business.controller.InstrumentationMapper;
+import de.halbmann.sam.business.entity.InstrumentEntity;
 import de.halbmann.sam.business.entity.InstrumentationEntity;
 import de.halbmann.sam.business.entity.SheetMusicEntity;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
@@ -11,7 +12,6 @@ import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-
 import java.util.List;
 import java.util.UUID;
 
@@ -25,8 +25,11 @@ public class InstrumentationRepository implements PanacheRepositoryBase<Instrume
     @Inject
     SheetRepository sheetRepository;
 
+    @Inject
+    InstrumentRepository instrumentRepository;
+
     public List<Instrumentation> getInstrumentations(final String sheetId) {
-        Sort sort = Sort.ascending("instrumentName", "partLabel", "transposition", "clef");
+        Sort sort = Sort.ascending("instrument.name", "partLabel");
         return find("sheet.id = :sheet_id", sort, Parameters.with("sheet_id", UUID.fromString(sheetId))).list().stream()
                 .map(instrumentationMapper::toDto)
                 .toList();
@@ -39,8 +42,10 @@ public class InstrumentationRepository implements PanacheRepositoryBase<Instrume
 
     public Instrumentation addInstrumentation(final String sheetId, final CreateInstrumentation instrumentation) {
         final SheetMusicEntity sheet = sheetRepository.findById(UUID.fromString(sheetId));
+        final InstrumentEntity instrument = instrumentRepository.findById(instrumentation.getInstrumentId());
         final InstrumentationEntity instrumentationEntity = instrumentationMapper.fromDto(instrumentation);
         instrumentationEntity.setSheet(sheet);
+        instrumentationEntity.setInstrument(instrument);
         persistAndFlush(instrumentationEntity);
         return instrumentationMapper.toDto(instrumentationEntity);
     }
@@ -48,8 +53,13 @@ public class InstrumentationRepository implements PanacheRepositoryBase<Instrume
     public void addInstrumentations(final String sheetId, final List<CreateInstrumentation> instrumentations) {
         final SheetMusicEntity sheet = sheetRepository.findById(UUID.fromString(sheetId));
         List<InstrumentationEntity> instrumentationEntities = instrumentations.stream()
-                .map(instrumentationMapper::fromDto)
-                .peek(instrumentationEntity -> instrumentationEntity.setSheet(sheet))
+                .map(dto -> {
+                    InstrumentEntity instrument = instrumentRepository.findById(dto.getInstrumentId());
+                    InstrumentationEntity entity = instrumentationMapper.fromDto(dto);
+                    entity.setSheet(sheet);
+                    entity.setInstrument(instrument);
+                    return entity;
+                })
                 .toList();
         sheet.getInstrumentations().addAll(instrumentationEntities);
     }

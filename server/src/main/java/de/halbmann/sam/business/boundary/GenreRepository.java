@@ -6,7 +6,6 @@ import io.quarkus.panache.common.Parameters;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.NoResultException;
 import jakarta.transaction.Transactional;
-
 import java.util.UUID;
 
 @ApplicationScoped

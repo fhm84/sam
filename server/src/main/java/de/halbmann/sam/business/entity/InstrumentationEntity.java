@@ -1,14 +1,12 @@
 package de.halbmann.sam.business.entity;
 
 import de.halbmann.sam.api.entity.Clef;
-import de.halbmann.sam.api.entity.InstrumentTransposing;
 import de.halbmann.sam.api.entity.NotationType;
 import jakarta.persistence.*;
+import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.envers.Audited;
-
-import java.util.Set;
 
 /**
  * Defines individual instrument parts for a piece of sheet music.
@@ -21,26 +19,21 @@ import java.util.Set;
 @Table(
         name = "instrumentations",
         uniqueConstraints =
-        @UniqueConstraint(
-                name = "uc_instrumentation",
-                columnNames = {"sheet_id", "instrumentName", "partLabel", "transposition", "clef"}))
+                @UniqueConstraint(
+                        name = "uc_instrumentation",
+                        columnNames = {"sheet_id", "instrument_id", "partLabel"}))
 public class InstrumentationEntity extends AbstractEntity {
 
     /**
-     * Instrument name (e.g. Trumpet, Violin, Bass)
+     * The linked instrument.
      */
-    String instrumentName;
+    @ManyToOne(optional = false)
+    InstrumentEntity instrument;
 
     /**
      * The part number/label (for example: '2' for 2. Bass, or even '3rd' or 'Solo')
      */
     String partLabel;
-
-    /**
-     * Specific partLabel signature for this instrument (e.g., Bb Major, C Major)
-     */
-    @Enumerated(EnumType.STRING)
-    InstrumentTransposing transposition;
 
     /**
      * Clef type (e.g., Treble, Bass, Alto, Tenor)

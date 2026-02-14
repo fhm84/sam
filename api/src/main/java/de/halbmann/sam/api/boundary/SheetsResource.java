@@ -3,7 +3,6 @@ package de.halbmann.sam.api.boundary;
 import de.halbmann.sam.api.entity.*;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
-import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 /**
  * RESTful API for managing sheet music resources. Provides operations to find, add, load, update,

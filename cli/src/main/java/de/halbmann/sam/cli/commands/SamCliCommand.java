@@ -13,16 +13,15 @@ import picocli.CommandLine;
         version = "1.0.0",
         description = "CLI tool for managing music sheets",
         subcommands = {
-                ListSheetsCommand.class,
-                ShowSheetCommand.class,
-                ImportSheetCommand.class
-        }
-)
+            ListSheetsCommand.class,
+            ShowSheetCommand.class,
+            ImportSheetCommand.class,
+            ImportInstrumentCommand.class
+        })
 public class SamCliCommand implements Runnable {
 
     @Override
     public void run() {
         System.out.println("Use --help to see available commands");
     }
-
 }

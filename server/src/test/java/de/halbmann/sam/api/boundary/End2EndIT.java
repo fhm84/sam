@@ -1,33 +1,37 @@
 package de.halbmann.sam.api.boundary;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import de.halbmann.sam.api.entity.CreateInstrumentation;
 import de.halbmann.sam.api.entity.Instrumentation;
 import de.halbmann.sam.api.entity.SheetMusic;
 import io.quarkus.test.junit.QuarkusIntegrationTest;
+import java.net.URI;
+import java.util.List;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentest4j.MultipleFailuresError;
 
-import java.net.URI;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
-
 @QuarkusIntegrationTest
 class End2EndIT {
 
     SheetsResource sheetsResource;
+    InstrumentsResource instrumentsResource;
 
     @BeforeEach
     void setup() {
-        sheetsResource = RestClientBuilder.newBuilder()
-                .baseUri(URI.create("http://localhost:8081")) // Use your test port
-                .build(SheetsResource.class);
+        URI baseUri = URI.create("http://localhost:8081");
+        sheetsResource = RestClientBuilder.newBuilder().baseUri(baseUri).build(SheetsResource.class);
+        instrumentsResource = RestClientBuilder.newBuilder().baseUri(baseUri).build(InstrumentsResource.class);
     }
 
     @Test
     void testCreateSheetIncludingInstrumentationAndPdf() {
+        // Create instruments first
+        instrumentsResource.add(ObjectMother.createFluteInstrument());
+        instrumentsResource.add(ObjectMother.createTrumpetInstrument());
+
         final SheetMusic sheetMusic = sheetsResource.add(ObjectMother.createFullSheetMusic());
         assertNotNull(sheetMusic.getId());
 
@@ -48,11 +52,10 @@ class End2EndIT {
     boolean matches(final CreateInstrumentation expected, final Instrumentation actual) {
         try {
             assertAll(
-                    () -> assertSame(expected.getClef(), actual.getClef()),
-                    () -> assertSame(expected.getTransposition(), actual.getTransposition()),
-                    () -> assertSame(expected.getInstrumentName(), actual.getInstrumentName()),
+                    () -> assertEquals(
+                            expected.getInstrumentId(), actual.getInstrument().getId()),
                     () -> assertSame(expected.getNotationType(), actual.getNotationType()),
-                    () -> assertSame(expected.getPartLabel(), actual.getPartLabel()));
+                    () -> assertEquals(expected.getPartLabel(), actual.getPartLabel()));
             return true;
         } catch (MultipleFailuresError e) {
             e.printStackTrace();

@@ -1,6 +1,6 @@
 package de.halbmann.sam.cli.commands;
 
-import de.halbmann.sam.cli.controller.SheetImporter;
+import de.halbmann.sam.cli.controller.InstrumentImporter;
 import de.halbmann.sam.cli.entity.ImportResult;
 import io.quarkus.arc.Unremovable;
 import jakarta.inject.Inject;
@@ -19,15 +19,16 @@ import picocli.CommandLine;
 @Unremovable
 @Singleton
 @CommandLine.Command(
-        name = "import",
-        description = "Import music sheet(s) from JSON file(s)",
+        name = "importInstrument",
+        aliases = {"importInstrument"},
+        description = "Import instrument(s) from JSON file(s)",
         mixinStandardHelpOptions = true)
-public class ImportSheetCommand implements Runnable {
+public class ImportInstrumentCommand implements Runnable {
 
     @Inject
-    SheetImporter sheetImporter;
+    InstrumentImporter instrumentImporter;
 
-    @CommandLine.Parameters(description = "JSON file(s) or directory to import. Single sheet per file.")
+    @CommandLine.Parameters(description = "JSON file(s) or directory to import. Single instrument per file.")
     File[] files;
 
     @CommandLine.Option(
@@ -44,12 +45,12 @@ public class ImportSheetCommand implements Runnable {
                     fileStream
                             .map(Path::toFile)
                             .filter(File::isFile)
-                            .forEach(f -> results.add(sheetImporter.importFile(f, dryRun)));
+                            .forEach(f -> results.add(instrumentImporter.importFile(f, dryRun)));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             } else {
-                results.add(sheetImporter.importFile(file, dryRun));
+                results.add(instrumentImporter.importFile(file, dryRun));
             }
         }
 
@@ -59,7 +60,7 @@ public class ImportSheetCommand implements Runnable {
         Long failureCount = collected.get(Boolean.FALSE);
         System.out.println();
         if (dryRun) {
-            System.out.println("Dry run completed. No sheets were imported.");
+            System.out.println("Dry run completed. No instruments were imported.");
         } else {
             System.out.println("Import completed: " + successCount + " succeeded, " + failureCount + " failed.");
         }

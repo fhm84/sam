@@ -21,5 +21,4 @@ public class CliLauncher {
             System.out.println("CliLauncher.main - Quarkus.run returned");
         }
     }
-
 }

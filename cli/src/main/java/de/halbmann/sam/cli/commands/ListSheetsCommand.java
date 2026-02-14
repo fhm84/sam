@@ -11,11 +11,7 @@ import picocli.CommandLine;
 
 @Unremovable
 @Singleton
-@CommandLine.Command(
-        name = "list",
-        description = "List all music sheets",
-        mixinStandardHelpOptions = true
-)
+@CommandLine.Command(name = "list", description = "List all music sheets", mixinStandardHelpOptions = true)
 public class ListSheetsCommand implements Runnable {
 
     @Inject
@@ -24,8 +20,7 @@ public class ListSheetsCommand implements Runnable {
 
     @CommandLine.Option(
             names = {"-v", "--verbose"},
-            description = "Show detailed information"
-    )
+            description = "Show detailed information")
     boolean verbose;
 
     @Override
@@ -51,19 +46,14 @@ public class ListSheetsCommand implements Runnable {
             }
         } catch (Exception e) {
             System.err.println("Error listing sheets: " + e.getMessage());
-            throw new CommandLine.ExecutionException(
-                    new CommandLine(this),
-                    "Failed to list sheets",
-                    e
-            );
+            throw new CommandLine.ExecutionException(new CommandLine(this), "Failed to list sheets", e);
         }
     }
 
     private void printShortSheet(SheetMusic sheet) {
-        System.out.printf("  [%s] %s%n",
-                sheet.getId(),
-                sheet.getTitle() // Adjust to your DTO fields
-        );
+        System.out.printf(
+                "  [%s] %s%n", sheet.getId(), sheet.getTitle() // Adjust to your DTO fields
+                );
     }
 
     private void printDetailedSheet(SheetMusic sheet) {

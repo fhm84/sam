@@ -1,16 +1,15 @@
 package de.halbmann.sam.business.controller;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import org.apache.tika.config.TikaConfig;
 import org.apache.tika.detect.Detector;
 import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.mime.MediaType;
-
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * Utility class to detect a mime type.

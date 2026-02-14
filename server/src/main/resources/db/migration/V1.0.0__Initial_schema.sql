@@ -123,20 +123,44 @@ create table genres_AUD
     primary key (REV, id)
 );
 
+-- Create instruments table
+CREATE TABLE instruments
+(
+    id            VARCHAR(255) NOT NULL PRIMARY KEY,
+    version       INTEGER      NOT NULL DEFAULT 0,
+    created       TIMESTAMP(6),
+    lastUpdate    TIMESTAMP(6),
+    name          VARCHAR(255) NOT NULL,
+    displayName   VARCHAR(255),
+    transposition VARCHAR(255)
+);
+
+-- Create audit table for instruments
+CREATE TABLE instruments_AUD
+(
+    id            VARCHAR(255) NOT NULL,
+    REV           INTEGER      NOT NULL,
+    REVTYPE       SMALLINT,
+    REVEND        INTEGER,
+    name          VARCHAR(255),
+    displayName   VARCHAR(255),
+    transposition VARCHAR(255),
+    PRIMARY KEY (REV, id)
+);
+
 create table instrumentations
 (
-    id             uuid    not null,
-    created        timestamp(6),
-    lastUpdate     timestamp(6),
-    version        integer not null,
-    clef           varchar(255) check (clef in ('TREBLE', 'ALTO', 'TENOR', 'BASS')),
-    instrumentName varchar(255),
-    notationType   varchar(255) check (notationType in
-                                       ('STANDARD', 'TABLATURE', 'PERCUSSION', 'LEAD_SHEET', 'GRAPHIC')),
-    notes          text,
-    partLabel      varchar(255),
-    transposition  varchar(255) check (transposition in ('C', 'D', 'Eb', 'F', 'G', 'A', 'Ab', 'Bb')),
-    sheet_id       uuid,
+    id            uuid         not null,
+    created       timestamp(6),
+    lastUpdate    timestamp(6),
+    version       integer      not null,
+    clef          varchar(255) check (clef in ('TREBLE', 'ALTO', 'TENOR', 'BASS')),
+    instrument_id varchar(255) not null,
+    notationType  varchar(255) check (notationType in
+                                      ('STANDARD', 'TABLATURE', 'PERCUSSION', 'LEAD_SHEET', 'GRAPHIC')),
+    notes         text,
+    partLabel     varchar(255),
+    sheet_id      uuid,
     primary key (id)
 );
 
@@ -159,17 +183,16 @@ create table instrumentations_attachments_AUD
 
 create table instrumentations_AUD
 (
-    id             uuid    not null,
-    REV            integer not null,
-    REVTYPE        smallint,
-    REVEND         integer,
-    clef           varchar(255),
-    instrumentName varchar(255),
-    notationType   varchar(255),
-    notes          text,
-    partLabel      varchar(255),
-    transposition  varchar(255),
-    sheet_id       uuid,
+    id            uuid    not null,
+    REV           integer not null,
+    REVTYPE       smallint,
+    REVEND        integer,
+    clef          varchar(255),
+    instrument_id varchar(255),
+    notationType  varchar(255),
+    notes         text,
+    partLabel     varchar(255),
+    sheet_id      uuid,
     primary key (REV, id)
 );
 
@@ -239,6 +262,7 @@ create table sheet_collections
     date        date,
     description varchar(255),
     name        varchar(255),
+    type varchar(255) check ((type in ('FOLDER','SETLIST'))),
     primary key (id)
 );
 
@@ -251,6 +275,7 @@ create table sheet_collections_AUD
     date        date,
     description varchar(255),
     name        varchar(255),
+    type varchar(255),
     primary key (REV, id)
 );
 
@@ -280,7 +305,7 @@ create table sheets
     copyright           varchar(255),
     difficultyLevel     varchar(255),
     edition             varchar(255),
-    fingerprint         char(64) NOT NULL,
+    fingerprint         varchar(64) NOT NULL,
     fingerprint_version integer  NOT NULL,
     gemaWorkNumber      varchar(255),
     iswc                varchar(255),
@@ -324,7 +349,7 @@ create table sheets_AUD
     copyright           varchar(255),
     difficultyLevel     varchar(255),
     edition             varchar(255),
-    fingerprint         char(64),
+    fingerprint         varchar(64),
     fingerprint_version integer,
     gemaWorkNumber      varchar(255),
     iswc                varchar(255),
@@ -351,7 +376,7 @@ alter table if exists genres
     add constraint UKpe1a9woik1k97l87cieguyhh4 unique (name);
 
 alter table if exists instrumentations
-    add constraint uc_instrumentation unique (sheet_id, instrumentName, partLabel, transposition, clef);
+    add constraint uc_instrumentation unique (sheet_id, instrument_id, partLabel, clef);
 
 alter table if exists instrumentations_attachments
     add constraint UKk6qbr4m70grnh6s0w0ejwr5na unique (attachments_id);
@@ -429,10 +454,24 @@ alter table if exists genres_AUD
         foreign key (REVEND)
             references REVINFO;
 
+alter table if exists instruments_AUD
+    add constraint FKtjd4o2umt2urv5hewcapjor0h
+        foreign key (REV)
+            references REVINFO;
+
+alter table if exists instruments_AUD
+    add constraint FKhqtg86cpoqgxaf1auws5o62g0
+        foreign key (REVEND)
+            references REVINFO;
+
 alter table if exists instrumentations
     add constraint FK2trg3cgqowoc8l9ha9aqltfud
         foreign key (sheet_id)
             references sheets;
+
+alter table instrumentations
+    add constraint fk_instrumentation_instrument
+        foreign key (instrument_id) references instruments (id);
 
 alter table if exists instrumentations_attachments
     add constraint FKiwnbx87wm92sk39urmtj5nq6v
@@ -528,6 +567,9 @@ alter table if exists sheets
     add constraint FKgm7puj2ckqcbalxiwkehmli3t
         foreign key (genre_id)
             references genres;
+
+alter table if exists sheets
+    add constraint UKfcbv63f6xe2tib2tl6xty2qv9 unique (fingerprint);
 
 alter table if exists sheets_attachments
     add constraint FK5pkvthou2jp3m2rydco8xhqs2

@@ -14,10 +14,10 @@ public final class TextNormalizer {
 
         normalized = normalized
                 .toLowerCase(Locale.ROOT)
-                .replaceAll("\\p{M}", "")          // Diacritics entfernen
-                .replaceAll("[^a-z0-9]+", " ")     // Sonderzeichen → Space
+                .replaceAll("\\p{M}", "") // Diacritics entfernen
+                .replaceAll("[^a-z0-9]+", " ") // Sonderzeichen → Space
                 .trim()
-                .replaceAll("\\s+", " ");          // Mehrfach-Spaces
+                .replaceAll("\\s+", " "); // Mehrfach-Spaces
 
         return normalized;
     }

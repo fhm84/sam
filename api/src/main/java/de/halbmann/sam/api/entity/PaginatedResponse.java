@@ -1,8 +1,7 @@
 package de.halbmann.sam.api.entity;
 
-import lombok.Data;
-
 import java.util.List;
+import lombok.Data;
 
 /**
  * Generic wrapper for a paginated response (data list) including some metadata like size and

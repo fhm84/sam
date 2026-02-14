@@ -2,7 +2,6 @@ package de.halbmann.sam.storage.upload;
 
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
-
 import java.io.IOException;
 
 @Priority(10)

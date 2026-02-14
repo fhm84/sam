@@ -7,7 +7,6 @@ import de.halbmann.sam.api.entity.PaginatedResponse;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 @Path("documents")
 public interface DocumentsResource {

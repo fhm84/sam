@@ -95,5 +95,4 @@ public class CreateSheetMusic {
      * Additional notes.
      */
     String additionalNotes;
-
 }

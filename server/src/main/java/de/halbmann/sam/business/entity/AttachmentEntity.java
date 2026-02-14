@@ -2,12 +2,11 @@ package de.halbmann.sam.business.entity;
 
 import de.halbmann.sam.api.entity.AttachmentType;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.envers.Audited;
-
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 
 /**
  * Represents an attachment entity with metadata and auditing capabilities. This entity is mapped to

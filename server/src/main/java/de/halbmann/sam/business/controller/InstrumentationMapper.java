@@ -7,7 +7,7 @@ import org.mapstruct.*;
 
 @Mapper(
         componentModel = MappingConstants.ComponentModel.JAKARTA_CDI,
-        uses = {AttachmentMapper.class},
+        uses = {AttachmentMapper.class, InstrumentMapper.class},
         unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface InstrumentationMapper {
 
@@ -19,6 +19,7 @@ public interface InstrumentationMapper {
     @Mapping(target = "lastUpdate", ignore = true)
     @Mapping(target = "sheet", ignore = true)
     @Mapping(target = "attachments", ignore = true)
+    @Mapping(target = "instrument", ignore = true)
     InstrumentationEntity fromDto(final CreateInstrumentation dto);
 
     @Mapping(target = "id", ignore = true)
@@ -27,5 +28,6 @@ public interface InstrumentationMapper {
     @Mapping(target = "lastUpdate", ignore = true)
     @Mapping(target = "sheet", ignore = true)
     @Mapping(target = "attachments", ignore = true)
+    @Mapping(target = "instrument", ignore = true)
     void update(@MappingTarget final InstrumentationEntity entity, final Instrumentation dto);
 }

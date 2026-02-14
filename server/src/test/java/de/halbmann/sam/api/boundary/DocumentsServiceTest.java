@@ -1,19 +1,18 @@
 package de.halbmann.sam.api.boundary;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import de.halbmann.sam.api.entity.Clef;
 import de.halbmann.sam.classification.boundary.ClassificationService;
 import de.halbmann.sam.classification.entity.SheetAnalyzerResult;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 @Disabled
 @QuarkusTest

@@ -1,10 +1,9 @@
 package de.halbmann.sam.api.entity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * An attachment (can be added to either SheetMusic or Instrumentation). This represents a file or

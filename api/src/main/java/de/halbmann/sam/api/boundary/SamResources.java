@@ -13,6 +13,9 @@ public interface SamResources {
     @Path("documents")
     DocumentsResource documents();
 
+    @Path("instruments")
+    InstrumentsResource instruments();
+
     @Path("musicians")
     MusiciansResource musicians();
 
@@ -21,5 +24,4 @@ public interface SamResources {
 
     @Path("sheets")
     SheetsResource sheets();
-
 }

@@ -2,13 +2,12 @@ package de.halbmann.sam.business.entity;
 
 import de.halbmann.sam.api.entity.CollectionType;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.envers.Audited;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.envers.Audited;
 
 /**
  * Groups multiple pieces of sheet music.

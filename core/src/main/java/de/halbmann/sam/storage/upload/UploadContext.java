@@ -12,5 +12,4 @@ import java.nio.file.Path;
  * @param tempPath    optional temp storage path
  * @param mimeType    optional MIME type detected
  */
-public record UploadContext(InputStream inputStream, String filename, long size, Path tempPath, String mimeType) {
-}
+public record UploadContext(InputStream inputStream, String filename, long size, Path tempPath, String mimeType) {}

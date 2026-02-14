@@ -14,7 +14,7 @@ public class FingerprintEntity {
     @NotBlank
     @Column(name = "fingerprint", length = 64, nullable = false)
     String hashValue;
+
     @Column(name = "fingerprint_version", nullable = false)
     int version;
-
 }

@@ -1,23 +1,17 @@
 package de.halbmann.sam.api.entity;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * Defines request data for creating a canonical musical entity for an instrument.
+ * Canonical musical entity for an instrument.
  */
 @Data
 @EqualsAndHashCode
-public class CreateInstrument {
+public class Instrument {
 
-    /**
-     * Canonical ID like "TENORHORN_BB"
-     */
-    @NotBlank
-    @Pattern(regexp = "^[-_A-Z0-9]+(_[A-Z0-9]+)*$")
-    String id;
+    String id; // "TENORHORN_BB"
 
     /**
      * Instrument name (e.g. Trumpet, Violin, Bass)

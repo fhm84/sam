@@ -2,13 +2,12 @@ package de.halbmann.sam.api.entity;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * Groups multiple pieces of sheet music.

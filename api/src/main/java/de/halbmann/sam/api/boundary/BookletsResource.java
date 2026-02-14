@@ -5,7 +5,6 @@ import de.halbmann.sam.api.entity.BookletFilterRequest;
 import de.halbmann.sam.api.entity.PaginatedResponse;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
-import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 @Path("booklets")
 @Produces(MediaType.APPLICATION_JSON)

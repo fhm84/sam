@@ -9,11 +9,11 @@ import org.mapstruct.*;
 @Mapper(
         componentModel = MappingConstants.ComponentModel.JAKARTA_CDI,
         uses = {
-                MusicianMapper.class,
-                GenreMapper.class,
-                InstrumentationMapper.class,
-                AttachmentMapper.class,
-                GenreRepository.class
+            MusicianMapper.class,
+            GenreMapper.class,
+            InstrumentationMapper.class,
+            AttachmentMapper.class,
+            GenreRepository.class
         },
         unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface SheetMusicMapper {
@@ -28,6 +28,7 @@ public interface SheetMusicMapper {
     @Mapping(target = "genre", source = "genre")
     @Mapping(target = "instrumentations", ignore = true)
     @Mapping(target = "attachments", ignore = true)
+    @Mapping(target = "fingerprint", ignore = true)
     SheetMusicEntity fromDto(final CreateSheetMusic dto);
 
     @Mapping(target = "id", ignore = true)
@@ -37,5 +38,6 @@ public interface SheetMusicMapper {
     @Mapping(target = "genre", source = "genre")
     @Mapping(target = "instrumentations", ignore = true)
     @Mapping(target = "attachments", ignore = true)
+    @Mapping(target = "fingerprint", ignore = true)
     void update(@MappingTarget final SheetMusicEntity entity, final SheetMusic dto);
 }

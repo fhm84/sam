@@ -1,7 +1,6 @@
 package de.halbmann.storage.local;
 
 import de.halbmann.storage.api.FileSystemWrapper;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;

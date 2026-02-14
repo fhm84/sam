@@ -9,9 +9,6 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.event.Level;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
@@ -20,6 +17,8 @@ import java.nio.file.Files;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.event.Level;
 
 @Slf4j
 @RequestScoped
