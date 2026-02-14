@@ -9,10 +9,7 @@ import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
@@ -29,46 +26,46 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
     public PaginatedResponse<SheetMusicSearchResult> findSheets(final SheetFilterRequest filterRequest) {
         if (filterRequest.getQuery() != null) {
             String sql = """
-                            WITH q AS (
-                                SELECT
-                                    plainto_tsquery('simple', :query) AS tsq,
-                                    :query AS raw,
-                                    dmetaphone(:query) AS phonetic
-                            )
-                            SELECT s.*,
-                                   -- metrics
-                                   ts_rank(s.search_vector, q.tsq)    AS fts_rank,
-                                   similarity(s.title, q.raw)         AS title_similarity,
-                                   similarity(s.composer_name, q.raw) AS composer_similarity,
-                                   (s.composer_phonetic = q.phonetic) AS phonetic_match,
+                    WITH q AS (
+                        SELECT
+                            plainto_tsquery('simple', :query) AS tsq,
+                            :query AS raw,
+                            dmetaphone(:query) AS phonetic
+                    )
+                    SELECT s.*,
+                           -- metrics
+                           ts_rank(s.search_vector, q.tsq)    AS fts_rank,
+                           similarity(s.title, q.raw)         AS title_similarity,
+                           similarity(s.composer_name, q.raw) AS composer_similarity,
+                           (s.composer_phonetic = q.phonetic) AS phonetic_match,
 
-                                   -- final score
-                                   (
-                                       ts_rank(s.search_vector, q.tsq) * 0.70
-                                     + similarity(s.title, q.raw) * 0.20
-                                     + similarity(s.composer_name, q.raw) * 0.10
-                                     + CASE
-                                           WHEN s.composer_phonetic = q.phonetic THEN 0.05
-                                           ELSE 0
-                                       END
-                                   ) AS final_rank
-                            FROM sheets s, q
-                            WHERE
-                                  s.search_vector @@ q.tsq
-                               OR s.title % q.raw
-                               OR s.composer_name % q.raw
-                               OR s.composer_phonetic = q.phonetic
-                            ORDER BY
-                                (
-                                    ts_rank(s.search_vector, q.tsq) * 0.70
-                                  + similarity(s.title, q.raw) * 0.20
-                                  + similarity(s.composer_name, q.raw) * 0.10
-                                  + CASE
-                                        WHEN s.composer_phonetic = q.phonetic THEN 0.05
-                                        ELSE 0
-                                    END
-                                ) DESC
-                            """;
+                           -- final score
+                           (
+                               ts_rank(s.search_vector, q.tsq) * 0.70
+                             + similarity(s.title, q.raw) * 0.20
+                             + similarity(s.composer_name, q.raw) * 0.10
+                             + CASE
+                                   WHEN s.composer_phonetic = q.phonetic THEN 0.05
+                                   ELSE 0
+                               END
+                           ) AS final_rank
+                    FROM sheets s, q
+                    WHERE
+                          s.search_vector @@ q.tsq
+                       OR s.title % q.raw
+                       OR s.composer_name % q.raw
+                       OR s.composer_phonetic = q.phonetic
+                    ORDER BY
+                        (
+                            ts_rank(s.search_vector, q.tsq) * 0.70
+                          + similarity(s.title, q.raw) * 0.20
+                          + similarity(s.composer_name, q.raw) * 0.10
+                          + CASE
+                                WHEN s.composer_phonetic = q.phonetic THEN 0.05
+                                ELSE 0
+                            END
+                        ) DESC
+                    """;
 
             List<Object[]> results = getEntityManager()
                     .createNativeQuery(sql, "SheetWithMetrics")
@@ -82,11 +79,19 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
                     .map(r -> new SheetMusicSearchResult(
                             sheetMusicMapper.toDto((SheetMusicEntity) r[0]),
                             new SearchResultMetrics(
-                                    ((Number) r[1]).doubleValue(),
-                                    ((Number) r[2]).doubleValue(),
-                                    ((Number) r[3]).doubleValue(),
+                                    Optional.ofNullable((Number) r[1])
+                                            .map(Number::doubleValue)
+                                            .orElse(0.0),
+                                    Optional.ofNullable((Number) r[2])
+                                            .map(Number::doubleValue)
+                                            .orElse(0.0),
+                                    Optional.ofNullable((Number) r[3])
+                                            .map(Number::doubleValue)
+                                            .orElse(0.0),
                                     (Boolean) r[4],
-                                    ((Number) r[5]).doubleValue())))
+                                    Optional.ofNullable((Number) r[5])
+                                            .map(Number::doubleValue)
+                                            .orElse(0.0))))
                     .toList());
             response.setPage(filterRequest.getPage());
             response.setSize(response.getData().size());
