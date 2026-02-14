@@ -16,7 +16,7 @@
     <properties>
         <tika-core.version>3.2.3</tika-core.version>
         <aws-java-nio-spi-s3.version>2.2.1</aws-java-nio-spi-s3.version>
-        <quarkus-langchain4j.version>1.0.2</quarkus-langchain4j.version>
+        <quarkus-langchain4j.version>1.7.1</quarkus-langchain4j.version>
         <pdfbox-tools.version>3.0.4</pdfbox-tools.version>
     </properties>
 
