@@ -28,8 +28,7 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
 
     public PaginatedResponse<SheetMusicSearchResult> findSheets(final SheetFilterRequest filterRequest) {
         if (filterRequest.getQuery() != null) {
-            String sql =
-                    """
+            String sql = """
                             WITH q AS (
                                 SELECT
                                     plainto_tsquery('simple', :query) AS tsq,

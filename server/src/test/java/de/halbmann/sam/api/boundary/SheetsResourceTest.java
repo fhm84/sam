@@ -46,8 +46,7 @@ class SheetsResourceTest {
 
     @Test
     void testAddingSheetMusic_plainJson() {
-        final String testJson =
-                """
+        final String testJson = """
                         {
                             "title": "Kuschelpolka",
                             "publisher": "Ewoton Verlag",

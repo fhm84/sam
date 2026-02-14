@@ -116,8 +116,7 @@ public class DocumentsResourceImpl implements DocumentsResource {
             return """
                     "filename": "%s",
                     "id": "%s"
-                    """
-                    .formatted(attachment.getDisplayName(), attachment.getId());
+                    """.formatted(attachment.getDisplayName(), attachment.getId());
         } catch (IOException | NoSuchAlgorithmException e) {
             log.atWarn()
                     .setCause(e)
