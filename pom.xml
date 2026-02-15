@@ -31,6 +31,8 @@
         <lombok.version>1.18.42</lombok.version>
         <org.mapstruct.version>1.6.3</org.mapstruct.version>
 
+        <tika-core.version>3.2.3</tika-core.version>
+
         <skipITs>true</skipITs>
     </properties>
 
