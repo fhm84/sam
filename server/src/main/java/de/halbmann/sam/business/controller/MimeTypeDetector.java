@@ -17,7 +17,7 @@ import org.apache.tika.mime.MediaType;
  * @author FabianHalbmann
  */
 @ApplicationScoped
-public class MimeTypeController {
+public class MimeTypeDetector {
 
     final TikaConfig tikaConfig = TikaConfig.getDefaultConfig();
 

@@ -1,9 +1,12 @@
-package de.halbmann.sam.business.boundary;
+package de.halbmann.sam.business.controller;
 
 import de.halbmann.sam.api.entity.Attachment;
 import de.halbmann.sam.api.entity.AttachmentType;
 import de.halbmann.sam.api.entity.DocumentDownload;
-import de.halbmann.sam.business.controller.AttachmentMapper;
+import de.halbmann.sam.business.boundary.AttachmentRepository;
+import de.halbmann.sam.business.boundary.DocumentRepository;
+import de.halbmann.sam.business.boundary.InstrumentationRepository;
+import de.halbmann.sam.business.boundary.SheetRepository;
 import de.halbmann.sam.business.entity.*;
 import de.halbmann.sam.storage.MimeTypeUtils;
 import de.halbmann.sam.storage.malware.VirusScanner;

@@ -4,7 +4,7 @@ import de.halbmann.sam.api.boundary.DocumentsResource;
 import de.halbmann.sam.api.boundary.InstrumentationsResource;
 import de.halbmann.sam.api.boundary.SheetsResource;
 import de.halbmann.sam.api.entity.*;
-import de.halbmann.sam.business.boundary.SheetRepository;
+import de.halbmann.sam.business.controller.SheetService;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.container.ResourceContext;
@@ -17,31 +17,31 @@ public class SheetsResourceImpl implements SheetsResource {
     ResourceContext resourceContext;
 
     @Inject
-    SheetRepository sheetRepository;
+    SheetService sheetService;
 
     @Override
     public PaginatedResponse<SheetMusicSearchResult> findSheets(final SheetFilterRequest filterRequest) {
-        return sheetRepository.findSheets(filterRequest);
+        return sheetService.findSheets(filterRequest);
     }
 
     @Override
     public SheetMusic add(final CreateSheetMusic sheetMusic) {
-        return sheetRepository.addSheet(sheetMusic);
+        return sheetService.addSheet(sheetMusic);
     }
 
     @Override
     public SheetMusic load(final String sheetId) {
-        return sheetRepository.getSheet(sheetId);
+        return sheetService.getSheet(sheetId);
     }
 
     @Override
     public void update(final String sheetId, final SheetMusic sheetMusic) {
-        sheetRepository.updateSheet(sheetId, sheetMusic);
+        sheetService.updateSheet(sheetId, sheetMusic);
     }
 
     @Override
     public void delete(final String sheetId) {
-        sheetRepository.deleteSheet(sheetId);
+        sheetService.deleteSheet(sheetId);
     }
 
     @Override

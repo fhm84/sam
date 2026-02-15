@@ -4,7 +4,7 @@ import de.halbmann.sam.api.boundary.DocumentsResource;
 import de.halbmann.sam.api.boundary.InstrumentationsResource;
 import de.halbmann.sam.api.entity.CreateInstrumentation;
 import de.halbmann.sam.api.entity.Instrumentation;
-import de.halbmann.sam.business.boundary.InstrumentationRepository;
+import de.halbmann.sam.business.controller.InstrumentationService;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.PathParam;
@@ -22,36 +22,36 @@ public class InstrumentationsResourceImpl implements InstrumentationsResource {
     ResourceContext resourceContext;
 
     @Inject
-    InstrumentationRepository instrumentationRepository;
+    InstrumentationService instrumentationService;
 
     @Override
     public List<Instrumentation> listAll() {
-        return instrumentationRepository.getInstrumentations(sheetId);
+        return instrumentationService.getInstrumentations(sheetId);
     }
 
     @Override
     public Instrumentation get(final String instrumentationId) {
-        return instrumentationRepository.getInstrumentation(instrumentationId);
+        return instrumentationService.getInstrumentation(instrumentationId);
     }
 
     @Override
     public void add(final CreateInstrumentation instrumentation) {
-        instrumentationRepository.addInstrumentation(sheetId, instrumentation);
+        instrumentationService.addInstrumentation(sheetId, instrumentation);
     }
 
     @Override
     public void add(List<CreateInstrumentation> instrumentations) {
-        instrumentationRepository.addInstrumentations(sheetId, instrumentations);
+        instrumentationService.addInstrumentations(sheetId, instrumentations);
     }
 
     @Override
     public void update(final String instrumentationId, final Instrumentation instrumentation) {
-        instrumentationRepository.updateInstrumentation(instrumentationId, instrumentation);
+        instrumentationService.updateInstrumentation(instrumentationId, instrumentation);
     }
 
     @Override
     public void delete(final String instrumentationId) {
-        instrumentationRepository.deleteInstrumentation(instrumentationId);
+        instrumentationService.deleteInstrumentation(instrumentationId);
     }
 
     @Override

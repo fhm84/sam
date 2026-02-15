@@ -2,7 +2,7 @@ package de.halbmann.sam.api.impl.boundary;
 
 import de.halbmann.sam.api.boundary.DocumentsResource;
 import de.halbmann.sam.api.entity.*;
-import de.halbmann.sam.business.boundary.DocumentsService;
+import de.halbmann.sam.business.controller.DocumentsService;
 import de.halbmann.sam.business.entity.DocumentEntity;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;

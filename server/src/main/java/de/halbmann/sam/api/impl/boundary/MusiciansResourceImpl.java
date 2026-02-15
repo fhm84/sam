@@ -4,7 +4,7 @@ import de.halbmann.sam.api.boundary.MusiciansResource;
 import de.halbmann.sam.api.entity.Musician;
 import de.halbmann.sam.api.entity.MusicianFilterRequest;
 import de.halbmann.sam.api.entity.PaginatedResponse;
-import de.halbmann.sam.business.boundary.MusicianRepository;
+import de.halbmann.sam.business.controller.MusicianService;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 
@@ -12,34 +12,30 @@ import jakarta.inject.Inject;
 public class MusiciansResourceImpl implements MusiciansResource {
 
     @Inject
-    MusicianRepository musicianRepository;
+    MusicianService musicianService;
 
     @Override
     public PaginatedResponse<Musician> findMusicians(MusicianFilterRequest filterRequest) {
-        if (filterRequest.getName() != null && !filterRequest.getName().isEmpty()) {
-            return musicianRepository.findMusicians(filterRequest);
-        } else {
-            return musicianRepository.getAllMusicians(filterRequest);
-        }
+        return musicianService.findMusicians(filterRequest);
     }
 
     @Override
     public Musician add(Musician musician) {
-        return musicianRepository.addMusician(musician);
+        return musicianService.addMusician(musician);
     }
 
     @Override
     public Musician load(String musicianId) {
-        return musicianRepository.getMusician(musicianId);
+        return musicianService.getMusician(musicianId);
     }
 
     @Override
     public void update(String musicianId, Musician musician) {
-        musicianRepository.updateMusician(musicianId, musician);
+        musicianService.updateMusician(musicianId, musician);
     }
 
     @Override
     public void delete(String musicianId) {
-        musicianRepository.deleteMusician(musicianId);
+        musicianService.deleteMusician(musicianId);
     }
 }
