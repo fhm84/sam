@@ -8,6 +8,7 @@ import de.halbmann.sam.business.boundary.SheetRepository;
 import de.halbmann.sam.business.entity.InstrumentEntity;
 import de.halbmann.sam.business.entity.InstrumentationEntity;
 import de.halbmann.sam.business.entity.SheetMusicEntity;
+import de.halbmann.sam.business.exception.EntityNotFoundException;
 import io.quarkus.panache.common.Parameters;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -43,13 +44,19 @@ public class InstrumentationService {
     }
 
     public Instrumentation getInstrumentation(final String instrumentationId) {
-        final InstrumentationEntity entity = instrumentationRepository.findById(UUID.fromString(instrumentationId));
+        final InstrumentationEntity entity = instrumentationRepository
+                .findByIdOptional(UUID.fromString(instrumentationId))
+                .orElseThrow(() -> new EntityNotFoundException("Instrumentation", instrumentationId));
         return instrumentationMapper.toDto(entity);
     }
 
     public Instrumentation addInstrumentation(final String sheetId, final CreateInstrumentation instrumentation) {
-        final SheetMusicEntity sheet = sheetRepository.findById(UUID.fromString(sheetId));
-        final InstrumentEntity instrument = instrumentRepository.findById(instrumentation.getInstrumentId());
+        final SheetMusicEntity sheet = sheetRepository
+                .findByIdOptional(UUID.fromString(sheetId))
+                .orElseThrow(() -> new EntityNotFoundException("SheetMusic", sheetId));
+        final InstrumentEntity instrument = instrumentRepository
+                .findByIdOptional(instrumentation.getInstrumentId())
+                .orElseThrow(() -> new EntityNotFoundException("Instrument", instrumentation.getInstrumentId()));
         final InstrumentationEntity entity = instrumentationMapper.fromDto(instrumentation);
         entity.setSheet(sheet);
         entity.setInstrument(instrument);
@@ -58,10 +65,14 @@ public class InstrumentationService {
     }
 
     public void addInstrumentations(final String sheetId, final List<CreateInstrumentation> instrumentations) {
-        final SheetMusicEntity sheet = sheetRepository.findById(UUID.fromString(sheetId));
+        final SheetMusicEntity sheet = sheetRepository
+                .findByIdOptional(UUID.fromString(sheetId))
+                .orElseThrow(() -> new EntityNotFoundException("SheetMusic", sheetId));
         List<InstrumentationEntity> instrumentationEntities = instrumentations.stream()
                 .map(dto -> {
-                    InstrumentEntity instrument = instrumentRepository.findById(dto.getInstrumentId());
+                    InstrumentEntity instrument = instrumentRepository
+                            .findByIdOptional(dto.getInstrumentId())
+                            .orElseThrow(() -> new EntityNotFoundException("Instrument", dto.getInstrumentId()));
                     InstrumentationEntity entity = instrumentationMapper.fromDto(dto);
                     entity.setSheet(sheet);
                     entity.setInstrument(instrument);
@@ -72,12 +83,16 @@ public class InstrumentationService {
     }
 
     public void updateInstrumentation(final String instrumentationId, final Instrumentation instrumentation) {
-        final InstrumentationEntity entity = instrumentationRepository.findById(UUID.fromString(instrumentationId));
+        final InstrumentationEntity entity = instrumentationRepository
+                .findByIdOptional(UUID.fromString(instrumentationId))
+                .orElseThrow(() -> new EntityNotFoundException("Instrumentation", instrumentationId));
         instrumentationMapper.update(entity, instrumentation);
     }
 
     public void deleteInstrumentation(final String instrumentationId) {
-        final InstrumentationEntity entity = instrumentationRepository.findById(UUID.fromString(instrumentationId));
+        final InstrumentationEntity entity = instrumentationRepository
+                .findByIdOptional(UUID.fromString(instrumentationId))
+                .orElseThrow(() -> new EntityNotFoundException("Instrumentation", instrumentationId));
         instrumentationRepository.delete(entity);
     }
 }

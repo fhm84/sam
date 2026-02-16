@@ -4,6 +4,7 @@ import de.halbmann.sam.api.entity.*;
 import de.halbmann.sam.business.boundary.MusicianRepository;
 import de.halbmann.sam.business.entity.MusicianEntity;
 import de.halbmann.sam.business.entity.PaginatedEntities;
+import de.halbmann.sam.business.exception.EntityNotFoundException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -45,7 +46,9 @@ public class MusicianService {
     }
 
     public Musician getMusician(final String musicianId) {
-        MusicianEntity entity = musicianRepository.findById(UUID.fromString(musicianId));
+        MusicianEntity entity = musicianRepository
+                .findByIdOptional(UUID.fromString(musicianId))
+                .orElseThrow(() -> new EntityNotFoundException("Musician", musicianId));
         return musicianMapper.toDto(entity);
     }
 
@@ -58,12 +61,16 @@ public class MusicianService {
     }
 
     public void updateMusician(final String musicianId, final Musician musician) {
-        final MusicianEntity entity = musicianRepository.findById(UUID.fromString(musicianId));
+        final MusicianEntity entity = musicianRepository
+                .findByIdOptional(UUID.fromString(musicianId))
+                .orElseThrow(() -> new EntityNotFoundException("Musician", musicianId));
         musicianMapper.update(entity, musician);
     }
 
     public void deleteMusician(final String musicianId) {
-        final MusicianEntity entity = musicianRepository.findById(UUID.fromString(musicianId));
+        final MusicianEntity entity = musicianRepository
+                .findByIdOptional(UUID.fromString(musicianId))
+                .orElseThrow(() -> new EntityNotFoundException("Musician", musicianId));
         // TODO: check for links -> if the musician is still in use -> do NOT delete!
         musicianRepository.delete(entity);
     }

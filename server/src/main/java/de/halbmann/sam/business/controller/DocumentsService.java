@@ -8,6 +8,8 @@ import de.halbmann.sam.business.boundary.DocumentRepository;
 import de.halbmann.sam.business.boundary.InstrumentationRepository;
 import de.halbmann.sam.business.boundary.SheetRepository;
 import de.halbmann.sam.business.entity.*;
+import de.halbmann.sam.business.exception.EntityNotFoundException;
+import de.halbmann.sam.business.exception.StorageException;
 import de.halbmann.sam.storage.MimeTypeUtils;
 import de.halbmann.sam.storage.malware.VirusScanner;
 import de.halbmann.sam.storage.upload.UploadContext;
@@ -18,7 +20,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.NotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -94,7 +95,7 @@ public class DocumentsService {
         return attachmentMapper.toDto(uploaded);
     }
 
-    public DocumentDownload loadAttachmentByInstrumentation(String instrumentationId, String docId) throws IOException {
+    public DocumentDownload loadAttachmentByInstrumentation(String instrumentationId, String docId) {
         if (instrumentationId == null) {
             return null;
         }
@@ -111,7 +112,7 @@ public class DocumentsService {
         return null;
     }
 
-    public DocumentDownload loadAttachmentBySheet(String sheetId, String docId) throws IOException {
+    public DocumentDownload loadAttachmentBySheet(String sheetId, String docId) {
         if (sheetId == null) {
             return null;
         }
@@ -128,7 +129,7 @@ public class DocumentsService {
         return null;
     }
 
-    public DocumentDownload loadAttachment(String docIdentifier) throws IOException {
+    public DocumentDownload loadAttachment(String docIdentifier) {
         if (docIdentifier != null) {
             AttachmentEntity attachment = attachmentRepository.findById(UUID.fromString(docIdentifier));
             if (attachment.getDocument() != null) {
@@ -195,7 +196,7 @@ public class DocumentsService {
                 documentRepository.persist(doc);
                 return doc;
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new StorageException("Failed to store file", e);
             }
         });
 
@@ -218,20 +219,19 @@ public class DocumentsService {
     }
 
     DocumentDownload load(UUID documentId) {
-        // FIXME: JAX-RS exception!
         DocumentEntity doc = documentRepository
                 .findByIdOptional(documentId)
-                .orElseThrow(() -> new NotFoundException("Document not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Document", documentId));
 
         if (!filesystem.exists(doc.getPath())) {
-            throw new IllegalStateException("Physical file missing: " + doc.getPath());
+            throw new StorageException("Physical file missing: " + doc.getPath());
         }
 
         InputStream stream;
         try {
             stream = filesystem.openForRead(doc.getPath());
         } catch (IOException e) {
-            throw new RuntimeException("Failed to open document stream", e);
+            throw new StorageException("Failed to open document stream", e);
         }
 
         return new DocumentDownload(
@@ -244,7 +244,9 @@ public class DocumentsService {
 
     @Transactional
     void deleteIfUnlinked(UUID documentId) {
-        DocumentEntity doc = documentRepository.findByIdOptional(documentId).orElseThrow(NotFoundException::new);
+        DocumentEntity doc = documentRepository
+                .findByIdOptional(documentId)
+                .orElseThrow(() -> new EntityNotFoundException("Document", documentId));
 
         if (doc.getRefCount() > 0) {
             throw new IllegalStateException("Document is still linked");
@@ -253,7 +255,7 @@ public class DocumentsService {
         try {
             filesystem.delete(doc.getPath());
         } catch (IOException e) {
-            throw new RuntimeException("Failed to delete physical file", e);
+            throw new StorageException("Failed to delete physical file", e);
         }
 
         documentRepository.delete(doc);

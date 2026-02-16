@@ -4,6 +4,7 @@ import de.halbmann.sam.api.entity.*;
 import de.halbmann.sam.business.boundary.SheetRepository;
 import de.halbmann.sam.business.entity.PaginatedEntities;
 import de.halbmann.sam.business.entity.SheetMusicEntity;
+import de.halbmann.sam.business.exception.EntityNotFoundException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -83,7 +84,9 @@ public class SheetService {
     }
 
     public SheetMusic getSheet(final String sheetId) {
-        final SheetMusicEntity entity = sheetRepository.findById(UUID.fromString(sheetId));
+        final SheetMusicEntity entity = sheetRepository
+                .findByIdOptional(UUID.fromString(sheetId))
+                .orElseThrow(() -> new EntityNotFoundException("SheetMusic", sheetId));
         return sheetMusicMapper.toDto(entity);
     }
 
@@ -94,12 +97,16 @@ public class SheetService {
     }
 
     public void updateSheet(final String sheetId, final SheetMusic sheetMusic) {
-        final SheetMusicEntity entity = sheetRepository.findById(UUID.fromString(sheetId));
+        final SheetMusicEntity entity = sheetRepository
+                .findByIdOptional(UUID.fromString(sheetId))
+                .orElseThrow(() -> new EntityNotFoundException("SheetMusic", sheetId));
         sheetMusicMapper.update(entity, sheetMusic);
     }
 
     public void deleteSheet(final String sheetId) {
-        final SheetMusicEntity entity = sheetRepository.findById(UUID.fromString(sheetId));
+        final SheetMusicEntity entity = sheetRepository
+                .findByIdOptional(UUID.fromString(sheetId))
+                .orElseThrow(() -> new EntityNotFoundException("SheetMusic", sheetId));
         sheetRepository.delete(entity);
     }
 }

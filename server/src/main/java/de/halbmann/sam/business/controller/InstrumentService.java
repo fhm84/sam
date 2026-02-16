@@ -4,6 +4,7 @@ import de.halbmann.sam.api.entity.*;
 import de.halbmann.sam.business.boundary.InstrumentRepository;
 import de.halbmann.sam.business.entity.InstrumentEntity;
 import de.halbmann.sam.business.entity.PaginatedEntities;
+import de.halbmann.sam.business.exception.EntityNotFoundException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -44,7 +45,9 @@ public class InstrumentService {
     }
 
     public Instrument getInstrument(final String instrumentId) {
-        InstrumentEntity entity = instrumentRepository.findById(instrumentId);
+        InstrumentEntity entity = instrumentRepository
+                .findByIdOptional(instrumentId)
+                .orElseThrow(() -> new EntityNotFoundException("Instrument", instrumentId));
         return instrumentMapper.toDto(entity);
     }
 
@@ -55,12 +58,16 @@ public class InstrumentService {
     }
 
     public void updateInstrument(final String instrumentId, final Instrument instrument) {
-        final InstrumentEntity entity = instrumentRepository.findById(instrumentId);
+        final InstrumentEntity entity = instrumentRepository
+                .findByIdOptional(instrumentId)
+                .orElseThrow(() -> new EntityNotFoundException("Instrument", instrumentId));
         instrumentMapper.update(entity, instrument);
     }
 
     public void deleteInstrument(final String instrumentId) {
-        final InstrumentEntity entity = instrumentRepository.findById(instrumentId);
+        final InstrumentEntity entity = instrumentRepository
+                .findByIdOptional(instrumentId)
+                .orElseThrow(() -> new EntityNotFoundException("Instrument", instrumentId));
         instrumentRepository.delete(entity);
     }
 }

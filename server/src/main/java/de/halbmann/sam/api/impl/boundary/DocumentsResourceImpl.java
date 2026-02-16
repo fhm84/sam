@@ -52,23 +52,11 @@ public class DocumentsResourceImpl implements DocumentsResource {
     public Response load(String docIdentifier, String ifNoneMatch) {
         DocumentDownload attachment;
         if (instrumentationId != null) {
-            try {
-                attachment = documentsService.loadAttachmentByInstrumentation(instrumentationId, docIdentifier);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            attachment = documentsService.loadAttachmentByInstrumentation(instrumentationId, docIdentifier);
         } else if (sheetId != null) {
-            try {
-                attachment = documentsService.loadAttachmentBySheet(sheetId, docIdentifier);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            attachment = documentsService.loadAttachmentBySheet(sheetId, docIdentifier);
         } else {
-            try {
-                attachment = documentsService.loadAttachment(docIdentifier);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            attachment = documentsService.loadAttachment(docIdentifier);
         }
         if (attachment == null) {
             log.info("Document ({}) not found", docIdentifier);
