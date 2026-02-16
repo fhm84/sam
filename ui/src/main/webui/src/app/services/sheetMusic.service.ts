@@ -26,13 +26,15 @@ export class SheetMusicService {
     };
 
     const cleaned = this.nullifyService.convertEmptyStringsToNull(data);
-    console.log(cleaned);
+    console.log("payload to add sheet: " + JSON.stringify(cleaned));
     return this.httpClient.post(`${this.baseUrl}/sheets`, cleaned);
   }
 
   updateSheet(id: string, data: any): Observable<any> {
-    console.log("updating sheetMusic ${id}");
-    return this.httpClient.put(`${this.baseUrl}/sheets/${id}`, data);
+    console.log('updating sheetMusic: ${id}');
+    const cleaned = this.nullifyService.convertEmptyStringsToNull(data);
+    console.log("payload to update sheet: " + JSON.stringify(cleaned));
+    return this.httpClient.put(`${this.baseUrl}/sheets/${id}`, cleaned);
   }
 
   getSheetList(page: number = 0, size: number = 10): Observable<any> {

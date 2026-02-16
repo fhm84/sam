@@ -12,6 +12,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTable, MatTableModule } from '@angular/material/table';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { A } from '@angular/cdk/keycodes';
 
 @Component({
     selector: 'app-instrumentation-list',
@@ -20,9 +22,7 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
         MatTableModule,
         MatInputModule,
         MatSelectModule,
-        MatRadioModule,
-        MatCardModule,
-        MatExpansionModule,
+        MatTooltipModule,
         MatFormFieldModule,
         MatButtonModule,
         MatIconModule,
@@ -66,20 +66,31 @@ export class InstrumentationListComponent implements OnInit {
 
     setDisplayedColumns() {
         this.displayedColumns = this.editMode
-            ? ['instrumentName', 'partLabel', 'transposition', 'clef', 'notationType', 'actions']
-            : ['instrumentName', 'partLabel', 'transposition', 'clef', 'notationType', 'actions'];
+            ? ['instrumentName', 'partLabel', 'transposition', 'clef', 'notationType', 'attachments', 'actions']
+            : ['instrumentName', 'partLabel', 'transposition', 'clef', 'notationType', 'attachments', 'actions'];
+    }
+
+    /** Extract instrument fields from the nested instrument object. */
+    private extractInstrumentFields(instr: any) {
+        return {
+            instrumentName: instr.instrument?.name ?? instr.instrumentName,
+            transposition: instr.instrument?.transposition ?? instr.transposition,
+            clef: instr.instrument?.clef ?? instr.clef,
+        };
     }
 
     setInstrumentations(data: any[]) {
         const array = this.instrumentationForm.get('instrumentations') as FormArray;
         array.clear();
         data.forEach(instr => {
+            const fields = this.extractInstrumentFields(instr);
             array.push(this.fb.group({
-                instrumentName: [instr.instrumentName, [Validators.required, Validators.maxLength(100)]],
+                instrumentName: [fields.instrumentName, [Validators.required, Validators.maxLength(100)]],
                 partLabel: [instr.partLabel],
-                transposition: [instr.transposition],
-                clef: [instr.clef],
+                transposition: [fields.transposition],
+                clef: [fields.clef],
                 notationType: [instr.notationType],
+                attachments: [instr.attachments || []],
                 dirty: [false]
             }));
         });
@@ -91,12 +102,14 @@ export class InstrumentationListComponent implements OnInit {
     }
 
     addInstrumentation(instr?: any) {
+        const fields = instr ? this.extractInstrumentFields(instr) : { instrumentName: '', transposition: 'C', clef: 'TREBLE' };
         const group = this.fb.group({
-            instrumentName: [instr?.instrumentName || '', [Validators.required, Validators.maxLength(100)]],
+            instrumentName: [fields.instrumentName || '', [Validators.required, Validators.maxLength(100)]],
             partLabel: [instr?.partLabel || ''],
-            transposition: [instr?.transposition || 'C Major'],
-            clef: [instr?.clef || 'Treble'],
-            notationType: [instr?.notationType || 'Standard'],
+            transposition: [fields.transposition || 'C'],
+            clef: [fields.clef || 'TREBLE'],
+            notationType: [instr?.notationType || 'STANDARD'],
+            attachments: [instr?.attachments || []],
             dirty: [false] // track unsaved state
         })
         group.valueChanges.subscribe(() => group.get('dirty')?.setValue(true, { emitEvent: false }));
