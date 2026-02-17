@@ -77,4 +77,16 @@ public interface SheetsResource {
      */
     @Path("{sheetId}/documents")
     DocumentsResource documents(final @PathParam("sheetId") String sheetId);
+
+    /**
+     * Evaluates the coverage of a sheet music's instrumentations against an ensemble definition.
+     *
+     * @param sheetId the ID of the sheet music
+     * @param ensembleId the ID of the ensemble to evaluate against
+     * @return the coverage result with per-voice breakdown
+     */
+    @GET
+    @Path("{sheetId}/coverage")
+    CoverageResult coverage(
+            final @PathParam("sheetId") String sheetId, final @QueryParam("ensemble") String ensembleId);
 }

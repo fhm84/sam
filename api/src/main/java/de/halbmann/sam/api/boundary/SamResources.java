@@ -24,4 +24,7 @@ public interface SamResources {
 
     @Path("sheets")
     SheetsResource sheets();
+
+    @Path("ensembles")
+    EnsemblesResource ensembles();
 }

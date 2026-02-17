@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 3.2.1263 on 2026-02-14 22:33:10.
+// Generated using typescript-generator version 3.2.1263 on 2026-02-17 22:12:09.
 
 export interface Attachment {
     checksum?: string;
@@ -28,6 +28,23 @@ export interface CollectionSheet {
     id?: string;
     identifier: string;
     sheetMusic: SheetMusic;
+}
+
+export interface CoverageResult {
+    coverageScore?: number;
+    details?: VoiceCoverageDetail[];
+    status?: CoverageStatus;
+}
+
+export interface CreateEnsemble {
+    description?: string;
+    name: string;
+}
+
+export interface CreateEnsembleVoice {
+    label: string;
+    required?: boolean;
+    weight?: number;
 }
 
 export interface CreateInstrument {
@@ -64,10 +81,35 @@ export interface CreateSheetMusic {
     yearOfComposition?: number;
 }
 
+export interface CreateVoiceOption {
+    factor?: number;
+    instrumentId: string;
+    type?: VoiceOptionType;
+}
+
 export interface DocumentDownload {
 }
 
 export interface DocumentFilterRequest extends PaginationRequest {
+}
+
+export interface Ensemble {
+    description?: string;
+    id?: string;
+    name: string;
+    voices?: EnsembleVoice[];
+}
+
+export interface EnsembleFilterRequest extends PaginationRequest {
+    name?: string;
+}
+
+export interface EnsembleVoice {
+    id?: string;
+    label: string;
+    options?: VoiceOption[];
+    required?: boolean;
+    weight?: number;
 }
 
 export interface FileUploadRequest {
@@ -180,6 +222,23 @@ export interface SheetMusicSearchResult extends SheetMusic {
     metrics?: SearchResultMetrics;
 }
 
+export interface VoiceCoverageDetail {
+    explanation?: string;
+    matchScore?: number;
+    matchedInstrumentId?: string;
+    optionFactor?: number;
+    required?: boolean;
+    voiceLabel?: string;
+    weight?: number;
+}
+
+export interface VoiceOption {
+    factor?: number;
+    id?: string;
+    instrumentId: string;
+    type?: VoiceOptionType;
+}
+
 export interface FileUpload extends FilePart {
     headers?: any;
 }
@@ -195,8 +254,12 @@ export type Clef = "TREBLE" | "ALTO" | "TENOR" | "BASS";
 
 export type CollectionType = "FOLDER" | "SETLIST";
 
+export type CoverageStatus = "COMPLETE" | "PLAYABLE" | "INCOMPLETE";
+
 export type InstrumentTransposing = "C" | "D" | "Eb" | "F" | "G" | "A" | "Ab" | "Bb";
 
 export type NotationType = "STANDARD" | "TABLATURE" | "PERCUSSION" | "LEAD_SHEET" | "GRAPHIC";
 
 export type SortOrder = "ASC" | "DESC";
+
+export type VoiceOptionType = "PRIMARY" | "ALTERNATE" | "FALLBACK";

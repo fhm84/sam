@@ -38,8 +38,8 @@ export class SheetMusicDetailsComponent implements OnInit {
           this.data = val;
 
           this.instrumentations = [
-            { instrument: { id: 'TRUMPET_BB', name: 'Trumpet', transposition: 'Bb', clef: 'TREBLE' }, partLabel: 'Trompete 1', notationType: 'STANDARD', attachments: [{id: '123', displayName: 'test.pdf', mimeType: 'application/pdf', type: 'PART'}] },
-            { instrument: { id: 'TROMBONE_C', name: 'Trombone', transposition: 'C', clef: 'BASS' }, partLabel: 'Posaune', notationType: 'STANDARD' }
+            { instrument: { id: 'TRUMPET_BB', name: 'Trumpet', transposition: 'Bb'}, clef: 'TREBLE', partLabel: 'Trompete 1', notationType: 'STANDARD', attachments: [{id: '123', displayName: 'test.pdf', mimeType: 'application/pdf', type: 'PART'}] },
+            { instrument: { id: 'TROMBONE_C', name: 'Trombone', transposition: 'C'}, clef: 'BASS', partLabel: 'Posaune', notationType: 'STANDARD' }
           ];
           // Load instrumentations for the sheet music
           /*this.sheetMusicService.getInstrumentationsForSheet(id).subscribe({
