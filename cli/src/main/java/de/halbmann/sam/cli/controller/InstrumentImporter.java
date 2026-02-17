@@ -50,7 +50,6 @@ public class InstrumentImporter {
     }
 
     private CreateInstrument parseJsonFile(File file) throws IOException {
-        // Try to parse as array first
         try (var bis = new BufferedInputStream(Files.newInputStream(file.toPath()))) {
             return jsonb.fromJson(bis, CreateInstrument.class);
         }

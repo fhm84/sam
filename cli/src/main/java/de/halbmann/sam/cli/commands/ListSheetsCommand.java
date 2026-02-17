@@ -35,7 +35,6 @@ public class ListSheetsCommand implements Runnable {
             }
 
             System.out.println("Found " + sheets.getSize() + " music sheet(s):");
-            System.out.println();
 
             for (SheetMusic sheet : sheets.getData()) {
                 if (verbose) {
@@ -51,15 +50,11 @@ public class ListSheetsCommand implements Runnable {
     }
 
     private void printShortSheet(SheetMusic sheet) {
-        System.out.printf(
-                "  [%s] %s%n", sheet.getId(), sheet.getTitle() // Adjust to your DTO fields
-                );
+        System.out.printf("  [%s] %s%n", sheet.getId(), sheet.getTitle());
     }
 
     private void printDetailedSheet(SheetMusic sheet) {
         System.out.println("  ID: " + sheet.getId());
         System.out.println("  Title: " + sheet.getTitle());
-        // Add more fields as needed
-        System.out.println();
     }
 }

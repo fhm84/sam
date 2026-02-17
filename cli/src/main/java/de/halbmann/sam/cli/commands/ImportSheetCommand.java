@@ -57,7 +57,6 @@ public class ImportSheetCommand implements Runnable {
                 results.stream().collect(Collectors.groupingBy(ImportResult::success, Collectors.counting()));
         Long successCount = collected.get(Boolean.TRUE);
         Long failureCount = collected.get(Boolean.FALSE);
-        System.out.println();
         if (dryRun) {
             System.out.println("Dry run completed. No sheets were imported.");
         } else {

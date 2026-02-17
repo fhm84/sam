@@ -58,6 +58,5 @@ public class ShowSheetCommand implements Runnable {
         System.out.println("===================");
         System.out.println("ID:       " + sheet.getId());
         System.out.println("Title:    " + sheet.getTitle());
-        // Add more fields as needed
     }
 }
