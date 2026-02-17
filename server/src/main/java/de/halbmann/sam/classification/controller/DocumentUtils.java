@@ -41,6 +41,10 @@ public class DocumentUtils {
     }
 
     static BufferedImage cropImage(BufferedImage bim) {
+        return cropImage(bim, BufferedImage.TYPE_BYTE_GRAY);
+    }
+
+    static BufferedImage cropImage(BufferedImage bim, int imageType) {
         int percentageTop = 20;
         // calculate the height for the top part of the image
         int topHeight = (int) ((bim.getHeight() / 100.0) * percentageTop);
@@ -56,7 +60,7 @@ public class DocumentUtils {
         int height = topBim.getHeight() + bottomBim.getHeight();
 
         // create a new buffered image with the determined width and height
-        BufferedImage combined = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+        BufferedImage combined = new BufferedImage(width, height, imageType);
 
         // get the graphics context of the combined image
         Graphics g = combined.getGraphics();
