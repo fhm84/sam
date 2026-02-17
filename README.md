@@ -1,169 +1,105 @@
-# code-with-quarkus
+# SAM — Sheet music Archiving & Management
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+A Quarkus-based application for archiving sheet music, managing instrumentations, musicians, and collections for bands and ensembles.
 
-If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
+## Quick Start
 
-## Running the application in dev mode
-
-You can run your application in dev mode that enables live coding using:
-
-```shell script
-./mvnw quarkus:dev
-```
-
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
-
-## Packaging and running the application
-
-The application can be packaged using:
-
-```shell script
+```bash
+# Build all modules
 ./mvnw package
+
+# Run server in dev mode (Dev UI at http://localhost:8080/q/dev/)
+./mvnw quarkus:dev -pl server
+
+# Run tests
+./mvnw test
+
+# Format code
+./mvnw spotless:apply
 ```
 
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
+**Prerequisites:** Java 21, PostgreSQL (with `pg_trgm` and `fuzzystrmatch` extensions), default connection: `localhost:5432/sam_music`, user `sam`.
 
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
+## Features
 
-If you want to build an _über-jar_, execute the following command:
+### Sheet Music Management
+- Full CRUD for sheet music entries (title, subtitle, composer, arranger, publisher, genre, difficulty level, copyright, ISWC, GEMA work number, etc.)
+- Paginated search with full-text search (PostgreSQL `tsvector`), trigram fuzzy matching (`pg_trgm`), and phonetic search (`dmetaphone`)
+- Content-based fingerprinting for deduplication of sheet music
 
-```shell script
-./mvnw package -Dquarkus.package.jar.type=uber-jar
+### Instrumentations
+- Per-sheet instrumentation management (sub-resource of sheets)
+- Each instrumentation links to a canonical instrument with part label, clef, notation type
+- Bulk import of instrumentations
+- Document attachments per instrumentation
+
+### Instruments
+- Canonical instrument registry with transposition metadata (C, Bb, Eb, F, etc.)
+- Paginated, filterable CRUD
+
+### Musicians
+- Composer/arranger registry with birth/death years and IPI numbers
+- Paginated, filterable CRUD
+
+### Collections & Booklets
+- **Sheet Collections** — group sheets into folders or setlists, with optional date (e.g. for gig programs)
+- **Booklets** — named groupings of sheets (e.g. "27 Weihnachtslieder", "Gotteslob")
+- Both support adding/removing/reordering sheets with per-collection identifiers
+
+### Ensembles & Coverage Evaluation
+- **Ensemble definitions** — define named ensembles with weighted, prioritized voice requirements
+- **Ensemble voices** — each voice has a label, weight, required flag, and multiple instrument options (primary/alternate/fallback with scoring factors)
+- **Coverage evaluation** — score-based matching of a sheet's instrumentations against an ensemble definition, producing per-voice breakdown with explanations and an overall coverage status (Complete / Playable / Incomplete)
+
+### Document Management
+- File upload/download with content-addressed storage (SHA-256 deduplication, reference counting)
+- Pluggable storage backends: local filesystem, AWS S3
+- Attachment system linking documents to sheets and instrumentations (typed: full score, part, cover, lyrics, MIDI, audio, etc.)
+
+### AI-Powered Classification
+- LangChain4j integration for automated sheet music analysis
+- PDF-to-image conversion with intelligent cropping (header/footer extraction)
+- Vision-based extraction of metadata (title, composer, instrument, etc.) from scanned sheet music images
+
+### Audit Trail
+- Full entity history via Hibernate Envers (every table has an `_AUD` mirror)
+- Validity audit strategy with revision start/end tracking
+
+### CLI
+- PicoCLI-based command-line tool for batch importing sheet music data
+- Consumes the same REST API interfaces as the server (shared `api` module)
+
+## Architecture
+
+See [docs/architecture.md](docs/architecture.md) for module overview, data model, design decisions, and technology stack.
+
+## Module Structure
+
+```
+sam (parent)
+ +-- api            Contracts: JAX-RS interfaces, DTOs, enums
+ +-- core           Shared business logic (exceptions, utilities)
+ +-- storage        Storage abstraction (SPI + local/S3 impls)
+ +-- server         Quarkus runtime: REST impls, JPA entities, services
+ +-- ui             Angular frontend (served via Quarkus Quinoa)
+ +-- cli            PicoCLI batch import tool (REST client)
 ```
 
-The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
+## TODOs
 
-## Creating a native executable
+- Security (Keycloak)
+- Multitenancy
+- Extended revision info
+- Download multiple PDFs at once (merged PDF or ZIP)
+- Generate table of contents for sheet collections (different sorting/grouping)
+- GEMA export
+- Dashboard/statistics (sheets by composer/arranger/genre)
+- Auto-convert to MusicXML format (for transposition)
+- Event logging (e.g. document downloads)
 
-You can create a native executable using:
-
-```shell script
-./mvnw package -Dnative
-```
-
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using:
-
-```shell script
-./mvnw package -Dnative -Dquarkus.native.container-build=true
-```
-
-You can then execute your native executable with: `./target/code-with-quarkus-1.0.0-SNAPSHOT-runner`
-
-If you want to learn more about building native executables, please consult <https://quarkus.io/guides/maven-tooling>.
-
-## Provided Code
-
-### REST
-
-Easily start your REST Web Services
-
-[Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
-
-
-
-
-# Sheet Music Archiving Data Model Documentation
-
-## Overview
-This data model is designed for an application that archives sheetMusic music, supports bands with multiple instrumentations, and allows for different notations per instrument.
-
-## Entities
-
-### **SheetMusic**
-Represents a piece of music.
-- `id` (UUID): Unique identifier
-- `title` (String): Name of the piece
-- `composer_id` (UUID): Reference to Composer
-- `arranger_id` (UUID, optional): Reference to Arranger
-- `genre` (String): Classification (e.g., Classical, Jazz)
-- `difficulty_level` (String): Level (Beginner, Intermediate, Advanced)
-- `time_signature` (String): Time signature (e.g., 4/4, 3/4)
-- `year_of_composition` (Integer): Year of composition
-- `publisher` (String): Publisher name
-- `edition` (String): Edition name
-- `license` (String): Licensing information
-- `audio_reference_url` (String): External link to an audio reference
-- `preview_image_path` (String): Thumbnail or first page preview
-- `performance_notes` (String): Additional notes
-
-### **Instrumentation**
-Defines individual instrument parts for a piece of sheetMusic music.
-- `id` (UUID): Unique identifier
-- `sheet_music_id` (UUID): Reference to SheetMusic
-- `instrument_name` (String): Instrument name (e.g., Trumpet, Violin)
-- `key_signature` (String): Specific key signature for this instrument
-- `clef` (String): Clef type (e.g., Treble, Bass, Alto, Tenor)
-- `notation_type` (String): Type of notation (Standard, Tablature, Percussion)
-- `pdf_file_path` (String): Location of the sheetMusic music file
-- `midi_file_path` (String, optional): MIDI file location
-
-### **Composer**
-Stores information about composers and arrangers.
-- `id` (UUID): Unique identifier
-- `name` (String): Full name
-- `birth_year` (Integer): Year of birth
-- `death_year` (Integer, optional): Year of death
-
-### **Band**
-Represents a group of musicians using the sheetMusic music.
-- `id` (UUID): Unique identifier
-- `name` (String): Band name
-- `description` (String): Short description
-
-### **Band_Member**
-Links users to bands with specific roles.
-- `id` (UUID): Unique identifier
-- `band_id` (UUID): Reference to Band
-- `user_id` (UUID): Reference to User
-- `role` (String): Role in the band (e.g., Trumpet Player, Conductor)
-
-### **Collection**
-Groups multiple pieces of sheetMusic music.
-- `id` (UUID): Unique identifier
-- `name` (String): Collection name
-- `description` (String): Short description
-
-### **SheetMusic_Collection**
-Many-to-many relationship between SheetMusic and Collection.
-- `sheet_music_id` (UUID): Reference to SheetMusic
-- `collection_id` (UUID): Reference to Collection
-
-### **Tag**
-Represents a tag for organizing sheetMusic music.
-- `id` (UUID): Unique identifier
-- `name` (String): Tag name
-
-### **SheetMusic_Tag**
-Many-to-many relationship between SheetMusic and Tag.
-- `sheet_music_id` (UUID): Reference to SheetMusic
-- `tag_id` (UUID): Reference to Tag
-
-## Constraints
-- **Instrumentation (Unique Constraint):** Each combination of `sheet_music_id`, `instrument_name`, and `notation_type` must be unique to prevent duplicates.
-- **Foreign Key Relationships:** Ensures referential integrity between entities.
-
-This model provides a structured way to manage sheetMusic music with instrument-specific transpositions, bands, collections, and tagging for efficient organization.
-
-
-TODO:  
-musicians -> unique name!?  
-instrumentation templates  
-directory structure for storing documents!  
-add another "type": booklet (or something like this representing a collection like christmas collection of songs)  
-
-TODOs (features):
-- security (keycloak)
-- multitenancy
-- file-upload (pdf, midi?)
-- AI for automatically link pdf to correct sheet music and instrumentation!?
-- system-info (api/info)?
+### technical focused
+- more advanced file-upload (also include linking-/meta-data)
+- system-info (/api/info)?
 - extended revinfo
-- download multiple (selected) pdfs at once (as single, merged pdf or as zip-file)
-- generate table of content (for sheet collections) - different sorting/grouping
-- export(s) e.g. for GEMA
-- Dashboard/statistics (number of sheets by composer/arranger/genre) -> "Statistical ListResult"
-- manage ensemble(s) (to also double-check availabilities?)
-- (auto) convert to Music XML file format(s) - to maybe also transpose?
-- log events (like e.g. document downloads)
+- rethink directory-structure for strogin documents?
+- use AI for automatically link pdf to correct sheet music and instrumentation?

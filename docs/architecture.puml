@@ -1,0 +1,160 @@
+@startuml SAM Architecture
+skinparam linetype ortho
+skinparam packageStyle rectangle
+
+title SAM - Component Overview
+
+package "API Module" as api {
+  interface SamResources
+  interface SheetsResource
+  interface InstrumentsResource
+  interface MusiciansResource
+  interface EnsemblesResource
+  interface SheetCollectionsResource
+  interface BookletsResource
+  interface DocumentsResource
+
+  note right of SamResources
+    Root resource aggregator
+    @Path("/")
+    @RegisterRestClient
+  end note
+}
+
+package "Server Module" as server {
+
+  package "REST Implementations" as rest {
+    class SheetsResourceImpl
+    class InstrumentsResourceImpl
+    class MusiciansResourceImpl
+    class EnsemblesResourceImpl
+    class EnsembleVoicesResourceImpl
+    class VoiceOptionsResourceImpl
+    class SheetCollectionsResourceImpl
+    class DocumentsResourceImpl
+  }
+
+  package "Services" as services {
+    class SheetService
+    class InstrumentService
+    class InstrumentationService
+    class MusicianService
+    class EnsembleService
+    class EnsembleVoiceService
+    class VoiceOptionService
+    class DocumentsService
+    class CoverageEvaluationService
+    class MatchingService
+  }
+
+  package "Repositories" as repos {
+    class SheetRepository
+    class InstrumentRepository
+    class InstrumentationRepository
+    class MusicianRepository
+    class EnsembleRepository
+    class EnsembleVoiceRepository
+    class VoiceOptionRepository
+    class DocumentRepository
+    class AttachmentRepository
+  }
+
+  package "Entities" as entities {
+    class SheetMusicEntity
+    class InstrumentEntity
+    class InstrumentationEntity
+    class MusicianEntity
+    class EnsembleEntity
+    class EnsembleVoiceEntity
+    class VoiceOptionEntity
+    class DocumentEntity
+    class AttachmentEntity
+    class SheetCollectionEntity
+  }
+
+  package "AI Classification" as ai {
+    interface SheetAnalyzer <<@RegisterAiService>>
+    class ClassificationService
+    class DocumentUtils
+  }
+
+  package "Mappers" as mappers {
+    interface SheetMusicMapper
+    interface InstrumentMapper
+    interface InstrumentationMapper
+    interface EnsembleMapper
+    interface EnsembleVoiceMapper
+    interface VoiceOptionMapper
+  }
+}
+
+package "Core Module" as core {
+  class FingerprintService
+  class EntityNotFoundException
+  class PaginatedEntities
+}
+
+package "Storage Module" as storage {
+  interface FileSystemProvider <<SPI>>
+  interface FileSystemWrapper
+  class LocalFileSystemProvider
+  class S3FileSystemProvider
+}
+
+package "CLI Module" as cli {
+  class SheetImporter <<PicoCLI>>
+}
+
+package "UI Module" as ui {
+  class "Angular App" as angular <<Quinoa>>
+}
+
+' --- Relationships ---
+
+' REST impls -> Services
+SheetsResourceImpl --> SheetService
+SheetsResourceImpl --> CoverageEvaluationService
+InstrumentsResourceImpl --> InstrumentService
+MusiciansResourceImpl --> MusicianService
+EnsemblesResourceImpl --> EnsembleService
+EnsembleVoicesResourceImpl --> EnsembleVoiceService
+VoiceOptionsResourceImpl --> VoiceOptionService
+DocumentsResourceImpl --> DocumentsService
+
+' Services -> Repositories
+SheetService --> SheetRepository
+InstrumentService --> InstrumentRepository
+InstrumentationService --> InstrumentationRepository
+MusicianService --> MusicianRepository
+EnsembleService --> EnsembleRepository
+EnsembleVoiceService --> EnsembleVoiceRepository
+VoiceOptionService --> VoiceOptionRepository
+DocumentsService --> DocumentRepository
+DocumentsService --> AttachmentRepository
+CoverageEvaluationService --> SheetRepository
+CoverageEvaluationService --> EnsembleRepository
+CoverageEvaluationService --> MatchingService
+
+' AI
+ClassificationService --> SheetAnalyzer
+ClassificationService --> DocumentUtils
+
+' Storage
+DocumentsService --> FileSystemWrapper
+FileSystemProvider <|.. LocalFileSystemProvider
+FileSystemProvider <|.. S3FileSystemProvider
+
+' Cross-module
+cli --> api : REST Client
+angular --> api : Generated TS types
+rest ..|> api : implements
+
+' Entity relationships
+SheetMusicEntity "1" --> "*" InstrumentationEntity : instrumentations
+InstrumentationEntity "*" --> "1" InstrumentEntity : instrument
+EnsembleEntity "1" --> "*" EnsembleVoiceEntity : voices
+EnsembleVoiceEntity "1" --> "*" VoiceOptionEntity : options
+VoiceOptionEntity "*" --> "1" InstrumentEntity : instrument
+SheetMusicEntity "*" --> "0..1" MusicianEntity : composer/arranger
+
+@enduml
