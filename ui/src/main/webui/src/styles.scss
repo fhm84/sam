@@ -1,4 +1,66 @@
-/* You can add global styles to this file, and also import other style files */
+@use "primeicons/primeicons.css";
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+// ─── Design tokens ─────────────────────────────────────────
+:root {
+  --sam-font-display: "DM Sans", system-ui, sans-serif;
+  --sam-font-body: "DM Sans", system-ui, sans-serif;
+
+  // Light palette
+  --sam-bg: #f4f3f0;
+  --sam-surface: #ffffff;
+  --sam-border: #e4e2dd;
+  --sam-hover: rgba(0, 0, 0, 0.04);
+  --sam-active-bg: rgba(45, 50, 80, 0.08);
+  --sam-accent: #3b4070;
+  --sam-text: #1a1a1e;
+  --sam-text-secondary: #4a4a52;
+  --sam-text-muted: #8a8a96;
+}
+
+:root.dark {
+  --sam-bg: #111114;
+  --sam-surface: #1a1a1f;
+  --sam-border: #2a2a32;
+  --sam-hover: rgba(255, 255, 255, 0.06);
+  --sam-active-bg: rgba(140, 150, 210, 0.12);
+  --sam-accent: #9ba2d0;
+  --sam-text: #e8e8ec;
+  --sam-text-secondary: #a0a0ac;
+  --sam-text-muted: #606068;
+}
+
+// ─── Base ──────────────────────────────────────────────────
+html,
+body {
+  height: 100%;
+  margin: 0;
+  font-family: var(--sam-font-body);
+  background: var(--sam-bg);
+  color: var(--sam-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+// ─── Scrollbar styling ────────────────────────────────────
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--sam-border);
+  border-radius: 3px;
+
+  &:hover {
+    background: var(--sam-text-muted);
+  }
+}

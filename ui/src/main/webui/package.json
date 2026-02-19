@@ -1,6 +1,6 @@
 {
   "name": "sam",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -8,33 +8,40 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
+  "prettier": {
+    "printWidth": 100,
+    "singleQuote": true,
+    "overrides": [
+      {
+        "files": "*.html",
+        "options": {
+          "parser": "angular"
+        }
+      }
+    ]
+  },
   "private": true,
+  "packageManager": "npm@11.7.0",
   "dependencies": {
-    "@angular/cdk": "^19.2.1",
-    "@angular/common": "^19.2.18",
-    "@angular/compiler": "^19.2.18",
-    "@angular/core": "^19.2.18",
-    "@angular/forms": "^19.2.18",
-    "@angular/material": "^19.2.19",
-    "@angular/animations": "^19.2.18",
-    "@angular/platform-server": "^19.2.18",
-    "@angular/platform-browser-dynamic": "^19.2.18",
-    "@angular/router": "^19.2.18",
+    "@angular/animations": "^21.1.5",
+    "@angular/common": "^21.0.0",
+    "@angular/compiler": "^21.0.0",
+    "@angular/core": "^21.0.0",
+    "@angular/forms": "^21.0.0",
+    "@angular/platform-browser": "^21.0.0",
+    "@angular/router": "^21.0.0",
+    "@primeuix/themes": "^2.0.3",
+    "primeicons": "^7.0.0",
+    "primeng": "^21.1.1",
     "rxjs": "~7.8.0",
-    "tslib": "^2.3.0",
-    "zone.js": "^0.15.1"
+    "tslib": "^2.3.0"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^19.2.19",
-    "@angular/cli": "^19.2.19",
-    "@angular/compiler-cli": "^19.2.18",
-    "@types/jasmine": "~5.1.0",
-    "jasmine-core": "~5.6.0",
-    "karma": "~6.4.0",
-    "karma-chrome-launcher": "~3.2.0",
-    "karma-coverage": "~2.2.0",
-    "karma-jasmine": "~5.1.0",
-    "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.7.2"
+    "@angular/build": "^21.0.4",
+    "@angular/cli": "^21.0.4",
+    "@angular/compiler-cli": "^21.0.0",
+    "jsdom": "^27.1.0",
+    "typescript": "~5.9.2",
+    "vitest": "^4.0.8"
   }
 }

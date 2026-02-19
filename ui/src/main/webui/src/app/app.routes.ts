@@ -1,14 +1,35 @@
 import { Routes } from '@angular/router';
-import { SheetMusicAddEditComponent } from './components/sheetMusic-add-edit/sheetMusic-add-edit.component';
-import { SheetMusicListComponent } from './components/sheetMusic-list/sheetMusic-list.component';
-import { SheetMusicDetailsComponent } from './components/sheetMusic-details/sheetMusic-details.component';
-import { UploadComponent } from './components/upload/upload.component';
 
 export const routes: Routes = [
-  { path: 'sheets', component: SheetMusicListComponent },
-  { path: 'sheets/add', component: SheetMusicAddEditComponent },
-  { path: 'sheets/:id', component: SheetMusicDetailsComponent },
-  { path: 'sheets/:id/edit', component: SheetMusicAddEditComponent },
-  { path: 'uploads', component: UploadComponent },
-  { path: '', redirectTo: 'sheets', pathMatch: 'full' }
+  {
+    path: 'sheets',
+    loadComponent: () => import('./features/sheets/sheets').then((m) => m.Sheets),
+  },
+  {
+    path: 'collections',
+    loadComponent: () => import('./features/collections/collections').then((m) => m.Collections),
+  },
+  {
+    path: 'uploads',
+    loadComponent: () => import('./features/uploads/uploads').then((m) => m.Uploads),
+  },
+  {
+    path: 'musicians',
+    loadComponent: () => import('./features/musicians/musicians').then((m) => m.Musicians),
+  },
+  {
+    path: 'admin/ensembles',
+    loadComponent: () => import('./features/ensembles/ensembles').then((m) => m.Ensembles),
+  },
+  {
+    path: 'admin/instruments',
+    loadComponent: () =>
+      import('./features/instruments/instruments').then((m) => m.Instruments),
+  },
+  {
+    path: 'admin/configuration',
+    loadComponent: () =>
+      import('./features/configuration/configuration').then((m) => m.Configuration),
+  },
+  { path: '', redirectTo: 'sheets', pathMatch: 'full' },
 ];
