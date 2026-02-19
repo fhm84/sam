@@ -32,13 +32,162 @@
     "title": "Uploads"
   },
   "musicians": {
-    "title": "Musicians"
+    "title": "Musicians",
+    "new": "New musician",
+    "edit": "Edit musician",
+    "columns": {
+      "name": "Name",
+      "ipi": "IPI",
+      "birthYear": "Birth Year",
+      "deathYear": "Death Year",
+      "actions": "Actions"
+    },
+    "form": {
+      "name": "Name",
+      "ipi": "IPI",
+      "ipiHint": "Interested Parties Information code",
+      "birthYear": "Birth Year",
+      "deathYear": "Death Year"
+    },
+    "delete": {
+      "confirm": "Are you sure you want to delete the musician \"{name}\"?",
+      "header": "Confirm deletion"
+    },
+    "messages": {
+      "created": "Musician created successfully",
+      "updated": "Musician updated successfully",
+      "deleted": "Musician deleted successfully",
+      "error": "An error occurred"
+    },
+    "search": "Search by name",
+    "empty": "No musicians found",
+    "save": "Save",
+    "cancel": "Cancel"
   },
   "ensembles": {
-    "title": "Ensembles"
+    "title": "Ensembles",
+    "new": "New ensemble",
+    "edit": "Edit ensemble",
+    "columns": {
+      "name": "Name",
+      "description": "Description",
+      "voices": "Voices",
+      "actions": "Actions"
+    },
+    "form": {
+      "name": "Name",
+      "description": "Description"
+    },
+    "delete": {
+      "confirm": "Are you sure you want to delete the ensemble \"{name}\"?",
+      "header": "Confirm deletion"
+    },
+    "messages": {
+      "created": "Ensemble created successfully",
+      "updated": "Ensemble updated successfully",
+      "deleted": "Ensemble deleted successfully",
+      "error": "An error occurred"
+    },
+    "search": "Search by name",
+    "empty": "No ensembles found",
+    "save": "Save",
+    "cancel": "Cancel",
+    "voices": {
+      "title": "Voices",
+      "new": "New voice",
+      "edit": "Edit voice",
+      "columns": {
+        "label": "Label",
+        "weight": "Weight",
+        "required": "Required",
+        "actions": "Actions"
+      },
+      "form": {
+        "label": "Label",
+        "weight": "Weight",
+        "required": "Required"
+      },
+      "delete": {
+        "confirm": "Are you sure you want to delete the voice \"{label}\"?",
+        "header": "Confirm deletion"
+      },
+      "messages": {
+        "created": "Voice created successfully",
+        "updated": "Voice updated successfully",
+        "deleted": "Voice deleted successfully",
+        "error": "An error occurred"
+      },
+      "empty": "No voices defined yet",
+      "save": "Save",
+      "cancel": "Cancel",
+      "yes": "Yes",
+      "no": "No",
+      "options": {
+        "title": "Options",
+        "new": "New option",
+        "edit": "Edit option",
+        "columns": {
+          "instrument": "Instrument",
+          "type": "Type",
+          "factor": "Factor",
+          "actions": "Actions"
+        },
+        "form": {
+          "instrument": "Instrument",
+          "instrumentPlaceholder": "Select instrument",
+          "type": "Type",
+          "typePlaceholder": "Select type",
+          "factor": "Factor"
+        },
+        "delete": {
+          "confirm": "Are you sure you want to delete this voice option?",
+          "header": "Confirm deletion"
+        },
+        "messages": {
+          "created": "Voice option created successfully",
+          "updated": "Voice option updated successfully",
+          "deleted": "Voice option deleted successfully",
+          "error": "An error occurred"
+        },
+        "empty": "No options defined yet",
+        "save": "Save",
+        "cancel": "Cancel"
+      }
+    }
   },
   "instruments": {
-    "title": "Instruments"
+    "title": "Instruments",
+    "new": "New instrument",
+    "edit": "Edit instrument",
+    "columns": {
+      "id": "ID",
+      "name": "Name",
+      "displayName": "Display Name",
+      "transposition": "Transposition",
+      "actions": "Actions"
+    },
+    "form": {
+      "id": "ID",
+      "idHint": "Unique identifier (e.g. trumpet-bb)",
+      "name": "Name",
+      "displayName": "Display Name",
+      "transposition": "Transposition",
+      "transpositionPlaceholder": "Select transposition",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "delete": {
+      "confirm": "Are you sure you want to delete the instrument \"{name}\"?",
+      "header": "Confirm deletion"
+    },
+    "messages": {
+      "created": "Instrument created successfully",
+      "updated": "Instrument updated successfully",
+      "deleted": "Instrument deleted successfully",
+      "error": "An error occurred"
+    },
+    "search": "Search by name",
+    "empty": "No instruments found"
   },
   "configuration": {
     "title": "Configuration"

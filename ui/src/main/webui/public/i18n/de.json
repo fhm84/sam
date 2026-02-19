@@ -32,13 +32,162 @@
     "title": "Uploads"
   },
   "musicians": {
-    "title": "Musiker"
+    "title": "Musiker",
+    "new": "Neuer Musiker",
+    "edit": "Musiker bearbeiten",
+    "columns": {
+      "name": "Name",
+      "ipi": "IPI",
+      "birthYear": "Geburtsjahr",
+      "deathYear": "Todesjahr",
+      "actions": "Aktionen"
+    },
+    "form": {
+      "name": "Name",
+      "ipi": "IPI",
+      "ipiHint": "Interested Parties Information Code",
+      "birthYear": "Geburtsjahr",
+      "deathYear": "Todesjahr"
+    },
+    "delete": {
+      "confirm": "Möchten Sie den Musiker \"{name}\" wirklich löschen?",
+      "header": "Löschen bestätigen"
+    },
+    "messages": {
+      "created": "Musiker erfolgreich erstellt",
+      "updated": "Musiker erfolgreich aktualisiert",
+      "deleted": "Musiker erfolgreich gelöscht",
+      "error": "Ein Fehler ist aufgetreten"
+    },
+    "search": "Nach Name suchen",
+    "empty": "Keine Musiker gefunden",
+    "save": "Speichern",
+    "cancel": "Abbrechen"
   },
   "ensembles": {
-    "title": "Ensembles"
+    "title": "Ensembles",
+    "new": "Neues Ensemble",
+    "edit": "Ensemble bearbeiten",
+    "columns": {
+      "name": "Name",
+      "description": "Beschreibung",
+      "voices": "Stimmen",
+      "actions": "Aktionen"
+    },
+    "form": {
+      "name": "Name",
+      "description": "Beschreibung"
+    },
+    "delete": {
+      "confirm": "Möchten Sie das Ensemble \"{name}\" wirklich löschen?",
+      "header": "Löschen bestätigen"
+    },
+    "messages": {
+      "created": "Ensemble erfolgreich erstellt",
+      "updated": "Ensemble erfolgreich aktualisiert",
+      "deleted": "Ensemble erfolgreich gelöscht",
+      "error": "Ein Fehler ist aufgetreten"
+    },
+    "search": "Nach Name suchen",
+    "empty": "Keine Ensembles gefunden",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "voices": {
+      "title": "Stimmen",
+      "new": "Neue Stimme",
+      "edit": "Stimme bearbeiten",
+      "columns": {
+        "label": "Bezeichnung",
+        "weight": "Gewichtung",
+        "required": "Pflicht",
+        "actions": "Aktionen"
+      },
+      "form": {
+        "label": "Bezeichnung",
+        "weight": "Gewichtung",
+        "required": "Pflicht"
+      },
+      "delete": {
+        "confirm": "Möchten Sie die Stimme \"{label}\" wirklich löschen?",
+        "header": "Löschen bestätigen"
+      },
+      "messages": {
+        "created": "Stimme erfolgreich erstellt",
+        "updated": "Stimme erfolgreich aktualisiert",
+        "deleted": "Stimme erfolgreich gelöscht",
+        "error": "Ein Fehler ist aufgetreten"
+      },
+      "empty": "Noch keine Stimmen definiert",
+      "save": "Speichern",
+      "cancel": "Abbrechen",
+      "yes": "Ja",
+      "no": "Nein",
+      "options": {
+        "title": "Optionen",
+        "new": "Neue Option",
+        "edit": "Option bearbeiten",
+        "columns": {
+          "instrument": "Instrument",
+          "type": "Typ",
+          "factor": "Faktor",
+          "actions": "Aktionen"
+        },
+        "form": {
+          "instrument": "Instrument",
+          "instrumentPlaceholder": "Instrument auswählen",
+          "type": "Typ",
+          "typePlaceholder": "Typ auswählen",
+          "factor": "Faktor"
+        },
+        "delete": {
+          "confirm": "Möchten Sie diese Stimmoption wirklich löschen?",
+          "header": "Löschen bestätigen"
+        },
+        "messages": {
+          "created": "Stimmoption erfolgreich erstellt",
+          "updated": "Stimmoption erfolgreich aktualisiert",
+          "deleted": "Stimmoption erfolgreich gelöscht",
+          "error": "Ein Fehler ist aufgetreten"
+        },
+        "empty": "Noch keine Optionen definiert",
+        "save": "Speichern",
+        "cancel": "Abbrechen"
+      }
+    }
   },
   "instruments": {
-    "title": "Instrumente"
+    "title": "Instrumente",
+    "new": "Neues Instrument",
+    "edit": "Instrument bearbeiten",
+    "columns": {
+      "id": "ID",
+      "name": "Name",
+      "displayName": "Anzeigename",
+      "transposition": "Transposition",
+      "actions": "Aktionen"
+    },
+    "form": {
+      "id": "ID",
+      "idHint": "Eindeutige Kennung (z.B. trumpet-bb)",
+      "name": "Name",
+      "displayName": "Anzeigename",
+      "transposition": "Transposition",
+      "transpositionPlaceholder": "Transposition auswählen",
+      "save": "Speichern",
+      "cancel": "Abbrechen"
+    },
+    "delete": {
+      "confirm": "Möchten Sie das Instrument \"{name}\" wirklich löschen?",
+      "header": "Löschen bestätigen"
+    },
+    "messages": {
+      "created": "Instrument erfolgreich erstellt",
+      "updated": "Instrument erfolgreich aktualisiert",
+      "deleted": "Instrument erfolgreich gelöscht",
+      "error": "Ein Fehler ist aufgetreten"
+    },
+    "search": "Nach Name suchen",
+    "empty": "Keine Instrumente gefunden"
   },
   "configuration": {
     "title": "Konfiguration"

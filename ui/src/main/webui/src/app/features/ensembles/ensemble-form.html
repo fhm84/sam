@@ -1,0 +1,32 @@
+<form [formGroup]="form" (ngSubmit)="onSave()" class="ensemble-form">
+  <div class="form-field">
+    <label for="ensemble-name">{{ 'ensembles.form.name' | translate }}</label>
+    <input pInputText id="ensemble-name" formControlName="name" />
+  </div>
+
+  <div class="form-field">
+    <label for="ensemble-description">{{ 'ensembles.form.description' | translate }}</label>
+    <textarea
+      pTextarea
+      id="ensemble-description"
+      formControlName="description"
+      [rows]="3"
+      [autoResize]="true"
+    ></textarea>
+  </div>
+
+  <div class="form-actions">
+    <p-button
+      [label]="t.t('ensembles.cancel')"
+      severity="secondary"
+      [text]="true"
+      (onClick)="cancelled.emit()"
+    />
+    <p-button
+      [label]="t.t('ensembles.save')"
+      type="submit"
+      [disabled]="form.invalid || saving"
+      [loading]="saving"
+    />
+  </div>
+</form>

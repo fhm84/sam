@@ -1,0 +1,80 @@
+<div class="voices-section">
+  <div class="voices-toolbar">
+    <h3>{{ 'ensembles.voices.title' | translate }}</h3>
+    <p-button
+      [label]="t.t('ensembles.voices.new')"
+      icon="pi pi-plus"
+      size="small"
+      (onClick)="openNewVoice()"
+    />
+  </div>
+
+  <p-table
+    [value]="voices()"
+    [loading]="loading()"
+  >
+    <ng-template #header>
+      <tr>
+        <th>{{ 'ensembles.voices.columns.label' | translate }}</th>
+        <th>{{ 'ensembles.voices.columns.weight' | translate }}</th>
+        <th>{{ 'ensembles.voices.columns.required' | translate }}</th>
+        <th>{{ 'ensembles.voices.columns.actions' | translate }}</th>
+      </tr>
+    </ng-template>
+
+    <ng-template #body let-voice>
+      <tr>
+        <td>{{ voice.label }}</td>
+        <td>{{ voice.weight }}</td>
+        <td>
+          @if (voice.required) {
+            <p-tag severity="success" [value]="t.t('ensembles.voices.yes')" />
+          } @else {
+            <p-tag severity="secondary" [value]="t.t('ensembles.voices.no')" />
+          }
+        </td>
+        <td class="actions-cell">
+          <p-button
+            icon="pi pi-pencil"
+            [rounded]="true"
+            [text]="true"
+            size="small"
+            (onClick)="openEditVoice(voice)"
+          />
+          <p-button
+            icon="pi pi-trash"
+            [rounded]="true"
+            [text]="true"
+            size="small"
+            severity="danger"
+            (onClick)="confirmDeleteVoice(voice)"
+          />
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="4" class="empty-message">{{ 'ensembles.voices.empty' | translate }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog
+  [header]="editingVoice ? t.t('ensembles.voices.edit') : t.t('ensembles.voices.new')"
+  [(visible)]="voiceDialogVisible"
+  [modal]="true"
+  [style]="{ width: '26rem' }"
+>
+  @if (voiceDialogVisible) {
+    <app-voice-form
+      [ensembleId]="ensembleId"
+      [voice]="editingVoice"
+      (saved)="onVoiceSaved()"
+      (cancelled)="voiceDialogVisible = false"
+    />
+  }
+</p-dialog>
+
+<p-confirmdialog />

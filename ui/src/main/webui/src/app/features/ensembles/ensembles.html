@@ -1,0 +1,107 @@
+<div class="ensembles-page">
+  <div class="page-toolbar">
+    <h1>{{ 'ensembles.title' | translate }}</h1>
+    <p-button
+      [label]="t.t('ensembles.new')"
+      icon="pi pi-plus"
+      (onClick)="openNew()"
+    />
+  </div>
+
+  <p-table
+    [value]="ensembles()"
+    [lazy]="true"
+    [paginator]="true"
+    [rows]="rows"
+    [totalRecords]="totalRecords()"
+    [loading]="loading()"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    (onLazyLoad)="onLazyLoad($event)"
+  >
+    <ng-template #caption>
+      <p-iconfield>
+        <p-inputicon styleClass="pi pi-search" />
+        <input
+          pInputText
+          type="text"
+          [placeholder]="t.t('ensembles.search')"
+          (input)="onFilter($event)"
+        />
+      </p-iconfield>
+    </ng-template>
+
+    <ng-template #header>
+      <tr>
+        <th>{{ 'ensembles.columns.name' | translate }}</th>
+        <th>{{ 'ensembles.columns.description' | translate }}</th>
+        <th>{{ 'ensembles.columns.voices' | translate }}</th>
+        <th>{{ 'ensembles.columns.actions' | translate }}</th>
+      </tr>
+    </ng-template>
+
+    <ng-template #body let-ensemble>
+      <tr>
+        <td>{{ ensemble.name }}</td>
+        <td>{{ ensemble.description }}</td>
+        <td>{{ ensemble.voices?.length ?? 0 }}</td>
+        <td class="actions-cell">
+          <p-button
+            icon="pi pi-list"
+            [rounded]="true"
+            [text]="true"
+            (onClick)="openVoices(ensemble)"
+            [pTooltip]="t.t('ensembles.voices.title')"
+          />
+          <p-button
+            icon="pi pi-pencil"
+            [rounded]="true"
+            [text]="true"
+            (onClick)="openEdit(ensemble)"
+          />
+          <p-button
+            icon="pi pi-trash"
+            [rounded]="true"
+            [text]="true"
+            severity="danger"
+            (onClick)="confirmDelete(ensemble)"
+          />
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="4" class="empty-message">{{ 'ensembles.empty' | translate }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog
+  [header]="editingEnsemble ? t.t('ensembles.edit') : t.t('ensembles.new')"
+  [(visible)]="dialogVisible"
+  [modal]="true"
+  [style]="{ width: '28rem' }"
+>
+  @if (dialogVisible) {
+    <app-ensemble-form
+      [ensemble]="editingEnsemble"
+      (saved)="onSaved()"
+      (cancelled)="dialogVisible = false"
+    />
+  }
+</p-dialog>
+
+<p-dialog
+  [header]="voicesEnsemble?.name + ' — ' + t.t('ensembles.voices.title')"
+  [(visible)]="voicesDialogVisible"
+  [modal]="true"
+  [style]="{ width: '42rem' }"
+>
+  @if (voicesDialogVisible && voicesEnsemble) {
+    <app-ensemble-voices [ensembleId]="voicesEnsemble.id!" />
+  }
+</p-dialog>
+
+<p-toast />
+<p-confirmdialog />

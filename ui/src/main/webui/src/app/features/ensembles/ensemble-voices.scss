@@ -1,0 +1,29 @@
+.voices-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.voices-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--sam-text);
+  }
+}
+
+.actions-cell {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.empty-message {
+  text-align: center;
+  color: var(--sam-text-muted);
+  padding: 1.5rem !important;
+}

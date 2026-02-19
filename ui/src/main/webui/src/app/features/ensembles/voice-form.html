@@ -1,0 +1,42 @@
+<form [formGroup]="form" (ngSubmit)="onSave()" class="voice-form">
+  <div class="form-field">
+    <label for="voice-label">{{ 'ensembles.voices.form.label' | translate }}</label>
+    <input pInputText id="voice-label" formControlName="label" />
+  </div>
+
+  <div class="form-row">
+    <div class="form-field">
+      <label for="voice-weight">{{ 'ensembles.voices.form.weight' | translate }}</label>
+      <p-inputnumber
+        id="voice-weight"
+        formControlName="weight"
+        [useGrouping]="false"
+        styleClass="w-full"
+      />
+    </div>
+
+    <div class="form-field form-field--checkbox">
+      <p-checkbox
+        inputId="voice-required"
+        formControlName="required"
+        [binary]="true"
+      />
+      <label for="voice-required">{{ 'ensembles.voices.form.required' | translate }}</label>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <p-button
+      [label]="t.t('ensembles.voices.cancel')"
+      severity="secondary"
+      [text]="true"
+      (onClick)="cancelled.emit()"
+    />
+    <p-button
+      [label]="t.t('ensembles.voices.save')"
+      type="submit"
+      [disabled]="form.invalid || saving"
+      [loading]="saving"
+    />
+  </div>
+</form>

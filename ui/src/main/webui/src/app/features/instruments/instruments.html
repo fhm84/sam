@@ -1,0 +1,91 @@
+<div class="instruments-page">
+  <div class="page-toolbar">
+    <h1>{{ 'instruments.title' | translate }}</h1>
+    <p-button
+      [label]="t.t('instruments.new')"
+      icon="pi pi-plus"
+      (onClick)="openNew()"
+    />
+  </div>
+
+  <p-table
+    [value]="instruments()"
+    [lazy]="true"
+    [paginator]="true"
+    [rows]="rows"
+    [totalRecords]="totalRecords()"
+    [loading]="loading()"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    (onLazyLoad)="onLazyLoad($event)"
+  >
+    <ng-template #caption>
+      <p-iconfield>
+        <p-inputicon styleClass="pi pi-search" />
+        <input
+          pInputText
+          type="text"
+          [placeholder]="t.t('instruments.search')"
+          (input)="onFilter($event)"
+        />
+      </p-iconfield>
+    </ng-template>
+
+    <ng-template #header>
+      <tr>
+        <th>{{ 'instruments.columns.id' | translate }}</th>
+        <th>{{ 'instruments.columns.name' | translate }}</th>
+        <th>{{ 'instruments.columns.displayName' | translate }}</th>
+        <th>{{ 'instruments.columns.transposition' | translate }}</th>
+        <th>{{ 'instruments.columns.actions' | translate }}</th>
+      </tr>
+    </ng-template>
+
+    <ng-template #body let-instrument>
+      <tr>
+        <td>{{ instrument.id }}</td>
+        <td>{{ instrument.name }}</td>
+        <td>{{ instrument.displayName }}</td>
+        <td>{{ instrument.transposition }}</td>
+        <td class="actions-cell">
+          <p-button
+            icon="pi pi-pencil"
+            [rounded]="true"
+            [text]="true"
+            (onClick)="openEdit(instrument)"
+          />
+          <p-button
+            icon="pi pi-trash"
+            [rounded]="true"
+            [text]="true"
+            severity="danger"
+            (onClick)="confirmDelete(instrument)"
+          />
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="5" class="empty-message">{{ 'instruments.empty' | translate }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog
+  [header]="editingInstrument ? t.t('instruments.edit') : t.t('instruments.new')"
+  [(visible)]="dialogVisible"
+  [modal]="true"
+  [style]="{ width: '28rem' }"
+>
+  @if (dialogVisible) {
+    <app-instrument-form
+      [instrument]="editingInstrument"
+      (saved)="onSaved()"
+      (cancelled)="dialogVisible = false"
+    />
+  }
+</p-dialog>
+
+<p-toast />
+<p-confirmdialog />
