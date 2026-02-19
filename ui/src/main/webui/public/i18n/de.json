@@ -1,0 +1,119 @@
+{
+  "app": {
+    "title": "SAM | Notenarchiv für Musik"
+  },
+  "nav": {
+    "sheets": "Noten",
+    "collections": "Sammlungen",
+    "uploads": "Uploads",
+    "musicians": "Musiker",
+    "admin": {
+      "title": "Verwaltung",
+      "ensembles": "Ensembles",
+      "instruments": "Instrumente",
+      "configuration": "Konfiguration"
+    }
+  },
+  "aria": {
+    "toggleSidebar": "Seitenleiste umschalten",
+    "openMenu": "Menü öffnen",
+    "samLogo": "SAM-Logo",
+    "switchToLight": "Zum hellen Modus wechseln",
+    "switchToDark": "Zum dunklen Modus wechseln",
+    "switchLanguage": "Sprache wechseln"
+  },
+  "sheets": {
+    "title": "Noten"
+  },
+  "collections": {
+    "title": "Notensammlungen"
+  },
+  "uploads": {
+    "title": "Uploads"
+  },
+  "musicians": {
+    "title": "Musiker"
+  },
+  "ensembles": {
+    "title": "Ensembles"
+  },
+  "instruments": {
+    "title": "Instrumente"
+  },
+  "configuration": {
+    "title": "Konfiguration"
+  },
+  "primeng": {
+    "accept": "Ja",
+    "reject": "Nein",
+    "choose": "Auswählen",
+    "upload": "Hochladen",
+    "cancel": "Abbrechen",
+    "dayNames": ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"],
+    "dayNamesShort": ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"],
+    "dayNamesMin": ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"],
+    "monthNames": ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"],
+    "monthNamesShort": ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"],
+    "today": "Heute",
+    "clear": "Löschen",
+    "weekHeader": "KW",
+    "firstDayOfWeek": 1,
+    "dateFormat": "dd.mm.yy",
+    "emptyMessage": "Keine Ergebnisse gefunden",
+    "emptyFilterMessage": "Keine Ergebnisse gefunden",
+    "searchMessage": "{0} Ergebnisse verfügbar",
+    "selectionMessage": "{0} Einträge ausgewählt",
+    "emptySelectionMessage": "Kein Eintrag ausgewählt",
+    "emptySearchMessage": "Keine Ergebnisse gefunden",
+    "contains": "Enthält",
+    "notContains": "Enthält nicht",
+    "endsWith": "Endet mit",
+    "equals": "Gleich",
+    "notEquals": "Ungleich",
+    "lt": "Kleiner als",
+    "lte": "Kleiner oder gleich",
+    "gt": "Größer als",
+    "gte": "Größer oder gleich",
+    "startsWith": "Beginnt mit",
+    "matchAll": "Alle Bedingungen",
+    "matchAny": "Beliebige Bedingung",
+    "addRule": "Regel hinzufügen",
+    "removeRule": "Regel entfernen",
+    "apply": "Anwenden",
+    "aria": {
+      "trueLabel": "Wahr",
+      "falseLabel": "Falsch",
+      "nullLabel": "Nicht ausgewählt",
+      "star": "1 Stern",
+      "stars": "{star} Sterne",
+      "selectAll": "Alle Einträge ausgewählt",
+      "unselectAll": "Alle Einträge abgewählt",
+      "close": "Schließen",
+      "previous": "Zurück",
+      "next": "Weiter",
+      "navigation": "Navigation",
+      "scrollTop": "Nach oben scrollen",
+      "moveTop": "An den Anfang",
+      "moveUp": "Nach oben",
+      "moveDown": "Nach unten",
+      "moveBottom": "An das Ende",
+      "moveToTarget": "Zum Ziel verschieben",
+      "moveToSource": "Zur Quelle verschieben",
+      "moveAllToTarget": "Alle zum Ziel verschieben",
+      "moveAllToSource": "Alle zur Quelle verschieben",
+      "pageLabel": "Seite {page}",
+      "firstPageLabel": "Erste Seite",
+      "lastPageLabel": "Letzte Seite",
+      "nextPageLabel": "Nächste Seite",
+      "prevPageLabel": "Vorherige Seite",
+      "rowsPerPageLabel": "Zeilen pro Seite",
+      "previousPageLabel": "Vorherige Seite",
+      "nextPageLabel2": "Nächste Seite",
+      "expandRow": "Zeile aufgeklappt",
+      "collapseRow": "Zeile zugeklappt",
+      "editRow": "Zeile bearbeiten",
+      "saveEdit": "Bearbeitung speichern",
+      "cancelEdit": "Bearbeitung abbrechen"
+    }
+  }
+}

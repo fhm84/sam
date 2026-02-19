@@ -1,0 +1,119 @@
+{
+  "app": {
+    "title": "SAM | Sheet Archive for Music"
+  },
+  "nav": {
+    "sheets": "Sheets",
+    "collections": "Collections",
+    "uploads": "Uploads",
+    "musicians": "Musicians",
+    "admin": {
+      "title": "Admin",
+      "ensembles": "Ensembles",
+      "instruments": "Instruments",
+      "configuration": "Configuration"
+    }
+  },
+  "aria": {
+    "toggleSidebar": "Toggle sidebar",
+    "openMenu": "Open menu",
+    "samLogo": "SAM logo",
+    "switchToLight": "Switch to light mode",
+    "switchToDark": "Switch to dark mode",
+    "switchLanguage": "Switch language"
+  },
+  "sheets": {
+    "title": "Sheets"
+  },
+  "collections": {
+    "title": "Sheet Collections"
+  },
+  "uploads": {
+    "title": "Uploads"
+  },
+  "musicians": {
+    "title": "Musicians"
+  },
+  "ensembles": {
+    "title": "Ensembles"
+  },
+  "instruments": {
+    "title": "Instruments"
+  },
+  "configuration": {
+    "title": "Configuration"
+  },
+  "primeng": {
+    "accept": "Yes",
+    "reject": "No",
+    "choose": "Choose",
+    "upload": "Upload",
+    "cancel": "Cancel",
+    "dayNames": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    "dayNamesShort": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+    "dayNamesMin": ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
+    "monthNames": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+    "monthNamesShort": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    "today": "Today",
+    "clear": "Clear",
+    "weekHeader": "Wk",
+    "firstDayOfWeek": 0,
+    "dateFormat": "mm/dd/yy",
+    "emptyMessage": "No results found",
+    "emptyFilterMessage": "No results found",
+    "searchMessage": "{0} results are available",
+    "selectionMessage": "{0} items selected",
+    "emptySelectionMessage": "No selected item",
+    "emptySearchMessage": "No results found",
+    "contains": "Contains",
+    "notContains": "Not contains",
+    "endsWith": "Ends with",
+    "equals": "Equals",
+    "notEquals": "Not equals",
+    "lt": "Less than",
+    "lte": "Less than or equal to",
+    "gt": "Greater than",
+    "gte": "Greater than or equal to",
+    "startsWith": "Starts with",
+    "matchAll": "Match All",
+    "matchAny": "Match Any",
+    "addRule": "Add Rule",
+    "removeRule": "Remove Rule",
+    "apply": "Apply",
+    "aria": {
+      "trueLabel": "True",
+      "falseLabel": "False",
+      "nullLabel": "Not Selected",
+      "star": "1 star",
+      "stars": "{star} stars",
+      "selectAll": "All items selected",
+      "unselectAll": "All items unselected",
+      "close": "Close",
+      "previous": "Previous",
+      "next": "Next",
+      "navigation": "Navigation",
+      "scrollTop": "Scroll Top",
+      "moveTop": "Move Top",
+      "moveUp": "Move Up",
+      "moveDown": "Move Down",
+      "moveBottom": "Move Bottom",
+      "moveToTarget": "Move to Target",
+      "moveToSource": "Move to Source",
+      "moveAllToTarget": "Move All to Target",
+      "moveAllToSource": "Move All to Source",
+      "pageLabel": "Page {page}",
+      "firstPageLabel": "First Page",
+      "lastPageLabel": "Last Page",
+      "nextPageLabel": "Next Page",
+      "prevPageLabel": "Previous Page",
+      "rowsPerPageLabel": "Rows per page",
+      "previousPageLabel": "Previous Page",
+      "nextPageLabel2": "Next Page",
+      "expandRow": "Row Expanded",
+      "collapseRow": "Row Collapsed",
+      "editRow": "Row Edit",
+      "saveEdit": "Save Edit",
+      "cancelEdit": "Cancel Edit"
+    }
+  }
+}
