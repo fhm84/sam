@@ -70,6 +70,14 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
                 .getResultList();
     }
 
+    public List<String> listDistinctGenres() {
+        return getEntityManager()
+                .createQuery(
+                        "SELECT DISTINCT s.genre FROM SheetMusicEntity s WHERE s.genre IS NOT NULL ORDER BY s.genre",
+                        String.class)
+                .getResultList();
+    }
+
     public PaginatedEntities<SheetMusicEntity> findSheetEntities(
             final PaginationRequest paginationRequest, final Map<String, Object> parameters) {
         final Map<String, Object> nonNullParams = parameters.entrySet().stream()

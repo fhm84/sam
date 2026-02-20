@@ -1,0 +1,153 @@
+@if (loading()) {
+  <div class="loading-indicator">
+    <i class="pi pi-spinner pi-spin"></i>
+  </div>
+} @else if (sheet(); as s) {
+  <div class="detail-header">
+    <div class="detail-title-group">
+      <h2>{{ s.title }}</h2>
+      @if (s.subtitle) {
+        <span class="detail-subtitle">{{ s.subtitle }}</span>
+      }
+    </div>
+    <p-button
+      icon="pi pi-pencil"
+      [label]="t.t('sheets.edit')"
+      [outlined]="true"
+      size="small"
+      (onClick)="onEdit()"
+    />
+  </div>
+
+  <div class="detail-meta">
+    @if (s.composer?.name) {
+      <div class="meta-entry">
+        <span class="detail-label">{{ 'sheets.detail.composer' | translate }}</span>
+        <span class="detail-value">{{ s.composer?.name }}</span>
+      </div>
+    }
+    @if (s.arranger?.name) {
+      <div class="meta-entry">
+        <span class="detail-label">{{ 'sheets.detail.arranger' | translate }}</span>
+        <span class="detail-value">{{ s.arranger?.name }}</span>
+      </div>
+    }
+    @if (s.genre) {
+      <div class="meta-entry">
+        <span class="detail-label">{{ 'sheets.detail.genre' | translate }}</span>
+        <span class="detail-value">{{ s.genre }}</span>
+      </div>
+    }
+    @if (s.yearOfComposition) {
+      <div class="meta-entry">
+        <span class="detail-label">{{ 'sheets.detail.year' | translate }}</span>
+        <span class="detail-value">{{ s.yearOfComposition }}</span>
+      </div>
+    }
+    @if (s.publisher) {
+      <div class="meta-entry">
+        <span class="detail-label">{{ 'sheets.detail.publisher' | translate }}</span>
+        <span class="detail-value">{{ s.publisher }}</span>
+      </div>
+    }
+    @if (s.edition) {
+      <div class="meta-entry">
+        <span class="detail-label">{{ 'sheets.detail.edition' | translate }}</span>
+        <span class="detail-value">{{ s.edition }}</span>
+      </div>
+    }
+    @if (s.difficultyLevel) {
+      <div class="meta-entry">
+        <span class="detail-label">{{ 'sheets.detail.difficulty' | translate }}</span>
+        <span class="detail-value">{{ s.difficultyLevel }}</span>
+      </div>
+    }
+    @if (s.copyright) {
+      <div class="meta-entry">
+        <span class="detail-label">{{ 'sheets.detail.copyright' | translate }}</span>
+        <span class="detail-value">{{ s.copyright }}</span>
+      </div>
+    }
+    @if (s.additionalNotes) {
+      <div class="meta-entry full-width">
+        <span class="detail-label">{{ 'sheets.detail.notes' | translate }}</span>
+        <span class="detail-value">{{ s.additionalNotes }}</span>
+      </div>
+    }
+  </div>
+
+  <div class="instrumentations-section">
+    <div class="instrumentations-toolbar">
+      <h3>{{ 'sheets.instrumentations.title' | translate }}</h3>
+      <p-button
+        [label]="t.t('sheets.instrumentations.new')"
+        icon="pi pi-plus"
+        size="small"
+        (onClick)="openNewInstrumentation()"
+      />
+    </div>
+
+    <p-table
+      [value]="instrumentations()"
+      [loading]="instrumentationsLoading()"
+    >
+      <ng-template #header>
+        <tr>
+          <th>{{ 'sheets.instrumentations.columns.instrument' | translate }}</th>
+          <th>{{ 'sheets.instrumentations.columns.partLabel' | translate }}</th>
+          <th>{{ 'sheets.instrumentations.columns.clef' | translate }}</th>
+          <th>{{ 'sheets.instrumentations.columns.actions' | translate }}</th>
+        </tr>
+      </ng-template>
+
+      <ng-template #body let-instr>
+        <tr>
+          <td>{{ instr.instrument?.name }}</td>
+          <td>{{ instr.partLabel }}</td>
+          <td>{{ instr.clef }}</td>
+          <td class="actions-cell">
+            <p-button
+              icon="pi pi-pencil"
+              [rounded]="true"
+              [text]="true"
+              size="small"
+              (onClick)="openEditInstrumentation(instr)"
+            />
+            <p-button
+              icon="pi pi-trash"
+              [rounded]="true"
+              [text]="true"
+              size="small"
+              severity="danger"
+              (onClick)="confirmDeleteInstrumentation(instr)"
+            />
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="4" class="empty-message">{{ 'sheets.instrumentations.empty' | translate }}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+}
+
+<p-dialog
+  [header]="editingInstrumentation ? t.t('sheets.instrumentations.edit') : t.t('sheets.instrumentations.new')"
+  [(visible)]="instrumentationDialogVisible"
+  [modal]="true"
+  [style]="{ width: '32rem' }"
+>
+  @if (instrumentationDialogVisible) {
+    <app-instrumentation-form
+      [sheetId]="sheetId"
+      [instrumentation]="editingInstrumentation"
+      (saved)="onInstrumentationSaved()"
+      (cancelled)="instrumentationDialogVisible = false"
+    />
+  }
+</p-dialog>
+
+<p-confirmdialog />

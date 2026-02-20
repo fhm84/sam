@@ -59,6 +59,9 @@ public class SheetService {
             if (filterRequest.getComposer() != null) {
                 parameters.put("composer.name", filterRequest.getComposer());
             }
+            if (filterRequest.getGenre() != null) {
+                parameters.put("genre", filterRequest.getGenre());
+            }
 
             PaginatedResponse<SheetMusic> sheets = getAllSheets(filterRequest, parameters);
             PaginatedResponse<SheetMusicSearchResult> response = new PaginatedResponse<>();
@@ -101,6 +104,10 @@ public class SheetService {
                 .findByIdOptional(UUID.fromString(sheetId))
                 .orElseThrow(() -> new EntityNotFoundException("SheetMusic", sheetId));
         sheetMusicMapper.update(entity, sheetMusic);
+    }
+
+    public List<String> getDistinctGenres() {
+        return sheetRepository.listDistinctGenres();
     }
 
     public void deleteSheet(final String sheetId) {

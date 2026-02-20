@@ -25,4 +25,10 @@ public class SheetFilterRequest extends PaginationRequest {
      */
     @QueryParam("composer")
     private String composer;
+
+    /**
+     * Filter by genre
+     */
+    @QueryParam("genre")
+    private String genre;
 }

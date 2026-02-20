@@ -35,6 +35,14 @@
         </td>
         <td class="actions-cell">
           <p-button
+            icon="pi pi-cog"
+            [rounded]="true"
+            [text]="true"
+            size="small"
+            (onClick)="openOptions(voice)"
+            [pTooltip]="t.t('ensembles.voices.options.title')"
+          />
+          <p-button
             icon="pi pi-pencil"
             [rounded]="true"
             [text]="true"
@@ -73,6 +81,20 @@
       [voice]="editingVoice"
       (saved)="onVoiceSaved()"
       (cancelled)="voiceDialogVisible = false"
+    />
+  }
+</p-dialog>
+
+<p-dialog
+  [header]="optionsVoice?.label + ' — ' + t.t('ensembles.voices.options.title')"
+  [(visible)]="optionsDialogVisible"
+  [modal]="true"
+  [style]="{ width: '38rem' }"
+>
+  @if (optionsDialogVisible && optionsVoice) {
+    <app-voice-options
+      [ensembleId]="ensembleId"
+      [voiceId]="optionsVoice.id!"
     />
   }
 </p-dialog>

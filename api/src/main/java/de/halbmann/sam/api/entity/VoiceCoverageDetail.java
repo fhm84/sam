@@ -9,43 +9,37 @@ import lombok.Data;
 @Data
 public class VoiceCoverageDetail {
 
-    /**
-     * Label of the ensemble voice being evaluated (e.g. "1. Trumpet").
-     */
-    String voiceLabel;
+    /** Anzeige / Referenz */
+    private String voiceId;
 
-    /**
-     * Whether this voice is required for the ensemble to be playable.
-     */
-    boolean required;
+    private String voiceLabel;
 
-    /**
-     * The weight of this voice in the overall coverage score.
-     */
-    double weight;
+    /** Fachliche Regeln */
+    private boolean required;
 
-    double effectiveCount;
+    private int minCount;
+    private int targetCount;
 
-    /**
-     * Canonical ID of the instrument that best matched this voice, or {@code null} if no match was
-     * found.
-     */
-    String matchedInstrumentId;
+    /** Bewertung */
+    private double weight;
 
-    /**
-     * Quality of the instrument match (0.0 - 1.0), considering transposition, clef, and notation
-     * type compatibility.
-     */
-    double matchScore;
+    /** Ergebnis */
+    private double effectiveCount; // z.B. 2.85
 
-    /**
-     * The voice option's scoring factor that was applied (reflects primary/alternate/fallback
-     * preference).
-     */
-    double optionFactor;
+    private double score; // 0..1 (nach Baseline & Normalisierung)
 
-    /**
-     * Human-readable explanation of how the match was determined.
-     */
-    String explanation;
+    /** Erklärung für UI / Debug */
+    private String explanation;
+
+    // --------------------
+    // Derived helpers
+    // --------------------
+
+    public boolean isMissingRequired() {
+        return required && effectiveCount < minCount;
+    }
+
+    public boolean isPresent() {
+        return effectiveCount >= 1.0;
+    }
 }

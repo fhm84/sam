@@ -3,6 +3,7 @@ package de.halbmann.sam.api.boundary;
 import de.halbmann.sam.api.entity.*;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import java.util.List;
 
 /**
  * RESTful API for managing sheet music resources. Provides operations to find, add, load, update,
@@ -59,6 +60,15 @@ public interface SheetsResource {
     @DELETE
     @Path("{sheetId}")
     void delete(final @PathParam("sheetId") String sheetId);
+
+    /**
+     * Returns all distinct genre values used across sheet music.
+     *
+     * @return a sorted list of genre strings
+     */
+    @GET
+    @Path("genres")
+    List<String> getGenres();
 
     /**
      * Provides access to the instrumentations resource for a specific sheet music.

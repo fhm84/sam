@@ -1,0 +1,164 @@
+.sheets-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.page-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--sam-text);
+  }
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.filter-panel {
+  background: var(--p-surface-50);
+  padding: 1rem 1.25rem;
+  border-radius: var(--p-border-radius);
+  border: 1px solid var(--p-surface-200);
+}
+
+.filter-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+
+  label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--sam-text-secondary);
+  }
+}
+
+.clear-filters {
+  color: var(--p-primary-color);
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding-bottom: 0.5rem;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.sheet-title-cell {
+  display: block;
+  font-weight: 500;
+}
+
+.sheet-subtitle-cell {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--sam-text-muted);
+}
+
+.clickable-row {
+  cursor: pointer;
+}
+
+.actions-cell {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.empty-message {
+  text-align: center;
+  color: var(--sam-text-muted);
+  padding: 2rem !important;
+}
+
+.loading-indicator {
+  display: flex;
+  justify-content: center;
+  padding: 3rem;
+  font-size: 2rem;
+  color: var(--sam-text-muted);
+}
+
+// Card view
+.sheet-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.sheet-card.clickable-card {
+  cursor: pointer;
+}
+
+.sheet-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  background: var(--p-surface-0);
+  border: 1px solid var(--p-surface-200);
+  border-radius: var(--p-border-radius);
+  transition: box-shadow 0.2s;
+
+  &:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.card-title {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--sam-text);
+}
+
+.card-subtitle {
+  font-size: 0.875rem;
+  color: var(--sam-text-muted);
+}
+
+.card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  font-size: 0.85rem;
+  color: var(--sam-text-secondary);
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+
+    i {
+      font-size: 0.8rem;
+    }
+  }
+}
+
+.card-actions {
+  display: flex;
+  gap: 0.25rem;
+  margin-top: auto;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--p-surface-100);
+}

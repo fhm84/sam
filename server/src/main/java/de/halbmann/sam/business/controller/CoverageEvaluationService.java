@@ -1,7 +1,6 @@
 package de.halbmann.sam.business.controller;
 
 import de.halbmann.sam.api.entity.CoverageResult;
-import de.halbmann.sam.api.entity.CoverageStatus;
 import de.halbmann.sam.api.entity.VoiceCoverageDetail;
 import de.halbmann.sam.business.boundary.EnsembleRepository;
 import de.halbmann.sam.business.boundary.SheetRepository;
@@ -10,11 +9,10 @@ import de.halbmann.sam.business.exception.EntityNotFoundException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @ApplicationScoped
 @Transactional
@@ -57,28 +55,54 @@ public class CoverageEvaluationService {
             totalWeight += voice.getWeight();
 
             VoiceCoverageDetail detail = new VoiceCoverageDetail();
+            detail.setVoiceId(voice.getId().toString());
             detail.setVoiceLabel(voice.getLabel());
             detail.setRequired(voice.isRequired());
             detail.setWeight(voice.getWeight());
+            detail.setMinCount(voice.getMinCount());
+            detail.setTargetCount(voice.getTargetCount());
 
             double effectiveCount = 0.0;
             List<String> explanations = new ArrayList<>();
 
-            for (VoiceOptionEntity option : voice.getOptions()) {
-                for (InstrumentationEntity instrumentation : instrumentations) {
+            List<VoiceOptionEntity> options =
+                    voice.getOptions().isEmpty() ? List.of(VoiceOptionEntity.defaultOption()) : voice.getOptions();
+
+            for (InstrumentationEntity instrumentation : instrumentations) {
+                double bestContribution = 0.0;
+                VoiceOptionEntity bestOption = null;
+                double bestMatchScore = 0.0;
+
+                for (VoiceOptionEntity option : options) {
                     double matchScore = matchingService.score(option, instrumentation);
                     if (matchScore > 0) {
                         double contribution = matchScore * option.getFactor();
-                        effectiveCount += contribution;
-                        explanations.add(buildExplanation(option, instrumentation, matchScore));
+
+                        if (contribution > bestContribution) {
+                            bestContribution = contribution;
+                            bestOption = option;
+                            bestMatchScore = matchScore;
+
+                            // perfekt → besser geht nicht
+                            if (matchScore == 1.0 && option.getFactor() == 1.0) {
+                                break;
+                            }
+                        }
                     }
                 }
+
+                if (bestContribution > 0) {
+                    effectiveCount += bestContribution;
+                    explanations.add(buildExplanation(bestOption, instrumentation, bestMatchScore));
+                }
             }
+
+            detail.setEffectiveCount(effectiveCount);
 
             // Pflichtprüfung (hart)
             if (voice.isRequired() && effectiveCount < voice.getMinCount()) {
                 missingRequired = true;
-                detail.setMatchScore(0);
+                detail.setScore(0);
                 detail.setExplanation("Required voice missing");
                 details.add(detail);
                 continue;
@@ -87,21 +111,16 @@ public class CoverageEvaluationService {
             // Count-basierter Score mit Amateur-Baseline
             double countScore = 0.0;
             if (effectiveCount >= 1.0) {
-                double normalized =
-                        Math.min(effectiveCount / voice.getTargetCount(), 1.0);
+                double normalized = Math.min(effectiveCount / voice.getTargetCount(), 1.0);
                 countScore = baseScore + (1.0 - baseScore) * normalized;
             }
 
             double voiceScore = countScore * voice.getWeight();
             coveredWeight += voiceScore;
 
-            detail.setEffectiveCount(effectiveCount);
-            detail.setMatchScore(countScore);
+            detail.setScore(voiceScore);
             detail.setExplanation(
-                    explanations.isEmpty()
-                            ? "No matching instrumentation found"
-                            : String.join("; ", explanations)
-            );
+                    explanations.isEmpty() ? "No matching instrumentation found" : String.join("; ", explanations));
 
             details.add(detail);
         }
@@ -109,22 +128,9 @@ public class CoverageEvaluationService {
         CoverageResult result = new CoverageResult();
         result.setCoverageScore(totalWeight > 0 ? coveredWeight / totalWeight : 0);
         result.setDetails(details);
-        result.setStatus(determineCoverageStatus(result.getCoverageScore(), missingRequired));
+        result.setMissingRequired(missingRequired);
 
         return result;
-    }
-
-    private CoverageStatus determineCoverageStatus(final double score, final boolean missingRequired) {
-        if (missingRequired) {
-            return CoverageStatus.INCOMPLETE;
-        }
-        if (score >= 0.9) {
-            return CoverageStatus.COMPLETE;
-        }
-        if (score >= 0.5) {
-            return CoverageStatus.PLAYABLE;
-        }
-        return CoverageStatus.INCOMPLETE;
     }
 
     private String buildExplanation(

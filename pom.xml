@@ -27,7 +27,7 @@
         <jandex-maven-plugin.version>3.3.0</jandex-maven-plugin.version>
         <spotless-maven-plugin.version>3.2.1</spotless-maven-plugin.version>
 
-        <quarkus.platform.version>3.31.3</quarkus.platform.version>
+        <quarkus.platform.version>3.31.4</quarkus.platform.version>
         <lombok.version>1.18.42</lombok.version>
         <org.mapstruct.version>1.6.3</org.mapstruct.version>
 

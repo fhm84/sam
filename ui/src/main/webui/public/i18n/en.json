@@ -23,13 +23,158 @@
     "switchLanguage": "Switch language"
   },
   "sheets": {
-    "title": "Sheets"
+    "title": "Sheets",
+    "new": "New sheet",
+    "edit": "Edit sheet",
+    "columns": {
+      "title": "Title",
+      "composer": "Composer",
+      "genre": "Genre",
+      "year": "Year",
+      "actions": "Actions"
+    },
+    "form": {
+      "title": "Title",
+      "subtitle": "Subtitle",
+      "composer": "Composer",
+      "composerPlaceholder": "Select composer",
+      "arranger": "Arranger",
+      "arrangerPlaceholder": "Select arranger",
+      "genre": "Genre",
+      "yearOfComposition": "Year of Composition",
+      "publisher": "Publisher",
+      "edition": "Edition",
+      "difficultyLevel": "Difficulty Level",
+      "copyright": "Copyright",
+      "additionalNotes": "Additional Notes"
+    },
+    "delete": {
+      "confirm": "Are you sure you want to delete the sheet \"{title}\"?",
+      "header": "Confirm deletion"
+    },
+    "messages": {
+      "created": "Sheet created successfully",
+      "updated": "Sheet updated successfully",
+      "deleted": "Sheet deleted successfully",
+      "error": "An error occurred"
+    },
+    "detail": {
+      "composer": "Composer",
+      "arranger": "Arranger",
+      "genre": "Genre",
+      "year": "Year",
+      "publisher": "Publisher",
+      "edition": "Edition",
+      "difficulty": "Difficulty",
+      "copyright": "Copyright",
+      "notes": "Notes"
+    },
+    "instrumentations": {
+      "title": "Instrumentations",
+      "new": "New instrumentation",
+      "edit": "Edit instrumentation",
+      "columns": {
+        "instrument": "Instrument",
+        "partLabel": "Part Label",
+        "clef": "Clef",
+        "actions": "Actions"
+      },
+      "form": {
+        "instrument": "Instrument",
+        "instrumentPlaceholder": "Select instrument",
+        "partLabel": "Part Label",
+        "clef": "Clef",
+        "clefPlaceholder": "Select clef",
+        "notationType": "Notation Type",
+        "notationTypePlaceholder": "Select notation type",
+        "notes": "Notes"
+      },
+      "delete": {
+        "confirm": "Are you sure you want to delete the instrumentation for \"{instrument}\"?",
+        "header": "Confirm deletion"
+      },
+      "messages": {
+        "created": "Instrumentation created successfully",
+        "updated": "Instrumentation updated successfully",
+        "deleted": "Instrumentation deleted successfully",
+        "error": "An error occurred"
+      },
+      "empty": "No instrumentations defined yet",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "filters": {
+      "toggle": "Filters",
+      "genre": "Genre",
+      "genrePlaceholder": "All genres",
+      "clear": "Clear filters"
+    },
+    "search": "Search sheets",
+    "empty": "No sheets found",
+    "save": "Save",
+    "cancel": "Cancel"
   },
   "collections": {
-    "title": "Sheet Collections"
+    "title": "Sheet Collections",
+    "new": "New collection",
+    "edit": "Edit collection",
+    "columns": {
+      "name": "Name",
+      "type": "Type",
+      "date": "Date",
+      "sheets": "Sheets",
+      "actions": "Actions"
+    },
+    "form": {
+      "name": "Name",
+      "description": "Description",
+      "type": "Type",
+      "typePlaceholder": "Select type",
+      "date": "Date"
+    },
+    "types": {
+      "FOLDER": "Folder",
+      "SETLIST": "Setlist"
+    },
+    "delete": {
+      "confirm": "Are you sure you want to delete the collection \"{name}\"?",
+      "header": "Confirm deletion"
+    },
+    "messages": {
+      "created": "Collection created successfully",
+      "updated": "Collection updated successfully",
+      "deleted": "Collection deleted successfully",
+      "error": "An error occurred"
+    },
+    "search": "Search collections",
+    "empty": "No collections found",
+    "save": "Save",
+    "cancel": "Cancel"
   },
   "uploads": {
-    "title": "Uploads"
+    "title": "Uploads",
+    "upload": "Upload",
+    "dragDrop": "Drag & drop files here or click Browse to upload",
+    "browse": "Browse",
+    "columns": {
+      "filename": "Filename",
+      "size": "Size",
+      "mimeType": "Type",
+      "checksum": "Checksum",
+      "actions": "Actions"
+    },
+    "delete": {
+      "confirm": "Are you sure you want to delete this document?",
+      "header": "Confirm deletion"
+    },
+    "messages": {
+      "uploaded": "File uploaded successfully",
+      "deleted": "Document deleted successfully",
+      "error": "An error occurred",
+      "downloadError": "Failed to download document"
+    },
+    "empty": "No unlinked documents found",
+    "activeUploads": "Active Uploads"
   },
   "musicians": {
     "title": "Musicians",

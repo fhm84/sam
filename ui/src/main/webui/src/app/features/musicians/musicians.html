@@ -1,0 +1,91 @@
+<div class="musicians-page">
+  <div class="page-toolbar">
+    <h1>{{ 'musicians.title' | translate }}</h1>
+    <p-button
+      [label]="t.t('musicians.new')"
+      icon="pi pi-plus"
+      (onClick)="openNew()"
+    />
+  </div>
+
+  <p-table
+    [value]="musicians()"
+    [lazy]="true"
+    [paginator]="true"
+    [rows]="rows"
+    [totalRecords]="totalRecords()"
+    [loading]="loading()"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    (onLazyLoad)="onLazyLoad($event)"
+  >
+    <ng-template #caption>
+      <p-iconfield>
+        <p-inputicon styleClass="pi pi-search" />
+        <input
+          pInputText
+          type="text"
+          [placeholder]="t.t('musicians.search')"
+          (input)="onFilter($event)"
+        />
+      </p-iconfield>
+    </ng-template>
+
+    <ng-template #header>
+      <tr>
+        <th>{{ 'musicians.columns.name' | translate }}</th>
+        <th>{{ 'musicians.columns.ipi' | translate }}</th>
+        <th>{{ 'musicians.columns.birthYear' | translate }}</th>
+        <th>{{ 'musicians.columns.deathYear' | translate }}</th>
+        <th>{{ 'musicians.columns.actions' | translate }}</th>
+      </tr>
+    </ng-template>
+
+    <ng-template #body let-musician>
+      <tr>
+        <td>{{ musician.name }}</td>
+        <td>{{ musician.ipi }}</td>
+        <td>{{ musician.birthYear }}</td>
+        <td>{{ musician.deathYear }}</td>
+        <td class="actions-cell">
+          <p-button
+            icon="pi pi-pencil"
+            [rounded]="true"
+            [text]="true"
+            (onClick)="openEdit(musician)"
+          />
+          <p-button
+            icon="pi pi-trash"
+            [rounded]="true"
+            [text]="true"
+            severity="danger"
+            (onClick)="confirmDelete(musician)"
+          />
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="5" class="empty-message">{{ 'musicians.empty' | translate }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog
+  [header]="editingMusician ? t.t('musicians.edit') : t.t('musicians.new')"
+  [(visible)]="dialogVisible"
+  [modal]="true"
+  [style]="{ width: '28rem' }"
+>
+  @if (dialogVisible) {
+    <app-musician-form
+      [musician]="editingMusician"
+      (saved)="onSaved()"
+      (cancelled)="dialogVisible = false"
+    />
+  }
+</p-dialog>
+
+<p-toast />
+<p-confirmdialog />

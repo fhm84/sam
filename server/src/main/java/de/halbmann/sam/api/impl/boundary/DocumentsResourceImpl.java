@@ -6,6 +6,7 @@ import de.halbmann.sam.business.controller.DocumentsService;
 import de.halbmann.sam.business.entity.DocumentEntity;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
@@ -94,25 +95,34 @@ public class DocumentsResourceImpl implements DocumentsResource {
     }
 
     @Override
-    public String uploadDocument(FileUploadRequest request) {
+    public Attachment uploadDocument(FileUploadRequest request) {
         log.atLevel(Level.INFO)
                 .log(() -> "File-Upload ... filename: " + request.getFile().fileName());
 
-        // TODO: if instrumentationId or sheetId is set, we have to directly add/link it!!!
         try (InputStream inputStream = Files.newInputStream(request.getFile().uploadedFile())) {
             Attachment attachment = documentsService.save(request.getFile().fileName(), inputStream, request.getType());
-            return """
-                    "filename": "%s",
-                    "id": "%s"
-                    """.formatted(attachment.getDisplayName(), attachment.getId());
+
+            // Link to sheet or instrumentation if uploaded via sub-resource path
+            if (sheetId != null) {
+                documentsService.linkAttachmentToSheet(attachment.getId().toString(), sheetId);
+            }
+            if (instrumentationId != null) {
+                documentsService.linkAttachmentToInstrumentation(
+                        attachment.getId().toString(), instrumentationId);
+            }
+
+            return attachment;
         } catch (IOException | NoSuchAlgorithmException e) {
             log.atWarn()
                     .setCause(e)
                     .log(() -> "Failed to upload file " + request.getFile().fileName());
-            return """
-                    "error": "Failed to save file"
-                    """;
+            throw new InternalServerErrorException("Failed to save file", e);
         }
+    }
+
+    @Override
+    public void delete(String docIdentifier) {
+        documentsService.deleteAttachment(docIdentifier);
     }
 
     private boolean etagMatches(String ifNoneMatch, String currentEtag) {

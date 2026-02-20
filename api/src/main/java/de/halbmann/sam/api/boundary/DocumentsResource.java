@@ -1,9 +1,6 @@
 package de.halbmann.sam.api.boundary;
 
-import de.halbmann.sam.api.entity.DocumentDownload;
-import de.halbmann.sam.api.entity.DocumentFilterRequest;
-import de.halbmann.sam.api.entity.FileUploadRequest;
-import de.halbmann.sam.api.entity.PaginatedResponse;
+import de.halbmann.sam.api.entity.*;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -21,5 +18,9 @@ public interface DocumentsResource {
 
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    String uploadDocument(@BeanParam FileUploadRequest request);
+    Attachment uploadDocument(@BeanParam FileUploadRequest request);
+
+    @DELETE
+    @Path("{docIdentifier}")
+    void delete(@PathParam("docIdentifier") String docIdentifier);
 }

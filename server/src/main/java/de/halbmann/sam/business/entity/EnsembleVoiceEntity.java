@@ -2,12 +2,11 @@ package de.halbmann.sam.business.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.envers.Audited;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Setter

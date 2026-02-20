@@ -23,6 +23,7 @@ export class SheetsApiService {
     if (filter.query) params = params.set('query', filter.query);
     if (filter.title) params = params.set('title', filter.title);
     if (filter.composer) params = params.set('composer', filter.composer);
+    if (filter.genre) params = params.set('genre', filter.genre);
     return this.http.get<PaginatedResponse<SheetMusicSearchResult>>(this.baseUrl, { params });
   }
 
@@ -40,6 +41,10 @@ export class SheetsApiService {
 
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
+  getGenres(): Observable<string[]> {
+    return this.http.get<string[]>(`${this.baseUrl}/genres`);
   }
 
   getCoverage(sheetId: string, ensembleId: string): Observable<CoverageResult> {

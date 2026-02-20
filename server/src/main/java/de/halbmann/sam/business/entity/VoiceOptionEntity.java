@@ -24,4 +24,11 @@ public class VoiceOptionEntity extends AbstractEntity {
     VoiceOptionType type;
 
     double factor;
+
+    public static VoiceOptionEntity defaultOption() {
+        VoiceOptionEntity o = new VoiceOptionEntity();
+        o.setFactor(1.0);
+        o.setInstrument(null); // bedeutet: match anything
+        return o;
+    }
 }

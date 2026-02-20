@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpEventType, HttpParams, HttpResponse } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import {
+  Attachment,
   AttachmentType,
   DocumentDownload,
   DocumentFilterRequest,
@@ -11,7 +12,7 @@ import {
 export interface UploadProgress {
   type: 'progress' | 'complete';
   progress?: number;
-  identifier?: string;
+  attachment?: Attachment;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -41,7 +42,7 @@ export class DocumentsApiService {
     if (type) formData.append('type', type);
 
     return this.http
-      .post<{ identifier: string }>(basePath, formData, {
+      .post<Attachment>(basePath, formData, {
         observe: 'events',
         reportProgress: true,
       })
@@ -54,11 +55,15 @@ export class DocumentsApiService {
             };
           }
           if (event.type === HttpEventType.Response) {
-            return { type: 'complete' as const, identifier: (event.body as any)?.identifier };
+            return { type: 'complete' as const, attachment: event.body ?? undefined };
           }
           return { type: 'progress' as const, progress: 0 };
         }),
       );
+  }
+
+  delete(basePath: string, docIdentifier: string): Observable<void> {
+    return this.http.delete<void>(`${basePath}/${docIdentifier}`);
   }
 
   // Convenience methods for common base paths

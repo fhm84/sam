@@ -1,0 +1,79 @@
+<div class="options-section">
+  <div class="options-toolbar">
+    <h4>{{ 'ensembles.voices.options.title' | translate }}</h4>
+    <p-button
+      [label]="t.t('ensembles.voices.options.new')"
+      icon="pi pi-plus"
+      size="small"
+      (onClick)="openNewOption()"
+    />
+  </div>
+
+  <p-table
+    [value]="options()"
+    [loading]="loading()"
+  >
+    <ng-template #header>
+      <tr>
+        <th>{{ 'ensembles.voices.options.columns.instrument' | translate }}</th>
+        <th>{{ 'ensembles.voices.options.columns.type' | translate }}</th>
+        <th>{{ 'ensembles.voices.options.columns.factor' | translate }}</th>
+        <th>{{ 'ensembles.voices.options.columns.actions' | translate }}</th>
+      </tr>
+    </ng-template>
+
+    <ng-template #body let-option>
+      <tr>
+        <td>{{ instrumentName(option.instrumentId) }}</td>
+        <td>
+          @if (option.type) {
+            <p-tag [severity]="typeSeverity(option.type)" [value]="option.type" />
+          }
+        </td>
+        <td>{{ option.factor }}</td>
+        <td class="actions-cell">
+          <p-button
+            icon="pi pi-pencil"
+            [rounded]="true"
+            [text]="true"
+            size="small"
+            (onClick)="openEditOption(option)"
+          />
+          <p-button
+            icon="pi pi-trash"
+            [rounded]="true"
+            [text]="true"
+            size="small"
+            severity="danger"
+            (onClick)="confirmDeleteOption(option)"
+          />
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="4" class="empty-message">{{ 'ensembles.voices.options.empty' | translate }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog
+  [header]="editingOption ? t.t('ensembles.voices.options.edit') : t.t('ensembles.voices.options.new')"
+  [(visible)]="optionDialogVisible"
+  [modal]="true"
+  [style]="{ width: '26rem' }"
+>
+  @if (optionDialogVisible) {
+    <app-voice-option-form
+      [ensembleId]="ensembleId"
+      [voiceId]="voiceId"
+      [option]="editingOption"
+      (saved)="onOptionSaved()"
+      (cancelled)="optionDialogVisible = false"
+    />
+  }
+</p-dialog>
+
+<p-confirmdialog />

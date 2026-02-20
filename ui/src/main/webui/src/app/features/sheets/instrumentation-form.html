@@ -1,0 +1,72 @@
+<form [formGroup]="form" (ngSubmit)="onSave()" class="instrumentation-form">
+  <div class="form-field">
+    <label for="instr-instrument">{{ 'sheets.instrumentations.form.instrument' | translate }}</label>
+    <p-select
+      id="instr-instrument"
+      formControlName="instrumentId"
+      [options]="instrumentOptions()"
+      optionLabel="label"
+      optionValue="value"
+      [placeholder]="t.t('sheets.instrumentations.form.instrumentPlaceholder')"
+      [filter]="true"
+      styleClass="w-full"
+    />
+  </div>
+
+  <div class="form-field">
+    <label for="instr-partLabel">{{ 'sheets.instrumentations.form.partLabel' | translate }}</label>
+    <input pInputText id="instr-partLabel" formControlName="partLabel" />
+  </div>
+
+  <div class="form-row">
+    <div class="form-field flex-1">
+      <label for="instr-clef">{{ 'sheets.instrumentations.form.clef' | translate }}</label>
+      <p-select
+        id="instr-clef"
+        formControlName="clef"
+        [options]="clefOptions"
+        [placeholder]="t.t('sheets.instrumentations.form.clefPlaceholder')"
+        [showClear]="true"
+        styleClass="w-full"
+      />
+    </div>
+
+    <div class="form-field flex-1">
+      <label for="instr-notationType">{{ 'sheets.instrumentations.form.notationType' | translate }}</label>
+      <p-select
+        id="instr-notationType"
+        formControlName="notationType"
+        [options]="notationTypeOptions"
+        [placeholder]="t.t('sheets.instrumentations.form.notationTypePlaceholder')"
+        [showClear]="true"
+        styleClass="w-full"
+      />
+    </div>
+  </div>
+
+  <div class="form-field">
+    <label for="instr-notes">{{ 'sheets.instrumentations.form.notes' | translate }}</label>
+    <textarea
+      pTextarea
+      id="instr-notes"
+      formControlName="notes"
+      [rows]="3"
+      [autoResize]="true"
+    ></textarea>
+  </div>
+
+  <div class="form-actions">
+    <p-button
+      [label]="t.t('sheets.instrumentations.cancel')"
+      severity="secondary"
+      [text]="true"
+      (onClick)="cancelled.emit()"
+    />
+    <p-button
+      [label]="t.t('sheets.instrumentations.save')"
+      type="submit"
+      [disabled]="form.invalid || saving"
+      [loading]="saving"
+    />
+  </div>
+</form>

@@ -1,7 +1,13 @@
 package de.halbmann.sam.api.entity;
 
+import jakarta.json.bind.annotation.JsonbTransient;
 import java.io.InputStream;
 import java.util.UUID;
 
 public record DocumentDownload(
-        InputStream stream, UUID id, String filename, long size, String mimeType, String checksumSha256) {}
+        @JsonbTransient InputStream stream,
+        UUID id,
+        String filename,
+        long size,
+        String mimeType,
+        String checksumSha256) {}

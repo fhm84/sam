@@ -23,13 +23,158 @@
     "switchLanguage": "Sprache wechseln"
   },
   "sheets": {
-    "title": "Noten"
+    "title": "Noten",
+    "new": "Neues Notenblatt",
+    "edit": "Notenblatt bearbeiten",
+    "columns": {
+      "title": "Titel",
+      "composer": "Komponist",
+      "genre": "Genre",
+      "year": "Jahr",
+      "actions": "Aktionen"
+    },
+    "form": {
+      "title": "Titel",
+      "subtitle": "Untertitel",
+      "composer": "Komponist",
+      "composerPlaceholder": "Komponist auswählen",
+      "arranger": "Arrangeur",
+      "arrangerPlaceholder": "Arrangeur auswählen",
+      "genre": "Genre",
+      "yearOfComposition": "Kompositionsjahr",
+      "publisher": "Verlag",
+      "edition": "Ausgabe",
+      "difficultyLevel": "Schwierigkeitsgrad",
+      "copyright": "Urheberrecht",
+      "additionalNotes": "Zusätzliche Anmerkungen"
+    },
+    "delete": {
+      "confirm": "Möchten Sie das Notenblatt \"{title}\" wirklich löschen?",
+      "header": "Löschen bestätigen"
+    },
+    "messages": {
+      "created": "Notenblatt erfolgreich erstellt",
+      "updated": "Notenblatt erfolgreich aktualisiert",
+      "deleted": "Notenblatt erfolgreich gelöscht",
+      "error": "Ein Fehler ist aufgetreten"
+    },
+    "detail": {
+      "composer": "Komponist",
+      "arranger": "Arrangeur",
+      "genre": "Genre",
+      "year": "Jahr",
+      "publisher": "Verlag",
+      "edition": "Ausgabe",
+      "difficulty": "Schwierigkeitsgrad",
+      "copyright": "Urheberrecht",
+      "notes": "Anmerkungen"
+    },
+    "instrumentations": {
+      "title": "Instrumentierungen",
+      "new": "Neue Instrumentierung",
+      "edit": "Instrumentierung bearbeiten",
+      "columns": {
+        "instrument": "Instrument",
+        "partLabel": "Stimmenbezeichnung",
+        "clef": "Notenschlüssel",
+        "actions": "Aktionen"
+      },
+      "form": {
+        "instrument": "Instrument",
+        "instrumentPlaceholder": "Instrument auswählen",
+        "partLabel": "Stimmenbezeichnung",
+        "clef": "Notenschlüssel",
+        "clefPlaceholder": "Notenschlüssel auswählen",
+        "notationType": "Notationsart",
+        "notationTypePlaceholder": "Notationsart auswählen",
+        "notes": "Anmerkungen"
+      },
+      "delete": {
+        "confirm": "Möchten Sie die Instrumentierung für \"{instrument}\" wirklich löschen?",
+        "header": "Löschen bestätigen"
+      },
+      "messages": {
+        "created": "Instrumentierung erfolgreich erstellt",
+        "updated": "Instrumentierung erfolgreich aktualisiert",
+        "deleted": "Instrumentierung erfolgreich gelöscht",
+        "error": "Ein Fehler ist aufgetreten"
+      },
+      "empty": "Noch keine Instrumentierungen definiert",
+      "save": "Speichern",
+      "cancel": "Abbrechen"
+    },
+    "filters": {
+      "toggle": "Filter",
+      "genre": "Genre",
+      "genrePlaceholder": "Alle Genres",
+      "clear": "Filter zurücksetzen"
+    },
+    "search": "Noten suchen",
+    "empty": "Keine Noten gefunden",
+    "save": "Speichern",
+    "cancel": "Abbrechen"
   },
   "collections": {
-    "title": "Notensammlungen"
+    "title": "Notensammlungen",
+    "new": "Neue Sammlung",
+    "edit": "Sammlung bearbeiten",
+    "columns": {
+      "name": "Name",
+      "type": "Typ",
+      "date": "Datum",
+      "sheets": "Noten",
+      "actions": "Aktionen"
+    },
+    "form": {
+      "name": "Name",
+      "description": "Beschreibung",
+      "type": "Typ",
+      "typePlaceholder": "Typ auswählen",
+      "date": "Datum"
+    },
+    "types": {
+      "FOLDER": "Ordner",
+      "SETLIST": "Setliste"
+    },
+    "delete": {
+      "confirm": "Möchten Sie die Sammlung \"{name}\" wirklich löschen?",
+      "header": "Löschen bestätigen"
+    },
+    "messages": {
+      "created": "Sammlung erfolgreich erstellt",
+      "updated": "Sammlung erfolgreich aktualisiert",
+      "deleted": "Sammlung erfolgreich gelöscht",
+      "error": "Ein Fehler ist aufgetreten"
+    },
+    "search": "Sammlungen suchen",
+    "empty": "Keine Sammlungen gefunden",
+    "save": "Speichern",
+    "cancel": "Abbrechen"
   },
   "uploads": {
-    "title": "Uploads"
+    "title": "Uploads",
+    "upload": "Hochladen",
+    "dragDrop": "Dateien hierher ziehen oder auf Durchsuchen klicken",
+    "browse": "Durchsuchen",
+    "columns": {
+      "filename": "Dateiname",
+      "size": "Größe",
+      "mimeType": "Typ",
+      "checksum": "Prüfsumme",
+      "actions": "Aktionen"
+    },
+    "delete": {
+      "confirm": "Möchten Sie dieses Dokument wirklich löschen?",
+      "header": "Löschen bestätigen"
+    },
+    "messages": {
+      "uploaded": "Datei erfolgreich hochgeladen",
+      "deleted": "Dokument erfolgreich gelöscht",
+      "error": "Ein Fehler ist aufgetreten",
+      "downloadError": "Dokument konnte nicht heruntergeladen werden"
+    },
+    "empty": "Keine nicht verknüpften Dokumente gefunden",
+    "activeUploads": "Aktive Uploads"
   },
   "musicians": {
     "title": "Musiker",

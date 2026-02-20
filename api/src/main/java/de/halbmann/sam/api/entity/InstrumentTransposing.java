@@ -41,5 +41,14 @@ public enum InstrumentTransposing {
     /**
      * B♭
      */
-    Bb
+    Bb;
+
+    public static InstrumentTransposing fromString(String s) {
+        for (InstrumentTransposing instrumentTransposing : InstrumentTransposing.values()) {
+            if (instrumentTransposing.name().equalsIgnoreCase(s)) {
+                return instrumentTransposing;
+            }
+        }
+        return null;
+    }
 }

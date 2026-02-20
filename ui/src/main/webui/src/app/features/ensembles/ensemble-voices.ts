@@ -5,15 +5,17 @@ import { ConfirmDialog } from 'primeng/confirmdialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Button } from 'primeng/button';
 import { Tag } from 'primeng/tag';
+import { Tooltip } from 'primeng/tooltip';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../core/translation.service';
 import { EnsemblesApiService } from '../../core/api';
 import { EnsembleVoice } from '../../model/datamodels';
 import { VoiceForm } from './voice-form';
+import { VoiceOptions } from './voice-options';
 
 @Component({
   selector: 'app-ensemble-voices',
-  imports: [TableModule, Dialog, ConfirmDialog, Button, Tag, TranslatePipe, VoiceForm],
+  imports: [TableModule, Dialog, ConfirmDialog, Button, Tag, Tooltip, TranslatePipe, VoiceForm, VoiceOptions],
   providers: [ConfirmationService],
   templateUrl: './ensemble-voices.html',
   styleUrl: './ensemble-voices.scss',
@@ -32,6 +34,9 @@ export class EnsembleVoices implements OnChanges {
   protected voiceDialogVisible = false;
   protected editingVoice: EnsembleVoice | null = null;
 
+  protected optionsDialogVisible = false;
+  protected optionsVoice: EnsembleVoice | null = null;
+
   ngOnChanges(): void {
     if (this.ensembleId) {
       this.loadVoices();
@@ -46,6 +51,11 @@ export class EnsembleVoices implements OnChanges {
   protected openEditVoice(voice: EnsembleVoice): void {
     this.editingVoice = { ...voice };
     this.voiceDialogVisible = true;
+  }
+
+  protected openOptions(voice: EnsembleVoice): void {
+    this.optionsVoice = voice;
+    this.optionsDialogVisible = true;
   }
 
   protected confirmDeleteVoice(voice: EnsembleVoice): void {

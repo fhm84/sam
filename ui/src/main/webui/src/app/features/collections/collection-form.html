@@ -1,0 +1,57 @@
+<form [formGroup]="form" (ngSubmit)="onSave()" class="collection-form">
+  <div class="form-field">
+    <label for="collection-name">{{ 'collections.form.name' | translate }}</label>
+    <input pInputText id="collection-name" formControlName="name" />
+  </div>
+
+  <div class="form-field">
+    <label for="collection-description">{{ 'collections.form.description' | translate }}</label>
+    <textarea
+      pTextarea
+      id="collection-description"
+      formControlName="description"
+      [rows]="3"
+      [autoResize]="true"
+    ></textarea>
+  </div>
+
+  <div class="form-row">
+    <div class="form-field flex-1">
+      <label for="collection-type">{{ 'collections.form.type' | translate }}</label>
+      <p-select
+        id="collection-type"
+        formControlName="type"
+        [options]="typeOptions"
+        optionLabel="label"
+        optionValue="value"
+        [showClear]="true"
+        [placeholder]="t.t('collections.form.typePlaceholder')"
+      />
+    </div>
+    <div class="form-field flex-1">
+      <label for="collection-date">{{ 'collections.form.date' | translate }}</label>
+      <p-datepicker
+        id="collection-date"
+        formControlName="date"
+        [showIcon]="true"
+        [showButtonBar]="true"
+        dateFormat="dd.mm.yy"
+      />
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <p-button
+      [label]="t.t('collections.cancel')"
+      severity="secondary"
+      [text]="true"
+      (onClick)="cancelled.emit()"
+    />
+    <p-button
+      [label]="t.t('collections.save')"
+      type="submit"
+      [disabled]="form.invalid || saving"
+      [loading]="saving"
+    />
+  </div>
+</form>

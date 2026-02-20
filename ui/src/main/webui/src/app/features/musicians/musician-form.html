@@ -1,0 +1,50 @@
+<form [formGroup]="form" (ngSubmit)="onSave()" class="musician-form">
+  <div class="form-field">
+    <label for="musician-name">{{ 'musicians.form.name' | translate }}</label>
+    <input pInputText id="musician-name" formControlName="name" />
+  </div>
+
+  <div class="form-field">
+    <label for="musician-ipi">{{ 'musicians.form.ipi' | translate }}</label>
+    <input pInputText id="musician-ipi" formControlName="ipi" [placeholder]="t.t('musicians.form.ipiHint')" />
+  </div>
+
+  <div class="form-row">
+    <div class="form-field">
+      <label for="musician-birthYear">{{ 'musicians.form.birthYear' | translate }}</label>
+      <p-inputnumber
+        id="musician-birthYear"
+        formControlName="birthYear"
+        [useGrouping]="false"
+        [maxFractionDigits]="0"
+        styleClass="w-full"
+      />
+    </div>
+
+    <div class="form-field">
+      <label for="musician-deathYear">{{ 'musicians.form.deathYear' | translate }}</label>
+      <p-inputnumber
+        id="musician-deathYear"
+        formControlName="deathYear"
+        [useGrouping]="false"
+        [maxFractionDigits]="0"
+        styleClass="w-full"
+      />
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <p-button
+      [label]="t.t('musicians.cancel')"
+      severity="secondary"
+      [text]="true"
+      (onClick)="cancelled.emit()"
+    />
+    <p-button
+      [label]="t.t('musicians.save')"
+      type="submit"
+      [disabled]="form.invalid || saving"
+      [loading]="saving"
+    />
+  </div>
+</form>

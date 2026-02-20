@@ -1,5 +1,6 @@
 package de.halbmann.sam.api.entity;
 
+import java.time.Instant;
 import java.util.List;
 import lombok.Data;
 
@@ -12,18 +13,63 @@ import lombok.Data;
 public class CoverageResult {
 
     /**
-     * Overall coverage score (0.0 - 1.0). Computed as the weighted sum of individual voice scores
-     * divided by the total voice weight.
+     * Referenzen
      */
-    double coverageScore;
+    private String sheetMusicId;
+
+    private String ensembleId;
 
     /**
-     * High-level assessment: COMPLETE, PLAYABLE, or INCOMPLETE.
+     * Zeitstempel
      */
-    CoverageStatus status;
+    private Instant evaluatedAt = Instant.now();
 
     /**
-     * Per-voice breakdown showing which instrumentation matched each voice and why.
+     * Aggregierte Bewertung
      */
-    List<VoiceCoverageDetail> details;
+    private double coverageScore; // 0..1 (gewichteter Mittelwert)
+
+    /**
+     * Detailergebnisse
+     */
+    private List<VoiceCoverageDetail> details;
+
+    /**
+     * Vorberechnet im Service
+     */
+    private boolean missingRequired;
+
+    // --------------------
+    // Core decisions
+    // --------------------
+
+    /**
+     * Binäre Spielbarkeitsentscheidung.
+     * TRUE, wenn keine Pflichtstimme fehlt.
+     */
+    public boolean isPlayable() {
+        return !missingRequired;
+    }
+
+    /**
+     * UX-/Anzeige-Logik (Ampel).
+     * NICHT für fachliche Entscheidungen verwenden.
+     */
+    public CoverageStatus getStatus() {
+        if (!isPlayable()) {
+            return CoverageStatus.INCOMPLETE;
+        }
+        if (coverageScore >= 0.85) {
+            return CoverageStatus.COMPLETE;
+        }
+        return CoverageStatus.PLAYABLE;
+    }
+
+    // --------------------
+    // Convenience helpers
+    // --------------------
+
+    public long getMissingRequiredCount() {
+        return details.stream().filter(VoiceCoverageDetail::isMissingRequired).count();
+    }
 }

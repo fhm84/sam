@@ -242,6 +242,37 @@ public class DocumentsService {
         return documentRepository.findUnlinked();
     }
 
+    public void deleteAttachment(String attachmentId) {
+        AttachmentEntity attachment = attachmentRepository
+                .findByIdOptional(UUID.fromString(attachmentId))
+                .orElseThrow(() -> new EntityNotFoundException("Attachment", UUID.fromString(attachmentId)));
+
+        DocumentEntity document = attachment.getDocument();
+        attachmentRepository.delete(attachment);
+
+        if (document != null) {
+            documentRepository.decrementRefCount(document);
+        }
+    }
+
+    public void linkAttachmentToSheet(String attachmentId, String sheetId) {
+        AttachmentEntity attachment = attachmentRepository.findById(UUID.fromString(attachmentId));
+        SheetMusicEntity sheet = sheetRepository.findById(UUID.fromString(sheetId));
+        if (sheet != null && attachment != null) {
+            sheet.getAttachments().add(attachment);
+            sheetRepository.persist(sheet);
+        }
+    }
+
+    public void linkAttachmentToInstrumentation(String attachmentId, String instrumentationId) {
+        AttachmentEntity attachment = attachmentRepository.findById(UUID.fromString(attachmentId));
+        InstrumentationEntity instrumentation = instrumentationRepository.findById(UUID.fromString(instrumentationId));
+        if (instrumentation != null && attachment != null) {
+            instrumentation.getAttachments().add(attachment);
+            instrumentationRepository.persist(instrumentation);
+        }
+    }
+
     @Transactional
     void deleteIfUnlinked(UUID documentId) {
         DocumentEntity doc = documentRepository

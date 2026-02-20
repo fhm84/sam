@@ -1,0 +1,176 @@
+<div class="collections-page">
+  <div class="page-toolbar">
+    <h1>{{ 'collections.title' | translate }}</h1>
+    <div class="toolbar-actions">
+      <p-iconfield>
+        <p-inputicon styleClass="pi pi-search" />
+        <input
+          pInputText
+          type="text"
+          [placeholder]="t.t('collections.search')"
+          (input)="onFilter($event)"
+        />
+      </p-iconfield>
+      <p-selectbutton
+        [options]="viewOptions"
+        [(ngModel)]="viewMode"
+        optionLabel="icon"
+        optionValue="value"
+        (onChange)="onViewModeChange()"
+      >
+        <ng-template #item let-item>
+          <i [class]="item.icon"></i>
+        </ng-template>
+      </p-selectbutton>
+      <p-button
+        [label]="t.t('collections.new')"
+        icon="pi pi-plus"
+        (onClick)="openNew()"
+      />
+    </div>
+  </div>
+
+  @if (viewMode() === 'list') {
+    <p-table
+      [value]="collections()"
+      [lazy]="true"
+      [paginator]="true"
+      [rows]="rows"
+      [totalRecords]="totalRecords()"
+      [loading]="loading()"
+      [rowsPerPageOptions]="[10, 25, 50]"
+      (onLazyLoad)="onLazyLoad($event)"
+    >
+      <ng-template #header>
+        <tr>
+          <th>{{ 'collections.columns.name' | translate }}</th>
+          <th>{{ 'collections.columns.type' | translate }}</th>
+          <th>{{ 'collections.columns.date' | translate }}</th>
+          <th>{{ 'collections.columns.sheets' | translate }}</th>
+          <th>{{ 'collections.columns.actions' | translate }}</th>
+        </tr>
+      </ng-template>
+
+      <ng-template #body let-collection>
+        <tr>
+          <td>
+            <span class="collection-name-cell">{{ collection.name }}</span>
+            @if (collection.description) {
+              <span class="collection-desc-cell">{{ collection.description }}</span>
+            }
+          </td>
+          <td>
+            @if (collection.type) {
+              <span class="type-badge type-{{ collection.type | lowercase }}">
+                {{ 'collections.types.' + collection.type | translate }}
+              </span>
+            }
+          </td>
+          <td>{{ formatDate(collection.date) }}</td>
+          <td>{{ collection.sheets?.length ?? 0 }}</td>
+          <td class="actions-cell">
+            <p-button
+              icon="pi pi-pencil"
+              [rounded]="true"
+              [text]="true"
+              (onClick)="openEdit(collection)"
+            />
+            <p-button
+              icon="pi pi-trash"
+              [rounded]="true"
+              [text]="true"
+              severity="danger"
+              (onClick)="confirmDelete(collection)"
+            />
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="5" class="empty-message">{{ 'collections.empty' | translate }}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  } @else {
+    @if (loading()) {
+      <div class="loading-indicator">
+        <i class="pi pi-spinner pi-spin"></i>
+      </div>
+    } @else if (collections().length === 0) {
+      <div class="empty-message">{{ 'collections.empty' | translate }}</div>
+    } @else {
+      <div class="collection-cards">
+        @for (collection of collections(); track collection.id) {
+          <div class="collection-card">
+            <div class="card-header">
+              <span class="card-title">{{ collection.name }}</span>
+              @if (collection.description) {
+                <span class="card-subtitle">{{ collection.description }}</span>
+              }
+            </div>
+            <div class="card-meta">
+              @if (collection.type) {
+                <span class="meta-item">
+                  <span class="type-badge type-{{ collection.type | lowercase }}">
+                    {{ 'collections.types.' + collection.type | translate }}
+                  </span>
+                </span>
+              }
+              @if (collection.date) {
+                <span class="meta-item">
+                  <i class="pi pi-calendar"></i> {{ formatDate(collection.date) }}
+                </span>
+              }
+              <span class="meta-item">
+                <i class="pi pi-file"></i>
+                {{ collection.sheets?.length ?? 0 }} {{ 'collections.columns.sheets' | translate }}
+              </span>
+            </div>
+            <div class="card-actions">
+              <p-button
+                icon="pi pi-pencil"
+                [rounded]="true"
+                [text]="true"
+                size="small"
+                (onClick)="openEdit(collection)"
+              />
+              <p-button
+                icon="pi pi-trash"
+                [rounded]="true"
+                [text]="true"
+                severity="danger"
+                size="small"
+                (onClick)="confirmDelete(collection)"
+              />
+            </div>
+          </div>
+        }
+      </div>
+      <p-paginator
+        [rows]="rows"
+        [totalRecords]="totalRecords()"
+        [rowsPerPageOptions]="[10, 25, 50]"
+        (onPageChange)="onPageChange($event)"
+      />
+    }
+  }
+</div>
+
+<p-dialog
+  [header]="editingCollection ? t.t('collections.edit') : t.t('collections.new')"
+  [(visible)]="dialogVisible"
+  [modal]="true"
+  [style]="{ width: '32rem' }"
+>
+  @if (dialogVisible) {
+    <app-collection-form
+      [collection]="editingCollection"
+      (saved)="onSaved()"
+      (cancelled)="dialogVisible = false"
+    />
+  }
+</p-dialog>
+
+<p-toast />
+<p-confirmdialog />

@@ -10,6 +10,7 @@ import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.container.ResourceContext;
 import jakarta.ws.rs.core.Context;
+import java.util.List;
 
 @RequestScoped
 public class SheetsResourceImpl implements SheetsResource {
@@ -46,6 +47,11 @@ public class SheetsResourceImpl implements SheetsResource {
     @Override
     public void delete(final String sheetId) {
         sheetService.deleteSheet(sheetId);
+    }
+
+    @Override
+    public List<String> getGenres() {
+        return sheetService.getDistinctGenres();
     }
 
     @Override

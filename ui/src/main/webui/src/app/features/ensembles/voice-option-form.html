@@ -1,0 +1,54 @@
+<form [formGroup]="form" (ngSubmit)="onSave()" class="voice-option-form">
+  <div class="form-field">
+    <label for="option-instrument">{{ 'ensembles.voices.options.form.instrument' | translate }}</label>
+    <p-select
+      id="option-instrument"
+      formControlName="instrumentId"
+      [options]="instrumentOptions()"
+      optionLabel="label"
+      optionValue="value"
+      [placeholder]="t.t('ensembles.voices.options.form.instrumentPlaceholder')"
+      [filter]="true"
+      styleClass="w-full"
+    />
+  </div>
+
+  <div class="form-row">
+    <div class="form-field">
+      <label for="option-type">{{ 'ensembles.voices.options.form.type' | translate }}</label>
+      <p-select
+        id="option-type"
+        formControlName="type"
+        [options]="typeOptions"
+        [placeholder]="t.t('ensembles.voices.options.form.typePlaceholder')"
+        [showClear]="true"
+        styleClass="w-full"
+      />
+    </div>
+
+    <div class="form-field">
+      <label for="option-factor">{{ 'ensembles.voices.options.form.factor' | translate }}</label>
+      <p-inputnumber
+        id="option-factor"
+        formControlName="factor"
+        [useGrouping]="false"
+        styleClass="w-full"
+      />
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <p-button
+      [label]="t.t('ensembles.voices.options.cancel')"
+      severity="secondary"
+      [text]="true"
+      (onClick)="cancelled.emit()"
+    />
+    <p-button
+      [label]="t.t('ensembles.voices.options.save')"
+      type="submit"
+      [disabled]="form.invalid || saving"
+      [loading]="saving"
+    />
+  </div>
+</form>

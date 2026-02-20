@@ -27,4 +27,8 @@ public class CreateEnsembleVoice {
      * Whether this voice must be covered for the ensemble to be considered playable.
      */
     boolean required;
+
+    int minCount;
+    int targetCount;
+    int maxCount;
 }

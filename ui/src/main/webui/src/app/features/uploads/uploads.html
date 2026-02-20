@@ -1,0 +1,88 @@
+<div class="uploads-page">
+  <div class="page-toolbar">
+    <h1>{{ 'uploads.title' | translate }}</h1>
+  </div>
+
+  <div class="upload-area">
+    <p-fileupload
+      mode="advanced"
+      [multiple]="true"
+      [auto]="false"
+      [customUpload]="true"
+      [chooseLabel]="t.t('uploads.browse')"
+      chooseIcon="pi pi-upload"
+      [showUploadButton]="false"
+      [showCancelButton]="false"
+      (onSelect)="onSelect($event)"
+    >
+      <ng-template #content>
+        <div class="upload-drop-area">
+          <i class="pi pi-cloud-upload"></i>
+          <span>{{ 'uploads.dragDrop' | translate }}</span>
+        </div>
+      </ng-template>
+    </p-fileupload>
+  </div>
+
+  @if (uploads().length > 0) {
+    <div class="active-uploads">
+      <h3>{{ 'uploads.activeUploads' | translate }}</h3>
+      @for (upload of uploads(); track upload.filename) {
+        <div class="upload-item">
+          <span class="upload-filename">{{ upload.filename }}</span>
+          <p-progressbar [value]="upload.progress" [style]="{ height: '0.5rem', flex: 1 }" />
+          <span class="upload-percent">{{ upload.progress }}%</span>
+        </div>
+      }
+    </div>
+  }
+
+  <p-table
+    [value]="documents()"
+    [loading]="loading()"
+    [rows]="20"
+  >
+    <ng-template #header>
+      <tr>
+        <th>{{ 'uploads.columns.filename' | translate }}</th>
+        <th>{{ 'uploads.columns.size' | translate }}</th>
+        <th>{{ 'uploads.columns.mimeType' | translate }}</th>
+        <th>{{ 'uploads.columns.checksum' | translate }}</th>
+        <th>{{ 'uploads.columns.actions' | translate }}</th>
+      </tr>
+    </ng-template>
+
+    <ng-template #body let-doc>
+      <tr>
+        <td>{{ doc.filename }}</td>
+        <td>{{ formatSize(doc.size) }}</td>
+        <td>{{ doc.mimeType }}</td>
+        <td [title]="doc.checksumSha256">{{ truncateChecksum(doc.checksumSha256) }}</td>
+        <td class="actions-cell">
+          <p-button
+            icon="pi pi-download"
+            [rounded]="true"
+            [text]="true"
+            (onClick)="onDownload(doc)"
+          />
+          <p-button
+            icon="pi pi-trash"
+            [rounded]="true"
+            [text]="true"
+            severity="danger"
+            (onClick)="confirmDelete(doc)"
+          />
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="5" class="empty-message">{{ 'uploads.empty' | translate }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-toast />
+<p-confirmdialog />

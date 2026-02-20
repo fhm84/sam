@@ -88,6 +88,11 @@ export interface CreateVoiceOption {
 }
 
 export interface DocumentDownload {
+    id?: string;
+    filename?: string;
+    size?: number;
+    mimeType?: string;
+    checksumSha256?: string;
 }
 
 export interface DocumentFilterRequest extends PaginationRequest {
@@ -192,6 +197,7 @@ export interface SheetCollectionFilterRequest extends PaginationRequest {
 
 export interface SheetFilterRequest extends PaginationRequest {
     composer?: string;
+    genre?: string;
     query?: string;
     title?: string;
 }
