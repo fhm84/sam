@@ -24,6 +24,8 @@ public class VoiceCoverageDetail {
      */
     double weight;
 
+    double effectiveCount;
+
     /**
      * Canonical ID of the instrument that best matched this voice, or {@code null} if no match was
      * found.

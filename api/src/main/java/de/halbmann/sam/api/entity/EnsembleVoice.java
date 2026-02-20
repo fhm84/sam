@@ -38,6 +38,10 @@ public class EnsembleVoice {
      */
     boolean required;
 
+    int minCount;
+    int targetCount;
+    int maxCount;
+
     /**
      * Instrument options that can fill this voice, ordered by preference (primary, alternate,
      * fallback).

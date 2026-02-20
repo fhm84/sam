@@ -10,6 +10,8 @@ import de.halbmann.sam.business.exception.EntityNotFoundException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -17,6 +19,9 @@ import java.util.UUID;
 @ApplicationScoped
 @Transactional
 public class CoverageEvaluationService {
+
+    @ConfigProperty(name = "sam.coverage.base-score", defaultValue = "0.7")
+    double baseScore;
 
     @Inject
     SheetRepository sheetRepository;
@@ -36,6 +41,10 @@ public class CoverageEvaluationService {
                 .findByIdOptional(UUID.fromString(ensembleId))
                 .orElseThrow(() -> new EntityNotFoundException("Ensemble", ensembleId));
 
+        return evaluate(sheet, ensemble);
+    }
+
+    CoverageResult evaluate(SheetMusicEntity sheet, EnsembleEntity ensemble) {
         List<InstrumentationEntity> instrumentations = sheet.getInstrumentations();
         List<EnsembleVoiceEntity> voices = ensemble.getVoices();
 
@@ -52,38 +61,47 @@ public class CoverageEvaluationService {
             detail.setRequired(voice.isRequired());
             detail.setWeight(voice.getWeight());
 
-            // Find best match across all voice options and instrumentations
-            double bestScore = 0;
-            double bestFactor = 0;
-            String bestInstrumentId = null;
-            String bestExplanation = "No matching instrumentation found";
+            double effectiveCount = 0.0;
+            List<String> explanations = new ArrayList<>();
 
             for (VoiceOptionEntity option : voice.getOptions()) {
                 for (InstrumentationEntity instrumentation : instrumentations) {
                     double matchScore = matchingService.score(option, instrumentation);
-                    double effectiveScore = matchScore * option.getFactor();
-
-                    if (effectiveScore > bestScore * bestFactor || (bestInstrumentId == null && matchScore > 0)) {
-                        if (matchScore * option.getFactor() > bestScore * bestFactor) {
-                            bestScore = matchScore;
-                            bestFactor = option.getFactor();
-                            bestInstrumentId = instrumentation.getInstrument().getId();
-                            bestExplanation = buildExplanation(option, instrumentation, matchScore);
-                        }
+                    if (matchScore > 0) {
+                        double contribution = matchScore * option.getFactor();
+                        effectiveCount += contribution;
+                        explanations.add(buildExplanation(option, instrumentation, matchScore));
                     }
                 }
             }
 
-            detail.setMatchScore(bestScore);
-            detail.setOptionFactor(bestFactor);
-            detail.setMatchedInstrumentId(bestInstrumentId);
-            detail.setExplanation(bestExplanation);
-
-            if (bestInstrumentId != null) {
-                coveredWeight += voice.getWeight() * bestFactor * bestScore;
-            } else if (voice.isRequired()) {
+            // Pflichtprüfung (hart)
+            if (voice.isRequired() && effectiveCount < voice.getMinCount()) {
                 missingRequired = true;
+                detail.setMatchScore(0);
+                detail.setExplanation("Required voice missing");
+                details.add(detail);
+                continue;
             }
+
+            // Count-basierter Score mit Amateur-Baseline
+            double countScore = 0.0;
+            if (effectiveCount >= 1.0) {
+                double normalized =
+                        Math.min(effectiveCount / voice.getTargetCount(), 1.0);
+                countScore = baseScore + (1.0 - baseScore) * normalized;
+            }
+
+            double voiceScore = countScore * voice.getWeight();
+            coveredWeight += voiceScore;
+
+            detail.setEffectiveCount(effectiveCount);
+            detail.setMatchScore(countScore);
+            detail.setExplanation(
+                    explanations.isEmpty()
+                            ? "No matching instrumentation found"
+                            : String.join("; ", explanations)
+            );
 
             details.add(detail);
         }

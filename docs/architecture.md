@@ -181,15 +181,48 @@ The storage layer uses an SPI (`FileSystemProvider` / `FileSystemWrapper`) so ba
 
 Each sheet music entry gets a deterministic fingerprint computed from its metadata (title, composer, etc.) at persist time via `@PrePersist`. A unique constraint on the fingerprint column prevents duplicate entries.
 
-### Ensemble Coverage Evaluation
+### Ensembles & Coverage Evaluation
 
-Coverage scoring uses a weighted, multi-factor approach:
+SAM models ensembles as **Besetzungsrahmen** for amateur bands – focusing on playability rather than perfect theoretical coverage.
 
-1. For each **ensemble voice**, find the best matching instrumentation via its voice options
-2. Each match is scored by: `instrumentIdMatch * transpositionFactor * clefFactor * notationTypeFactor`
-3. Overall coverage: `Sum(voiceWeight * optionFactor * matchScore) / Sum(voiceWeight)`
-4. Status thresholds: >= 0.9 = COMPLETE, >= 0.5 = PLAYABLE, else INCOMPLETE
-5. Missing required voices always result in INCOMPLETE regardless of score
+- **Ensemble definitions**  
+  Define named ensembles as collections of instrument groups (e.g. Trumpets, Saxophones, Tenorhorns), independent of piece-specific musical roles.
+
+- **Ensemble voices**  
+  Each voice represents an instrument group and defines:
+    - `required` — whether the group is mandatory for playability
+    - `minCount` — minimum number of parts required to be playable
+    - `targetCount` — ideal number of parts for good balance
+    - `maxCount` — upper bound (no additional benefit beyond this)
+    - `weight` — musical importance of the group
+    - multiple instrument options (primary / alternate / fallback), each with a weighting factor
+
+- **Coverage evaluation (count-based)**  
+  Coverage is evaluated by matching a sheet’s instrumentations against an ensemble definition:
+    - All matching instrumentations are counted
+    - Alternate instruments contribute with reduced weight
+    - **A single matching part is sufficient to be playable**
+    - Additional parts gradually improve the score up to `targetCount`
+    - Missing required voices fail playability regardless of score
+
+- **Scoring model (amateur-friendly)**  
+  Coverage distinguishes clearly between:
+    - *playable* (minimum met)
+    - *playable with compromises*
+    - *well covered / balanced*
+
+- **Coverage details**  
+  Evaluation results include a per-voice breakdown with:
+    - effective (weighted) part count
+    - normalized score
+    - human-readable explanations
+
+- **Configuration-driven behavior**  
+  Key parameters such as the baseline score for “one part is enough” are configurable via application properties.
+
+This approach reflects real-world amateur band practice:  
+*If at least one part exists, the piece can be played — more parts simply make it sound better.*
+
 
 ### AI-Powered Sheet Analysis
 
