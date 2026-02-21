@@ -220,6 +220,7 @@ export interface SheetFilterRequest extends PaginationRequest {
     genre?: string;
     query?: string;
     title?: string;
+    titleStartsWith?: string;
 }
 
 export interface SheetMusic {

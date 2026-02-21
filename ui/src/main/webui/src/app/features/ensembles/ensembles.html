@@ -16,6 +16,7 @@
         [(ngModel)]="viewMode"
         optionLabel="icon"
         optionValue="value"
+        (onChange)="onViewModeChange()"
       >
         <ng-template #item let-item>
           <i [class]="item.icon"></i>

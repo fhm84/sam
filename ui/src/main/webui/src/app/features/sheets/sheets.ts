@@ -17,6 +17,7 @@ import { Drawer } from 'primeng/drawer';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../core/translation.service';
+import { LayoutPreferenceService } from '../../core/layout-preference.service';
 import { SheetsApiService } from '../../core/api';
 import { SheetMusic, SheetMusicSearchResult } from '../../model/datamodels';
 import { SheetDetail } from './sheet-detail';
@@ -53,23 +54,31 @@ export class Sheets implements OnInit {
   private readonly confirmationService = inject(ConfirmationService);
   private readonly messageService = inject(MessageService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly layoutPref = inject(LayoutPreferenceService);
+
+  protected readonly ALL_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
   protected readonly sheets = signal<SheetMusicSearchResult[]>([]);
   protected readonly totalRecords = signal(0);
   protected readonly loading = signal(true);
-  protected readonly viewMode = signal<'list' | 'cards'>('list');
+  protected readonly viewMode = signal<'list' | 'cards'>('cards');
   protected readonly filterPanelOpen = signal(false);
   protected readonly genres = signal<string[]>([]);
   protected readonly selectedGenre = signal<string | null>(null);
-  protected readonly activeFilterCount = computed(() => (this.selectedGenre() ? 1 : 0));
-  protected rows = 10;
+  protected readonly selectedLetter = signal<string | null>(null);
+  protected readonly availableLetters = signal<string[]>([]);
+  protected readonly hasTextSearch = signal(false);
+  protected readonly activeFilterCount = computed(
+    () => (this.selectedGenre() ? 1 : 0) + (this.selectedLetter() ? 1 : 0),
+  );
+  protected rows = 20;
 
   protected detailDrawerVisible = false;
   protected selectedSheetId: string | null = null;
 
   protected readonly viewOptions = [
-    { icon: 'pi pi-list', value: 'list' },
     { icon: 'pi pi-th-large', value: 'cards' },
+    { icon: 'pi pi-list', value: 'list' },
   ];
 
   private currentPage = 0;
@@ -81,11 +90,18 @@ export class Sheets implements OnInit {
       .pipe(debounceTime(300), takeUntilDestroyed(this.destroyRef))
       .subscribe((value) => {
         this.searchFilter = value;
+        this.hasTextSearch.set(!!value);
+        if (value) {
+          this.selectedLetter.set(null);
+        }
         this.currentPage = 0;
         this.loadData();
       });
 
     this.api.getGenres().subscribe((genres) => this.genres.set(genres));
+    this.viewMode.set(this.layoutPref.getViewMode('sheets'));
+    this.loadAvailableLetters();
+    this.loadData();
   }
 
   protected onLazyLoad(event: TableLazyLoadEvent): void {
@@ -105,6 +121,7 @@ export class Sheets implements OnInit {
   }
 
   protected onViewModeChange(): void {
+    this.layoutPref.setViewMode('sheets', this.viewMode());
     this.currentPage = 0;
     this.loadData();
   }
@@ -115,14 +132,30 @@ export class Sheets implements OnInit {
 
   protected onGenreChange(genre: string | null): void {
     this.selectedGenre.set(genre);
+    this.selectedLetter.set(null);
     this.currentPage = 0;
+    this.loadAvailableLetters();
     this.loadData();
   }
 
   protected clearFilters(): void {
     this.selectedGenre.set(null);
+    this.selectedLetter.set(null);
+    this.currentPage = 0;
+    this.loadAvailableLetters();
+    this.loadData();
+  }
+
+  protected onLetterSelect(letter: string): void {
+    this.selectedLetter.update((current) => (current === letter ? null : letter));
     this.currentPage = 0;
     this.loadData();
+  }
+
+  private loadAvailableLetters(): void {
+    this.api
+      .getAvailableLetters(this.selectedGenre() ?? undefined)
+      .subscribe((letters) => this.availableLetters.set(letters));
   }
 
   protected openNew(): void {
@@ -181,6 +214,7 @@ export class Sheets implements OnInit {
         size: this.rows,
         query: this.searchFilter || undefined,
         genre: this.selectedGenre() || undefined,
+        titleStartsWith: this.selectedLetter() || undefined,
       })
       .subscribe({
         next: (res) => {

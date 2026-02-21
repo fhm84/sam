@@ -9,6 +9,8 @@ import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -70,6 +72,17 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
                 .getResultList();
     }
 
+    public List<String> listAvailableFirstLetters(String genre) {
+        String jpql = genre != null
+                ? "SELECT DISTINCT UPPER(SUBSTRING(s.title, 1, 1)) FROM SheetMusicEntity s WHERE s.genre.name = :genre"
+                : "SELECT DISTINCT UPPER(SUBSTRING(s.title, 1, 1)) FROM SheetMusicEntity s";
+        var query = getEntityManager().createQuery(jpql, String.class);
+        if (genre != null) {
+            query.setParameter("genre", genre);
+        }
+        return query.getResultList().stream().sorted().toList();
+    }
+
     public List<String> listDistinctGenres() {
         return getEntityManager()
                 .createQuery(
@@ -79,26 +92,33 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
     }
 
     public PaginatedEntities<SheetMusicEntity> findSheetEntities(
-            final PaginationRequest paginationRequest, final Map<String, Object> parameters) {
-        // TODO: how to map filter for genre here?!? (-> sheet.genre.name)
+            final PaginationRequest paginationRequest,
+            final Map<String, Object> parameters,
+            final String titleStartsWith) {
         final Map<String, Object> nonNullParams = parameters.entrySet().stream()
                 .filter(entry -> entry.getValue() != null)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        final String filter = nonNullParams.keySet().stream()
-                        .map(o -> o + "=:" + o)
-                .collect(Collectors.joining(" and "));
+        final List<String> conditions = new ArrayList<>(
+                nonNullParams.keySet().stream().map(o -> o + "=:" + o).toList());
+        final Map<String, Object> queryParams = new HashMap<>(nonNullParams);
 
+        if (titleStartsWith != null && !titleStartsWith.isBlank()) {
+            conditions.add("lower(title) like :titlePrefix");
+            queryParams.put("titlePrefix", titleStartsWith.toLowerCase() + "%");
+        }
+
+        final String filter = String.join(" and ", conditions);
         final Sort sort = prepareSort(paginationRequest);
 
         long totalItems;
         PanacheQuery<SheetMusicEntity> sheetQuery;
-        if (nonNullParams.isEmpty()) {
+        if (queryParams.isEmpty()) {
             sheetQuery = findAll(sort);
             totalItems = count();
         } else {
-            sheetQuery = find(filter, nonNullParams);
-            totalItems = count(filter, nonNullParams);
+            sheetQuery = find(filter, sort, queryParams);
+            totalItems = count(filter, queryParams);
         }
         final List<SheetMusicEntity> sheets = sheetQuery
                 .page(paginationRequest.getPage(), paginationRequest.getSize())

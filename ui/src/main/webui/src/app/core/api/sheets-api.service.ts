@@ -24,6 +24,7 @@ export class SheetsApiService {
     if (filter.title) params = params.set('title', filter.title);
     if (filter.composer) params = params.set('composer', filter.composer);
     if (filter.genre) params = params.set('genre', filter.genre);
+    if (filter.titleStartsWith) params = params.set('titleStartsWith', filter.titleStartsWith);
     return this.http.get<PaginatedResponse<SheetMusicSearchResult>>(this.baseUrl, { params });
   }
 
@@ -45,6 +46,12 @@ export class SheetsApiService {
 
   getGenres(): Observable<string[]> {
     return this.http.get<string[]>(`${this.baseUrl}/genres`);
+  }
+
+  getAvailableLetters(genre?: string): Observable<string[]> {
+    let params = new HttpParams();
+    if (genre) params = params.set('genre', genre);
+    return this.http.get<string[]>(`${this.baseUrl}/letters`, { params });
   }
 
   getCoverage(sheetId: string, ensembleId: string): Observable<CoverageResult> {

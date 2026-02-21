@@ -71,6 +71,16 @@ public interface SheetsResource {
     List<String> getGenres();
 
     /**
+     * Returns all distinct first letters of sheet music titles, optionally filtered by genre.
+     *
+     * @param genre optional genre to restrict the letter set
+     * @return a sorted list of single uppercase letters
+     */
+    @GET
+    @Path("letters")
+    List<String> getAvailableLetters(@QueryParam("genre") String genre);
+
+    /**
      * Provides access to the instrumentations resource for a specific sheet music.
      *
      * @param sheetId the ID of the sheet music

@@ -12,6 +12,7 @@ import { SelectButton } from 'primeng/selectbutton';
 import { Paginator } from 'primeng/paginator';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { LayoutPreferenceService } from '../../core/layout-preference.service';
 import { EnsemblesApiService } from '../../core/api';
 import { Ensemble, EnsembleFilterRequest } from '../../model/datamodels';
 import { BaseCrudList } from '../../shared/base/base-crud-list';
@@ -41,6 +42,7 @@ import { EnsembleForm } from './ensemble-form';
 })
 export class Ensembles extends BaseCrudList<Ensemble, EnsembleFilterRequest> {
   api: CrudApi<Ensemble, EnsembleFilterRequest> = inject(EnsemblesApiService);
+  private readonly layoutPref = inject(LayoutPreferenceService);
   translationPrefix = 'ensembles';
   getItemId = (e: Ensemble) => e.id!;
   getItemName = (e: Ensemble) => e.name;
@@ -52,11 +54,20 @@ export class Ensembles extends BaseCrudList<Ensemble, EnsembleFilterRequest> {
 
   private readonly router = inject(Router);
 
-  protected readonly viewMode = signal<'list' | 'cards'>('list');
+  protected readonly viewMode = signal<'list' | 'cards'>('cards');
   protected readonly viewOptions = [
-    { icon: 'pi pi-list', value: 'list' },
     { icon: 'pi pi-th-large', value: 'cards' },
+    { icon: 'pi pi-list', value: 'list' },
   ];
+
+  protected override init(): void {
+    this.viewMode.set(this.layoutPref.getViewMode('ensembles'));
+    this.loadData();
+  }
+
+  protected onViewModeChange(): void {
+    this.layoutPref.setViewMode('ensembles', this.viewMode());
+  }
 
   protected openDetail(ensemble: Ensemble): void {
     this.router.navigate(['/admin/ensembles', ensemble.id]);

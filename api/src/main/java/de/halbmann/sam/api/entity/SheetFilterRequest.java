@@ -31,4 +31,10 @@ public class SheetFilterRequest extends PaginationRequest {
      */
     @QueryParam("genre")
     private String genre;
+
+    /**
+     * Filter by first letter of title (case-insensitive prefix)
+     */
+    @QueryParam("titleStartsWith")
+    private String titleStartsWith;
 }

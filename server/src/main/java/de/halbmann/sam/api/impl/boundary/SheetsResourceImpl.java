@@ -55,6 +55,11 @@ public class SheetsResourceImpl implements SheetsResource {
     }
 
     @Override
+    public List<String> getAvailableLetters(String genre) {
+        return sheetService.getAvailableLetters(genre);
+    }
+
+    @Override
     public InstrumentationsResource instrumentations(final String sheetId) {
         return resourceContext.getResource(InstrumentationsResourceImpl.class);
     }
