@@ -131,29 +131,6 @@
       <div class="sheet-cards">
         @for (sheet of sheets(); track sheet.id) {
           <div class="sheet-card clickable-card" (click)="openDetail(sheet)">
-            <div class="card-header">
-              <span class="card-title">{{ sheet.title }}</span>
-              @if (sheet.subtitle) {
-                <span class="card-subtitle">{{ sheet.subtitle }}</span>
-              }
-            </div>
-            <div class="card-meta">
-              @if (sheet.composer?.name) {
-                <span class="meta-item">
-                  <i class="pi pi-user"></i> {{ sheet.composer?.name }}
-                </span>
-              }
-              @if (sheet.genre) {
-                <span class="meta-item">
-                  <i class="pi pi-tag"></i> {{ sheet.genre }}
-                </span>
-              }
-              @if (sheet.yearOfComposition) {
-                <span class="meta-item">
-                  <i class="pi pi-calendar"></i> {{ sheet.yearOfComposition }}
-                </span>
-              }
-            </div>
             <div class="card-actions">
               <p-button
                 icon="pi pi-pencil"
@@ -171,6 +148,55 @@
                 (onClick)="confirmDelete(sheet); $event.stopPropagation()"
               />
             </div>
+            <div class="card-header">
+              <span class="card-title">{{ sheet.title }}</span>
+              @if (sheet.subtitle) {
+                <span class="card-subtitle">{{ sheet.subtitle }}</span>
+              }
+            </div>
+            <div class="card-people">
+              @if (sheet.composer?.name) {
+                <div class="people-item">
+                  <i class="pi pi-user"></i>
+                  <div class="people-detail">
+                    <span class="people-role">{{ 'sheets.detail.composer' | translate }}</span>
+                    <span class="people-name">{{ sheet.composer?.name }}</span>
+                  </div>
+                </div>
+              }
+              @if (sheet.arranger?.name) {
+                <div class="people-item">
+                  <i class="pi pi-users"></i>
+                  <div class="people-detail">
+                    <span class="people-role">{{ 'sheets.detail.arranger' | translate }}</span>
+                    <span class="people-name">{{ sheet.arranger?.name }}</span>
+                  </div>
+                </div>
+              }
+              @if (sheet.publisher) {
+                <div class="people-item">
+                  <i class="pi pi-building"></i>
+                  <div class="people-detail">
+                    <span class="people-role">{{ 'sheets.detail.publisher' | translate }}</span>
+                    <span class="people-name">{{ sheet.publisher }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+            <div class="card-tags">
+              @if (sheet.genre) {
+                <span class="card-tag">
+                  <i class="pi pi-tag"></i> {{ sheet.genre }}
+                </span>
+              }
+              @if (sheet.yearOfComposition) {
+                <span class="card-tag">
+                  <i class="pi pi-calendar"></i> {{ sheet.yearOfComposition }}
+                </span>
+              }
+            </div>
+            <!-- reserved: rating & coverage indicators -->
+            <div class="card-indicators"></div>
           </div>
         }
       </div>
@@ -198,20 +224,4 @@
   }
 </p-drawer>
 
-<p-dialog
-  [header]="editingSheet ? t.t('sheets.edit') : t.t('sheets.new')"
-  [(visible)]="dialogVisible"
-  [modal]="true"
-  [style]="{ width: '40rem' }"
->
-  @if (dialogVisible) {
-    <app-sheet-form
-      [sheet]="editingSheet"
-      (saved)="onSaved()"
-      (cancelled)="dialogVisible = false"
-    />
-  }
-</p-dialog>
-
-<p-toast />
 <p-confirmdialog />

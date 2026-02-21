@@ -73,19 +73,21 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
     public List<String> listDistinctGenres() {
         return getEntityManager()
                 .createQuery(
-                        "SELECT DISTINCT s.genre FROM SheetMusicEntity s WHERE s.genre IS NOT NULL ORDER BY s.genre",
+                        "SELECT DISTINCT g.name FROM GenreEntity g WHERE g.name IS NOT NULL ORDER BY g.name",
                         String.class)
                 .getResultList();
     }
 
     public PaginatedEntities<SheetMusicEntity> findSheetEntities(
             final PaginationRequest paginationRequest, final Map<String, Object> parameters) {
+        // TODO: how to map filter for genre here?!? (-> sheet.genre.name)
         final Map<String, Object> nonNullParams = parameters.entrySet().stream()
                 .filter(entry -> entry.getValue() != null)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        final String filter =
-                nonNullParams.keySet().stream().map(o -> o + "=:" + o).collect(Collectors.joining(" and "));
+        final String filter = nonNullParams.keySet().stream()
+                        .map(o -> o + "=:" + o)
+                .collect(Collectors.joining(" and "));
 
         final Sort sort = prepareSort(paginationRequest);
 

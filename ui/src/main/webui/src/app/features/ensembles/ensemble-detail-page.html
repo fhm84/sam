@@ -1,0 +1,44 @@
+<div class="ensemble-detail-page">
+  <div class="page-toolbar">
+    <p-button
+      icon="pi pi-arrow-left"
+      [label]="t.t('ensembles.detail.backToList')"
+      [text]="true"
+      (onClick)="goBack()"
+    />
+    @if (ensemble()) {
+      <p-button
+        icon="pi pi-pencil"
+        [label]="t.t('ensembles.edit')"
+        [text]="true"
+        (onClick)="openEdit()"
+      />
+    }
+  </div>
+
+  @if (ensemble(); as ens) {
+    <div class="ensemble-header">
+      <h1>{{ ens.name }}</h1>
+      @if (ens.description) {
+        <p class="ensemble-description">{{ ens.description }}</p>
+      }
+    </div>
+
+    <app-ensemble-voices [ensembleId]="ensembleId()" />
+  }
+</div>
+
+<p-dialog
+  [header]="t.t('ensembles.edit')"
+  [(visible)]="editDialogVisible"
+  [modal]="true"
+  [style]="{ width: '28rem' }"
+>
+  @if (editDialogVisible) {
+    <app-ensemble-form
+      [ensemble]="ensemble()"
+      (saved)="onEditSaved()"
+      (cancelled)="editDialogVisible = false"
+    />
+  }
+</p-dialog>

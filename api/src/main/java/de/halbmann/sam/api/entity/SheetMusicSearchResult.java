@@ -23,6 +23,8 @@ public class SheetMusicSearchResult extends SheetMusic {
                 sheetMusic.getOriginalBy(),
                 sheetMusic.getGenre(),
                 sheetMusic.getDifficultyLevel(),
+                sheetMusic.getDuration(),
+                sheetMusic.isFavorite(),
                 sheetMusic.getYearOfComposition(),
                 sheetMusic.getEdition(),
                 sheetMusic.getCopyright(),

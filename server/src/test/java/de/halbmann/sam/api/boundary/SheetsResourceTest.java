@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import de.halbmann.sam.api.entity.DifficultyLevel;
 import de.halbmann.sam.api.entity.Musician;
 import de.halbmann.sam.api.entity.SheetMusic;
 import io.quarkus.test.junit.QuarkusTest;
@@ -21,7 +22,7 @@ class SheetsResourceTest {
         final SheetMusic sheet = new SheetMusic();
         sheet.setTitle("My first sheet");
         sheet.setGenre("Classical");
-        sheet.setDifficultyLevel("Beginner");
+        sheet.setDifficultyLevel(DifficultyLevel.EASY);
         sheet.setPublisher("Who knows");
         sheet.setYearOfComposition(1875);
         final Musician musician = new Musician();
@@ -37,7 +38,7 @@ class SheetsResourceTest {
                     .contentType(ContentType.JSON)
                     .body("title", equalTo(sheet.getTitle()))
                     .body("genre", equalTo(sheet.getGenre()))
-                    .body("difficultyLevel", equalTo(sheet.getDifficultyLevel()))
+                    .body("difficultyLevel", equalTo(sheet.getDifficultyLevel().getGrade()))
                     .body("publisher", equalTo(sheet.getPublisher()))
                     .body("yearOfComposition", equalTo(sheet.getYearOfComposition()))
                     .body("composer.name", equalTo(musician.getName()));

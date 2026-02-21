@@ -9,7 +9,7 @@
   </div>
 
   <p-table
-    [value]="instruments()"
+    [value]="items()"
     [lazy]="true"
     [paginator]="true"
     [rows]="rows"
@@ -73,19 +73,18 @@
 </div>
 
 <p-dialog
-  [header]="editingInstrument ? t.t('instruments.edit') : t.t('instruments.new')"
+  [header]="editingItem ? t.t('instruments.edit') : t.t('instruments.new')"
   [(visible)]="dialogVisible"
   [modal]="true"
   [style]="{ width: '28rem' }"
 >
   @if (dialogVisible) {
     <app-instrument-form
-      [instrument]="editingInstrument"
+      [instrument]="editingItem"
       (saved)="onSaved()"
       (cancelled)="dialogVisible = false"
     />
   }
 </p-dialog>
 
-<p-toast />
 <p-confirmdialog />

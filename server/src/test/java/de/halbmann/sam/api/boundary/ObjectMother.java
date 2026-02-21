@@ -12,7 +12,7 @@ public class ObjectMother {
         sheetMusic.setTitle("Music from Pirates of the Caribbean");
         sheetMusic.setPublisher("Disney Music Corp");
         sheetMusic.setGenre("Movie");
-        sheetMusic.setDifficultyLevel("Medium");
+        sheetMusic.setDifficultyLevel(DifficultyLevel.MEDIUM);
         return sheetMusic;
     }
 

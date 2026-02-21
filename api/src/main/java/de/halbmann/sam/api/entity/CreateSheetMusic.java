@@ -1,7 +1,9 @@
 package de.halbmann.sam.api.entity;
 
+import jakarta.json.bind.annotation.JsonbTypeAdapter;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import java.time.Duration;
 import lombok.*;
 
 /**
@@ -59,7 +61,13 @@ public class CreateSheetMusic {
     /**
      * Level (Beginner, Intermediate, Advanced).
      */
-    String difficultyLevel;
+    @JsonbTypeAdapter(DifficultyJsonbAdapter.class)
+    DifficultyLevel difficultyLevel;
+
+    @JsonbTypeAdapter(DurationJsonbAdapter.class)
+    Duration duration;
+
+    boolean favorite;
 
     /**
      * Year of composition.

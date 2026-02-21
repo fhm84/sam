@@ -32,7 +32,7 @@
 
   @if (viewMode() === 'list') {
     <p-table
-      [value]="collections()"
+      [value]="items()"
       [lazy]="true"
       [paginator]="true"
       [rows]="rows"
@@ -97,11 +97,11 @@
       <div class="loading-indicator">
         <i class="pi pi-spinner pi-spin"></i>
       </div>
-    } @else if (collections().length === 0) {
+    } @else if (items().length === 0) {
       <div class="empty-message">{{ 'collections.empty' | translate }}</div>
     } @else {
       <div class="collection-cards">
-        @for (collection of collections(); track collection.id) {
+        @for (collection of items(); track collection.id) {
           <div class="collection-card">
             <div class="card-header">
               <span class="card-title">{{ collection.name }}</span>
@@ -158,19 +158,18 @@
 </div>
 
 <p-dialog
-  [header]="editingCollection ? t.t('collections.edit') : t.t('collections.new')"
+  [header]="editingItem ? t.t('collections.edit') : t.t('collections.new')"
   [(visible)]="dialogVisible"
   [modal]="true"
   [style]="{ width: '32rem' }"
 >
   @if (dialogVisible) {
     <app-collection-form
-      [collection]="editingCollection"
+      [collection]="editingItem"
       (saved)="onSaved()"
       (cancelled)="dialogVisible = false"
     />
   }
 </p-dialog>
 
-<p-toast />
 <p-confirmdialog />

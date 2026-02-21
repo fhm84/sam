@@ -1,0 +1,107 @@
+<div class="sheet-form-page">
+  <div class="page-toolbar">
+    <p-button
+      icon="pi pi-arrow-left"
+      [label]="t.t('sheets.detail.backToList')"
+      [text]="true"
+      (onClick)="onCancelled()"
+    />
+  </div>
+
+  @if (loading()) {
+    <div class="loading-indicator">
+      <i class="pi pi-spinner pi-spin"></i>
+    </div>
+  } @else {
+    <div class="detail-header">
+      <div class="detail-title-group">
+        <h2>{{ (isEdit ? 'sheets.edit' : 'sheets.new') | translate }}</h2>
+        @if (isEdit && sheet(); as s) {
+          <span class="detail-subtitle">{{ s.title }}</span>
+        }
+      </div>
+    </div>
+
+    <div class="detail-panels">
+      <div class="detail-top-row">
+        <!-- Form -->
+        <p-panel [header]="t.t('sheets.detail.baseData')">
+          <app-sheet-form
+            [sheet]="sheet()"
+            (saved)="onSaved($event)"
+            (cancelled)="onCancelled()"
+          />
+        </p-panel>
+
+        <!-- Documents -->
+        <p-panel [header]="t.t('sheets.detail.documents')">
+          @if (isEdit) {
+            <input #fileInput type="file" hidden (change)="uploadFile($event)" />
+            <ng-template pTemplate="headeractions">
+              <label class="upload-label">
+                <p-button
+                  icon="pi pi-upload"
+                  [label]="t.t('sheets.detail.upload')"
+                  size="small"
+                  [outlined]="true"
+                  (onClick)="fileInput.click()"
+                />
+              </label>
+            </ng-template>
+            @if (documentsLoading()) {
+              <div class="loading-indicator small">
+                <i class="pi pi-spinner pi-spin"></i>
+              </div>
+            } @else {
+              @if (documents().length === 0) {
+                <span class="empty-block">{{ 'sheets.detail.noDocuments' | translate }}</span>
+              } @else {
+                <div class="document-list">
+                  @for (doc of documents(); track doc.id) {
+                    <div class="document-row">
+                      <i class="pi pi-file"></i>
+                      <span class="document-name">{{ doc.filename }}</span>
+                      <span class="document-size">{{ formatSize(doc.size) }}</span>
+                      <div class="document-actions">
+                        <p-button
+                          icon="pi pi-download"
+                          [rounded]="true"
+                          [text]="true"
+                          size="small"
+                          (onClick)="downloadDocument(doc)"
+                        />
+                        <p-button
+                          icon="pi pi-trash"
+                          [rounded]="true"
+                          [text]="true"
+                          size="small"
+                          severity="danger"
+                          (onClick)="confirmDeleteDocument(doc)"
+                        />
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+              <div
+                class="drop-zone"
+                [class.drop-zone-active]="dragging()"
+                (dragover)="onDragOver($event)"
+                (dragleave)="onDragLeave($event)"
+                (drop)="onDrop($event)"
+                (click)="fileInput.click()"
+              >
+                <i class="pi pi-cloud-upload"></i>
+                <span>{{ 'sheets.detail.dropFiles' | translate }}</span>
+              </div>
+            }
+          } @else {
+            <span class="empty-block">{{ 'sheets.detail.documentsAfterSave' | translate }}</span>
+          }
+        </p-panel>
+      </div>
+    </div>
+  }
+</div>
+
+<p-confirmdialog />

@@ -1,7 +1,9 @@
 package de.halbmann.sam.api.entity;
 
+import jakarta.json.bind.annotation.JsonbTypeAdapter;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -68,7 +70,13 @@ public class SheetMusic {
     /**
      * Level (Beginner, Intermediate, Advanced).
      */
-    String difficultyLevel;
+    @JsonbTypeAdapter(DifficultyJsonbAdapter.class)
+    DifficultyLevel difficultyLevel;
+
+    @JsonbTypeAdapter(DurationJsonbAdapter.class)
+    Duration duration;
+
+    boolean favorite;
 
     /**
      * Year of composition.
@@ -115,4 +123,7 @@ public class SheetMusic {
      * Metadata of the sheet music files (including location, mime-type, fileSize, ...)
      */
     Set<Attachment> attachments;
+
+    // TODO: Set<String> tags; // "Weihnachten", "Hochzeit", "Zugabe", "Trauerfeier"
+
 }

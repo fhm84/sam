@@ -59,15 +59,35 @@
       "error": "Ein Fehler ist aufgetreten"
     },
     "detail": {
+      "baseData": "Stammdaten",
+      "documents": "Dokumente",
+      "legalMisc": "Rechtliches / Sonstiges",
       "composer": "Komponist",
       "arranger": "Arrangeur",
       "genre": "Genre",
       "year": "Jahr",
       "publisher": "Verlag",
+      "publisherIpi": "Verlags-IPI",
       "edition": "Ausgabe",
       "difficulty": "Schwierigkeitsgrad",
       "copyright": "Urheberrecht",
-      "notes": "Anmerkungen"
+      "gemaWorkNumber": "GEMA-Werknummer",
+      "iswc": "ISWC",
+      "originalBy": "Original von",
+      "rating": "Bewertung",
+      "notes": "Anmerkungen",
+      "noNotes": "Keine Anmerkungen",
+      "noDocuments": "Keine Dokumente vorhanden",
+      "upload": "Hochladen",
+      "deleteDocument": {
+        "confirm": "Möchten Sie dieses Dokument wirklich löschen?",
+        "header": "Löschen bestätigen"
+      },
+      "documentDeleted": "Dokument gelöscht",
+      "uploadComplete": "Upload abgeschlossen",
+      "dropFiles": "Dateien hierher ziehen oder klicken zum Durchsuchen",
+      "documentsAfterSave": "Speichern Sie das Notenblatt, um Dokumente anzuhängen.",
+      "backToList": "Zurück zur Liste"
     },
     "instrumentations": {
       "title": "Instrumentierungen",
@@ -237,6 +257,9 @@
     "empty": "Keine Ensembles gefunden",
     "save": "Speichern",
     "cancel": "Abbrechen",
+    "detail": {
+      "backToList": "Zurück zur Übersicht"
+    },
     "voices": {
       "title": "Stimmen",
       "new": "Neue Stimme",
@@ -333,6 +356,9 @@
     },
     "search": "Nach Name suchen",
     "empty": "Keine Instrumente gefunden"
+  },
+  "errors": {
+    "requestFailed": "Anfrage fehlgeschlagen"
   },
   "configuration": {
     "title": "Konfiguration"

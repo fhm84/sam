@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 3.2.1263 on 2026-02-17 22:12:09.
+// Generated using typescript-generator version 3.2.1263 on 2026-02-21 22:50:59.
 
 export interface Attachment {
     checksum?: string;
@@ -33,6 +33,12 @@ export interface CollectionSheet {
 export interface CoverageResult {
     coverageScore?: number;
     details?: VoiceCoverageDetail[];
+    ensembleId?: string;
+    evaluatedAt?: Date;
+    missingRequired?: boolean;
+    missingRequiredCount?: number;
+    playable?: boolean;
+    sheetMusicId?: string;
     status?: CoverageStatus;
 }
 
@@ -43,7 +49,10 @@ export interface CreateEnsemble {
 
 export interface CreateEnsembleVoice {
     label: string;
+    maxCount?: number;
+    minCount?: number;
     required?: boolean;
+    targetCount?: number;
     weight?: number;
 }
 
@@ -67,8 +76,10 @@ export interface CreateSheetMusic {
     arranger?: Musician;
     composer?: Musician;
     copyright?: string;
-    difficultyLevel?: string;
+    difficultyLevel?: short;
+    duration?: long;
     edition?: string;
+    favorite?: boolean;
     gemaWorkNumber?: string;
     genre?: string;
     iswc?: string;
@@ -87,6 +98,9 @@ export interface CreateVoiceOption {
     type?: VoiceOptionType;
 }
 
+export interface DifficultyJsonbAdapter extends JsonbAdapter<short, number> {
+}
+
 export interface DocumentDownload {
     id?: string;
     filename?: string;
@@ -96,6 +110,9 @@ export interface DocumentDownload {
 }
 
 export interface DocumentFilterRequest extends PaginationRequest {
+}
+
+export interface DurationJsonbAdapter extends JsonbAdapter<long, string> {
 }
 
 export interface Ensemble {
@@ -112,8 +129,11 @@ export interface EnsembleFilterRequest extends PaginationRequest {
 export interface EnsembleVoice {
     id?: string;
     label: string;
+    maxCount?: number;
+    minCount?: number;
     options?: VoiceOption[];
     required?: boolean;
+    targetCount?: number;
     weight?: number;
 }
 
@@ -208,8 +228,10 @@ export interface SheetMusic {
     attachments?: Attachment[];
     composer?: Musician;
     copyright?: string;
-    difficultyLevel?: string;
+    difficultyLevel?: short;
+    duration?: long;
     edition?: string;
+    favorite?: boolean;
     gemaWorkNumber?: string;
     genre?: string;
     id?: string;
@@ -229,11 +251,15 @@ export interface SheetMusicSearchResult extends SheetMusic {
 }
 
 export interface VoiceCoverageDetail {
+    effectiveCount?: number;
     explanation?: string;
-    matchScore?: number;
-    matchedInstrumentId?: string;
-    optionFactor?: number;
+    minCount?: number;
+    missingRequired?: boolean;
+    present?: boolean;
     required?: boolean;
+    score?: number;
+    targetCount?: number;
+    voiceId?: string;
     voiceLabel?: string;
     weight?: number;
 }
@@ -247,6 +273,9 @@ export interface VoiceOption {
 
 export interface FileUpload extends FilePart {
     headers?: any;
+}
+
+export interface JsonbAdapter<Original, Adapted> {
 }
 
 export interface FilePart {

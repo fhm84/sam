@@ -73,12 +73,7 @@ export class EnsembleVoices implements OnChanges {
             });
             this.loadVoices();
           },
-          error: () => {
-            this.messageService.add({
-              severity: 'error',
-              summary: this.t.t('ensembles.voices.messages.error'),
-            });
-          },
+          error: () => {},
         });
       },
     });

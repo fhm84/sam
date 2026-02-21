@@ -6,6 +6,21 @@ export const routes: Routes = [
     loadComponent: () => import('./features/sheets/sheets').then((m) => m.Sheets),
   },
   {
+    path: 'sheets/new',
+    loadComponent: () =>
+      import('./features/sheets/sheet-form-page').then((m) => m.SheetFormPage),
+  },
+  {
+    path: 'sheets/:id',
+    loadComponent: () =>
+      import('./features/sheets/sheet-detail-page').then((m) => m.SheetDetailPage),
+  },
+  {
+    path: 'sheets/:id/edit',
+    loadComponent: () =>
+      import('./features/sheets/sheet-form-page').then((m) => m.SheetFormPage),
+  },
+  {
     path: 'collections',
     loadComponent: () => import('./features/collections/collections').then((m) => m.Collections),
   },
@@ -20,6 +35,11 @@ export const routes: Routes = [
   {
     path: 'admin/ensembles',
     loadComponent: () => import('./features/ensembles/ensembles').then((m) => m.Ensembles),
+  },
+  {
+    path: 'admin/ensembles/:id',
+    loadComponent: () =>
+      import('./features/ensembles/ensemble-detail-page').then((m) => m.EnsembleDetailPage),
   },
   {
     path: 'admin/instruments',

@@ -9,7 +9,7 @@
   </div>
 
   <p-table
-    [value]="musicians()"
+    [value]="items()"
     [lazy]="true"
     [paginator]="true"
     [rows]="rows"
@@ -73,19 +73,18 @@
 </div>
 
 <p-dialog
-  [header]="editingMusician ? t.t('musicians.edit') : t.t('musicians.new')"
+  [header]="editingItem ? t.t('musicians.edit') : t.t('musicians.new')"
   [(visible)]="dialogVisible"
   [modal]="true"
   [style]="{ width: '28rem' }"
 >
   @if (dialogVisible) {
     <app-musician-form
-      [musician]="editingMusician"
+      [musician]="editingItem"
       (saved)="onSaved()"
       (cancelled)="dialogVisible = false"
     />
   }
 </p-dialog>
 
-<p-toast />
 <p-confirmdialog />

@@ -1,28 +1,32 @@
-import { Component, EventEmitter, inject, Input, OnChanges, Output, signal } from '@angular/core';
+import { Component, EventEmitter, HostBinding, inject, Input, OnChanges, Output, signal } from '@angular/core';
 import { TableModule } from 'primeng/table';
 import { Dialog } from 'primeng/dialog';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Button } from 'primeng/button';
+import { Panel } from 'primeng/panel';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
-import { TranslationService } from '../../core/translation.service';
 import { SheetsApiService, InstrumentationsApiService } from '../../core/api';
 import { Instrumentation, SheetMusic } from '../../model/datamodels';
+import { DocumentHandler } from '../../shared/base/document-handler';
 import { InstrumentationForm } from './instrumentation-form';
 
 @Component({
   selector: 'app-sheet-detail',
-  imports: [TableModule, Dialog, ConfirmDialog, Button, TranslatePipe, InstrumentationForm],
+  imports: [TableModule, Dialog, ConfirmDialog, Button, Panel, TranslatePipe, InstrumentationForm],
   providers: [ConfirmationService],
   templateUrl: './sheet-detail.html',
   styleUrl: './sheet-detail.scss',
 })
-export class SheetDetail implements OnChanges {
-  protected readonly t = inject(TranslationService);
+export class SheetDetail extends DocumentHandler implements OnChanges {
+  @Input() mode: 'compact' | 'full' = 'compact';
+
+  @HostBinding('class.mode-full')
+  get isFullMode() {
+    return this.mode === 'full';
+  }
   private readonly sheetsApi = inject(SheetsApiService);
   private readonly instrumentationsApi = inject(InstrumentationsApiService);
-  private readonly confirmationService = inject(ConfirmationService);
-  private readonly messageService = inject(MessageService);
 
   @Input({ required: true }) sheetId!: string;
   @Output() edit = new EventEmitter<SheetMusic>();
@@ -36,10 +40,15 @@ export class SheetDetail implements OnChanges {
   protected instrumentationDialogVisible = false;
   protected editingInstrumentation: Instrumentation | null = null;
 
+  protected getDocumentBasePath(): string {
+    return this.documentsApi.forSheets(this.sheetId);
+  }
+
   ngOnChanges(): void {
     if (this.sheetId) {
       this.loadSheet();
       this.loadInstrumentations();
+      this.loadDocuments();
     }
   }
 
@@ -76,12 +85,7 @@ export class SheetDetail implements OnChanges {
             });
             this.loadInstrumentations();
           },
-          error: () => {
-            this.messageService.add({
-              severity: 'error',
-              summary: this.t.t('sheets.instrumentations.messages.error'),
-            });
-          },
+          error: () => {},
         });
       },
     });

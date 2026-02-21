@@ -59,15 +59,35 @@
       "error": "An error occurred"
     },
     "detail": {
+      "baseData": "Base Data",
+      "documents": "Documents",
+      "legalMisc": "Legal / Misc",
       "composer": "Composer",
       "arranger": "Arranger",
       "genre": "Genre",
       "year": "Year",
       "publisher": "Publisher",
+      "publisherIpi": "Publisher IPI",
       "edition": "Edition",
       "difficulty": "Difficulty",
       "copyright": "Copyright",
-      "notes": "Notes"
+      "gemaWorkNumber": "GEMA Work No.",
+      "iswc": "ISWC",
+      "originalBy": "Original by",
+      "rating": "Rating",
+      "notes": "Notes",
+      "noNotes": "No notes",
+      "noDocuments": "No documents attached",
+      "upload": "Upload",
+      "deleteDocument": {
+        "confirm": "Are you sure you want to delete this document?",
+        "header": "Confirm deletion"
+      },
+      "documentDeleted": "Document deleted",
+      "uploadComplete": "Upload complete",
+      "dropFiles": "Drop files here or click to browse",
+      "documentsAfterSave": "Save the sheet first to attach documents.",
+      "backToList": "Back to list"
     },
     "instrumentations": {
       "title": "Instrumentations",
@@ -237,6 +257,9 @@
     "empty": "No ensembles found",
     "save": "Save",
     "cancel": "Cancel",
+    "detail": {
+      "backToList": "Back to Ensembles"
+    },
     "voices": {
       "title": "Voices",
       "new": "New voice",
@@ -333,6 +356,9 @@
     },
     "search": "Search by name",
     "empty": "No instruments found"
+  },
+  "errors": {
+    "requestFailed": "Request failed"
   },
   "configuration": {
     "title": "Configuration"

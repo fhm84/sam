@@ -1,8 +1,10 @@
 package de.halbmann.sam.business.entity;
 
+import de.halbmann.sam.api.entity.DifficultyLevel;
 import de.halbmann.sam.business.controller.FingerprintFactory;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -75,9 +77,17 @@ public class SheetMusicEntity extends AbstractEntity {
     GenreEntity genre;
 
     /**
-     * Level (Beginner, Intermediate, Advanced).
+     * Difficulty Level.
+     * Automatically mapped to grade (int) via {@link DifficultyLevelConverter}
      */
-    String difficultyLevel;
+    DifficultyLevel difficultyLevel;
+
+    /**
+     * automatically mapped via {@link DurationAttributeConverter}
+     */
+    Duration duration;
+
+    boolean favorite;
 
     /**
      * Year of composition.

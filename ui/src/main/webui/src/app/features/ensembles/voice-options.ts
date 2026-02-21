@@ -9,6 +9,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../core/translation.service';
 import { EnsemblesApiService, InstrumentsApiService } from '../../core/api';
 import { Instrument, VoiceOption } from '../../model/datamodels';
+import { FETCH_ALL_SIZE } from '../../shared/constants';
 import { VoiceOptionForm } from './voice-option-form';
 
 @Component({
@@ -36,7 +37,7 @@ export class VoiceOptions implements OnChanges, OnInit {
   protected editingOption: VoiceOption | null = null;
 
   ngOnInit(): void {
-    this.instrumentsApi.find({ size: 1000 }).subscribe((res) => {
+    this.instrumentsApi.find({ size: FETCH_ALL_SIZE }).subscribe((res) => {
       const map = new Map<string, string>();
       for (const i of res.data ?? []) {
         map.set(i.id!, i.name);
@@ -80,12 +81,7 @@ export class VoiceOptions implements OnChanges, OnInit {
             });
             this.loadOptions();
           },
-          error: () => {
-            this.messageService.add({
-              severity: 'error',
-              summary: this.t.t('ensembles.voices.options.messages.error'),
-            });
-          },
+          error: () => {},
         });
       },
     });

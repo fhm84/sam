@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@ang
 import { TableModule } from 'primeng/table';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { Toast } from 'primeng/toast';
 import { Button } from 'primeng/button';
 import { ProgressBar } from 'primeng/progressbar';
 import { FileUpload, FileSelectEvent } from 'primeng/fileupload';
@@ -10,6 +9,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../core/translation.service';
 import { DocumentsApiService, UploadProgress } from '../../core/api/documents-api.service';
 import { DocumentDownload } from '../../model/datamodels';
+import { formatSize } from '../../shared/utils/format.utils';
 
 interface ActiveUpload {
   filename: string;
@@ -21,13 +21,12 @@ interface ActiveUpload {
   imports: [
     TableModule,
     ConfirmDialog,
-    Toast,
     Button,
     ProgressBar,
     FileUpload,
     TranslatePipe,
   ],
-  providers: [ConfirmationService, MessageService],
+  providers: [ConfirmationService],
   templateUrl: './uploads.html',
   styleUrl: './uploads.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -66,12 +65,6 @@ export class Uploads implements OnInit {
         a.click();
         URL.revokeObjectURL(url);
       },
-      error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: this.t.t('uploads.messages.downloadError'),
-        });
-      },
     });
   }
 
@@ -90,23 +83,12 @@ export class Uploads implements OnInit {
             });
             this.loadDocuments();
           },
-          error: () => {
-            this.messageService.add({
-              severity: 'error',
-              summary: this.t.t('uploads.messages.error'),
-            });
-          },
         });
       },
     });
   }
 
-  protected formatSize(bytes?: number): string {
-    if (bytes == null || bytes === 0) return '0 B';
-    const units = ['B', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return (bytes / Math.pow(1024, i)).toFixed(i > 0 ? 1 : 0) + ' ' + units[i];
-  }
+  protected formatSize = formatSize;
 
   protected truncateChecksum(checksum?: string): string {
     if (!checksum) return '';
@@ -134,10 +116,6 @@ export class Uploads implements OnInit {
       },
       error: () => {
         this.uploads.update((list) => list.filter((u) => u !== upload));
-        this.messageService.add({
-          severity: 'error',
-          summary: this.t.t('uploads.messages.error'),
-        });
       },
     });
   }

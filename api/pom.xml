@@ -75,6 +75,10 @@
                     <classPatterns>
                         <classPattern>de.halbmann.sam.api.entity.*</classPattern>
                     </classPatterns>
+                    <customTypeMappings>
+                        <customTypeMapping>java.time.Duration:long</customTypeMapping>
+                        <customTypeMapping>de.halbmann.sam.api.entity.DifficultyLevel:short</customTypeMapping>
+                    </customTypeMappings>
                     <outputFile>${project.basedir}/../ui/src/main/webui/src/app/model/datamodels.d.ts</outputFile>
                     <outputKind>module</outputKind>
                     <requiredAnnotations>

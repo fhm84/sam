@@ -1,0 +1,22 @@
+@use 'pages';
+
+.ensemble-detail-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.ensemble-header {
+  h1 {
+    margin: 0 0 0.25rem;
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--sam-text);
+  }
+}
+
+.ensemble-description {
+  margin: 0;
+  color: var(--sam-text-secondary);
+  font-size: 0.95rem;
+}

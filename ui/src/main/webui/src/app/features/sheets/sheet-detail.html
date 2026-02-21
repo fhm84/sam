@@ -10,127 +10,250 @@
         <span class="detail-subtitle">{{ s.subtitle }}</span>
       }
     </div>
-    <p-button
-      icon="pi pi-pencil"
-      [label]="t.t('sheets.edit')"
-      [outlined]="true"
-      size="small"
-      (onClick)="onEdit()"
-    />
-  </div>
-
-  <div class="detail-meta">
-    @if (s.composer?.name) {
-      <div class="meta-entry">
-        <span class="detail-label">{{ 'sheets.detail.composer' | translate }}</span>
-        <span class="detail-value">{{ s.composer?.name }}</span>
-      </div>
-    }
-    @if (s.arranger?.name) {
-      <div class="meta-entry">
-        <span class="detail-label">{{ 'sheets.detail.arranger' | translate }}</span>
-        <span class="detail-value">{{ s.arranger?.name }}</span>
-      </div>
-    }
-    @if (s.genre) {
-      <div class="meta-entry">
-        <span class="detail-label">{{ 'sheets.detail.genre' | translate }}</span>
-        <span class="detail-value">{{ s.genre }}</span>
-      </div>
-    }
-    @if (s.yearOfComposition) {
-      <div class="meta-entry">
-        <span class="detail-label">{{ 'sheets.detail.year' | translate }}</span>
-        <span class="detail-value">{{ s.yearOfComposition }}</span>
-      </div>
-    }
-    @if (s.publisher) {
-      <div class="meta-entry">
-        <span class="detail-label">{{ 'sheets.detail.publisher' | translate }}</span>
-        <span class="detail-value">{{ s.publisher }}</span>
-      </div>
-    }
-    @if (s.edition) {
-      <div class="meta-entry">
-        <span class="detail-label">{{ 'sheets.detail.edition' | translate }}</span>
-        <span class="detail-value">{{ s.edition }}</span>
-      </div>
-    }
-    @if (s.difficultyLevel) {
-      <div class="meta-entry">
-        <span class="detail-label">{{ 'sheets.detail.difficulty' | translate }}</span>
-        <span class="detail-value">{{ s.difficultyLevel }}</span>
-      </div>
-    }
-    @if (s.copyright) {
-      <div class="meta-entry">
-        <span class="detail-label">{{ 'sheets.detail.copyright' | translate }}</span>
-        <span class="detail-value">{{ s.copyright }}</span>
-      </div>
-    }
-    @if (s.additionalNotes) {
-      <div class="meta-entry full-width">
-        <span class="detail-label">{{ 'sheets.detail.notes' | translate }}</span>
-        <span class="detail-value">{{ s.additionalNotes }}</span>
-      </div>
-    }
-  </div>
-
-  <div class="instrumentations-section">
-    <div class="instrumentations-toolbar">
-      <h3>{{ 'sheets.instrumentations.title' | translate }}</h3>
+    <div class="detail-header-actions">
+      @if (mode === 'compact') {
+        <a [href]="'/sheets/' + sheetId" target="_blank" rel="noopener" class="open-fullpage-link">
+          <p-button
+            icon="pi pi-external-link"
+            [rounded]="true"
+            [text]="true"
+            size="small"
+          />
+        </a>
+      }
       <p-button
-        [label]="t.t('sheets.instrumentations.new')"
-        icon="pi pi-plus"
+        icon="pi pi-pencil"
+        [label]="t.t('sheets.edit')"
+        [outlined]="true"
         size="small"
-        (onClick)="openNewInstrumentation()"
+        (onClick)="onEdit()"
       />
     </div>
+  </div>
 
-    <p-table
-      [value]="instrumentations()"
-      [loading]="instrumentationsLoading()"
-    >
-      <ng-template #header>
-        <tr>
-          <th>{{ 'sheets.instrumentations.columns.instrument' | translate }}</th>
-          <th>{{ 'sheets.instrumentations.columns.partLabel' | translate }}</th>
-          <th>{{ 'sheets.instrumentations.columns.clef' | translate }}</th>
-          <th>{{ 'sheets.instrumentations.columns.actions' | translate }}</th>
-        </tr>
-      </ng-template>
+  <div class="detail-panels">
+    <div class="detail-top-row">
+      <!-- Base Data -->
+      <p-panel [header]="t.t('sheets.detail.baseData')">
+        <div class="detail-meta">
+          @if (s.composer?.name) {
+            <div class="meta-entry">
+              <span class="detail-label">{{ 'sheets.detail.composer' | translate }}</span>
+              <span class="detail-value">{{ s.composer?.name }}</span>
+            </div>
+          }
+          @if (s.arranger?.name) {
+            <div class="meta-entry">
+              <span class="detail-label">{{ 'sheets.detail.arranger' | translate }}</span>
+              <span class="detail-value">{{ s.arranger?.name }}</span>
+            </div>
+          }
+          @if (s.publisher) {
+            <div class="meta-entry">
+              <span class="detail-label">{{ 'sheets.detail.publisher' | translate }}</span>
+              <span class="detail-value">{{ s.publisher }}</span>
+            </div>
+          }
+          @if (s.genre) {
+            <div class="meta-entry">
+              <span class="detail-label">{{ 'sheets.detail.genre' | translate }}</span>
+              <span class="detail-value">{{ s.genre }}</span>
+            </div>
+          }
+          @if (s.yearOfComposition) {
+            <div class="meta-entry">
+              <span class="detail-label">{{ 'sheets.detail.year' | translate }}</span>
+              <span class="detail-value">{{ s.yearOfComposition }}</span>
+            </div>
+          }
+          @if (s.difficultyLevel) {
+            <div class="meta-entry">
+              <span class="detail-label">{{ 'sheets.detail.difficulty' | translate }}</span>
+              <span class="detail-value">{{ s.difficultyLevel }}</span>
+            </div>
+          }
+        </div>
+      </p-panel>
 
-      <ng-template #body let-instr>
-        <tr>
-          <td>{{ instr.instrument?.name }}</td>
-          <td>{{ instr.partLabel }}</td>
-          <td>{{ instr.clef }}</td>
-          <td class="actions-cell">
-            <p-button
-              icon="pi pi-pencil"
-              [rounded]="true"
-              [text]="true"
-              size="small"
-              (onClick)="openEditInstrumentation(instr)"
-            />
-            <p-button
-              icon="pi pi-trash"
-              [rounded]="true"
-              [text]="true"
-              size="small"
-              severity="danger"
-              (onClick)="confirmDeleteInstrumentation(instr)"
-            />
-          </td>
-        </tr>
+      <!-- Documents -->
+      <p-panel [header]="t.t('sheets.detail.documents')">
+      <input #fileInput type="file" hidden (change)="uploadFile($event)" />
+      <ng-template pTemplate="headeractions">
+        <label class="upload-label">
+          <p-button
+            icon="pi pi-upload"
+            [label]="t.t('sheets.detail.upload')"
+            size="small"
+            [outlined]="true"
+            (onClick)="fileInput.click()"
+          />
+        </label>
       </ng-template>
+      @if (documentsLoading()) {
+        <div class="loading-indicator small">
+          <i class="pi pi-spinner pi-spin"></i>
+        </div>
+      } @else {
+        @if (documents().length === 0) {
+          <span class="empty-block">{{ 'sheets.detail.noDocuments' | translate }}</span>
+        } @else {
+          <div class="document-list">
+            @for (doc of documents(); track doc.id) {
+              <div class="document-row">
+                <i class="pi pi-file"></i>
+                <span class="document-name">{{ doc.filename }}</span>
+                <span class="document-size">{{ formatSize(doc.size) }}</span>
+                <div class="document-actions">
+                  <p-button
+                    icon="pi pi-download"
+                    [rounded]="true"
+                    [text]="true"
+                    size="small"
+                    (onClick)="downloadDocument(doc)"
+                  />
+                  <p-button
+                    icon="pi pi-trash"
+                    [rounded]="true"
+                    [text]="true"
+                    size="small"
+                    severity="danger"
+                    (onClick)="confirmDeleteDocument(doc)"
+                  />
+                </div>
+              </div>
+            }
+          </div>
+        }
+        @if (mode === 'full') {
+          <div
+            class="drop-zone"
+            [class.drop-zone-active]="dragging()"
+            (dragover)="onDragOver($event)"
+            (dragleave)="onDragLeave($event)"
+            (drop)="onDrop($event)"
+            (click)="fileInput.click()"
+          >
+            <i class="pi pi-cloud-upload"></i>
+            <span>{{ 'sheets.detail.dropFiles' | translate }}</span>
+          </div>
+        }
+      }
+    </p-panel>
+    </div>
 
-      <ng-template #emptymessage>
-        <tr>
-          <td colspan="4" class="empty-message">{{ 'sheets.instrumentations.empty' | translate }}</td>
-        </tr>
+    <!-- Instrumentations -->
+    <p-panel [header]="t.t('sheets.instrumentations.title')" [toggleable]="true">
+      <ng-template pTemplate="headeractions">
+        <p-button
+          icon="pi pi-plus"
+          [label]="t.t('sheets.instrumentations.new')"
+          size="small"
+          [outlined]="true"
+          (onClick)="openNewInstrumentation()"
+        />
       </ng-template>
-    </p-table>
+      <p-table
+        [value]="instrumentations()"
+        [loading]="instrumentationsLoading()"
+      >
+        <ng-template #header>
+          <tr>
+            <th>{{ 'sheets.instrumentations.columns.instrument' | translate }}</th>
+            <th>{{ 'sheets.instrumentations.columns.partLabel' | translate }}</th>
+            <th>{{ 'sheets.instrumentations.columns.clef' | translate }}</th>
+            <th>{{ 'sheets.instrumentations.columns.actions' | translate }}</th>
+          </tr>
+        </ng-template>
+
+        <ng-template #body let-instr>
+          <tr>
+            <td>{{ instr.instrument?.name }}</td>
+            <td>{{ instr.partLabel }}</td>
+            <td>{{ instr.clef }}</td>
+            <td class="actions-cell">
+              <p-button
+                icon="pi pi-pencil"
+                [rounded]="true"
+                [text]="true"
+                size="small"
+                (onClick)="openEditInstrumentation(instr)"
+              />
+              <p-button
+                icon="pi pi-trash"
+                [rounded]="true"
+                [text]="true"
+                size="small"
+                severity="danger"
+                (onClick)="confirmDeleteInstrumentation(instr)"
+              />
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template #emptymessage>
+          <tr>
+            <td colspan="4" class="empty-message">{{ 'sheets.instrumentations.empty' | translate }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-panel>
+
+    <!-- Notes -->
+    <p-panel [header]="t.t('sheets.detail.notes')" [toggleable]="true" [collapsed]="true">
+      @if (s.additionalNotes) {
+        <span class="detail-value">{{ s.additionalNotes }}</span>
+      } @else {
+        <span class="empty-block">{{ 'sheets.detail.noNotes' | translate }}</span>
+      }
+    </p-panel>
+
+    <!-- Legal / Misc -->
+    <p-panel [header]="t.t('sheets.detail.legalMisc')" [toggleable]="true" [collapsed]="true">
+      <div class="detail-meta">
+        @if (s.publisherIpi) {
+          <div class="meta-entry">
+            <span class="detail-label">{{ 'sheets.detail.publisherIpi' | translate }}</span>
+            <span class="detail-value">{{ s.publisherIpi }}</span>
+          </div>
+        }
+        @if (s.edition) {
+          <div class="meta-entry">
+            <span class="detail-label">{{ 'sheets.detail.edition' | translate }}</span>
+            <span class="detail-value">{{ s.edition }}</span>
+          </div>
+        }
+        @if (s.copyright) {
+          <div class="meta-entry">
+            <span class="detail-label">{{ 'sheets.detail.copyright' | translate }}</span>
+            <span class="detail-value">{{ s.copyright }}</span>
+          </div>
+        }
+        @if (s.gemaWorkNumber) {
+          <div class="meta-entry">
+            <span class="detail-label">{{ 'sheets.detail.gemaWorkNumber' | translate }}</span>
+            <span class="detail-value">{{ s.gemaWorkNumber }}</span>
+          </div>
+        }
+        @if (s.iswc) {
+          <div class="meta-entry">
+            <span class="detail-label">{{ 'sheets.detail.iswc' | translate }}</span>
+            <span class="detail-value">{{ s.iswc }}</span>
+          </div>
+        }
+        @if (s.originalBy) {
+          <div class="meta-entry">
+            <span class="detail-label">{{ 'sheets.detail.originalBy' | translate }}</span>
+            <span class="detail-value">{{ s.originalBy }}</span>
+          </div>
+        }
+        @if (s.rating != null) {
+          <div class="meta-entry">
+            <span class="detail-label">{{ 'sheets.detail.rating' | translate }}</span>
+            <span class="detail-value">{{ s.rating }}</span>
+          </div>
+        }
+      </div>
+    </p-panel>
   </div>
 }
 

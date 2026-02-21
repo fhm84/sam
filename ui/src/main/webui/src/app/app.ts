@@ -1,6 +1,7 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { Drawer } from 'primeng/drawer';
+import { Toast } from 'primeng/toast';
 import { Tooltip } from 'primeng/tooltip';
 import { ThemeService } from './core/theme.service';
 import { TranslationService } from './core/translation.service';
@@ -15,7 +16,7 @@ interface NavItem {
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, Drawer, Tooltip, TranslatePipe],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, Drawer, Toast, Tooltip, TranslatePipe],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })

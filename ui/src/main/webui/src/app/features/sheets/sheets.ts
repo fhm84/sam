@@ -1,11 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Router } from '@angular/router';
 import { Subject, debounceTime } from 'rxjs';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
-import { Dialog } from 'primeng/dialog';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { Toast } from 'primeng/toast';
 import { Button } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
 import { IconField } from 'primeng/iconfield';
@@ -20,17 +19,14 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../core/translation.service';
 import { SheetsApiService } from '../../core/api';
 import { SheetMusic, SheetMusicSearchResult } from '../../model/datamodels';
-import { SheetForm } from './sheet-form';
 import { SheetDetail } from './sheet-detail';
 
 @Component({
   selector: 'app-sheets',
   imports: [
     TableModule,
-    Dialog,
     ConfirmDialog,
-    Toast,
-    Button,
+Button,
     InputText,
     IconField,
     InputIcon,
@@ -40,18 +36,20 @@ import { SheetDetail } from './sheet-detail';
     Paginator,
     FormsModule,
     TranslatePipe,
-    SheetForm,
     SheetDetail,
     Drawer,
   ],
-  providers: [ConfirmationService, MessageService],
+  providers: [ConfirmationService],
   templateUrl: './sheets.html',
   styleUrl: './sheets.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Sheets implements OnInit {
+  private static readonly DRAWER_BREAKPOINT = '(min-width: 960px)';
+
   protected readonly t = inject(TranslationService);
   private readonly api = inject(SheetsApiService);
+  private readonly router = inject(Router);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly messageService = inject(MessageService);
   private readonly destroyRef = inject(DestroyRef);
@@ -66,13 +64,8 @@ export class Sheets implements OnInit {
   protected readonly activeFilterCount = computed(() => (this.selectedGenre() ? 1 : 0));
   protected rows = 10;
 
-  protected dialogVisible = false;
-  protected editingSheet: SheetMusic | null = null;
-
   protected detailDrawerVisible = false;
   protected selectedSheetId: string | null = null;
-
-  @ViewChild(SheetDetail) private sheetDetail?: SheetDetail;
 
   protected readonly viewOptions = [
     { icon: 'pi pi-list', value: 'list' },
@@ -80,14 +73,14 @@ export class Sheets implements OnInit {
   ];
 
   private currentPage = 0;
-  private queryFilter = '';
+  private searchFilter = '';
   private readonly filterSubject = new Subject<string>();
 
   ngOnInit(): void {
     this.filterSubject
       .pipe(debounceTime(300), takeUntilDestroyed(this.destroyRef))
       .subscribe((value) => {
-        this.queryFilter = value;
+        this.searchFilter = value;
         this.currentPage = 0;
         this.loadData();
       });
@@ -133,13 +126,11 @@ export class Sheets implements OnInit {
   }
 
   protected openNew(): void {
-    this.editingSheet = null;
-    this.dialogVisible = true;
+    this.router.navigate(['/sheets/new']);
   }
 
   protected openEdit(sheet: SheetMusic): void {
-    this.editingSheet = { ...sheet };
-    this.dialogVisible = true;
+    this.router.navigate(['/sheets', sheet.id, 'edit']);
   }
 
   protected confirmDelete(sheet: SheetMusic): void {
@@ -157,25 +148,23 @@ export class Sheets implements OnInit {
             });
             this.loadData();
           },
-          error: () => {
-            this.messageService.add({
-              severity: 'error',
-              summary: this.t.t('sheets.messages.error'),
-            });
-          },
+          error: () => {},
         });
       },
     });
   }
 
   protected openDetail(sheet: SheetMusicSearchResult): void {
-    this.selectedSheetId = sheet.id!;
-    this.detailDrawerVisible = true;
+    if (window.matchMedia(Sheets.DRAWER_BREAKPOINT).matches) {
+      this.selectedSheetId = sheet.id!;
+      this.detailDrawerVisible = true;
+    } else {
+      this.router.navigate(['/sheets', sheet.id]);
+    }
   }
 
   protected onDetailEdit(sheet: SheetMusic): void {
-    this.editingSheet = { ...sheet };
-    this.dialogVisible = true;
+    this.router.navigate(['/sheets', sheet.id, 'edit']);
   }
 
   protected onDetailDeleted(): void {
@@ -184,23 +173,13 @@ export class Sheets implements OnInit {
     this.loadData();
   }
 
-  protected onSaved(): void {
-    this.dialogVisible = false;
-    const key = this.editingSheet ? 'sheets.messages.updated' : 'sheets.messages.created';
-    this.messageService.add({ severity: 'success', summary: this.t.t(key) });
-    this.loadData();
-    if (this.detailDrawerVisible && this.sheetDetail) {
-      this.sheetDetail.reloadSheet();
-    }
-  }
-
   private loadData(): void {
     this.loading.set(true);
     this.api
       .find({
         page: this.currentPage,
         size: this.rows,
-        query: this.queryFilter || undefined,
+        query: this.searchFilter || undefined,
         genre: this.selectedGenre() || undefined,
       })
       .subscribe({

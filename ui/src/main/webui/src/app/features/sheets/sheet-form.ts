@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Input, OnChanges, OnInit, Output, signal } from '@angular/core';
+import { Component, inject, Input, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputText } from 'primeng/inputtext';
 import { InputNumber } from 'primeng/inputnumber';
@@ -6,11 +6,12 @@ import { Textarea } from 'primeng/textarea';
 import { Select } from 'primeng/select';
 import { Button } from 'primeng/button';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
-import { TranslationService } from '../../core/translation.service';
 import { SheetsApiService, MusiciansApiService } from '../../core/api';
 import { convertEmptyStringsToNull } from '../../shared/utils/object.utils';
 import { CreateSheetMusic, Musician, SheetMusic } from '../../model/datamodels';
 import { map, Observable } from 'rxjs';
+import { BaseForm } from '../../shared/base/base-form';
+import { FETCH_ALL_SIZE } from '../../shared/constants';
 
 @Component({
   selector: 'app-sheet-form',
@@ -18,19 +19,15 @@ import { map, Observable } from 'rxjs';
   templateUrl: './sheet-form.html',
   styleUrl: './sheet-form.scss',
 })
-export class SheetForm implements OnChanges, OnInit {
-  protected readonly t = inject(TranslationService);
+export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnInit {
   private readonly api = inject(SheetsApiService);
   private readonly musiciansApi = inject(MusiciansApiService);
 
   @Input() sheet: SheetMusic | null = null;
-  @Output() saved = new EventEmitter<void>();
-  @Output() cancelled = new EventEmitter<void>();
 
-  protected saving = false;
   protected readonly musicians = signal<Musician[]>([]);
 
-  protected readonly form = new FormGroup({
+  readonly form = new FormGroup({
     title: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     subtitle: new FormControl('', { nonNullable: true }),
     composerId: new FormControl<string | null>(null),
@@ -44,40 +41,31 @@ export class SheetForm implements OnChanges, OnInit {
     additionalNotes: new FormControl('', { nonNullable: true }),
   });
 
-  get isEdit(): boolean {
-    return this.sheet !== null;
-  }
+  getEntity = () => this.sheet;
 
   ngOnInit(): void {
-    this.musiciansApi.find({ size: 1000 }).subscribe((res) => {
+    this.musiciansApi.find({ size: FETCH_ALL_SIZE }).subscribe((res) => {
       this.musicians.set(res.data ?? []);
     });
   }
 
-  ngOnChanges(): void {
-    if (this.sheet) {
-      this.form.patchValue({
-        title: this.sheet.title,
-        subtitle: this.sheet.subtitle ?? '',
-        composerId: this.sheet.composer?.id ?? null,
-        arrangerId: this.sheet.arranger?.id ?? null,
-        genre: this.sheet.genre ?? '',
-        yearOfComposition: this.sheet.yearOfComposition ?? null,
-        publisher: this.sheet.publisher ?? '',
-        difficultyLevel: this.sheet.difficultyLevel ?? '',
-        edition: this.sheet.edition ?? '',
-        copyright: this.sheet.copyright ?? '',
-        additionalNotes: this.sheet.additionalNotes ?? '',
-      });
-    } else {
-      this.form.reset();
-    }
+  patchFormValues(s: SheetMusic): void {
+    this.form.patchValue({
+      title: s.title,
+      subtitle: s.subtitle ?? '',
+      composerId: s.composer?.id ?? null,
+      arrangerId: s.arranger?.id ?? null,
+      genre: s.genre ?? '',
+      yearOfComposition: s.yearOfComposition ?? null,
+      publisher: s.publisher ?? '',
+      difficultyLevel: s.difficultyLevel ?? '',
+      edition: s.edition ?? '',
+      copyright: s.copyright ?? '',
+      additionalNotes: s.additionalNotes ?? '',
+    });
   }
 
-  protected onSave(): void {
-    if (this.form.invalid) return;
-
-    this.saving = true;
+  buildSaveRequest(): Observable<SheetMusic> {
     const raw = this.form.getRawValue();
     const allMusicians = this.musicians();
 
@@ -102,18 +90,10 @@ export class SheetForm implements OnChanges, OnInit {
       additionalNotes: raw.additionalNotes,
     });
 
-    const request$: Observable<void> = this.isEdit
-      ? this.api.update(this.sheet!.id!, { ...payload, id: this.sheet!.id } as SheetMusic)
-      : this.api.create(payload).pipe(map(() => {}));
-
-    request$.subscribe({
-      next: () => {
-        this.saving = false;
-        this.saved.emit();
-      },
-      error: () => {
-        this.saving = false;
-      },
-    });
+    return this.isEdit
+      ? this.api.update(this.sheet!.id!, { ...payload, id: this.sheet!.id } as SheetMusic).pipe(
+          map(() => ({ ...payload, id: this.sheet!.id }) as SheetMusic),
+        )
+      : this.api.create(payload);
   }
 }

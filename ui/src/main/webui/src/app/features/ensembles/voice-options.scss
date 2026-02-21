@@ -1,3 +1,5 @@
+@use 'pages';
+
 .options-section {
   display: flex;
   flex-direction: column;
@@ -17,13 +19,6 @@
   }
 }
 
-.actions-cell {
-  display: flex;
-  gap: 0.25rem;
-}
-
 .empty-message {
-  text-align: center;
-  color: var(--sam-text-muted);
   padding: 1.5rem !important;
 }
