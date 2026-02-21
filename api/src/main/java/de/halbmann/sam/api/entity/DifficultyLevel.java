@@ -5,7 +5,6 @@ import lombok.Getter;
 
 @Getter
 public enum DifficultyLevel {
-
     VERY_EASY(1),
     EASY(2),
     MEDIUM(3),

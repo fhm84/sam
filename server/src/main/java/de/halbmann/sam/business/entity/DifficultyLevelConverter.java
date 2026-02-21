@@ -16,5 +16,4 @@ public class DifficultyLevelConverter implements AttributeConverter<DifficultyLe
     public DifficultyLevel convertToEntityAttribute(Short grade) {
         return grade == null ? null : DifficultyLevel.fromGrade(grade);
     }
-
 }

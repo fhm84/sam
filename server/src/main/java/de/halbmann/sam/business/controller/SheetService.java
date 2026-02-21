@@ -63,7 +63,8 @@ public class SheetService {
                 parameters.put("genre", filterRequest.getGenre());
             }
 
-            PaginatedResponse<SheetMusic> sheets = getAllSheets(filterRequest, parameters, filterRequest.getTitleStartsWith());
+            PaginatedResponse<SheetMusic> sheets =
+                    getAllSheets(filterRequest, parameters, filterRequest.getTitleStartsWith());
             PaginatedResponse<SheetMusicSearchResult> response = new PaginatedResponse<>();
             response.setPage(filterRequest.getPage());
             response.setSize(sheets.getSize());
@@ -78,7 +79,8 @@ public class SheetService {
             final PaginationRequest paginationRequest,
             final Map<String, Object> parameters,
             final String titleStartsWith) {
-        PaginatedEntities<SheetMusicEntity> result = sheetRepository.findSheetEntities(paginationRequest, parameters, titleStartsWith);
+        PaginatedEntities<SheetMusicEntity> result =
+                sheetRepository.findSheetEntities(paginationRequest, parameters, titleStartsWith);
 
         PaginatedResponse<SheetMusic> response = new PaginatedResponse<>();
         response.setData(result.data().stream().map(sheetMusicMapper::toDto).toList());

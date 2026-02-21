@@ -19,5 +19,4 @@ public class DurationAttributeConverter implements AttributeConverter<Duration, 
     public Duration convertToEntityAttribute(Long seconds) {
         return seconds == null ? null : Duration.ofSeconds(seconds);
     }
-
 }
