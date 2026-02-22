@@ -1,5 +1,6 @@
 import { Component, inject, Input, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FloatLabel } from 'primeng/floatlabel';
 import { Select } from 'primeng/select';
 import { InputText } from 'primeng/inputtext';
 import { Textarea } from 'primeng/textarea';
@@ -19,7 +20,7 @@ interface InstrumentOption {
 
 @Component({
   selector: 'app-instrumentation-form',
-  imports: [ReactiveFormsModule, Select, InputText, Textarea, Button, TranslatePipe],
+  imports: [ReactiveFormsModule, FloatLabel, Select, InputText, Textarea, Button, TranslatePipe],
   templateUrl: './instrumentation-form.html',
   styleUrl: './instrumentation-form.scss',
 })

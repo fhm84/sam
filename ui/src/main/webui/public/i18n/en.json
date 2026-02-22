@@ -7,6 +7,9 @@
     "collections": "Collections",
     "uploads": "Uploads",
     "musicians": "Musicians",
+    "profile": "Profile",
+    "userPreferences": "User Preferences",
+    "logout": "Logout",
     "admin": {
       "title": "Admin",
       "ensembles": "Ensembles",
@@ -20,7 +23,15 @@
     "samLogo": "SAM logo",
     "switchToLight": "Switch to light mode",
     "switchToDark": "Switch to dark mode",
-    "switchLanguage": "Switch language"
+    "switchLanguage": "Switch language",
+    "openUserMenu": "Open user menu"
+  },
+  "userPreferences": {
+    "title": "User Preferences",
+    "layoutTitle": "Overview Layout",
+    "layoutDescription": "Choose the default display mode for each overview page.",
+    "list": "List",
+    "cards": "Cards"
   },
   "sheets": {
     "title": "Sheets",

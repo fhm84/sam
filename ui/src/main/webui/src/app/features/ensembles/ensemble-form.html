@@ -1,18 +1,22 @@
 <form [formGroup]="form" (ngSubmit)="onSave()" class="sam-form">
   <div class="form-field">
-    <label for="ensemble-name">{{ 'ensembles.form.name' | translate }}</label>
-    <input pInputText id="ensemble-name" formControlName="name" />
+    <p-floatlabel variant="on">
+      <input pInputText id="ensemble-name" formControlName="name" />
+      <label for="ensemble-name">{{ 'ensembles.form.name' | translate }}</label>
+    </p-floatlabel>
   </div>
 
   <div class="form-field">
-    <label for="ensemble-description">{{ 'ensembles.form.description' | translate }}</label>
-    <textarea
-      pTextarea
-      id="ensemble-description"
-      formControlName="description"
-      [rows]="3"
-      [autoResize]="true"
-    ></textarea>
+    <p-floatlabel variant="on">
+      <textarea
+        pTextarea
+        id="ensemble-description"
+        formControlName="description"
+        [rows]="3"
+        [autoResize]="true"
+      ></textarea>
+      <label for="ensemble-description">{{ 'ensembles.form.description' | translate }}</label>
+    </p-floatlabel>
   </div>
 
   <div class="form-actions">

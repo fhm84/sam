@@ -1,5 +1,6 @@
 import { Component, inject, Input } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FloatLabel } from 'primeng/floatlabel';
 import { InputText } from 'primeng/inputtext';
 import { InputNumber } from 'primeng/inputnumber';
 import { Button } from 'primeng/button';
@@ -12,7 +13,7 @@ import { BaseForm } from '../../shared/base/base-form';
 
 @Component({
   selector: 'app-musician-form',
-  imports: [ReactiveFormsModule, InputText, InputNumber, Button, TranslatePipe],
+  imports: [ReactiveFormsModule, FloatLabel, InputText, InputNumber, Button, TranslatePipe],
   templateUrl: './musician-form.html',
   styleUrl: './musician-form.scss',
 })

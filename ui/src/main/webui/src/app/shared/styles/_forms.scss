@@ -15,6 +15,11 @@
     color: var(--sam-text-secondary);
   }
 
+  p-floatlabel {
+    display: block;
+    width: 100%;
+  }
+
   &.flex-1 {
     flex: 1;
   }

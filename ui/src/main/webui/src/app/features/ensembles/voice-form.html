@@ -1,18 +1,22 @@
 <form [formGroup]="form" (ngSubmit)="onSave()" class="sam-form">
   <div class="form-field">
-    <label for="voice-label">{{ 'ensembles.voices.form.label' | translate }}</label>
-    <input pInputText id="voice-label" formControlName="label" />
+    <p-floatlabel variant="on">
+      <input pInputText id="voice-label" formControlName="label" />
+      <label for="voice-label">{{ 'ensembles.voices.form.label' | translate }}</label>
+    </p-floatlabel>
   </div>
 
   <div class="form-row">
     <div class="form-field">
-      <label for="voice-weight">{{ 'ensembles.voices.form.weight' | translate }}</label>
-      <p-inputnumber
-        id="voice-weight"
-        formControlName="weight"
-        [useGrouping]="false"
-        styleClass="w-full"
-      />
+      <p-floatlabel variant="on">
+        <p-inputnumber
+          inputId="voice-weight"
+          formControlName="weight"
+          [useGrouping]="false"
+          styleClass="w-full"
+        />
+        <label for="voice-weight">{{ 'ensembles.voices.form.weight' | translate }}</label>
+      </p-floatlabel>
     </div>
 
     <div class="form-field form-field--checkbox">

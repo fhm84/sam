@@ -1,5 +1,6 @@
 import { Component, inject, Input, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FloatLabel } from 'primeng/floatlabel';
 import { Select } from 'primeng/select';
 import { InputNumber } from 'primeng/inputnumber';
 import { Button } from 'primeng/button';
@@ -18,7 +19,7 @@ interface InstrumentOption {
 
 @Component({
   selector: 'app-voice-option-form',
-  imports: [ReactiveFormsModule, Select, InputNumber, Button, TranslatePipe],
+  imports: [ReactiveFormsModule, FloatLabel, Select, InputNumber, Button, TranslatePipe],
   templateUrl: './voice-option-form.html',
   styleUrl: './voice-option-form.scss',
 })

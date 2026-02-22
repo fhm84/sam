@@ -1,29 +1,36 @@
 <form [formGroup]="form" (ngSubmit)="onSave()" class="sam-form">
   <div class="form-field">
-    <label for="instrument-id">{{ 'instruments.form.id' | translate }}</label>
-    <input pInputText id="instrument-id" formControlName="id" [placeholder]="t.t('instruments.form.idHint')" />
+    <p-floatlabel variant="on">
+      <input pInputText id="instrument-id" formControlName="id" [placeholder]="t.t('instruments.form.idHint')" />
+      <label for="instrument-id">{{ 'instruments.form.id' | translate }}</label>
+    </p-floatlabel>
   </div>
 
   <div class="form-field">
-    <label for="instrument-name">{{ 'instruments.form.name' | translate }}</label>
-    <input pInputText id="instrument-name" formControlName="name" />
+    <p-floatlabel variant="on">
+      <input pInputText id="instrument-name" formControlName="name" />
+      <label for="instrument-name">{{ 'instruments.form.name' | translate }}</label>
+    </p-floatlabel>
   </div>
 
   <div class="form-field">
-    <label for="instrument-displayName">{{ 'instruments.form.displayName' | translate }}</label>
-    <input pInputText id="instrument-displayName" formControlName="displayName" />
+    <p-floatlabel variant="on">
+      <input pInputText id="instrument-displayName" formControlName="displayName" />
+      <label for="instrument-displayName">{{ 'instruments.form.displayName' | translate }}</label>
+    </p-floatlabel>
   </div>
 
   <div class="form-field">
-    <label for="instrument-transposition">{{ 'instruments.form.transposition' | translate }}</label>
-    <p-select
-      id="instrument-transposition"
-      formControlName="transposition"
-      [options]="transpositionOptions"
-      [placeholder]="t.t('instruments.form.transpositionPlaceholder')"
-      [showClear]="true"
-      styleClass="w-full"
-    />
+    <p-floatlabel variant="on">
+      <p-select
+        inputId="instrument-transposition"
+        formControlName="transposition"
+        [options]="transpositionOptions"
+        [showClear]="true"
+        styleClass="w-full"
+      />
+      <label for="instrument-transposition">{{ 'instruments.form.transposition' | translate }}</label>
+    </p-floatlabel>
   </div>
 
   <div class="form-actions">

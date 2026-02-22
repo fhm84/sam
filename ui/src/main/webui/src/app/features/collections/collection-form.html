@@ -1,42 +1,49 @@
 <form [formGroup]="form" (ngSubmit)="onSave()" class="sam-form">
   <div class="form-field">
-    <label for="collection-name">{{ 'collections.form.name' | translate }}</label>
-    <input pInputText id="collection-name" formControlName="name" />
+    <p-floatlabel variant="on">
+      <input pInputText id="collection-name" formControlName="name" />
+      <label for="collection-name">{{ 'collections.form.name' | translate }}</label>
+    </p-floatlabel>
   </div>
 
   <div class="form-field">
-    <label for="collection-description">{{ 'collections.form.description' | translate }}</label>
-    <textarea
-      pTextarea
-      id="collection-description"
-      formControlName="description"
-      [rows]="3"
-      [autoResize]="true"
-    ></textarea>
+    <p-floatlabel variant="on">
+      <textarea
+        pTextarea
+        id="collection-description"
+        formControlName="description"
+        [rows]="3"
+        [autoResize]="true"
+      ></textarea>
+      <label for="collection-description">{{ 'collections.form.description' | translate }}</label>
+    </p-floatlabel>
   </div>
 
   <div class="form-row">
     <div class="form-field flex-1">
-      <label for="collection-type">{{ 'collections.form.type' | translate }}</label>
-      <p-select
-        id="collection-type"
-        formControlName="type"
-        [options]="typeOptions"
-        optionLabel="label"
-        optionValue="value"
-        [showClear]="true"
-        [placeholder]="t.t('collections.form.typePlaceholder')"
-      />
+      <p-floatlabel variant="on">
+        <p-select
+          inputId="collection-type"
+          formControlName="type"
+          [options]="typeOptions"
+          optionLabel="label"
+          optionValue="value"
+          [showClear]="true"
+        />
+        <label for="collection-type">{{ 'collections.form.type' | translate }}</label>
+      </p-floatlabel>
     </div>
     <div class="form-field flex-1">
-      <label for="collection-date">{{ 'collections.form.date' | translate }}</label>
-      <p-datepicker
-        id="collection-date"
-        formControlName="date"
-        [showIcon]="true"
-        [showButtonBar]="true"
-        dateFormat="dd.mm.yy"
-      />
+      <p-floatlabel variant="on">
+        <p-datepicker
+          inputId="collection-date"
+          formControlName="date"
+          [showIcon]="true"
+          [showButtonBar]="true"
+          dateFormat="dd.mm.yy"
+        />
+        <label for="collection-date">{{ 'collections.form.date' | translate }}</label>
+      </p-floatlabel>
     </div>
   </div>
 

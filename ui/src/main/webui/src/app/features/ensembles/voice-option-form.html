@@ -1,39 +1,43 @@
 <form [formGroup]="form" (ngSubmit)="onSave()" class="sam-form">
   <div class="form-field">
-    <label for="option-instrument">{{ 'ensembles.voices.options.form.instrument' | translate }}</label>
-    <p-select
-      id="option-instrument"
-      formControlName="instrumentId"
-      [options]="instrumentOptions()"
-      optionLabel="label"
-      optionValue="value"
-      [placeholder]="t.t('ensembles.voices.options.form.instrumentPlaceholder')"
-      [filter]="true"
-      styleClass="w-full"
-    />
+    <p-floatlabel variant="on">
+      <p-select
+        inputId="option-instrument"
+        formControlName="instrumentId"
+        [options]="instrumentOptions()"
+        optionLabel="label"
+        optionValue="value"
+        [filter]="true"
+        styleClass="w-full"
+      />
+      <label for="option-instrument">{{ 'ensembles.voices.options.form.instrument' | translate }}</label>
+    </p-floatlabel>
   </div>
 
   <div class="form-row">
     <div class="form-field">
-      <label for="option-type">{{ 'ensembles.voices.options.form.type' | translate }}</label>
-      <p-select
-        id="option-type"
-        formControlName="type"
-        [options]="typeOptions"
-        [placeholder]="t.t('ensembles.voices.options.form.typePlaceholder')"
-        [showClear]="true"
-        styleClass="w-full"
-      />
+      <p-floatlabel variant="on">
+        <p-select
+          inputId="option-type"
+          formControlName="type"
+          [options]="typeOptions"
+          [showClear]="true"
+          styleClass="w-full"
+        />
+        <label for="option-type">{{ 'ensembles.voices.options.form.type' | translate }}</label>
+      </p-floatlabel>
     </div>
 
     <div class="form-field">
-      <label for="option-factor">{{ 'ensembles.voices.options.form.factor' | translate }}</label>
-      <p-inputnumber
-        id="option-factor"
-        formControlName="factor"
-        [useGrouping]="false"
-        styleClass="w-full"
-      />
+      <p-floatlabel variant="on">
+        <p-inputnumber
+          inputId="option-factor"
+          formControlName="factor"
+          [useGrouping]="false"
+          styleClass="w-full"
+        />
+        <label for="option-factor">{{ 'ensembles.voices.options.form.factor' | translate }}</label>
+      </p-floatlabel>
     </div>
   </div>
 

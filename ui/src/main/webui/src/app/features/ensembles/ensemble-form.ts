@@ -1,5 +1,6 @@
 import { Component, inject, Input } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FloatLabel } from 'primeng/floatlabel';
 import { InputText } from 'primeng/inputtext';
 import { Textarea } from 'primeng/textarea';
 import { Button } from 'primeng/button';
@@ -12,7 +13,7 @@ import { BaseForm } from '../../shared/base/base-form';
 
 @Component({
   selector: 'app-ensemble-form',
-  imports: [ReactiveFormsModule, InputText, Textarea, Button, TranslatePipe],
+  imports: [ReactiveFormsModule, FloatLabel, InputText, Textarea, Button, TranslatePipe],
   templateUrl: './ensemble-form.html',
   styleUrl: './ensemble-form.scss',
 })

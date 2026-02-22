@@ -1,90 +1,110 @@
 <form [formGroup]="form" (ngSubmit)="onSave()" class="sam-form">
   <div class="form-field">
-    <label for="sheet-title">{{ 'sheets.form.title' | translate }}</label>
-    <input pInputText id="sheet-title" formControlName="title" />
+    <p-floatlabel variant="on">
+      <input pInputText id="sheet-title" formControlName="title" />
+      <label for="sheet-title">{{ 'sheets.form.title' | translate }}</label>
+    </p-floatlabel>
   </div>
 
   <div class="form-field">
-    <label for="sheet-subtitle">{{ 'sheets.form.subtitle' | translate }}</label>
-    <input pInputText id="sheet-subtitle" formControlName="subtitle" />
+    <p-floatlabel variant="on">
+      <input pInputText id="sheet-subtitle" formControlName="subtitle" />
+      <label for="sheet-subtitle">{{ 'sheets.form.subtitle' | translate }}</label>
+    </p-floatlabel>
   </div>
 
   <div class="form-row">
     <div class="form-field flex-1">
-      <label for="sheet-composer">{{ 'sheets.form.composer' | translate }}</label>
-      <p-select
-        id="sheet-composer"
-        formControlName="composerId"
-        [options]="musicians()"
-        optionLabel="name"
-        optionValue="id"
-        [filter]="true"
-        [showClear]="true"
-        [placeholder]="t.t('sheets.form.composerPlaceholder')"
-      />
+      <p-floatlabel variant="on">
+        <p-select
+          inputId="sheet-composer"
+          formControlName="composerId"
+          [options]="musicians()"
+          optionLabel="name"
+          optionValue="id"
+          [filter]="true"
+          [showClear]="true"
+        />
+        <label for="sheet-composer">{{ 'sheets.form.composer' | translate }}</label>
+      </p-floatlabel>
     </div>
     <div class="form-field flex-1">
-      <label for="sheet-arranger">{{ 'sheets.form.arranger' | translate }}</label>
-      <p-select
-        id="sheet-arranger"
-        formControlName="arrangerId"
-        [options]="musicians()"
-        optionLabel="name"
-        optionValue="id"
-        [filter]="true"
-        [showClear]="true"
-        [placeholder]="t.t('sheets.form.arrangerPlaceholder')"
-      />
-    </div>
-  </div>
-
-  <div class="form-row">
-    <div class="form-field flex-1">
-      <label for="sheet-genre">{{ 'sheets.form.genre' | translate }}</label>
-      <input pInputText id="sheet-genre" formControlName="genre" />
-    </div>
-    <div class="form-field flex-1">
-      <label for="sheet-year">{{ 'sheets.form.yearOfComposition' | translate }}</label>
-      <p-inputnumber
-        id="sheet-year"
-        formControlName="yearOfComposition"
-        [useGrouping]="false"
-        [maxlength]="4"
-      />
+      <p-floatlabel variant="on">
+        <p-select
+          inputId="sheet-arranger"
+          formControlName="arrangerId"
+          [options]="musicians()"
+          optionLabel="name"
+          optionValue="id"
+          [filter]="true"
+          [showClear]="true"
+        />
+        <label for="sheet-arranger">{{ 'sheets.form.arranger' | translate }}</label>
+      </p-floatlabel>
     </div>
   </div>
 
   <div class="form-row">
     <div class="form-field flex-1">
-      <label for="sheet-publisher">{{ 'sheets.form.publisher' | translate }}</label>
-      <input pInputText id="sheet-publisher" formControlName="publisher" />
+      <p-floatlabel variant="on">
+        <input pInputText id="sheet-genre" formControlName="genre" />
+        <label for="sheet-genre">{{ 'sheets.form.genre' | translate }}</label>
+      </p-floatlabel>
     </div>
     <div class="form-field flex-1">
-      <label for="sheet-edition">{{ 'sheets.form.edition' | translate }}</label>
-      <input pInputText id="sheet-edition" formControlName="edition" />
+      <p-floatlabel variant="on">
+        <p-inputnumber
+          inputId="sheet-year"
+          formControlName="yearOfComposition"
+          [useGrouping]="false"
+          [maxlength]="4"
+        />
+        <label for="sheet-year">{{ 'sheets.form.yearOfComposition' | translate }}</label>
+      </p-floatlabel>
     </div>
   </div>
 
   <div class="form-row">
     <div class="form-field flex-1">
-      <label for="sheet-difficulty">{{ 'sheets.form.difficultyLevel' | translate }}</label>
-      <input pInputText id="sheet-difficulty" formControlName="difficultyLevel" />
+      <p-floatlabel variant="on">
+        <input pInputText id="sheet-publisher" formControlName="publisher" />
+        <label for="sheet-publisher">{{ 'sheets.form.publisher' | translate }}</label>
+      </p-floatlabel>
     </div>
     <div class="form-field flex-1">
-      <label for="sheet-copyright">{{ 'sheets.form.copyright' | translate }}</label>
-      <input pInputText id="sheet-copyright" formControlName="copyright" />
+      <p-floatlabel variant="on">
+        <input pInputText id="sheet-edition" formControlName="edition" />
+        <label for="sheet-edition">{{ 'sheets.form.edition' | translate }}</label>
+      </p-floatlabel>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-field flex-1">
+      <p-floatlabel variant="on">
+        <input pInputText id="sheet-difficulty" formControlName="difficultyLevel" />
+        <label for="sheet-difficulty">{{ 'sheets.form.difficultyLevel' | translate }}</label>
+      </p-floatlabel>
+    </div>
+    <div class="form-field flex-1">
+      <p-floatlabel variant="on">
+        <input pInputText id="sheet-copyright" formControlName="copyright" />
+        <label for="sheet-copyright">{{ 'sheets.form.copyright' | translate }}</label>
+      </p-floatlabel>
     </div>
   </div>
 
   <div class="form-field">
-    <label for="sheet-notes">{{ 'sheets.form.additionalNotes' | translate }}</label>
-    <textarea
-      pTextarea
-      id="sheet-notes"
-      formControlName="additionalNotes"
-      [rows]="3"
-      [autoResize]="true"
-    ></textarea>
+    <p-floatlabel variant="on">
+      <textarea
+        pTextarea
+        id="sheet-notes"
+        formControlName="additionalNotes"
+        [rows]="3"
+        [autoResize]="true"
+      ></textarea>
+      <label for="sheet-notes">{{ 'sheets.form.additionalNotes' | translate }}</label>
+    </p-floatlabel>
   </div>
 
   <div class="form-actions">

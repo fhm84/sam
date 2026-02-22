@@ -1,5 +1,6 @@
 import { Component, inject, Input } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FloatLabel } from 'primeng/floatlabel';
 import { InputText } from 'primeng/inputtext';
 import { InputNumber } from 'primeng/inputnumber';
 import { Checkbox } from 'primeng/checkbox';
@@ -13,7 +14,7 @@ import { BaseForm } from '../../shared/base/base-form';
 
 @Component({
   selector: 'app-voice-form',
-  imports: [ReactiveFormsModule, InputText, InputNumber, Checkbox, Button, TranslatePipe],
+  imports: [ReactiveFormsModule, FloatLabel, InputText, InputNumber, Checkbox, Button, TranslatePipe],
   templateUrl: './voice-form.html',
   styleUrl: './voice-form.scss',
 })

@@ -1,0 +1,53 @@
+<div class="pref-page">
+  <h1 class="pref-title">{{ 'userPreferences.title' | translate }}</h1>
+
+  <div class="pref-card">
+    <h2 class="pref-card-title">{{ 'userPreferences.layoutTitle' | translate }}</h2>
+    <p class="pref-card-desc">{{ 'userPreferences.layoutDescription' | translate }}</p>
+
+    <div class="pref-rows">
+      <div class="pref-row">
+        <span class="pref-label">{{ 'nav.sheets' | translate }}</span>
+        <p-selectbutton
+          [options]="layoutOptions"
+          [(ngModel)]="sheetsLayout"
+          optionValue="value"
+          [allowEmpty]="false"
+          (onChange)="save('sheets', sheetsLayout)"
+        >
+          <ng-template #item let-item>
+            <i [class]="item.icon" [pTooltip]="item.labelKey | translate" tooltipPosition="top"></i>
+          </ng-template>
+        </p-selectbutton>
+      </div>
+      <div class="pref-row">
+        <span class="pref-label">{{ 'nav.collections' | translate }}</span>
+        <p-selectbutton
+          [options]="layoutOptions"
+          [(ngModel)]="collectionsLayout"
+          optionValue="value"
+          [allowEmpty]="false"
+          (onChange)="save('collections', collectionsLayout)"
+        >
+          <ng-template #item let-item>
+            <i [class]="item.icon" [pTooltip]="item.labelKey | translate" tooltipPosition="top"></i>
+          </ng-template>
+        </p-selectbutton>
+      </div>
+      <div class="pref-row">
+        <span class="pref-label">{{ 'nav.admin.ensembles' | translate }}</span>
+        <p-selectbutton
+          [options]="layoutOptions"
+          [(ngModel)]="ensemblesLayout"
+          optionValue="value"
+          [allowEmpty]="false"
+          (onChange)="save('ensembles', ensemblesLayout)"
+        >
+          <ng-template #item let-item>
+            <i [class]="item.icon" [pTooltip]="item.labelKey | translate" tooltipPosition="top"></i>
+          </ng-template>
+        </p-selectbutton>
+      </div>
+    </div>
+  </div>
+</div>

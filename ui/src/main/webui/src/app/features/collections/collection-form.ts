@@ -1,5 +1,6 @@
 import { Component, inject, Input } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FloatLabel } from 'primeng/floatlabel';
 import { InputText } from 'primeng/inputtext';
 import { Textarea } from 'primeng/textarea';
 import { Select } from 'primeng/select';
@@ -14,7 +15,7 @@ import { BaseForm } from '../../shared/base/base-form';
 
 @Component({
   selector: 'app-collection-form',
-  imports: [ReactiveFormsModule, InputText, Textarea, Select, DatePicker, Button, TranslatePipe],
+  imports: [ReactiveFormsModule, FloatLabel, InputText, Textarea, Select, DatePicker, Button, TranslatePipe],
   templateUrl: './collection-form.html',
   styleUrl: './collection-form.scss',
 })

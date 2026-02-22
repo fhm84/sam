@@ -1,5 +1,6 @@
 import { Component, inject, Input, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FloatLabel } from 'primeng/floatlabel';
 import { InputText } from 'primeng/inputtext';
 import { InputNumber } from 'primeng/inputnumber';
 import { Textarea } from 'primeng/textarea';
@@ -15,7 +16,7 @@ import { FETCH_ALL_SIZE } from '../../shared/constants';
 
 @Component({
   selector: 'app-sheet-form',
-  imports: [ReactiveFormsModule, InputText, InputNumber, Textarea, Select, Button, TranslatePipe],
+  imports: [ReactiveFormsModule, FloatLabel, InputText, InputNumber, Textarea, Select, Button, TranslatePipe],
   templateUrl: './sheet-form.html',
   styleUrl: './sheet-form.scss',
 })

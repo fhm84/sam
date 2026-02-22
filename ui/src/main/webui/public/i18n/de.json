@@ -7,6 +7,9 @@
     "collections": "Sammlungen",
     "uploads": "Uploads",
     "musicians": "Musiker",
+    "profile": "Profil",
+    "userPreferences": "Benutzereinstellungen",
+    "logout": "Abmelden",
     "admin": {
       "title": "Verwaltung",
       "ensembles": "Ensembles",
@@ -20,7 +23,15 @@
     "samLogo": "SAM-Logo",
     "switchToLight": "Zum hellen Modus wechseln",
     "switchToDark": "Zum dunklen Modus wechseln",
-    "switchLanguage": "Sprache wechseln"
+    "switchLanguage": "Sprache wechseln",
+    "openUserMenu": "Benutzermenü öffnen"
+  },
+  "userPreferences": {
+    "title": "Benutzereinstellungen",
+    "layoutTitle": "Übersichts-Layout",
+    "layoutDescription": "Wählen Sie den Standard-Anzeigemodus für jede Übersichtsseite.",
+    "list": "Liste",
+    "cards": "Kacheln"
   },
   "sheets": {
     "title": "Noten",
