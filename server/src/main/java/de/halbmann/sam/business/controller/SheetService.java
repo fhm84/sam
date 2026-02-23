@@ -59,6 +59,9 @@ public class SheetService {
             if (filterRequest.getGenre() != null) {
                 parameters.put("genre", filterRequest.getGenre());
             }
+            if (filterRequest.getFavorite() != null) {
+                parameters.put("favorite", filterRequest.getFavorite());
+            }
 
             PaginatedResponse<SheetMusic> sheets =
                     getAllSheets(filterRequest, parameters, filterRequest.getTitleStartsWith());

@@ -37,4 +37,10 @@ public class SheetFilterRequest extends PaginationRequest {
      */
     @QueryParam("titleStartsWith")
     private String titleStartsWith;
+
+    /**
+     * Filter for (non) favorite sheets.
+     */
+    @QueryParam("favorite")
+    private Boolean favorite;
 }
