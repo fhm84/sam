@@ -124,6 +124,26 @@
   </div>
 
   <div class="form-field">
+    <div class="field-with-hint">
+      <p-floatlabel variant="on">
+        <p-autocomplete
+          inputId="sheet-tags"
+          formControlName="tags"
+          [multiple]="true"
+          [typeahead]="false"
+          [addOnBlur]="true"
+          [addOnTab]="true"
+          separator=","
+        />
+        <label for="sheet-tags">{{ 'sheets.form.tags' | translate }}</label>
+      </p-floatlabel>
+      <i class="pi pi-info-circle field-hint-icon"
+         [pTooltip]="t.t('sheets.form.tagsTooltip')"
+         tooltipPosition="right"></i>
+    </div>
+  </div>
+
+  <div class="form-field">
     <p-floatlabel variant="on">
       <textarea
         pTextarea

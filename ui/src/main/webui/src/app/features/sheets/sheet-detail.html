@@ -5,10 +5,20 @@
 } @else if (sheet(); as s) {
   <div class="detail-header">
     <div class="detail-title-group">
-      <h2>{{ s.title }}</h2>
-      @if (s.subtitle) {
-        <span class="detail-subtitle">{{ s.subtitle }}</span>
-      }
+      <p-button
+        [icon]="s.favorite ? 'pi pi-star-fill' : 'pi pi-star'"
+        [severity]="s.favorite ? 'warn' : 'secondary'"
+        [rounded]="true"
+        [text]="true"
+        size="small"
+        (onClick)="toggleFavorite()"
+      />
+      <div class="detail-title-text">
+        <h2>{{ s.title }}</h2>
+        @if (s.subtitle) {
+          <span class="detail-subtitle">{{ s.subtitle }}</span>
+        }
+      </div>
     </div>
     <div class="detail-header-actions">
       @if (mode === 'compact') {
@@ -76,6 +86,16 @@
             <div class="meta-entry">
               <span class="detail-label">{{ 'sheets.detail.difficulty' | translate }}</span>
               <span class="detail-value">{{ s.difficultyLevel }}</span>
+            </div>
+          }
+          @if (s.tags && s.tags.length > 0) {
+            <div class="meta-entry full-width">
+              <span class="detail-label">{{ 'sheets.detail.tags' | translate }}</span>
+              <div class="detail-tags">
+                @for (tag of s.tags; track tag) {
+                  <span class="detail-tag">#{{ tag }}</span>
+                }
+              </div>
             </div>
           }
         </div>

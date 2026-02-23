@@ -15,6 +15,13 @@
 
 .detail-title-group {
   display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 0.125rem;
+}
+
+.detail-title-text {
+  display: flex;
   flex-direction: column;
   gap: 0.25rem;
 }

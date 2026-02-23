@@ -83,7 +83,9 @@
       "difficultyLevel": "Schwierigkeitsgrad",
       "difficultyLevelTooltip": "Freitext zur Schwierigkeit, z.B. '3/5', 'Stufe 4' oder 'Leicht'.",
       "copyright": "Urheberrecht",
-      "additionalNotes": "Zusätzliche Anmerkungen"
+      "additionalNotes": "Zusätzliche Anmerkungen",
+      "tags": "Tags",
+      "tagsTooltip": "Frei vergebene Schlagwörter zum schnellen Finden und Gruppieren von Stücken, z.B. 'outdoor', 'weihnachten', 'leicht'. Mit Enter oder Komma trennen."
     },
     "delete": {
       "confirm": "Möchten Sie das Notenblatt \"{title}\" wirklich löschen?",
@@ -113,6 +115,7 @@
       "iswc": "ISWC",
       "originalBy": "Original von",
       "rating": "Bewertung",
+      "tags": "Tags",
       "notes": "Anmerkungen",
       "noNotes": "Keine Anmerkungen",
       "noDocuments": "Keine Dokumente vorhanden",

@@ -100,6 +100,17 @@ export class SheetDetail extends DocumentHandler implements OnChanges {
     this.loadInstrumentations();
   }
 
+  protected toggleFavorite(): void {
+    const s = this.sheet();
+    if (!s?.id) return;
+    const wasFavorite = s.favorite;
+    this.sheet.update((current) => (current ? { ...current, favorite: !wasFavorite } : current));
+    const req = wasFavorite ? this.sheetsApi.unfavorite(s.id) : this.sheetsApi.favorite(s.id);
+    req.subscribe({
+      error: () => this.sheet.update((current) => (current ? { ...current, favorite: wasFavorite } : current)),
+    });
+  }
+
   reloadSheet(): void {
     this.loadSheet();
   }

@@ -84,6 +84,11 @@
   }
 }
 
+.fav-col {
+  width: 2.5rem;
+  padding-right: 0 !important;
+}
+
 .sheet-title-cell {
   display: block;
   font-weight: 500;
@@ -115,8 +120,8 @@
   display: flex;
   flex-direction: column;
   padding: 1.25rem;
-  background: var(--p-surface-0);
-  border: 1px solid var(--p-surface-200);
+  background: var(--sam-surface);
+  border: 1px solid var(--sam-border);
   border-radius: var(--p-border-radius);
   transition: box-shadow 0.2s;
 
@@ -131,9 +136,18 @@
 
 .card-header {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: flex-start;
   gap: 0.125rem;
   margin-bottom: 0.75rem;
+}
+
+.card-title-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  flex: 1;
+  min-width: 0;
 }
 
 .card-title {
@@ -205,13 +219,18 @@
   gap: 0.25rem;
   font-size: 0.75rem;
   color: var(--sam-text-secondary);
-  background: var(--p-surface-100);
+  background: var(--sam-bg);
   padding: 0.2rem 0.5rem;
   border-radius: 999px;
 
   i {
     font-size: 0.65rem;
   }
+}
+
+.card-tag-user {
+  color: var(--p-primary-color);
+  background: color-mix(in srgb, var(--p-primary-color) 10%, transparent);
 }
 
 // reserved space for future rating / coverage indicators
@@ -227,7 +246,8 @@
   gap: 0.125rem;
   opacity: 0;
   transition: opacity 0.15s;
-  background: var(--p-surface-0);
+  background: var(--sam-surface);
+  border: 1px solid var(--sam-border);
   border-radius: var(--p-border-radius);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
   padding: 0.125rem;

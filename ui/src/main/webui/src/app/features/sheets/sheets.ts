@@ -213,6 +213,17 @@ export class Sheets implements OnInit {
     this.loadData();
   }
 
+  protected toggleFavorite(sheet: SheetMusicSearchResult, event: Event): void {
+    event.stopPropagation();
+    const wasFavorite = sheet.favorite;
+    this.sheets.update((list) => list.map((s) => (s.id === sheet.id ? { ...s, favorite: !wasFavorite } : s)));
+    const req = wasFavorite ? this.api.unfavorite(sheet.id!) : this.api.favorite(sheet.id!);
+    req.subscribe({
+      error: () =>
+        this.sheets.update((list) => list.map((s) => (s.id === sheet.id ? { ...s, favorite: wasFavorite } : s))),
+    });
+  }
+
   private loadData(): void {
     this.loading.set(true);
     this.api

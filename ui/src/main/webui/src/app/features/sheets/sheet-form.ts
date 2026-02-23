@@ -5,6 +5,7 @@ import { InputText } from 'primeng/inputtext';
 import { InputNumber } from 'primeng/inputnumber';
 import { Textarea } from 'primeng/textarea';
 import { Select } from 'primeng/select';
+import { AutoComplete } from 'primeng/autocomplete';
 import { Button } from 'primeng/button';
 import { Tooltip } from 'primeng/tooltip';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
@@ -17,7 +18,7 @@ import { FETCH_ALL_SIZE, GENRES, STYLES } from '../../shared/constants';
 
 @Component({
   selector: 'app-sheet-form',
-  imports: [ReactiveFormsModule, FloatLabel, InputText, InputNumber, Textarea, Select, Button, Tooltip, TranslatePipe],
+  imports: [ReactiveFormsModule, FloatLabel, InputText, InputNumber, Textarea, Select, AutoComplete, Button, Tooltip, TranslatePipe],
   templateUrl: './sheet-form.html',
   styleUrl: './sheet-form.scss',
 })
@@ -50,6 +51,7 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
     edition: new FormControl('', { nonNullable: true }),
     copyright: new FormControl('', { nonNullable: true }),
     additionalNotes: new FormControl('', { nonNullable: true }),
+    tags: new FormControl<string[]>([], { nonNullable: true }),
   });
 
   getEntity = () => this.sheet;
@@ -74,6 +76,7 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
       edition: s.edition ?? '',
       copyright: s.copyright ?? '',
       additionalNotes: s.additionalNotes ?? '',
+      tags: s.tags ?? [],
     });
   }
 
@@ -101,6 +104,7 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
       edition: raw.edition,
       copyright: raw.copyright,
       additionalNotes: raw.additionalNotes,
+      tags: raw.tags.length > 0 ? raw.tags : undefined,
     });
 
     return this.isEdit

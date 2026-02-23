@@ -96,6 +96,7 @@
     >
       <ng-template #header>
         <tr>
+          <th class="fav-col"></th>
           <th>{{ 'sheets.columns.title' | translate }}</th>
           <th>{{ 'sheets.columns.composer' | translate }}</th>
           <th>{{ 'sheets.columns.genre' | translate }}</th>
@@ -107,6 +108,16 @@
 
       <ng-template #body let-sheet>
         <tr class="clickable-row" (click)="openDetail(sheet)">
+          <td class="fav-col">
+            <p-button
+              [icon]="sheet.favorite ? 'pi pi-star-fill' : 'pi pi-star'"
+              [severity]="sheet.favorite ? 'warn' : 'secondary'"
+              [rounded]="true"
+              [text]="true"
+              size="small"
+              (onClick)="toggleFavorite(sheet, $event)"
+            />
+          </td>
           <td>
             <span class="sheet-title-cell">{{ sheet.title }}</span>
             @if (sheet.subtitle) {
@@ -170,10 +181,20 @@
               />
             </div>
             <div class="card-header">
-              <span class="card-title">{{ sheet.title }}</span>
-              @if (sheet.subtitle) {
-                <span class="card-subtitle">{{ sheet.subtitle }}</span>
-              }
+              <p-button
+                [icon]="sheet.favorite ? 'pi pi-star-fill' : 'pi pi-star'"
+                [severity]="sheet.favorite ? 'warn' : 'secondary'"
+                [rounded]="true"
+                [text]="true"
+                size="small"
+                (onClick)="toggleFavorite(sheet, $event)"
+              />
+              <div class="card-title-text">
+                <span class="card-title">{{ sheet.title }}</span>
+                @if (sheet.subtitle) {
+                  <span class="card-subtitle">{{ sheet.subtitle }}</span>
+                }
+              </div>
             </div>
             <div class="card-people">
               @if (sheet.composer?.name) {
@@ -219,6 +240,9 @@
                 <span class="card-tag">
                   <i class="pi pi-calendar"></i> {{ sheet.yearOfComposition }}
                 </span>
+              }
+              @for (tag of sheet.tags; track tag) {
+                <span class="card-tag card-tag-user">#{{ tag }}</span>
               }
             </div>
             <!-- reserved: rating & coverage indicators -->

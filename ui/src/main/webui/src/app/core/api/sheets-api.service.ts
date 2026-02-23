@@ -58,4 +58,20 @@ export class SheetsApiService {
     const params = new HttpParams().set('ensemble', ensembleId);
     return this.http.get<CoverageResult>(`${this.baseUrl}/${sheetId}/coverage`, { params });
   }
+
+  favorite(id: string): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/${id}/favorite`, null);
+  }
+
+  unfavorite(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}/favorite`);
+  }
+
+  addTags(id: string, tags: string[]): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/${id}/tags`, tags);
+  }
+
+  removeTags(id: string, tags: string[]): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}/tags`, { body: tags });
+  }
 }
