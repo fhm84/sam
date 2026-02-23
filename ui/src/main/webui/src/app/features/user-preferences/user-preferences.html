@@ -2,6 +2,38 @@
   <h1 class="pref-title">{{ 'userPreferences.title' | translate }}</h1>
 
   <div class="pref-card">
+    <h2 class="pref-card-title">{{ 'userPreferences.themeTitle' | translate }}</h2>
+    <p class="pref-card-desc">{{ 'userPreferences.themeDescription' | translate }}</p>
+    <p-selectbutton
+      [options]="themeOptions"
+      [ngModel]="theme.dark() ? 'dark' : 'light'"
+      optionValue="value"
+      [allowEmpty]="false"
+      (ngModelChange)="setTheme($event)"
+    >
+      <ng-template #item let-item>
+        <i [class]="item.icon" [pTooltip]="item.labelKey | translate" tooltipPosition="top"></i>
+      </ng-template>
+    </p-selectbutton>
+  </div>
+
+  <div class="pref-card">
+    <h2 class="pref-card-title">{{ 'userPreferences.languageTitle' | translate }}</h2>
+    <p class="pref-card-desc">{{ 'userPreferences.languageDescription' | translate }}</p>
+    <p-selectbutton
+      [options]="languageOptions"
+      [ngModel]="i18n.locale()"
+      optionValue="value"
+      [allowEmpty]="false"
+      (ngModelChange)="setLanguage($event)"
+    >
+      <ng-template #item let-item>
+        <span [pTooltip]="item.labelKey | translate" tooltipPosition="top">{{ item.label }}</span>
+      </ng-template>
+    </p-selectbutton>
+  </div>
+
+  <div class="pref-card">
     <h2 class="pref-card-title">{{ 'userPreferences.layoutTitle' | translate }}</h2>
     <p class="pref-card-desc">{{ 'userPreferences.layoutDescription' | translate }}</p>
 

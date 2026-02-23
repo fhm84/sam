@@ -4,6 +4,8 @@ import { SelectButton } from 'primeng/selectbutton';
 import { Tooltip } from 'primeng/tooltip';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { LayoutPreferenceService } from '../../core/layout-preference.service';
+import { ThemeService } from '../../core/theme.service';
+import { Locale, TranslationService } from '../../core/translation.service';
 
 @Component({
   selector: 'app-user-preferences',
@@ -14,10 +16,22 @@ import { LayoutPreferenceService } from '../../core/layout-preference.service';
 })
 export class UserPreferences {
   private readonly layoutPrefs = inject(LayoutPreferenceService);
+  protected readonly theme = inject(ThemeService);
+  protected readonly i18n = inject(TranslationService);
 
   protected readonly layoutOptions = [
     { icon: 'pi pi-th-large', value: 'cards', labelKey: 'userPreferences.cards' },
     { icon: 'pi pi-list', value: 'list', labelKey: 'userPreferences.list' },
+  ];
+
+  protected readonly themeOptions = [
+    { icon: 'pi pi-sun', value: 'light', labelKey: 'userPreferences.light' },
+    { icon: 'pi pi-moon', value: 'dark', labelKey: 'userPreferences.dark' },
+  ];
+
+  protected readonly languageOptions = [
+    { label: 'EN', value: 'en', labelKey: 'userPreferences.languageEn' },
+    { label: 'DE', value: 'de', labelKey: 'userPreferences.languageDe' },
   ];
 
   protected readonly sheetsLayout = signal(this.layoutPrefs.getViewMode('sheets'));
@@ -26,5 +40,15 @@ export class UserPreferences {
 
   protected save(page: string, layout: WritableSignal<'list' | 'cards'>): void {
     this.layoutPrefs.setViewMode(page, layout());
+  }
+
+  protected setTheme(value: 'light' | 'dark'): void {
+    if (this.theme.dark() !== (value === 'dark')) {
+      this.theme.toggle();
+    }
+  }
+
+  protected setLanguage(value: Locale): void {
+    this.i18n.setLocale(value);
   }
 }
