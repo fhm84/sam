@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import picocli.CommandLine;
@@ -56,8 +57,8 @@ public class ImportInstrumentCommand implements Runnable {
 
         Map<Boolean, Long> collected =
                 results.stream().collect(Collectors.groupingBy(ImportResult::success, Collectors.counting()));
-        Long successCount = collected.get(Boolean.TRUE);
-        Long failureCount = collected.get(Boolean.FALSE);
+        Long successCount = Optional.ofNullable(collected.get(Boolean.TRUE)).orElse(0L);
+        Long failureCount = Optional.ofNullable(collected.get(Boolean.FALSE)).orElse(0L);
         if (dryRun) {
             System.out.println("Dry run completed. No instruments were imported.");
         } else {
