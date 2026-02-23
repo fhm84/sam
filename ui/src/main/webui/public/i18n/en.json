@@ -247,6 +247,11 @@
       "deleted": "Collection deleted successfully",
       "error": "An error occurred"
     },
+    "filters": {
+      "type": "Type",
+      "typePlaceholder": "All types",
+      "clear": "Clear filters"
+    },
     "search": "Search collections",
     "empty": "No collections found",
     "save": "Save",

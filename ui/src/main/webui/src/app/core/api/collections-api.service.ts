@@ -24,6 +24,7 @@ export class CollectionsApiService {
     if (filter.size !== undefined) params = params.set('size', filter.size);
     if (filter.name) params = params.set('name', filter.name);
     if (filter.query) params = params.set('query', filter.query);
+    if (filter.type) params = params.set('type', filter.type);
     return this.http.get<PaginatedResponse<SheetCollection>>(this.baseUrl, { params });
   }
 

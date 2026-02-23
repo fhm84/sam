@@ -19,4 +19,10 @@ public class SheetCollectionFilterRequest extends PaginationRequest {
      */
     @QueryParam("name")
     private String name;
+
+    /**
+     * Filter by collection type
+     */
+    @QueryParam("type")
+    private CollectionType type;
 }

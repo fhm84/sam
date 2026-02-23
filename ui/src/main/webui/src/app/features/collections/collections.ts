@@ -8,13 +8,14 @@ import { Button } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
+import { Select } from 'primeng/select';
 import { SelectButton } from 'primeng/selectbutton';
 import { Paginator } from 'primeng/paginator';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { LayoutPreferenceService } from '../../core/layout-preference.service';
 import { CollectionsApiService } from '../../core/api';
-import { SheetCollection, SheetCollectionFilterRequest } from '../../model/datamodels';
+import { CollectionType, SheetCollection, SheetCollectionFilterRequest } from '../../model/datamodels';
 import { BaseCrudList } from '../../shared/base/base-crud-list';
 import { CrudApi } from '../../shared/base/crud-api.interface';
 import { CollectionForm } from './collection-form';
@@ -29,6 +30,7 @@ Button,
     InputText,
     IconField,
     InputIcon,
+    Select,
     SelectButton,
     Paginator,
     LowerCasePipe,
@@ -47,10 +49,18 @@ export class Collections extends BaseCrudList<SheetCollection, SheetCollectionFi
   translationPrefix = 'collections';
   getItemId = (c: SheetCollection) => c.id!;
   getItemName = (c: SheetCollection) => c.name;
+  protected readonly typeFilter = signal<CollectionType | null>(null);
+
+  protected readonly typeFilterOptions: { value: CollectionType }[] = [
+    { value: 'FOLDER' },
+    { value: 'SETLIST' },
+  ];
+
   buildFilter = (): SheetCollectionFilterRequest => ({
     page: this.currentPage,
     size: this.rows,
     name: this.nameFilter || undefined,
+    type: this.typeFilter() ?? undefined,
   });
 
   protected readonly viewMode = signal<'list' | 'cards'>('cards');
@@ -68,6 +78,18 @@ export class Collections extends BaseCrudList<SheetCollection, SheetCollectionFi
 
   protected override init(): void {
     this.viewMode.set(this.layoutPref.getViewMode('collections'));
+    this.loadData();
+  }
+
+  protected onTypeFilterChange(value: CollectionType | null): void {
+    this.typeFilter.set(value ?? null);
+    this.currentPage = 0;
+    this.loadData();
+  }
+
+  protected clearFilters(): void {
+    this.typeFilter.set(null);
+    this.currentPage = 0;
     this.loadData();
   }
 

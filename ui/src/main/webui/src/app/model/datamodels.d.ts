@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 3.2.1263 on 2026-02-23 21:25:53.
+// Generated using typescript-generator version 3.2.1263 on 2026-02-23 23:00:53.
 
 export interface Attachment {
     checksum?: string;
@@ -211,10 +211,12 @@ export interface SheetCollection {
 export interface SheetCollectionFilterRequest extends PaginationRequest {
     name?: string;
     query?: string;
+    type?: CollectionType;
 }
 
 export interface SheetFilterRequest extends PaginationRequest {
     composer?: string;
+    favorite?: boolean;
     genre?: string;
     query?: string;
     title?: string;

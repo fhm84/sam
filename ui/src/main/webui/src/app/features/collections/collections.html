@@ -16,7 +16,7 @@
       </p-iconfield>
       <p-selectbutton
         [options]="viewOptions"
-        [(ngModel)]="viewMode"
+        [ngModel]="viewMode()" (ngModelChange)="viewMode.set($event)"
         optionLabel="icon"
         optionValue="value"
         (onChange)="onViewModeChange()"
@@ -30,6 +30,31 @@
         icon="pi pi-plus"
         (onClick)="openNew()"
       />
+    </div>
+  </div>
+
+  <div class="filter-panel">
+    <div class="filter-row">
+      <div class="filter-field">
+        <label>{{ 'collections.filters.type' | translate }}</label>
+        <p-select
+          [options]="typeFilterOptions"
+          [ngModel]="typeFilter()"
+          (ngModelChange)="onTypeFilterChange($event)"
+          optionValue="value"
+          [placeholder]="t.t('collections.filters.typePlaceholder')"
+          [showClear]="true"
+          appendTo="body"
+        >
+          <ng-template #selectedItem let-opt>{{ 'collections.types.' + opt.value | translate }}</ng-template>
+          <ng-template #item let-opt>{{ 'collections.types.' + opt.value | translate }}</ng-template>
+        </p-select>
+      </div>
+      @if (typeFilter()) {
+        <span class="clear-filters" (click)="clearFilters()">
+          {{ 'collections.filters.clear' | translate }}
+        </span>
+      }
     </div>
   </div>
 

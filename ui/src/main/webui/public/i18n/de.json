@@ -247,6 +247,11 @@
       "deleted": "Sammlung erfolgreich gelöscht",
       "error": "Ein Fehler ist aufgetreten"
     },
+    "filters": {
+      "type": "Typ",
+      "typePlaceholder": "Alle Typen",
+      "clear": "Filter zurücksetzen"
+    },
     "search": "Sammlungen suchen",
     "empty": "Keine Sammlungen gefunden",
     "save": "Speichern",

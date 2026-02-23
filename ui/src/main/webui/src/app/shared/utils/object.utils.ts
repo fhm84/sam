@@ -7,6 +7,7 @@ export function convertEmptyStringsToNull<T>(obj: T): T {
   if (Array.isArray(obj)) {
     return obj.map((value) => convertEmptyStringsToNull(value)) as T;
   }
+  if (obj instanceof Date) return obj;
   if (obj !== null && typeof obj === 'object') {
     return Object.fromEntries(
       Object.entries(obj).map(([key, value]) => [key, convertEmptyStringsToNull(value)]),
