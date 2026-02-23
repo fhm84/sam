@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FloatLabel } from 'primeng/floatlabel';
 import { InputText } from 'primeng/inputtext';
@@ -9,10 +9,10 @@ import { Button } from 'primeng/button';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { SheetsApiService, MusiciansApiService } from '../../core/api';
 import { convertEmptyStringsToNull } from '../../shared/utils/object.utils';
-import { CreateSheetMusic, Musician, SheetMusic } from '../../model/datamodels';
+import { CreateSheetMusic, Genre, Musician, SheetMusic } from '../../model/datamodels';
 import { map, Observable } from 'rxjs';
 import { BaseForm } from '../../shared/base/base-form';
-import { FETCH_ALL_SIZE } from '../../shared/constants';
+import { FETCH_ALL_SIZE, GENRES } from '../../shared/constants';
 
 @Component({
   selector: 'app-sheet-form',
@@ -28,12 +28,16 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
 
   protected readonly musicians = signal<Musician[]>([]);
 
+  protected readonly genreOptions = computed(() =>
+    GENRES.map((g) => ({ label: this.t.t(`sheets.genres.${g}`), value: g })),
+  );
+
   readonly form = new FormGroup({
     title: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     subtitle: new FormControl('', { nonNullable: true }),
     composerId: new FormControl<string | null>(null),
     arrangerId: new FormControl<string | null>(null),
-    genre: new FormControl('', { nonNullable: true }),
+    genre: new FormControl<Genre | null>(null),
     yearOfComposition: new FormControl<number | null>(null),
     publisher: new FormControl('', { nonNullable: true }),
     difficultyLevel: new FormControl('', { nonNullable: true }),
@@ -56,7 +60,7 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
       subtitle: s.subtitle ?? '',
       composerId: s.composer?.id ?? null,
       arrangerId: s.arranger?.id ?? null,
-      genre: s.genre ?? '',
+      genre: s.genre ?? null,
       yearOfComposition: s.yearOfComposition ?? null,
       publisher: s.publisher ?? '',
       difficultyLevel: s.difficultyLevel ?? '',
@@ -82,7 +86,7 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
       subtitle: raw.subtitle,
       composer: composer ? { id: composer.id, name: composer.name } : undefined,
       arranger: arranger ? { id: arranger.id, name: arranger.name } : undefined,
-      genre: raw.genre,
+      genre: raw.genre ?? undefined,
       yearOfComposition: raw.yearOfComposition ?? undefined,
       publisher: raw.publisher,
       difficultyLevel: raw.difficultyLevel,

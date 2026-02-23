@@ -4,10 +4,7 @@ import jakarta.json.bind.annotation.JsonbTypeAdapter;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import lombok.*;
 
 /**
@@ -63,9 +60,52 @@ public class SheetMusic {
     String originalBy;
 
     /**
-     * Classification (e.g., Classical, Jazz)
+     * The primary musical genre of this sheet music.
+     *
+     * <p>
+     * The genre represents the dominant musical form or category of the work
+     * (e.g. march, suite, overture). Exactly one genre MUST be assigned.
+     * </p>
+     *
+     * <p>
+     * The genre is used for:
+     * <ul>
+     *   <li>primary classification</li>
+     *   <li>filtering and search</li>
+     *   <li>domain validation rules</li>
+     * </ul>
+     * </p>
+     *
+     * <p>
+     * Stylistic characteristics MUST be expressed using {@link Style}, and
+     * situational aspects MUST be expressed using tags.
+     * </p>
      */
-    String genre;
+    Genre genre;
+
+    /**
+     * The stylistic classification of this sheet music.
+     *
+     * <p>
+     * The style describes the musical language or aesthetic of the work and
+     * complements the {@link #genre}. This field is optional.
+     * </p>
+     *
+     * <p>
+     * Examples:
+     * <ul>
+     *   <li>A traditional march &rarr; {@code Style.TRADITIONAL}</li>
+     *   <li>A contemporary concert work &rarr; {@code Style.CONTEMPORARY}</li>
+     *   <li>A jazz-influenced suite &rarr; {@code Style.SWING}</li>
+     * </ul>
+     * </p>
+     *
+     * <p>
+     * Styles are subject to domain validation rules and may be restricted or
+     * considered unusual for certain genres.
+     * </p>
+     */
+    Style style;
 
     /**
      * Level (Beginner, Intermediate, Advanced).
@@ -113,6 +153,8 @@ public class SheetMusic {
      */
     String additionalNotes;
 
+    Set<String> tags = new HashSet<>();
+
     /**
      * Individual instrument parts for a piece of sheet music.
      */
@@ -123,7 +165,4 @@ public class SheetMusic {
      * Metadata of the sheet music files (including location, mime-type, fileSize, ...)
      */
     Set<Attachment> attachments;
-
-    // TODO: Set<String> tags; // "Weihnachten", "Hochzeit", "Zugabe", "Trauerfeier"
-
 }

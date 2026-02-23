@@ -11,7 +11,7 @@ public class ObjectMother {
         final CreateSheetMusic sheetMusic = new CreateSheetMusic();
         sheetMusic.setTitle("Music from Pirates of the Caribbean");
         sheetMusic.setPublisher("Disney Music Corp");
-        sheetMusic.setGenre("Movie");
+        sheetMusic.setGenre(Genre.FILM_MUSIC);
         sheetMusic.setDifficultyLevel(DifficultyLevel.MEDIUM);
         return sheetMusic;
     }

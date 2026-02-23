@@ -19,7 +19,8 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../core/translation.service';
 import { LayoutPreferenceService } from '../../core/layout-preference.service';
 import { SheetsApiService } from '../../core/api';
-import { SheetMusic, SheetMusicSearchResult } from '../../model/datamodels';
+import { Genre, SheetMusic, SheetMusicSearchResult } from '../../model/datamodels';
+import { GENRES } from '../../shared/constants';
 import { SheetDetail } from './sheet-detail';
 
 @Component({
@@ -63,8 +64,11 @@ export class Sheets implements OnInit {
   protected readonly loading = signal(true);
   protected readonly viewMode = signal<'list' | 'cards'>('cards');
   protected readonly filterPanelOpen = signal(false);
-  protected readonly genres = signal<string[]>([]);
-  protected readonly selectedGenre = signal<string | null>(null);
+  protected readonly genreOptions = computed(() =>
+    GENRES.map((g) => ({ label: this.t.t(`sheets.genres.${g}`), value: g })),
+  );
+
+  protected readonly selectedGenre = signal<Genre | null>(null);
   protected readonly selectedLetter = signal<string | null>(null);
   protected readonly availableLetters = signal<string[]>([]);
   protected readonly hasTextSearch = signal(false);
@@ -98,7 +102,6 @@ export class Sheets implements OnInit {
         this.loadData();
       });
 
-    this.api.getGenres().subscribe((genres) => this.genres.set(genres));
     this.viewMode.set(this.layoutPref.getViewMode('sheets'));
     this.loadAvailableLetters();
     this.loadData();
@@ -130,7 +133,7 @@ export class Sheets implements OnInit {
     this.filterPanelOpen.update((v) => !v);
   }
 
-  protected onGenreChange(genre: string | null): void {
+  protected onGenreChange(genre: Genre | null): void {
     this.selectedGenre.set(genre);
     this.selectedLetter.set(null);
     this.currentPage = 0;

@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 3.2.1263 on 2026-02-21 22:50:59.
+// Generated using typescript-generator version 3.2.1263 on 2026-02-23 11:27:56.
 
 export interface Attachment {
     checksum?: string;
@@ -81,13 +81,15 @@ export interface CreateSheetMusic {
     edition?: string;
     favorite?: boolean;
     gemaWorkNumber?: string;
-    genre?: string;
+    genre?: Genre;
     iswc?: string;
     originalBy?: string;
     publisher?: string;
     publisherIpi?: string;
     rating?: number;
+    style?: Style;
     subtitle?: string;
+    tags?: string[];
     title: string;
     yearOfComposition?: number;
 }
@@ -140,10 +142,6 @@ export interface EnsembleVoice {
 export interface FileUploadRequest {
     file?: FileUpload;
     type?: AttachmentType;
-}
-
-export interface Genre {
-    name: string;
 }
 
 export interface Instrument {
@@ -234,7 +232,7 @@ export interface SheetMusic {
     edition?: string;
     favorite?: boolean;
     gemaWorkNumber?: string;
-    genre?: string;
+    genre?: Genre;
     id?: string;
     instrumentations?: Instrumentation[];
     iswc?: string;
@@ -242,7 +240,9 @@ export interface SheetMusic {
     publisher?: string;
     publisherIpi?: string;
     rating?: number;
+    style?: Style;
     subtitle?: string;
+    tags?: string[];
     title: string;
     yearOfComposition?: number;
 }
@@ -292,10 +292,14 @@ export type CollectionType = "FOLDER" | "SETLIST";
 
 export type CoverageStatus = "COMPLETE" | "PLAYABLE" | "INCOMPLETE";
 
+export type Genre = "MARCH" | "MARCHING_SHOW" | "CONCERT_WORK" | "OVERTURE" | "SUITE" | "SYMPHONY" | "FANTASY" | "VARIATIONS" | "DANCE" | "WALTZ" | "POLKA" | "FOLK_SONG" | "HYMN_CHORALE" | "FILM_MUSIC" | "SHOW_MUSIC" | "POP_ROCK" | "JAZZ" | "LATIN" | "CHRISTMAS" | "SACRED" | "SOLO_WITH_BAND";
+
 export type InstrumentTransposing = "C" | "D" | "Eb" | "F" | "G" | "A" | "Ab" | "Bb";
 
 export type NotationType = "STANDARD" | "TABLATURE" | "PERCUSSION" | "LEAD_SHEET" | "GRAPHIC";
 
 export type SortOrder = "ASC" | "DESC";
+
+export type Style = "CLASSICAL" | "ROMANTIC" | "MODERN" | "CONTEMPORARY" | "POP" | "ROCK" | "FUNK" | "SWING" | "LATIN" | "TRADITIONAL" | "FOLKLORISTIC" | "EXPERIMENTAL";
 
 export type VoiceOptionType = "PRIMARY" | "ALTERNATE" | "FALLBACK";

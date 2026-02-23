@@ -61,7 +61,9 @@
         <div class="filter-field">
           <label>{{ 'sheets.filters.genre' | translate }}</label>
           <p-select
-            [options]="genres()"
+            [options]="genreOptions()"
+            optionLabel="label"
+            optionValue="value"
             [ngModel]="selectedGenre()"
             (ngModelChange)="onGenreChange($event)"
             [placeholder]="t.t('sheets.filters.genrePlaceholder')"
@@ -108,7 +110,7 @@
             }
           </td>
           <td>{{ sheet.composer?.name }}</td>
-          <td>{{ sheet.genre }}</td>
+          <td>{{ sheet.genre ? ('sheets.genres.' + sheet.genre | translate) : '' }}</td>
           <td>{{ sheet.yearOfComposition }}</td>
           <td class="actions-cell">
             <p-button
@@ -200,7 +202,7 @@
             <div class="card-tags">
               @if (sheet.genre) {
                 <span class="card-tag">
-                  <i class="pi pi-tag"></i> {{ sheet.genre }}
+                  <i class="pi pi-tag"></i> {{ 'sheets.genres.' + sheet.genre | translate }}
                 </span>
               }
               @if (sheet.yearOfComposition) {

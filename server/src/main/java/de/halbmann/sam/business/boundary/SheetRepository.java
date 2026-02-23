@@ -1,5 +1,6 @@
 package de.halbmann.sam.business.boundary;
 
+import de.halbmann.sam.api.entity.Genre;
 import de.halbmann.sam.api.entity.PaginationRequest;
 import de.halbmann.sam.api.entity.SortOrder;
 import de.halbmann.sam.business.entity.PaginatedEntities;
@@ -9,11 +10,7 @@ import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
@@ -84,11 +81,7 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
     }
 
     public List<String> listDistinctGenres() {
-        return getEntityManager()
-                .createQuery(
-                        "SELECT DISTINCT g.name FROM GenreEntity g WHERE g.name IS NOT NULL ORDER BY g.name",
-                        String.class)
-                .getResultList();
+        return Arrays.stream(Genre.values()).map(Genre::name).toList();
     }
 
     public PaginatedEntities<SheetMusicEntity> findSheetEntities(

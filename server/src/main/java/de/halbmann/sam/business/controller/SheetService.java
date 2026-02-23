@@ -8,11 +8,8 @@ import de.halbmann.sam.business.exception.EntityNotFoundException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 @Transactional
@@ -123,5 +120,40 @@ public class SheetService {
                 .findByIdOptional(UUID.fromString(sheetId))
                 .orElseThrow(() -> new EntityNotFoundException("SheetMusic", sheetId));
         sheetRepository.delete(entity);
+    }
+
+    public void addTags(String sheetId, Set<String> newTags) {
+        final SheetMusicEntity entity = sheetRepository
+                .findByIdOptional(UUID.fromString(sheetId))
+                .orElseThrow(() -> new EntityNotFoundException("SheetMusic", sheetId));
+        entity.getTags().addAll(newTags);
+        sheetRepository.persistAndFlush(entity);
+    }
+
+    public void removeTags(String sheetId, Set<String> tagsToRemove) {
+        final SheetMusicEntity entity = sheetRepository
+                .findByIdOptional(UUID.fromString(sheetId))
+                .orElseThrow(() -> new EntityNotFoundException("SheetMusic", sheetId));
+        entity.getTags().removeAll(tagsToRemove);
+        sheetRepository.persistAndFlush(entity);
+    }
+
+    public void favorite(String sheetId, boolean favorite) {
+        final SheetMusicEntity entity = sheetRepository
+                .findByIdOptional(UUID.fromString(sheetId))
+                .orElseThrow(() -> new EntityNotFoundException("SheetMusic", sheetId));
+        entity.setFavorite(favorite);
+        sheetRepository.persistAndFlush(entity);
+    }
+
+    private Set<String> normalizeTags(Set<String> tags) {
+        if (tags == null) {
+            return Set.of();
+        }
+        return tags.stream()
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .map(String::toLowerCase)
+                .collect(Collectors.toSet());
     }
 }

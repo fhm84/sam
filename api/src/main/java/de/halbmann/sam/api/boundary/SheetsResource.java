@@ -4,6 +4,7 @@ import de.halbmann.sam.api.entity.*;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import java.util.List;
+import java.util.Set;
 
 /**
  * RESTful API for managing sheet music resources. Provides operations to find, add, load, update,
@@ -62,6 +63,38 @@ public interface SheetsResource {
     void delete(final @PathParam("sheetId") String sheetId);
 
     /**
+     * Add one or more tags to a sheet music entity.
+     */
+    @POST
+    @Path("{sheetId}/tags")
+    void addTags(final @PathParam("sheetId") String sheetId, Set<String> newTags);
+
+    /**
+     * Remove one or more tags from a sheet music entity.
+     */
+    @DELETE
+    @Path("{sheetId}/tags")
+    void removeTag(final @PathParam("sheetId") String sheetId, Set<String> tagsToRemove);
+
+    /**
+     * Favorite the sheet music.
+     *
+     * @param sheetId the ID of the sheet music
+     */
+    @POST
+    @Path("{sheetId}/favorite")
+    void favorite(final @PathParam("sheetId") String sheetId);
+
+    /**
+     * Unfavorite the sheet music.
+     *
+     * @param sheetId the ID of the sheet music
+     */
+    @DELETE
+    @Path("{sheetId}/favorite")
+    void unfavorite(final @PathParam("sheetId") String sheetId);
+
+    /**
      * Returns all distinct genre values used across sheet music.
      *
      * @return a sorted list of genre strings
@@ -101,7 +134,7 @@ public interface SheetsResource {
     /**
      * Evaluates the coverage of a sheet music's instrumentations against an ensemble definition.
      *
-     * @param sheetId the ID of the sheet music
+     * @param sheetId    the ID of the sheet music
      * @param ensembleId the ID of the ensemble to evaluate against
      * @return the coverage result with per-voice breakdown
      */

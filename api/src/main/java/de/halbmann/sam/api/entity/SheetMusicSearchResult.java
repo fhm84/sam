@@ -22,6 +22,7 @@ public class SheetMusicSearchResult extends SheetMusic {
                 sheetMusic.getArranger(),
                 sheetMusic.getOriginalBy(),
                 sheetMusic.getGenre(),
+                sheetMusic.getStyle(),
                 sheetMusic.getDifficultyLevel(),
                 sheetMusic.getDuration(),
                 sheetMusic.isFavorite(),
@@ -32,6 +33,7 @@ public class SheetMusicSearchResult extends SheetMusic {
                 sheetMusic.getIswc(),
                 sheetMusic.getGemaWorkNumber(),
                 sheetMusic.getAdditionalNotes(),
+                sheetMusic.getTags(),
                 sheetMusic.getInstrumentations(),
                 sheetMusic.getAttachments());
     }

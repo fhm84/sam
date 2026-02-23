@@ -31,7 +31,15 @@
     "layoutTitle": "Übersichts-Layout",
     "layoutDescription": "Wählen Sie den Standard-Anzeigemodus für jede Übersichtsseite.",
     "list": "Liste",
-    "cards": "Kacheln"
+    "cards": "Kacheln",
+    "themeTitle": "Erscheinungsbild",
+    "themeDescription": "Wählen Sie Ihr bevorzugtes Farbschema.",
+    "light": "Hell",
+    "dark": "Dunkel",
+    "languageTitle": "Sprache",
+    "languageDescription": "Wählen Sie Ihre bevorzugte Anzeigesprache.",
+    "languageEn": "English",
+    "languageDe": "Deutsch"
   },
   "sheets": {
     "title": "Noten",
@@ -133,6 +141,29 @@
       "empty": "Noch keine Instrumentierungen definiert",
       "save": "Speichern",
       "cancel": "Abbrechen"
+    },
+    "genres": {
+      "MARCH": "Marsch",
+      "MARCHING_SHOW": "Marching Show",
+      "CONCERT_WORK": "Konzertwerk",
+      "OVERTURE": "Ouvertüre",
+      "SUITE": "Suite",
+      "SYMPHONY": "Sinfonie",
+      "FANTASY": "Fantasie",
+      "VARIATIONS": "Variationen",
+      "DANCE": "Tanz",
+      "WALTZ": "Walzer",
+      "POLKA": "Polka",
+      "FOLK_SONG": "Volkslied",
+      "HYMN_CHORALE": "Choral / Hymne",
+      "FILM_MUSIC": "Filmmusik",
+      "SHOW_MUSIC": "Showmusik",
+      "POP_ROCK": "Pop / Rock",
+      "JAZZ": "Jazz",
+      "LATIN": "Latin",
+      "CHRISTMAS": "Weihnachten",
+      "SACRED": "Kirchenmusik",
+      "SOLO_WITH_BAND": "Solo mit Begleitung"
     },
     "filters": {
       "toggle": "Filter",

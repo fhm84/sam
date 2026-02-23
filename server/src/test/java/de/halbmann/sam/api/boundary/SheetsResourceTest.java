@@ -5,9 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import de.halbmann.sam.api.entity.DifficultyLevel;
-import de.halbmann.sam.api.entity.Musician;
-import de.halbmann.sam.api.entity.SheetMusic;
+import de.halbmann.sam.api.entity.*;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import jakarta.json.bind.Jsonb;
@@ -21,7 +19,8 @@ class SheetsResourceTest {
     void testAddingSheetMusic() throws Exception {
         final SheetMusic sheet = new SheetMusic();
         sheet.setTitle("My first sheet");
-        sheet.setGenre("Classical");
+        sheet.setGenre(Genre.SYMPHONY);
+        sheet.setStyle(Style.CLASSICAL);
         sheet.setDifficultyLevel(DifficultyLevel.EASY);
         sheet.setPublisher("Who knows");
         sheet.setYearOfComposition(1875);
@@ -54,7 +53,7 @@ class SheetsResourceTest {
                             "composer": {
                                 "name": "Frank Bernaerts"
                             },
-                            "genre": "Polka",
+                            "genre": "POLKA",
                             "type":""
                         }
                         """;
@@ -71,7 +70,7 @@ class SheetsResourceTest {
 
         assertNotNull(sheetResponse);
         assertEquals("Kuschelpolka", sheetResponse.getTitle());
-        assertEquals("Polka", sheetResponse.getGenre());
+        assertEquals(Genre.POLKA, sheetResponse.getGenre());
         assertEquals("Ewoton Verlag", sheetResponse.getPublisher());
         assertEquals("Frank Bernaerts", sheetResponse.getComposer().getName());
 

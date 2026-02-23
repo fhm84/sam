@@ -7,10 +7,6 @@ entity ScoreEntity {
     * id
 }
 
-entity GenreEntity {
-    * id
-}
-
 entity SheetCollectionEntity {
     * id
 }
@@ -19,7 +15,6 @@ entity CollectionSheetEntity {
     * id
 }
 
-SheetEntity }o--|| GenreEntity
 SheetEntity }|--|{ ScoreEntity
 CollectionSheetEntity ||--|{ SheetEntity
 SheetCollectionEntity }|--|{ CollectionSheetEntity

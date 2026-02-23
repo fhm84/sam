@@ -31,7 +31,15 @@
     "layoutTitle": "Overview Layout",
     "layoutDescription": "Choose the default display mode for each overview page.",
     "list": "List",
-    "cards": "Cards"
+    "cards": "Cards",
+    "themeTitle": "Appearance",
+    "themeDescription": "Choose your preferred colour scheme.",
+    "light": "Light",
+    "dark": "Dark",
+    "languageTitle": "Language",
+    "languageDescription": "Choose your preferred display language.",
+    "languageEn": "English",
+    "languageDe": "Deutsch"
   },
   "sheets": {
     "title": "Sheets",
@@ -133,6 +141,29 @@
       "empty": "No instrumentations defined yet",
       "save": "Save",
       "cancel": "Cancel"
+    },
+    "genres": {
+      "MARCH": "March",
+      "MARCHING_SHOW": "Marching Show",
+      "CONCERT_WORK": "Concert Work",
+      "OVERTURE": "Overture",
+      "SUITE": "Suite",
+      "SYMPHONY": "Symphony",
+      "FANTASY": "Fantasy",
+      "VARIATIONS": "Variations",
+      "DANCE": "Dance",
+      "WALTZ": "Waltz",
+      "POLKA": "Polka",
+      "FOLK_SONG": "Folk Song",
+      "HYMN_CHORALE": "Hymn / Chorale",
+      "FILM_MUSIC": "Film Music",
+      "SHOW_MUSIC": "Show Music",
+      "POP_ROCK": "Pop / Rock",
+      "JAZZ": "Jazz",
+      "LATIN": "Latin",
+      "CHRISTMAS": "Christmas",
+      "SACRED": "Sacred",
+      "SOLO_WITH_BAND": "Solo with Band"
     },
     "filters": {
       "toggle": "Filters",

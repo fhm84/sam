@@ -11,6 +11,7 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.container.ResourceContext;
 import jakarta.ws.rs.core.Context;
 import java.util.List;
+import java.util.Set;
 
 @RequestScoped
 public class SheetsResourceImpl implements SheetsResource {
@@ -47,6 +48,26 @@ public class SheetsResourceImpl implements SheetsResource {
     @Override
     public void delete(final String sheetId) {
         sheetService.deleteSheet(sheetId);
+    }
+
+    @Override
+    public void addTags(String sheetId, Set<String> newTags) {
+        sheetService.addTags(sheetId, newTags);
+    }
+
+    @Override
+    public void removeTag(String sheetId, Set<String> tagsToRemove) {
+        sheetService.removeTags(sheetId, tagsToRemove);
+    }
+
+    @Override
+    public void favorite(String sheetId) {
+        sheetService.favorite(sheetId, true);
+    }
+
+    @Override
+    public void unfavorite(String sheetId) {
+        sheetService.favorite(sheetId, false);
     }
 
     @Override

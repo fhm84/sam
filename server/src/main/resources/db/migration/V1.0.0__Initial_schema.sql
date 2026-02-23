@@ -103,26 +103,6 @@ create table documents_AUD
     primary key (REV, id)
 );
 
-create table genres
-(
-    id         uuid    not null,
-    created    timestamp(6),
-    lastUpdate timestamp(6),
-    version    integer not null,
-    name       varchar(255),
-    primary key (id)
-);
-
-create table genres_AUD
-(
-    id      uuid    not null,
-    REV     integer not null,
-    REVTYPE smallint,
-    REVEND  integer,
-    name    varchar(255),
-    primary key (REV, id)
-);
-
 -- Create instruments table
 CREATE TABLE instruments
 (
@@ -262,7 +242,7 @@ create table sheet_collections
     date        date,
     description varchar(255),
     name        varchar(255),
-    type varchar(255) check ((type in ('FOLDER','SETLIST'))),
+    type        varchar(255) check ((type in ('FOLDER', 'SETLIST'))),
     primary key (id)
 );
 
@@ -275,52 +255,69 @@ create table sheet_collections_AUD
     date        date,
     description varchar(255),
     name        varchar(255),
-    type varchar(255),
+    type        varchar(255),
     primary key (REV, id)
 );
 
 create table sheet_collections_collection_sheets
 (
-    SheetCollectionEntity_id uuid not null,
+    sheetCollectionEntity_id uuid not null,
     sheets_id                uuid not null
 );
 
 create table sheet_collections_collection_sheets_AUD
 (
     REV                      integer not null,
-    SheetCollectionEntity_id uuid    not null,
+    sheetCollectionEntity_id uuid    not null,
     sheets_id                uuid    not null,
     REVTYPE                  smallint,
     REVEND                   integer,
-    primary key (REV, SheetCollectionEntity_id, sheets_id)
+    primary key (REV, sheetCollectionEntity_id, sheets_id)
+);
+
+create table sheet_music_tags
+(
+    sheetMusicEntity_id uuid not null,
+    tag                 varchar(255)
+);
+
+create table sheet_music_tags_AUD
+(
+    REV                 integer      not null,
+    sheetMusicEntity_id uuid         not null,
+    tag                 varchar(255) not null,
+    REVTYPE             smallint,
+    REVEND              integer,
+    primary key (REV, sheetMusicEntity_id, tag)
 );
 
 create table sheets
 (
-    id                  uuid     not null,
+    id                  uuid        not null,
     created             timestamp(6),
     lastUpdate          timestamp(6),
-    version             integer  not null,
+    version             integer     not null,
     additionalNotes     text,
     copyright           varchar(255),
     difficultyLevel     smallint,
-    duration            integer,
+    duration            bigint,
     edition             varchar(255),
     favorite            bit,
     fingerprint         varchar(64) NOT NULL,
-    fingerprint_version integer  NOT NULL,
+    fingerprint_version integer     NOT NULL,
     gemaWorkNumber      varchar(255),
+    genre               varchar(32),
     iswc                varchar(255),
     originalBy          varchar(255),
     publisher           varchar(255),
     publisherIpi        varchar(255),
     rating              integer,
+    style               varchar(32),
     subtitle            varchar(255),
     title               varchar(255),
     yearOfComposition   integer,
     arranger_id         uuid,
     composer_id         uuid,
-    genre_id            uuid,
     primary key (id)
 );
 
@@ -350,23 +347,24 @@ create table sheets_AUD
     additionalNotes     text,
     copyright           varchar(255),
     difficultyLevel     smallint,
-    duration            integer,
+    duration            bigint,
     edition             varchar(255),
     favorite            bit,
     fingerprint         varchar(64),
     fingerprint_version integer,
     gemaWorkNumber      varchar(255),
+    genre               varchar(32),
     iswc                varchar(255),
     originalBy          varchar(255),
     publisher           varchar(255),
     publisherIpi        varchar(255),
     rating              integer,
+    style               varchar(32),
     subtitle            varchar(255),
     title               varchar(255),
     yearOfComposition   integer,
     arranger_id         uuid,
     composer_id         uuid,
-    genre_id            uuid,
     primary key (REV, id)
 );
 
@@ -375,9 +373,6 @@ alter table if exists classifications
 
 alter table if exists documents
     add constraint UKcfh78rjr0oxpk669kxbxg7c8i unique (sha256);
-
-alter table if exists genres
-    add constraint UKpe1a9woik1k97l87cieguyhh4 unique (name);
 
 alter table if exists instrumentations
     add constraint uc_instrumentation unique (sheet_id, instrument_id, partLabel, clef);
@@ -445,16 +440,6 @@ alter table if exists documents_AUD
 
 alter table if exists documents_AUD
     add constraint FKcelnyagqu491mfaw4apa51wwl
-        foreign key (REVEND)
-            references REVINFO;
-
-alter table if exists genres_AUD
-    add constraint FKu2wkbqf9o1r0v2n23ib4saa8
-        foreign key (REV)
-            references REVINFO;
-
-alter table if exists genres_AUD
-    add constraint FK2biwgekffc7yrf146o9nhnyqw
         foreign key (REVEND)
             references REVINFO;
 
@@ -568,11 +553,6 @@ alter table if exists sheets
             references musicians;
 
 alter table if exists sheets
-    add constraint FKgm7puj2ckqcbalxiwkehmli3t
-        foreign key (genre_id)
-            references genres;
-
-alter table if exists sheets
     add constraint UKfcbv63f6xe2tib2tl6xty2qv9 unique (fingerprint);
 
 alter table if exists sheets_attachments
@@ -605,122 +585,17 @@ alter table if exists sheets_AUD
         foreign key (REVEND)
             references REVINFO;
 
---------------------------------------------------------
--- set-up for google-like searching:
---    denormalized musician names
---    generated full-text
---    trigram fuzzy-search
---    phonetic (dmetaphone) fallback
---    indexes
---    ranked search query
---------------------------------------------------------
+alter table if exists sheet_music_tags
+    add constraint FKcin6e0swfbb7a6dp3uc3n5t1o
+        foreign key (SheetMusicEntity_id)
+            references sheets;
 
-CREATE EXTENSION IF NOT EXISTS pg_trgm;
-CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;
+alter table if exists sheet_music_tags_AUD
+    add constraint FK7bnr1ljxtw4pnatty23x3m2lh
+        foreign key (REV)
+            references REVINFO;
 
--- add denormalized search fields
-ALTER TABLE sheets
-    ADD COLUMN IF NOT EXISTS composer_name TEXT;
-ALTER TABLE sheets
-    ADD COLUMN IF NOT EXISTS arranger_name TEXT;
-ALTER TABLE sheets
-    ADD COLUMN IF NOT EXISTS composer_phonetic TEXT;
-ALTER TABLE sheets
-    ADD COLUMN IF NOT EXISTS arranger_phonetic TEXT;
-
--- synchronize musician names
-CREATE OR REPLACE FUNCTION sync_sheet_musicians()
-    RETURNS trigger AS
-$$
-BEGIN
-    SELECT name
-    INTO NEW.composer_name
-    FROM musicians
-    WHERE id = NEW.composer_id;
-
-    SELECT name
-    INTO NEW.arranger_name
-    FROM musicians
-    WHERE id = NEW.arranger_id;
-
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER sheets_sync_musicians
-    BEFORE INSERT OR UPDATE OF composer_id, arranger_id
-    ON sheets
-    FOR EACH ROW
-EXECUTE FUNCTION sync_sheet_musicians();
-
--- on update of musician name
-CREATE OR REPLACE FUNCTION propagate_musician_name()
-    RETURNS trigger AS
-$$
-BEGIN
-    UPDATE sheets
-    SET composer_name = NEW.name
-    WHERE composer_id = NEW.id;
-
-    UPDATE sheets
-    SET arranger_name = NEW.name
-    WHERE arranger_id = NEW.id;
-
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER musician_name_update
-    AFTER UPDATE OF name
-    ON musicians
-    FOR EACH ROW
-EXECUTE FUNCTION propagate_musician_name();
-
--- phonetic code (DMetaphone)
-CREATE OR REPLACE FUNCTION update_phonetics()
-    RETURNS trigger AS
-$$
-BEGIN
-    NEW.composer_phonetic :=
-            dmetaphone(coalesce(NEW.composer_name, ''));
-
-    NEW.arranger_phonetic :=
-            dmetaphone(coalesce(NEW.arranger_name, ''));
-
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER sheets_update_phonetics
-    BEFORE INSERT OR UPDATE OF composer_name, arranger_name
-    ON sheets
-    FOR EACH ROW
-EXECUTE FUNCTION update_phonetics();
-
--- add dedicated column for full-text search vector
-ALTER TABLE sheets
-    ADD COLUMN search_vector tsvector GENERATED ALWAYS AS (
-        setweight(to_tsvector('simple', coalesce(title, '')), 'A')
-            || setweight(to_tsvector('simple', coalesce(subtitle, '')), 'B')
-            || setweight(to_tsvector('simple', coalesce(composer_name, '')), 'A')
-            || setweight(to_tsvector('simple', coalesce(arranger_name, '')), 'C')
-        ) STORED;
-
--- create indexes
--- full-text
-CREATE INDEX sheets_search_vector_idx
-    ON sheets USING GIN (search_vector);
-
--- trigram
-CREATE INDEX sheets_title_trgm_idx
-    ON sheets USING GIN (title gin_trgm_ops);
-
-CREATE INDEX sheets_composer_trgm_idx
-    ON sheets USING GIN (composer_name gin_trgm_ops);
-
--- phonetic
-CREATE INDEX sheets_composer_phonetic_idx
-    ON sheets (composer_phonetic);
-
-CREATE INDEX sheets_arranger_phonetic_idx
-    ON sheets (arranger_phonetic);
+alter table if exists sheet_music_tags_AUD
+    add constraint FKolto5h1973nf226ncvcy7ukxn
+        foreign key (REVEND)
+            references REVINFO;

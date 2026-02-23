@@ -1,11 +1,14 @@
 package de.halbmann.sam.business.entity;
 
 import de.halbmann.sam.api.entity.DifficultyLevel;
+import de.halbmann.sam.api.entity.Genre;
+import de.halbmann.sam.api.entity.Style;
 import de.halbmann.sam.business.controller.FingerprintFactory;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.Getter;
@@ -71,10 +74,18 @@ public class SheetMusicEntity extends AbstractEntity {
     String originalBy;
 
     /**
-     * Classification (e.g., Classical, Jazz)
+     * Primary musical genre of this sheet music.
      */
-    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    GenreEntity genre;
+    @Enumerated(EnumType.STRING)
+    @Column(length = 32)
+    private Genre genre;
+
+    /**
+     * Stylistic classification of this sheet music.
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(length = 32)
+    private Style style;
 
     /**
      * Difficulty Level.
@@ -124,6 +135,11 @@ public class SheetMusicEntity extends AbstractEntity {
      */
     @Column(columnDefinition = "text")
     String additionalNotes;
+
+    @ElementCollection
+    @CollectionTable(name = "sheet_music_tags")
+    @Column(name = "tag")
+    private Set<String> tags = new HashSet<>();
 
     /**
      * Individual instrument parts.
