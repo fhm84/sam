@@ -41,6 +41,17 @@
     "languageEn": "English",
     "languageDe": "Deutsch"
   },
+  "home": {
+    "greeting": "Welcome to SAM",
+    "subtitle": "Your sheet music archive — browse, manage, and organize your collection.",
+    "cards": {
+      "sheets": "Browse and manage all pieces in your archive",
+      "collections": "Organize sheets into folders and setlists",
+      "uploads": "Manage documents not yet linked to a sheet",
+      "musicians": "Composers, arrangers, and other contributors"
+    },
+    "adminTitle": "Administration"
+  },
   "sheets": {
     "title": "Sheets",
     "subtitle": "Browse, search, and manage all pieces in your archive.",

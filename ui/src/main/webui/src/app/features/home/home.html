@@ -1,0 +1,67 @@
+<div class="home-wrapper">
+
+  <!-- Background watermark -->
+  <div class="home-bg-logo" aria-hidden="true"></div>
+
+  <div class="home-page">
+
+    <!-- Hero -->
+    <header class="home-hero">
+      <span class="home-hero-logo" [attr.aria-label]="'aria.samLogo' | translate"></span>
+      <h1 class="home-title">{{ 'home.greeting' | translate }}</h1>
+      <p class="home-subtitle">{{ 'home.subtitle' | translate }}</p>
+    </header>
+
+    <!-- Main navigation cards -->
+    <nav class="home-grid">
+      <a class="home-card" routerLink="/sheets">
+        <i class="pi pi-arrow-up-right home-card-arrow" aria-hidden="true"></i>
+        <i class="pi pi-file home-card-ghost" aria-hidden="true"></i>
+        <span class="home-card-icon-bg"><i class="pi pi-file"></i></span>
+        <span class="home-card-title">{{ 'nav.sheets' | translate }}</span>
+        <span class="home-card-desc">{{ 'home.cards.sheets' | translate }}</span>
+      </a>
+      <a class="home-card" routerLink="/collections">
+        <i class="pi pi-arrow-up-right home-card-arrow" aria-hidden="true"></i>
+        <i class="pi pi-folder home-card-ghost" aria-hidden="true"></i>
+        <span class="home-card-icon-bg"><i class="pi pi-folder"></i></span>
+        <span class="home-card-title">{{ 'nav.collections' | translate }}</span>
+        <span class="home-card-desc">{{ 'home.cards.collections' | translate }}</span>
+      </a>
+      <a class="home-card" routerLink="/uploads">
+        <i class="pi pi-arrow-up-right home-card-arrow" aria-hidden="true"></i>
+        <i class="pi pi-upload home-card-ghost" aria-hidden="true"></i>
+        <span class="home-card-icon-bg"><i class="pi pi-upload"></i></span>
+        <span class="home-card-title">{{ 'nav.uploads' | translate }}</span>
+        <span class="home-card-desc">{{ 'home.cards.uploads' | translate }}</span>
+      </a>
+      <a class="home-card" routerLink="/musicians">
+        <i class="pi pi-arrow-up-right home-card-arrow" aria-hidden="true"></i>
+        <i class="pi pi-user home-card-ghost" aria-hidden="true"></i>
+        <span class="home-card-icon-bg"><i class="pi pi-user"></i></span>
+        <span class="home-card-title">{{ 'nav.musicians' | translate }}</span>
+        <span class="home-card-desc">{{ 'home.cards.musicians' | translate }}</span>
+      </a>
+    </nav>
+
+    <!-- Admin section -->
+    <section class="home-admin">
+      <h2 class="home-admin-label">{{ 'home.adminTitle' | translate }}</h2>
+      <div class="home-admin-links">
+        <a class="home-admin-link" routerLink="/admin/ensembles">
+          <i class="pi pi-users"></i>
+          <span>{{ 'nav.admin.ensembles' | translate }}</span>
+        </a>
+        <a class="home-admin-link" routerLink="/admin/instruments">
+          <i class="pi pi-sliders-h"></i>
+          <span>{{ 'nav.admin.instruments' | translate }}</span>
+        </a>
+        <a class="home-admin-link" routerLink="/admin/configuration">
+          <i class="pi pi-wrench"></i>
+          <span>{{ 'nav.admin.configuration' | translate }}</span>
+        </a>
+      </div>
+    </section>
+
+  </div>
+</div>

@@ -41,6 +41,17 @@
     "languageEn": "English",
     "languageDe": "Deutsch"
   },
+  "home": {
+    "greeting": "Willkommen bei SAM",
+    "subtitle": "Ihr Notenarchiv – Stücke durchsuchen, verwalten und organisieren.",
+    "cards": {
+      "sheets": "Alle Stücke des Archivs durchsuchen und verwalten",
+      "collections": "Noten in Ordner und Setlists organisieren",
+      "uploads": "Dokumente verwalten, die noch keinem Notenblatt zugeordnet sind",
+      "musicians": "Komponisten, Arrangeure und andere Mitwirkende"
+    },
+    "adminTitle": "Verwaltung"
+  },
   "sheets": {
     "title": "Noten",
     "subtitle": "Alle Stücke Ihres Archivs – durchsuchen, filtern und verwalten.",

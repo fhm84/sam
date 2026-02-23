@@ -56,5 +56,9 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/user-preferences/user-preferences').then((m) => m.UserPreferences),
   },
-  { path: '', redirectTo: 'sheets', pathMatch: 'full' },
+  {
+    path: '',
+    loadComponent: () => import('./features/home/home').then((m) => m.Home),
+    pathMatch: 'full',
+  },
 ];
