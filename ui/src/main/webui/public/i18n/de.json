@@ -43,12 +43,14 @@
   },
   "sheets": {
     "title": "Noten",
+    "subtitle": "Alle Stücke Ihres Archivs – durchsuchen, filtern und verwalten.",
     "new": "Neues Notenblatt",
     "edit": "Notenblatt bearbeiten",
     "columns": {
       "title": "Titel",
       "composer": "Komponist",
       "genre": "Genre",
+      "style": "Stil",
       "year": "Jahr",
       "actions": "Aktionen"
     },
@@ -60,10 +62,15 @@
       "arranger": "Arrangeur",
       "arrangerPlaceholder": "Arrangeur auswählen",
       "genre": "Genre",
+      "genreTooltip": "Die formale Kategorie des Stücks, z.B. Marsch, Suite oder Ouvertüre.",
+      "style": "Stil",
+      "styleTooltip": "Die musikalische Epoche oder Stilrichtung, z.B. Klassik, Swing oder Pop.",
       "yearOfComposition": "Kompositionsjahr",
       "publisher": "Verlag",
       "edition": "Ausgabe",
+      "editionTooltip": "Die spezifische Verlagsausgabe oder Auflage, z.B. 'Revidierte Ausgabe 2010' oder 'Partitur & Stimmen'.",
       "difficultyLevel": "Schwierigkeitsgrad",
+      "difficultyLevelTooltip": "Freitext zur Schwierigkeit, z.B. '3/5', 'Stufe 4' oder 'Leicht'.",
       "copyright": "Urheberrecht",
       "additionalNotes": "Zusätzliche Anmerkungen"
     },
@@ -84,6 +91,7 @@
       "composer": "Komponist",
       "arranger": "Arrangeur",
       "genre": "Genre",
+      "style": "Stil",
       "year": "Jahr",
       "publisher": "Verlag",
       "publisherIpi": "Verlags-IPI",
@@ -122,10 +130,12 @@
         "instrument": "Instrument",
         "instrumentPlaceholder": "Instrument auswählen",
         "partLabel": "Stimmenbezeichnung",
+        "partLabelTooltip": "Unterscheidet Stimmen bei mehreren Spielern desselben Instruments, z.B. '1. Trompete' oder 'Solo'.",
         "clef": "Notenschlüssel",
         "clefPlaceholder": "Notenschlüssel auswählen",
         "notationType": "Notationsart",
         "notationTypePlaceholder": "Notationsart auswählen",
+        "notationTypeTooltip": "Notationsart: Standard (Notenlinien), Tabulatur (Saiteninstrumente), Schlagzeug, Lead Sheet (Melodie + Akkorde) oder Grafisch.",
         "notes": "Anmerkungen"
       },
       "delete": {
@@ -165,6 +175,20 @@
       "SACRED": "Kirchenmusik",
       "SOLO_WITH_BAND": "Solo mit Begleitung"
     },
+    "styles": {
+      "CLASSICAL": "Klassik",
+      "ROMANTIC": "Romantik",
+      "MODERN": "Moderne",
+      "CONTEMPORARY": "Zeitgenössisch",
+      "POP": "Pop",
+      "ROCK": "Rock",
+      "FUNK": "Funk",
+      "SWING": "Swing",
+      "LATIN": "Latin",
+      "TRADITIONAL": "Traditionell",
+      "FOLKLORISTIC": "Folkloristisch",
+      "EXPERIMENTAL": "Experimentell"
+    },
     "filters": {
       "toggle": "Filter",
       "genre": "Genre",
@@ -178,6 +202,7 @@
   },
   "collections": {
     "title": "Notensammlungen",
+    "subtitle": "Organisieren Sie Ihre Noten in Ordnern oder Setlisten.",
     "new": "Neue Sammlung",
     "edit": "Sammlung bearbeiten",
     "columns": {
@@ -215,6 +240,7 @@
   },
   "uploads": {
     "title": "Uploads",
+    "subtitle": "Dokumente, die noch keinem Notenblatt zugeordnet sind – hier hochladen und später verknüpfen.",
     "upload": "Hochladen",
     "dragDrop": "Dateien hierher ziehen oder auf Durchsuchen klicken",
     "browse": "Durchsuchen",
@@ -240,6 +266,7 @@
   },
   "musicians": {
     "title": "Musiker",
+    "subtitle": "Komponisten, Arrangeure und andere kreative Beteiligte, die in Ihren Noten referenziert werden.",
     "new": "Neuer Musiker",
     "edit": "Musiker bearbeiten",
     "columns": {
@@ -253,6 +280,7 @@
       "name": "Name",
       "ipi": "IPI",
       "ipiHint": "Interested Parties Information Code",
+      "ipiTooltip": "Interested Parties Information — ein eindeutiger 9-stelliger Code für Musikrechteinhaber. Leer lassen, wenn unbekannt.",
       "birthYear": "Geburtsjahr",
       "deathYear": "Todesjahr"
     },
@@ -273,6 +301,7 @@
   },
   "ensembles": {
     "title": "Ensembles",
+    "subtitle": "Bands und Orchester mit definierten Stimmstrukturen für die Besetzungsplanung.",
     "new": "Neues Ensemble",
     "edit": "Ensemble bearbeiten",
     "columns": {
@@ -315,7 +344,9 @@
       "form": {
         "label": "Bezeichnung",
         "weight": "Gewichtung",
-        "required": "Pflicht"
+        "weightTooltip": "Sortierreihenfolge im Ensemble — kleinere Zahlen erscheinen zuerst.",
+        "required": "Pflicht",
+        "requiredTooltip": "Pflicht-Stimmen müssen bei der Besetzungsplanung eines Stücks belegt werden."
       },
       "delete": {
         "confirm": "Möchten Sie die Stimme \"{label}\" wirklich löschen?",
@@ -347,7 +378,9 @@
           "instrumentPlaceholder": "Instrument auswählen",
           "type": "Typ",
           "typePlaceholder": "Typ auswählen",
-          "factor": "Faktor"
+          "typeTooltip": "PRIMARY: bevorzugtes Instrument. ALTERNATE: akzeptierter Ersatz. FALLBACK: letzter Ausweg, wenn keine andere Option verfügbar ist.",
+          "factor": "Faktor",
+          "factorTooltip": "Anzahl der benötigten Spieler — z.B. 2 bedeutet, zwei Musiker spielen diese Stimmoption."
         },
         "delete": {
           "confirm": "Möchten Sie diese Stimmoption wirklich löschen?",
@@ -367,6 +400,7 @@
   },
   "instruments": {
     "title": "Instrumente",
+    "subtitle": "Der Instrumentenkatalog für Instrumentierungen und Ensemblestimmen.",
     "new": "Neues Instrument",
     "edit": "Instrument bearbeiten",
     "columns": {
@@ -379,9 +413,13 @@
     "form": {
       "id": "ID",
       "idHint": "Eindeutige Kennung (z.B. trumpet-bb)",
+      "idTooltip": "Ein eindeutiger Slug zur internen Kennung, z.B. 'trumpet-bb'. Kann nach der Erstellung nicht geändert werden.",
       "name": "Name",
+      "nameTooltip": "Der kanonische Name für Systemreferenzen, z.B. 'Bb-Trompete'.",
       "displayName": "Anzeigename",
+      "displayNameTooltip": "Ein optionaler Kurzname, der in der Benutzeroberfläche angezeigt wird.",
       "transposition": "Transposition",
+      "transpositionTooltip": "Die klingende Tonart dieses Instruments. Z.B. klingt ein B-Instrument eine große Sekunde tiefer als notiert.",
       "transpositionPlaceholder": "Transposition auswählen",
       "save": "Speichern",
       "cancel": "Abbrechen"

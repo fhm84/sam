@@ -4,6 +4,7 @@ import { FloatLabel } from 'primeng/floatlabel';
 import { Select } from 'primeng/select';
 import { InputNumber } from 'primeng/inputnumber';
 import { Button } from 'primeng/button';
+import { Tooltip } from 'primeng/tooltip';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { EnsemblesApiService, InstrumentsApiService } from '../../core/api';
 import { convertEmptyStringsToNull } from '../../shared/utils/object.utils';
@@ -19,7 +20,7 @@ interface InstrumentOption {
 
 @Component({
   selector: 'app-voice-option-form',
-  imports: [ReactiveFormsModule, FloatLabel, Select, InputNumber, Button, TranslatePipe],
+  imports: [ReactiveFormsModule, FloatLabel, Select, InputNumber, Button, Tooltip, TranslatePipe],
   templateUrl: './voice-option-form.html',
   styleUrl: './voice-option-form.scss',
 })

@@ -43,12 +43,14 @@
   },
   "sheets": {
     "title": "Sheets",
+    "subtitle": "Browse, search, and manage all pieces in your archive.",
     "new": "New sheet",
     "edit": "Edit sheet",
     "columns": {
       "title": "Title",
       "composer": "Composer",
       "genre": "Genre",
+      "style": "Style",
       "year": "Year",
       "actions": "Actions"
     },
@@ -60,10 +62,15 @@
       "arranger": "Arranger",
       "arrangerPlaceholder": "Select arranger",
       "genre": "Genre",
+      "genreTooltip": "The formal/structural category of the piece, e.g. March, Suite, Overture.",
+      "style": "Style",
+      "styleTooltip": "The musical period or idiom, e.g. Classical, Swing, Pop.",
       "yearOfComposition": "Year of Composition",
       "publisher": "Publisher",
       "edition": "Edition",
+      "editionTooltip": "The specific publisher edition or print run, e.g. 'Revised Edition 2010' or 'Score & Parts'.",
       "difficultyLevel": "Difficulty Level",
+      "difficultyLevelTooltip": "Free-form text, e.g. '3/5', 'Grade 4', or 'Easy'.",
       "copyright": "Copyright",
       "additionalNotes": "Additional Notes"
     },
@@ -84,6 +91,7 @@
       "composer": "Composer",
       "arranger": "Arranger",
       "genre": "Genre",
+      "style": "Style",
       "year": "Year",
       "publisher": "Publisher",
       "publisherIpi": "Publisher IPI",
@@ -122,10 +130,12 @@
         "instrument": "Instrument",
         "instrumentPlaceholder": "Select instrument",
         "partLabel": "Part Label",
+        "partLabelTooltip": "Distinguishes parts when multiple players use the same instrument, e.g. '1st Trumpet' or 'Solo'.",
         "clef": "Clef",
         "clefPlaceholder": "Select clef",
         "notationType": "Notation Type",
         "notationTypePlaceholder": "Select notation type",
+        "notationTypeTooltip": "How the music is written: Standard (staff notation), Tablature (strings/fretted), Percussion, Lead Sheet (melody + chords), or Graphic.",
         "notes": "Notes"
       },
       "delete": {
@@ -165,6 +175,20 @@
       "SACRED": "Sacred",
       "SOLO_WITH_BAND": "Solo with Band"
     },
+    "styles": {
+      "CLASSICAL": "Classical",
+      "ROMANTIC": "Romantic",
+      "MODERN": "Modern",
+      "CONTEMPORARY": "Contemporary",
+      "POP": "Pop",
+      "ROCK": "Rock",
+      "FUNK": "Funk",
+      "SWING": "Swing",
+      "LATIN": "Latin",
+      "TRADITIONAL": "Traditional",
+      "FOLKLORISTIC": "Folkloristic",
+      "EXPERIMENTAL": "Experimental"
+    },
     "filters": {
       "toggle": "Filters",
       "genre": "Genre",
@@ -178,6 +202,7 @@
   },
   "collections": {
     "title": "Sheet Collections",
+    "subtitle": "Organize your sheets into folders or setlists.",
     "new": "New collection",
     "edit": "Edit collection",
     "columns": {
@@ -215,6 +240,7 @@
   },
   "uploads": {
     "title": "Uploads",
+    "subtitle": "Documents not yet linked to any sheet — upload files here and assign them later.",
     "upload": "Upload",
     "dragDrop": "Drag & drop files here or click Browse to upload",
     "browse": "Browse",
@@ -240,6 +266,7 @@
   },
   "musicians": {
     "title": "Musicians",
+    "subtitle": "Composers, arrangers, and other creative contributors referenced across your sheet music.",
     "new": "New musician",
     "edit": "Edit musician",
     "columns": {
@@ -253,6 +280,7 @@
       "name": "Name",
       "ipi": "IPI",
       "ipiHint": "Interested Parties Information code",
+      "ipiTooltip": "Interested Parties Information — a unique 9-digit code assigned to music rights holders. Leave empty if unknown.",
       "birthYear": "Birth Year",
       "deathYear": "Death Year"
     },
@@ -273,6 +301,7 @@
   },
   "ensembles": {
     "title": "Ensembles",
+    "subtitle": "Bands and orchestras with defined voice structures for instrumentation planning.",
     "new": "New ensemble",
     "edit": "Edit ensemble",
     "columns": {
@@ -315,7 +344,9 @@
       "form": {
         "label": "Label",
         "weight": "Weight",
-        "required": "Required"
+        "weightTooltip": "Sort order within the ensemble — lower numbers appear first.",
+        "required": "Required",
+        "requiredTooltip": "Required voices must be covered when assigning players to a piece."
       },
       "delete": {
         "confirm": "Are you sure you want to delete the voice \"{label}\"?",
@@ -347,7 +378,9 @@
           "instrumentPlaceholder": "Select instrument",
           "type": "Type",
           "typePlaceholder": "Select type",
-          "factor": "Factor"
+          "typeTooltip": "PRIMARY: preferred instrument for this voice. ALTERNATE: accepted substitute. FALLBACK: last resort if no other option is available.",
+          "factor": "Factor",
+          "factorTooltip": "How many players are needed — e.g. 2 means two musicians play this voice option."
         },
         "delete": {
           "confirm": "Are you sure you want to delete this voice option?",
@@ -367,6 +400,7 @@
   },
   "instruments": {
     "title": "Instruments",
+    "subtitle": "The instrument catalogue used across instrumentations and ensemble voice definitions.",
     "new": "New instrument",
     "edit": "Edit instrument",
     "columns": {
@@ -379,9 +413,13 @@
     "form": {
       "id": "ID",
       "idHint": "Unique identifier (e.g. trumpet-bb)",
+      "idTooltip": "A unique slug used internally, e.g. 'trumpet-bb'. Cannot be changed after creation.",
       "name": "Name",
+      "nameTooltip": "The canonical name used in system references, e.g. 'Bb Trumpet'.",
       "displayName": "Display Name",
+      "displayNameTooltip": "An optional shorter name shown in the UI instead of the canonical name.",
       "transposition": "Transposition",
+      "transpositionTooltip": "The concert-pitch key this instrument sounds in. E.g. a Bb instrument sounds a major 2nd lower than written.",
       "transpositionPlaceholder": "Select transposition",
       "save": "Save",
       "cancel": "Cancel"

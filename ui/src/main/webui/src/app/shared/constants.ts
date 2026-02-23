@@ -1,4 +1,4 @@
-import { Genre } from '../model/datamodels';
+import { Genre, Style } from '../model/datamodels';
 
 /** Page size used when fetching all items for dropdown/select lists. */
 export const FETCH_ALL_SIZE = 1000;
@@ -10,3 +10,10 @@ export const GENRES = [
   'HYMN_CHORALE', 'FILM_MUSIC', 'SHOW_MUSIC', 'POP_ROCK', 'JAZZ',
   'LATIN', 'CHRISTMAS', 'SACRED', 'SOLO_WITH_BAND',
 ] as const satisfies readonly Genre[];
+
+/** All possible Style enum values, in display order. */
+export const STYLES = [
+  'CLASSICAL', 'ROMANTIC', 'MODERN', 'CONTEMPORARY',
+  'POP', 'ROCK', 'FUNK', 'SWING', 'LATIN',
+  'TRADITIONAL', 'FOLKLORISTIC', 'EXPERIMENTAL',
+] as const satisfies readonly Style[];

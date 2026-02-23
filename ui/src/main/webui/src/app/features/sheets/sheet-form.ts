@@ -6,17 +6,18 @@ import { InputNumber } from 'primeng/inputnumber';
 import { Textarea } from 'primeng/textarea';
 import { Select } from 'primeng/select';
 import { Button } from 'primeng/button';
+import { Tooltip } from 'primeng/tooltip';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { SheetsApiService, MusiciansApiService } from '../../core/api';
 import { convertEmptyStringsToNull } from '../../shared/utils/object.utils';
-import { CreateSheetMusic, Genre, Musician, SheetMusic } from '../../model/datamodels';
+import { CreateSheetMusic, Genre, Musician, SheetMusic, Style } from '../../model/datamodels';
 import { map, Observable } from 'rxjs';
 import { BaseForm } from '../../shared/base/base-form';
-import { FETCH_ALL_SIZE, GENRES } from '../../shared/constants';
+import { FETCH_ALL_SIZE, GENRES, STYLES } from '../../shared/constants';
 
 @Component({
   selector: 'app-sheet-form',
-  imports: [ReactiveFormsModule, FloatLabel, InputText, InputNumber, Textarea, Select, Button, TranslatePipe],
+  imports: [ReactiveFormsModule, FloatLabel, InputText, InputNumber, Textarea, Select, Button, Tooltip, TranslatePipe],
   templateUrl: './sheet-form.html',
   styleUrl: './sheet-form.scss',
 })
@@ -32,12 +33,17 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
     GENRES.map((g) => ({ label: this.t.t(`sheets.genres.${g}`), value: g })),
   );
 
+  protected readonly styleOptions = computed(() =>
+    STYLES.map((s) => ({ label: this.t.t(`sheets.styles.${s}`), value: s })),
+  );
+
   readonly form = new FormGroup({
     title: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     subtitle: new FormControl('', { nonNullable: true }),
     composerId: new FormControl<string | null>(null),
     arrangerId: new FormControl<string | null>(null),
     genre: new FormControl<Genre | null>(null),
+    style: new FormControl<Style | null>(null),
     yearOfComposition: new FormControl<number | null>(null),
     publisher: new FormControl('', { nonNullable: true }),
     difficultyLevel: new FormControl('', { nonNullable: true }),
@@ -61,6 +67,7 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
       composerId: s.composer?.id ?? null,
       arrangerId: s.arranger?.id ?? null,
       genre: s.genre ?? null,
+      style: s.style ?? null,
       yearOfComposition: s.yearOfComposition ?? null,
       publisher: s.publisher ?? '',
       difficultyLevel: s.difficultyLevel ?? '',
@@ -87,6 +94,7 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
       composer: composer ? { id: composer.id, name: composer.name } : undefined,
       arranger: arranger ? { id: arranger.id, name: arranger.name } : undefined,
       genre: raw.genre ?? undefined,
+      style: raw.style ?? undefined,
       yearOfComposition: raw.yearOfComposition ?? undefined,
       publisher: raw.publisher,
       difficultyLevel: raw.difficultyLevel,

@@ -40,3 +40,32 @@
 .flex-1 {
   flex: 1;
 }
+
+.field-with-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  p-floatlabel {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.checkbox-label-row {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.field-hint-icon {
+  font-size: 0.8rem;
+  color: var(--sam-text-muted);
+  cursor: help;
+  flex-shrink: 0;
+  transition: color 0.15s;
+
+  &:hover {
+    color: var(--sam-text-secondary);
+  }
+}

@@ -20,7 +20,7 @@ import { TranslationService } from '../../core/translation.service';
 import { LayoutPreferenceService } from '../../core/layout-preference.service';
 import { SheetsApiService } from '../../core/api';
 import { Genre, SheetMusic, SheetMusicSearchResult } from '../../model/datamodels';
-import { GENRES } from '../../shared/constants';
+import { GENRES, STYLES } from '../../shared/constants';
 import { SheetDetail } from './sheet-detail';
 
 @Component({
@@ -66,6 +66,10 @@ export class Sheets implements OnInit {
   protected readonly filterPanelOpen = signal(false);
   protected readonly genreOptions = computed(() =>
     GENRES.map((g) => ({ label: this.t.t(`sheets.genres.${g}`), value: g })),
+  );
+
+  protected readonly styleOptions = computed(() =>
+    STYLES.map((s) => ({ label: this.t.t(`sheets.styles.${s}`), value: s })),
   );
 
   protected readonly selectedGenre = signal<Genre | null>(null);

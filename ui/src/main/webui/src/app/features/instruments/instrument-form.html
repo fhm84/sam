@@ -1,36 +1,56 @@
 <form [formGroup]="form" (ngSubmit)="onSave()" class="sam-form">
   <div class="form-field">
-    <p-floatlabel variant="on">
-      <input pInputText id="instrument-id" formControlName="id" [placeholder]="t.t('instruments.form.idHint')" />
-      <label for="instrument-id">{{ 'instruments.form.id' | translate }}</label>
-    </p-floatlabel>
+    <div class="field-with-hint">
+      <p-floatlabel variant="on">
+        <input pInputText id="instrument-id" formControlName="id" [placeholder]="t.t('instruments.form.idHint')" />
+        <label for="instrument-id">{{ 'instruments.form.id' | translate }}</label>
+      </p-floatlabel>
+      <i class="pi pi-info-circle field-hint-icon"
+         [pTooltip]="t.t('instruments.form.idTooltip')"
+         tooltipPosition="right"></i>
+    </div>
   </div>
 
   <div class="form-field">
-    <p-floatlabel variant="on">
-      <input pInputText id="instrument-name" formControlName="name" />
-      <label for="instrument-name">{{ 'instruments.form.name' | translate }}</label>
-    </p-floatlabel>
+    <div class="field-with-hint">
+      <p-floatlabel variant="on">
+        <input pInputText id="instrument-name" formControlName="name" />
+        <label for="instrument-name">{{ 'instruments.form.name' | translate }}</label>
+      </p-floatlabel>
+      <i class="pi pi-info-circle field-hint-icon"
+         [pTooltip]="t.t('instruments.form.nameTooltip')"
+         tooltipPosition="right"></i>
+    </div>
   </div>
 
   <div class="form-field">
-    <p-floatlabel variant="on">
-      <input pInputText id="instrument-displayName" formControlName="displayName" />
-      <label for="instrument-displayName">{{ 'instruments.form.displayName' | translate }}</label>
-    </p-floatlabel>
+    <div class="field-with-hint">
+      <p-floatlabel variant="on">
+        <input pInputText id="instrument-displayName" formControlName="displayName" />
+        <label for="instrument-displayName">{{ 'instruments.form.displayName' | translate }}</label>
+      </p-floatlabel>
+      <i class="pi pi-info-circle field-hint-icon"
+         [pTooltip]="t.t('instruments.form.displayNameTooltip')"
+         tooltipPosition="right"></i>
+    </div>
   </div>
 
   <div class="form-field">
-    <p-floatlabel variant="on">
-      <p-select
-        inputId="instrument-transposition"
-        formControlName="transposition"
-        [options]="transpositionOptions"
-        [showClear]="true"
-        styleClass="w-full"
-      />
-      <label for="instrument-transposition">{{ 'instruments.form.transposition' | translate }}</label>
-    </p-floatlabel>
+    <div class="field-with-hint">
+      <p-floatlabel variant="on">
+        <p-select
+          inputId="instrument-transposition"
+          formControlName="transposition"
+          [options]="transpositionOptions"
+          [showClear]="true"
+          styleClass="w-full"
+        />
+        <label for="instrument-transposition">{{ 'instruments.form.transposition' | translate }}</label>
+      </p-floatlabel>
+      <i class="pi pi-info-circle field-hint-icon"
+         [pTooltip]="t.t('instruments.form.transpositionTooltip')"
+         tooltipPosition="right"></i>
+    </div>
   </div>
 
   <div class="form-actions">

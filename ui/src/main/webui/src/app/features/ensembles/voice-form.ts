@@ -5,6 +5,7 @@ import { InputText } from 'primeng/inputtext';
 import { InputNumber } from 'primeng/inputnumber';
 import { Checkbox } from 'primeng/checkbox';
 import { Button } from 'primeng/button';
+import { Tooltip } from 'primeng/tooltip';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { EnsemblesApiService } from '../../core/api';
 import { convertEmptyStringsToNull } from '../../shared/utils/object.utils';
@@ -14,7 +15,7 @@ import { BaseForm } from '../../shared/base/base-form';
 
 @Component({
   selector: 'app-voice-form',
-  imports: [ReactiveFormsModule, FloatLabel, InputText, InputNumber, Checkbox, Button, TranslatePipe],
+  imports: [ReactiveFormsModule, FloatLabel, InputText, InputNumber, Checkbox, Button, Tooltip, TranslatePipe],
   templateUrl: './voice-form.html',
   styleUrl: './voice-form.scss',
 })

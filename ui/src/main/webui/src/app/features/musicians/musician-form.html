@@ -7,10 +7,15 @@
   </div>
 
   <div class="form-field">
-    <p-floatlabel variant="on">
-      <input pInputText id="musician-ipi" formControlName="ipi" [placeholder]="t.t('musicians.form.ipiHint')" />
-      <label for="musician-ipi">{{ 'musicians.form.ipi' | translate }}</label>
-    </p-floatlabel>
+    <div class="field-with-hint">
+      <p-floatlabel variant="on">
+        <input pInputText id="musician-ipi" formControlName="ipi" [placeholder]="t.t('musicians.form.ipiHint')" />
+        <label for="musician-ipi">{{ 'musicians.form.ipi' | translate }}</label>
+      </p-floatlabel>
+      <i class="pi pi-info-circle field-hint-icon"
+         [pTooltip]="t.t('musicians.form.ipiTooltip')"
+         tooltipPosition="right"></i>
+    </div>
   </div>
 
   <div class="form-row">

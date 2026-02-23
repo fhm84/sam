@@ -5,6 +5,7 @@ import { Select } from 'primeng/select';
 import { InputText } from 'primeng/inputtext';
 import { Textarea } from 'primeng/textarea';
 import { Button } from 'primeng/button';
+import { Tooltip } from 'primeng/tooltip';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { InstrumentationsApiService, InstrumentsApiService } from '../../core/api';
 import { convertEmptyStringsToNull } from '../../shared/utils/object.utils';
@@ -20,7 +21,7 @@ interface InstrumentOption {
 
 @Component({
   selector: 'app-instrumentation-form',
-  imports: [ReactiveFormsModule, FloatLabel, Select, InputText, Textarea, Button, TranslatePipe],
+  imports: [ReactiveFormsModule, FloatLabel, Select, InputText, Textarea, Button, Tooltip, TranslatePipe],
   templateUrl: './instrumentation-form.html',
   styleUrl: './instrumentation-form.scss',
 })

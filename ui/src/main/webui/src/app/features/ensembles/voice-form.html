@@ -8,15 +8,20 @@
 
   <div class="form-row">
     <div class="form-field">
-      <p-floatlabel variant="on">
-        <p-inputnumber
-          inputId="voice-weight"
-          formControlName="weight"
-          [useGrouping]="false"
-          styleClass="w-full"
-        />
-        <label for="voice-weight">{{ 'ensembles.voices.form.weight' | translate }}</label>
-      </p-floatlabel>
+      <div class="field-with-hint">
+        <p-floatlabel variant="on">
+          <p-inputnumber
+            inputId="voice-weight"
+            formControlName="weight"
+            [useGrouping]="false"
+            styleClass="w-full"
+          />
+          <label for="voice-weight">{{ 'ensembles.voices.form.weight' | translate }}</label>
+        </p-floatlabel>
+        <i class="pi pi-info-circle field-hint-icon"
+           [pTooltip]="t.t('ensembles.voices.form.weightTooltip')"
+           tooltipPosition="right"></i>
+      </div>
     </div>
 
     <div class="form-field form-field--checkbox">
@@ -25,7 +30,12 @@
         formControlName="required"
         [binary]="true"
       />
-      <label for="voice-required">{{ 'ensembles.voices.form.required' | translate }}</label>
+      <div class="checkbox-label-row">
+        <label for="voice-required">{{ 'ensembles.voices.form.required' | translate }}</label>
+        <i class="pi pi-info-circle field-hint-icon"
+           [pTooltip]="t.t('ensembles.voices.form.requiredTooltip')"
+           tooltipPosition="right"></i>
+      </div>
     </div>
   </div>
 

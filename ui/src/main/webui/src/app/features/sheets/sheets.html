@@ -1,6 +1,9 @@
 <div class="sheets-page">
   <div class="page-toolbar">
-    <h1>{{ 'sheets.title' | translate }}</h1>
+    <div class="page-title-group">
+      <h1>{{ 'sheets.title' | translate }}</h1>
+      <p class="page-subtitle">{{ 'sheets.subtitle' | translate }}</p>
+    </div>
     <div class="toolbar-actions">
       <p-iconfield>
         <p-inputicon styleClass="pi pi-search" />
@@ -96,6 +99,7 @@
           <th>{{ 'sheets.columns.title' | translate }}</th>
           <th>{{ 'sheets.columns.composer' | translate }}</th>
           <th>{{ 'sheets.columns.genre' | translate }}</th>
+          <th>{{ 'sheets.columns.style' | translate }}</th>
           <th>{{ 'sheets.columns.year' | translate }}</th>
           <th>{{ 'sheets.columns.actions' | translate }}</th>
         </tr>
@@ -111,6 +115,7 @@
           </td>
           <td>{{ sheet.composer?.name }}</td>
           <td>{{ sheet.genre ? ('sheets.genres.' + sheet.genre | translate) : '' }}</td>
+          <td>{{ sheet.style ? ('sheets.styles.' + sheet.style | translate) : '' }}</td>
           <td>{{ sheet.yearOfComposition }}</td>
           <td class="actions-cell">
             <p-button
@@ -203,6 +208,11 @@
               @if (sheet.genre) {
                 <span class="card-tag">
                   <i class="pi pi-tag"></i> {{ 'sheets.genres.' + sheet.genre | translate }}
+                </span>
+              }
+              @if (sheet.style) {
+                <span class="card-tag">
+                  <i class="pi pi-palette"></i> {{ 'sheets.styles.' + sheet.style | translate }}
                 </span>
               }
               @if (sheet.yearOfComposition) {

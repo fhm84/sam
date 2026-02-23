@@ -60,6 +60,12 @@
               <span class="detail-value">{{ 'sheets.genres.' + s.genre | translate }}</span>
             </div>
           }
+          @if (s.style) {
+            <div class="meta-entry">
+              <span class="detail-label">{{ 'sheets.detail.style' | translate }}</span>
+              <span class="detail-value">{{ 'sheets.styles.' + s.style | translate }}</span>
+            </div>
+          }
           @if (s.yearOfComposition) {
             <div class="meta-entry">
               <span class="detail-label">{{ 'sheets.detail.year' | translate }}</span>

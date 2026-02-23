@@ -11,6 +11,18 @@
   }
 }
 
+.page-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.page-subtitle {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--sam-text-muted);
+}
+
 .toolbar-actions {
   display: flex;
   align-items: center;

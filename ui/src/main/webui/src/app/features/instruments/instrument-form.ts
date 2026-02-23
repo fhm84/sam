@@ -4,6 +4,7 @@ import { FloatLabel } from 'primeng/floatlabel';
 import { InputText } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
 import { Button } from 'primeng/button';
+import { Tooltip } from 'primeng/tooltip';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { InstrumentsApiService } from '../../core/api';
 import { convertEmptyStringsToNull } from '../../shared/utils/object.utils';
@@ -13,7 +14,7 @@ import { BaseForm } from '../../shared/base/base-form';
 
 @Component({
   selector: 'app-instrument-form',
-  imports: [ReactiveFormsModule, FloatLabel, InputText, Select, Button, TranslatePipe],
+  imports: [ReactiveFormsModule, FloatLabel, InputText, Select, Button, Tooltip, TranslatePipe],
   templateUrl: './instrument-form.html',
   styleUrl: './instrument-form.scss',
 })
