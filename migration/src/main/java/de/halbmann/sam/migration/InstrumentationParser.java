@@ -1,44 +1,43 @@
+package de.halbmann.sam.migration;
+
+import static java.util.function.Predicate.not;
+
 import de.halbmann.sam.api.entity.*;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class InstrumentationParser {
 
     public static List<Instrumentation> parseInstrumentations(String input) {
-        List<Instrumentation> instrumentations = new ArrayList<>();
-
-        // Split by semicolon
-        String[] parts = input.split(";");
-
-        for (String part : parts) {
-            part = part.trim();
-            if (part.isEmpty()) {
-                continue;
-            }
-
-            Instrumentation instr = parseInstrument(part);
-            if (instr != null) {
-                instrumentations.add(instr);
-            }
-        }
-
-        return instrumentations;
+        return Arrays.stream(input.split(";"))
+                .map(String::trim)
+                .filter(not(String::isEmpty))
+                .map(InstrumentationParser::parseInstrument)
+                .filter(Objects::nonNull)
+                .toList();
     }
 
     private static Instrumentation parseInstrument(String part) {
         // Pattern to match: "1. Instrument in key" or just "Instrument"
-        Pattern pattern = Pattern.compile("^(?:(\\d+)\\.\\s+)?(.+?)(?:\\s+in\\s+([a-z]+))?$", Pattern.CASE_INSENSITIVE);
+        // Pattern pattern = Pattern.compile("^(?:(\\d+)\\.\\s+Solo-Stimme\\s+)?(.+?)(?:\\s+in\\s+([a-z]+))?$",
+        // Pattern.CASE_INSENSITIVE);
+        String regex = "^\\s*(?:(?<partLabel>\\d+\\.\\s*(?:[A-Za-zÄÖÜäöüß\\-]+(?:-[A-Za-zÄÖÜäöüß\\-]+)*)?)\\s+)?"
+                + "(?<name>[A-Za-zÄÖÜäöüß\\-]+(?:-[A-Za-zÄÖÜäöüß\\-]+)*)"
+                + "(?:\\s+in\\s+(?<transposition>[a-z]))?\\s*$";
+
+        Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(part);
 
         if (!matcher.matches()) {
             return null;
         }
 
-        String partLabel = matcher.group(1); // e.g., "1", "2", "3"
-        String instrumentName = matcher.group(2); // e.g., "Trompete", "Flöte"
-        String key = matcher.group(3); // e.g., "b", "c", "es", "f"
+        String partLabel = matcher.group("partLabel"); // e.g., "1", "2", "3", "Solo-Stimme"
+        String instrumentName = matcher.group("name"); // e.g., "Trompete", "Flöte"
+        String key = matcher.group("transposition"); // e.g., "b", "c", "es", "f"
 
         // Determine transposition
         InstrumentTransposing transposition = parseTransposition(key);
@@ -50,7 +49,7 @@ public class InstrumentationParser {
         // Build the Instrument reference
         String trimmedName = instrumentName.trim();
         String instrumentId =
-                DataConversion.cleanUp(trimmedName) + "_" + (transposition != null ? transposition.name() : "C");
+                FilenameUtils.cleanUp(trimmedName) + "_" + (transposition != null ? transposition.name() : "C");
 
         Instrument instrument = new Instrument();
         instrument.setId(instrumentId.toUpperCase());
