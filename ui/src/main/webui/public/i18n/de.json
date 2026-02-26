@@ -427,18 +427,20 @@
         "edit": "Option bearbeiten",
         "columns": {
           "instrument": "Instrument",
+          "transposition": "Transposition",
           "type": "Typ",
           "factor": "Faktor",
           "actions": "Aktionen"
         },
         "form": {
           "instrument": "Instrument",
-          "instrumentPlaceholder": "Instrument auswählen",
+          "instrumentPlaceholder": "Instrumente suchen…",
+          "noResults": "Keine Instrumente gefunden",
           "type": "Typ",
           "typePlaceholder": "Typ auswählen",
           "typeTooltip": "PRIMARY: bevorzugtes Instrument. ALTERNATE: akzeptierter Ersatz. FALLBACK: letzter Ausweg, wenn keine andere Option verfügbar ist.",
           "factor": "Faktor",
-          "factorTooltip": "Anzahl der benötigten Spieler — z.B. 2 bedeutet, zwei Musiker spielen diese Stimmoption."
+          "factorTooltip": "Gewichtungsfaktor für diese Option (0,0–1,0). Eine primäre Option hat typischerweise den Wert 1,0; Alternativen und Fallbacks erhalten niedrigere Werte, z.B. 0,8 oder 0,4."
         },
         "delete": {
           "confirm": "Möchten Sie diese Stimmoption wirklich löschen?",

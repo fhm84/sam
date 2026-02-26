@@ -1,3 +1,4 @@
+<!-- ── Voices table ────────────────────────────────────── -->
 <div class="voices-section">
   <div class="voices-toolbar">
     <h3>{{ 'ensembles.voices.title' | translate }}</h3>
@@ -69,27 +70,146 @@
   </p-table>
 </div>
 
+<!-- ── Add dialog ──────────────────────────────────────── -->
 <p-dialog
-  [header]="editingVoice ? t.t('ensembles.voices.edit') : t.t('ensembles.voices.new')"
-  [(visible)]="voiceDialogVisible"
+  [header]="t.t('ensembles.voices.new')"
+  [(visible)]="addDialogVisible"
   [modal]="true"
   [style]="{ width: '26rem' }"
 >
-  @if (voiceDialogVisible) {
-    <app-voice-form
-      [ensembleId]="ensembleId"
-      [voice]="editingVoice"
-      (saved)="onVoiceSaved()"
-      (cancelled)="voiceDialogVisible = false"
-    />
+  @if (addDialogVisible) {
+    <form [formGroup]="addForm" (ngSubmit)="onAdd()" class="sam-form">
+      <div class="form-field">
+        <p-floatlabel variant="on">
+          <input pInputText id="add-voice-label" formControlName="label" />
+          <label for="add-voice-label">{{ 'ensembles.voices.form.label' | translate }}</label>
+        </p-floatlabel>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <div class="field-with-hint">
+            <p-floatlabel variant="on">
+              <p-inputnumber
+                inputId="add-voice-weight"
+                formControlName="weight"
+                [useGrouping]="false"
+                styleClass="w-full"
+              />
+              <label for="add-voice-weight">{{ 'ensembles.voices.form.weight' | translate }}</label>
+            </p-floatlabel>
+            <i
+              class="pi pi-info-circle field-hint-icon"
+              [pTooltip]="t.t('ensembles.voices.form.weightTooltip')"
+              tooltipPosition="right"
+            ></i>
+          </div>
+        </div>
+
+        <div class="form-field form-field--checkbox">
+          <p-checkbox inputId="add-voice-required" formControlName="required" [binary]="true" />
+          <div class="checkbox-label-row">
+            <label for="add-voice-required">{{ 'ensembles.voices.form.required' | translate }}</label>
+            <i
+              class="pi pi-info-circle field-hint-icon"
+              [pTooltip]="t.t('ensembles.voices.form.requiredTooltip')"
+              tooltipPosition="right"
+            ></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <p-button
+          [label]="t.t('ensembles.voices.cancel')"
+          severity="secondary"
+          [text]="true"
+          type="button"
+          (onClick)="addDialogVisible = false"
+        />
+        <p-button
+          [label]="t.t('ensembles.voices.save')"
+          type="submit"
+          [disabled]="addForm.invalid || saving"
+          [loading]="saving"
+        />
+      </div>
+    </form>
   }
 </p-dialog>
 
+<!-- ── Edit dialog ─────────────────────────────────────── -->
+<p-dialog
+  [header]="t.t('ensembles.voices.edit')"
+  [(visible)]="editDialogVisible"
+  [modal]="true"
+  [style]="{ width: '26rem' }"
+>
+  @if (editDialogVisible && editingVoice) {
+    <form [formGroup]="editForm" (ngSubmit)="onUpdate()" class="sam-form">
+      <div class="editing-voice-info">
+        <span class="info-label">{{ 'ensembles.voices.form.label' | translate }}</span>
+        <span class="info-value">{{ editingVoice.label }}</span>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <div class="field-with-hint">
+            <p-floatlabel variant="on">
+              <p-inputnumber
+                inputId="edit-voice-weight"
+                formControlName="weight"
+                [useGrouping]="false"
+                styleClass="w-full"
+              />
+              <label for="edit-voice-weight">{{ 'ensembles.voices.form.weight' | translate }}</label>
+            </p-floatlabel>
+            <i
+              class="pi pi-info-circle field-hint-icon"
+              [pTooltip]="t.t('ensembles.voices.form.weightTooltip')"
+              tooltipPosition="right"
+            ></i>
+          </div>
+        </div>
+
+        <div class="form-field form-field--checkbox">
+          <p-checkbox inputId="edit-voice-required" formControlName="required" [binary]="true" />
+          <div class="checkbox-label-row">
+            <label for="edit-voice-required">{{ 'ensembles.voices.form.required' | translate }}</label>
+            <i
+              class="pi pi-info-circle field-hint-icon"
+              [pTooltip]="t.t('ensembles.voices.form.requiredTooltip')"
+              tooltipPosition="right"
+            ></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <p-button
+          [label]="t.t('ensembles.voices.cancel')"
+          severity="secondary"
+          [text]="true"
+          type="button"
+          (onClick)="editDialogVisible = false"
+        />
+        <p-button
+          [label]="t.t('ensembles.voices.save')"
+          type="submit"
+          [disabled]="saving"
+          [loading]="saving"
+        />
+      </div>
+    </form>
+  }
+</p-dialog>
+
+<!-- ── Options dialog ──────────────────────────────────── -->
 <p-dialog
   [header]="optionsVoice?.label + ' — ' + t.t('ensembles.voices.options.title')"
   [(visible)]="optionsDialogVisible"
   [modal]="true"
-  [style]="{ width: '38rem' }"
+  [style]="{ width: '42rem' }"
 >
   @if (optionsDialogVisible && optionsVoice) {
     <app-voice-options

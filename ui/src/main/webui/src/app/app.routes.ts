@@ -3,69 +3,47 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: 'sheets',
-    loadComponent: () => import('./features/sheets/sheets').then((m) => m.Sheets),
-  },
-  {
-    path: 'sheets/new',
-    loadComponent: () =>
-      import('./features/sheets/sheet-form-page').then((m) => m.SheetFormPage),
-  },
-  {
-    path: 'sheets/:id',
-    loadComponent: () =>
-      import('./features/sheets/sheet-detail-page').then((m) => m.SheetDetailPage),
-  },
-  {
-    path: 'sheets/:id/edit',
-    loadComponent: () =>
-      import('./features/sheets/sheet-form-page').then((m) => m.SheetFormPage),
+    loadChildren: () => import('./features/sheets/sheets.routes').then((m) => m.SHEETS_ROUTES),
   },
   {
     path: 'collections',
-    loadComponent: () => import('./features/collections/collections').then((m) => m.Collections),
-  },
-  {
-    path: 'collections/:id',
-    loadComponent: () =>
-      import('./features/collections/collection-detail-page').then(
-        (m) => m.CollectionDetailPage,
-      ),
+    loadChildren: () =>
+      import('./features/collections/collections.routes').then((m) => m.COLLECTIONS_ROUTES),
   },
   {
     path: 'uploads',
-    loadComponent: () => import('./features/uploads/uploads').then((m) => m.Uploads),
+    loadChildren: () => import('./features/uploads/uploads.routes').then((m) => m.UPLOADS_ROUTES),
   },
   {
     path: 'musicians',
-    loadComponent: () => import('./features/musicians/musicians').then((m) => m.Musicians),
+    loadChildren: () =>
+      import('./features/musicians/musicians.routes').then((m) => m.MUSICIANS_ROUTES),
   },
   {
     path: 'admin/ensembles',
-    loadComponent: () => import('./features/ensembles/ensembles').then((m) => m.Ensembles),
-  },
-  {
-    path: 'admin/ensembles/:id',
-    loadComponent: () =>
-      import('./features/ensembles/ensemble-detail-page').then((m) => m.EnsembleDetailPage),
+    loadChildren: () =>
+      import('./features/ensembles/ensembles.routes').then((m) => m.ENSEMBLES_ROUTES),
   },
   {
     path: 'admin/instruments',
-    loadComponent: () =>
-      import('./features/instruments/instruments').then((m) => m.Instruments),
+    loadChildren: () =>
+      import('./features/instruments/instruments.routes').then((m) => m.INSTRUMENTS_ROUTES),
   },
   {
     path: 'admin/configuration',
-    loadComponent: () =>
-      import('./features/configuration/configuration').then((m) => m.Configuration),
+    loadChildren: () =>
+      import('./features/configuration/configuration.routes').then((m) => m.CONFIGURATION_ROUTES),
   },
   {
     path: 'user/preferences',
-    loadComponent: () =>
-      import('./features/user-preferences/user-preferences').then((m) => m.UserPreferences),
+    loadChildren: () =>
+      import('./features/user-preferences/user-preferences.routes').then(
+        (m) => m.USER_PREFERENCES_ROUTES,
+      ),
   },
   {
     path: '',
-    loadComponent: () => import('./features/home/home').then((m) => m.Home),
     pathMatch: 'full',
+    loadChildren: () => import('./features/home/home.routes').then((m) => m.HOME_ROUTES),
   },
 ];

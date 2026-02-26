@@ -1,0 +1,237 @@
+.collection-sheets-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.panel-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--sam-text);
+  }
+}
+
+.col-identifier {
+  width: 5rem;
+}
+
+.col-actions {
+  width: 8rem;
+}
+
+.identifier-cell {
+  font-weight: 600;
+  color: var(--sam-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.sheet-link {
+  color: var(--p-primary-color);
+  text-decoration: none;
+  font-weight: 500;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.sheet-subtitle {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--sam-text-muted);
+}
+
+.actions-cell {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.empty-message {
+  text-align: center;
+  padding: 2rem;
+  color: var(--sam-text-muted);
+  font-style: italic;
+}
+
+// ── Add dialog ──────────────────────────────────────────
+
+.add-sheet-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.search-bar {
+  .search-field {
+    width: 100%;
+  }
+}
+
+.col-composer {
+  width: 14rem;
+}
+
+.col-genre {
+  width: 10rem;
+}
+
+.search-row {
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &--selected td {
+    background: color-mix(in srgb, var(--p-primary-color) 12%, transparent) !important;
+  }
+}
+
+.search-title {
+  font-weight: 500;
+}
+
+.selected-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.875rem;
+  background: color-mix(in srgb, var(--p-primary-color) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--p-primary-color) 30%, transparent);
+  border-radius: var(--p-border-radius);
+  font-size: 0.9rem;
+  color: var(--sam-text);
+
+  i {
+    color: var(--p-primary-color);
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .selected-composer {
+    color: var(--sam-text-secondary);
+  }
+}
+
+.add-footer {
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  border-top: 1px solid var(--sam-border);
+  padding-top: 0.75rem;
+
+  .identifier-field {
+    flex: 0 0 12rem;
+  }
+
+  .dialog-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-left: auto;
+  }
+}
+
+.col-preview {
+  width: 3rem;
+}
+
+.preview-action-cell {
+  text-align: center;
+}
+
+// ── Preview dialog ───────────────────────────────────────
+
+.preview-loading {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+  font-size: 1.5rem;
+  color: var(--sam-text-muted);
+}
+
+.preview-subtitle {
+  font-size: 0.95rem;
+  color: var(--sam-text-secondary);
+  font-style: italic;
+}
+
+.preview-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 1.5rem;
+}
+
+.preview-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+
+  &--full {
+    grid-column: 1 / -1;
+  }
+
+  .field-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--sam-text-secondary);
+  }
+
+  .field-value {
+    font-size: 0.9rem;
+    color: var(--sam-text);
+  }
+}
+
+.preview-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.15rem;
+}
+
+.tag-chip {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  background: color-mix(in srgb, var(--p-primary-color) 12%, transparent);
+  color: var(--p-primary-color);
+  border: 1px solid color-mix(in srgb, var(--p-primary-color) 25%, transparent);
+}
+
+.preview-notes {
+  white-space: pre-wrap;
+  font-size: 0.88rem;
+  color: var(--sam-text-secondary);
+}
+
+// ── Edit dialog ──────────────────────────────────────────
+
+.editing-sheet-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem 1rem;
+  background: var(--sam-surface-raised, var(--sam-surface));
+  border: 1px solid var(--sam-border);
+  border-radius: var(--p-border-radius);
+  margin-bottom: 0.25rem;
+
+  .info-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--sam-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .info-value {
+    font-weight: 500;
+    color: var(--sam-text);
+  }
+}

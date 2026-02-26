@@ -1,0 +1,82 @@
+@use 'pages';
+
+.collection-detail-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.collection-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.collection-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+
+  h1 {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--sam-text);
+  }
+}
+
+.type-badge {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--p-border-radius);
+  font-size: 0.8rem;
+  font-weight: 500;
+
+  &.type-folder {
+    background: color-mix(in srgb, var(--p-blue-500) 15%, transparent);
+    color: var(--p-blue-500);
+  }
+
+  &.type-setlist {
+    background: color-mix(in srgb, var(--p-green-500) 15%, transparent);
+    color: var(--p-green-500);
+  }
+}
+
+.collection-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 1rem;
+  background: var(--sam-surface-raised, var(--sam-surface));
+  border: 1px solid var(--sam-border);
+  border-radius: var(--p-border-radius);
+}
+
+.actions-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--sam-text-secondary);
+  margin-right: 0.25rem;
+}
+
+.collection-description {
+  margin: 0;
+  color: var(--sam-text-secondary);
+  font-size: 0.95rem;
+}
+
+.collection-date {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.85rem;
+  color: var(--sam-text-secondary);
+
+  i {
+    font-size: 0.8rem;
+  }
+}

@@ -1,3 +1,4 @@
+<!-- ── Options table ──────────────────────────────────── -->
 <div class="options-section">
   <div class="options-toolbar">
     <h4>{{ 'ensembles.voices.options.title' | translate }}</h4>
@@ -16,6 +17,7 @@
     <ng-template #header>
       <tr>
         <th>{{ 'ensembles.voices.options.columns.instrument' | translate }}</th>
+        <th>{{ 'ensembles.voices.options.columns.transposition' | translate }}</th>
         <th>{{ 'ensembles.voices.options.columns.type' | translate }}</th>
         <th>{{ 'ensembles.voices.options.columns.factor' | translate }}</th>
         <th>{{ 'ensembles.voices.options.columns.actions' | translate }}</th>
@@ -25,6 +27,7 @@
     <ng-template #body let-option>
       <tr>
         <td>{{ instrumentName(option.instrumentId) }}</td>
+        <td class="transposition-cell">{{ instrumentTransposition(option.instrumentId) }}</td>
         <td>
           @if (option.type) {
             <p-tag [severity]="typeSeverity(option.type)" [value]="option.type" />
@@ -53,26 +56,217 @@
 
     <ng-template #emptymessage>
       <tr>
-        <td colspan="4" class="empty-message">{{ 'ensembles.voices.options.empty' | translate }}</td>
+        <td colspan="5" class="empty-message">{{ 'ensembles.voices.options.empty' | translate }}</td>
       </tr>
     </ng-template>
   </p-table>
 </div>
 
+<!-- ── Add dialog ──────────────────────────────────────── -->
 <p-dialog
-  [header]="editingOption ? t.t('ensembles.voices.options.edit') : t.t('ensembles.voices.options.new')"
-  [(visible)]="optionDialogVisible"
+  [header]="t.t('ensembles.voices.options.new')"
+  [(visible)]="addDialogVisible"
+  [modal]="true"
+  [style]="{ width: '44rem' }"
+  [breakpoints]="{ '768px': '95vw' }"
+>
+  @if (addDialogVisible) {
+    <div class="add-option-dialog">
+      <!-- Filter -->
+      <div class="filter-bar">
+        <p-iconfield class="filter-field">
+          <p-inputicon styleClass="pi pi-search" />
+          <input
+            pInputText
+            type="text"
+            [placeholder]="t.t('ensembles.voices.options.form.instrumentPlaceholder')"
+            (input)="onFilterInput($event)"
+          />
+        </p-iconfield>
+      </div>
+
+      <!-- Instrument table -->
+      <p-table
+        [value]="filteredInstruments()"
+        [rowHover]="true"
+        styleClass="instrument-select-table"
+      >
+        <ng-template #header>
+          <tr>
+            <th>{{ 'ensembles.voices.options.columns.instrument' | translate }}</th>
+            <th class="col-transposition">{{ 'ensembles.voices.options.columns.transposition' | translate }}</th>
+          </tr>
+        </ng-template>
+
+        <ng-template #body let-instrument>
+          <tr
+            class="instrument-row"
+            [class.instrument-row--selected]="isInstrumentSelected(instrument)"
+            (click)="selectInstrument(instrument)"
+          >
+            <td>{{ instrument.name }}</td>
+            <td class="transposition-cell">{{ instrument.transposition ?? '—' }}</td>
+          </tr>
+        </ng-template>
+
+        <ng-template #emptymessage>
+          <tr>
+            <td colspan="2" class="empty-message">
+              {{ 'ensembles.voices.options.form.noResults' | translate }}
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+
+      <!-- Selected indicator -->
+      @if (selectedInstrument) {
+        <div class="selected-indicator">
+          <i class="pi pi-check-circle"></i>
+          <span>{{ selectedInstrument.name }}</span>
+          @if (selectedInstrument.transposition) {
+            <span class="selected-transposition">— {{ selectedInstrument.transposition }}</span>
+          }
+        </div>
+      }
+
+      <!-- Type + factor + actions -->
+      <form [formGroup]="addForm" (ngSubmit)="onAdd()" class="add-footer">
+        <div class="footer-fields">
+          <div class="field-with-hint">
+            <p-floatlabel variant="on">
+              <p-select
+                inputId="add-type"
+                formControlName="type"
+                [options]="typeOptions"
+                [showClear]="true"
+                styleClass="w-full"
+              />
+              <label for="add-type">{{ 'ensembles.voices.options.form.type' | translate }}</label>
+            </p-floatlabel>
+            <i
+              class="pi pi-info-circle field-hint-icon"
+              [pTooltip]="t.t('ensembles.voices.options.form.typeTooltip')"
+              tooltipPosition="top"
+            ></i>
+          </div>
+          <div class="field-with-hint">
+            <p-floatlabel variant="on">
+              <p-inputnumber
+                inputId="add-factor"
+                formControlName="factor"
+                [useGrouping]="false"
+                [min]="0"
+                [max]="1"
+                [step]="0.1"
+                [minFractionDigits]="1"
+                [maxFractionDigits]="2"
+                styleClass="w-full"
+              />
+              <label for="add-factor">{{ 'ensembles.voices.options.form.factor' | translate }}</label>
+            </p-floatlabel>
+            <i
+              class="pi pi-info-circle field-hint-icon"
+              [pTooltip]="t.t('ensembles.voices.options.form.factorTooltip')"
+              tooltipPosition="top"
+            ></i>
+          </div>
+        </div>
+        <div class="dialog-actions">
+          <p-button
+            [label]="t.t('ensembles.voices.options.cancel')"
+            severity="secondary"
+            [text]="true"
+            type="button"
+            (onClick)="addDialogVisible = false"
+          />
+          <p-button
+            [label]="t.t('ensembles.voices.options.save')"
+            type="submit"
+            [disabled]="!canAdd || saving"
+            [loading]="saving"
+          />
+        </div>
+      </form>
+    </div>
+  }
+</p-dialog>
+
+<!-- ── Edit dialog ─────────────────────────────────────── -->
+<p-dialog
+  [header]="t.t('ensembles.voices.options.edit')"
+  [(visible)]="editDialogVisible"
   [modal]="true"
   [style]="{ width: '26rem' }"
 >
-  @if (optionDialogVisible) {
-    <app-voice-option-form
-      [ensembleId]="ensembleId"
-      [voiceId]="voiceId"
-      [option]="editingOption"
-      (saved)="onOptionSaved()"
-      (cancelled)="optionDialogVisible = false"
-    />
+  @if (editDialogVisible && editingOption) {
+    <form [formGroup]="editForm" (ngSubmit)="onUpdate()" class="sam-form">
+      <div class="editing-instrument-info">
+        <span class="info-label">{{ 'ensembles.voices.options.form.instrument' | translate }}</span>
+        <span class="info-value">{{ instrumentName(editingOption.instrumentId) }}</span>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <div class="field-with-hint">
+            <p-floatlabel variant="on">
+              <p-select
+                inputId="edit-type"
+                formControlName="type"
+                [options]="typeOptions"
+                [showClear]="true"
+                styleClass="w-full"
+              />
+              <label for="edit-type">{{ 'ensembles.voices.options.form.type' | translate }}</label>
+            </p-floatlabel>
+            <i
+              class="pi pi-info-circle field-hint-icon"
+              [pTooltip]="t.t('ensembles.voices.options.form.typeTooltip')"
+              tooltipPosition="right"
+            ></i>
+          </div>
+        </div>
+
+        <div class="form-field">
+          <div class="field-with-hint">
+            <p-floatlabel variant="on">
+              <p-inputnumber
+                inputId="edit-factor"
+                formControlName="factor"
+                [useGrouping]="false"
+                [min]="0"
+                [max]="1"
+                [step]="0.1"
+                [minFractionDigits]="1"
+                [maxFractionDigits]="2"
+                styleClass="w-full"
+              />
+              <label for="edit-factor">{{ 'ensembles.voices.options.form.factor' | translate }}</label>
+            </p-floatlabel>
+            <i
+              class="pi pi-info-circle field-hint-icon"
+              [pTooltip]="t.t('ensembles.voices.options.form.factorTooltip')"
+              tooltipPosition="right"
+            ></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <p-button
+          [label]="t.t('ensembles.voices.options.cancel')"
+          severity="secondary"
+          [text]="true"
+          type="button"
+          (onClick)="editDialogVisible = false"
+        />
+        <p-button
+          [label]="t.t('ensembles.voices.options.save')"
+          type="submit"
+          [disabled]="saving"
+          [loading]="saving"
+        />
+      </div>
+    </form>
   }
 </p-dialog>
 

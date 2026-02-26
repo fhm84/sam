@@ -19,6 +19,113 @@
   }
 }
 
+.transposition-cell {
+  color: var(--sam-text-secondary);
+  font-size: 0.875rem;
+  width: 7rem;
+}
+
+.actions-cell {
+  display: flex;
+  gap: 0.25rem;
+}
+
 .empty-message {
   padding: 1.5rem !important;
+}
+
+// ── Add dialog ───────────────────────────────────────────
+
+.add-option-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.filter-bar {
+  .filter-field {
+    width: 100%;
+  }
+}
+
+.col-transposition {
+  width: 8rem;
+}
+
+.instrument-row {
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &--selected td {
+    background: color-mix(in srgb, var(--p-primary-color) 12%, transparent) !important;
+  }
+}
+
+.selected-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.875rem;
+  background: color-mix(in srgb, var(--p-primary-color) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--p-primary-color) 30%, transparent);
+  border-radius: var(--p-border-radius);
+  font-size: 0.9rem;
+  color: var(--sam-text);
+
+  i {
+    color: var(--p-primary-color);
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .selected-transposition {
+    color: var(--sam-text-secondary);
+  }
+}
+
+.add-footer {
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  border-top: 1px solid var(--sam-border);
+  padding-top: 0.75rem;
+
+  .footer-fields {
+    display: flex;
+    gap: 1rem;
+    flex: 1;
+  }
+
+  .dialog-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+}
+
+// ── Edit dialog ──────────────────────────────────────────
+
+.editing-instrument-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem 1rem;
+  background: var(--sam-surface-raised, var(--sam-surface));
+  border: 1px solid var(--sam-border);
+  border-radius: var(--p-border-radius);
+  margin-bottom: 0.25rem;
+
+  .info-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--sam-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .info-value {
+    font-weight: 500;
+    color: var(--sam-text);
+  }
 }

@@ -427,18 +427,20 @@
         "edit": "Edit option",
         "columns": {
           "instrument": "Instrument",
+          "transposition": "Transposition",
           "type": "Type",
           "factor": "Factor",
           "actions": "Actions"
         },
         "form": {
           "instrument": "Instrument",
-          "instrumentPlaceholder": "Select instrument",
+          "instrumentPlaceholder": "Search instruments…",
+          "noResults": "No instruments found",
           "type": "Type",
           "typePlaceholder": "Select type",
           "typeTooltip": "PRIMARY: preferred instrument for this voice. ALTERNATE: accepted substitute. FALLBACK: last resort if no other option is available.",
           "factor": "Factor",
-          "factorTooltip": "How many players are needed — e.g. 2 means two musicians play this voice option."
+          "factorTooltip": "Scoring weight for this option (0.0–1.0). A primary option is typically 1.0; alternates and fallbacks use lower values, e.g. 0.8 or 0.4."
         },
         "delete": {
           "confirm": "Are you sure you want to delete this voice option?",

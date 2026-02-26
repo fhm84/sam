@@ -1,0 +1,68 @@
+<div class="collection-detail-page">
+  <div class="page-toolbar">
+    <p-button
+      icon="pi pi-arrow-left"
+      [label]="t.t('collections.detail.backToList')"
+      [text]="true"
+      (onClick)="goBack()"
+    />
+    @if (collection()) {
+      <p-button
+        icon="pi pi-pencil"
+        [label]="t.t('collections.edit')"
+        [text]="true"
+        (onClick)="openEdit()"
+      />
+    }
+  </div>
+
+  @if (collection(); as col) {
+    <div class="collection-header">
+      <div class="collection-title-row">
+        <h1>{{ col.name }}</h1>
+        @if (col.type) {
+          <span class="type-badge type-{{ col.type | lowercase }}">
+            {{ 'collections.types.' + col.type | translate }}
+          </span>
+        }
+      </div>
+      @if (col.description) {
+        <p class="collection-description">{{ col.description }}</p>
+      }
+      @if (col.date) {
+        <span class="collection-date">
+          <i class="pi pi-calendar"></i> {{ formatDate(col.date) }}
+        </span>
+      }
+    </div>
+
+    <div class="collection-actions">
+      <span class="actions-label">{{ 'collections.detail.actions.label' | translate }}</span>
+      <p-button
+        icon="pi pi-file-export"
+        [label]="t.t('collections.detail.actions.generateToc')"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        (onClick)="generateToc()"
+      />
+    </div>
+
+    <app-collection-sheets [collectionId]="collectionId()" />
+  }
+</div>
+
+<p-dialog
+  [header]="t.t('collections.edit')"
+  [(visible)]="editDialogVisible"
+  [modal]="true"
+  [style]="{ width: '32rem' }"
+>
+  @if (editDialogVisible) {
+    <app-collection-form
+      [collection]="collection()"
+      (saved)="onEditSaved()"
+      (cancelled)="editDialogVisible = false"
+    />
+  }
+</p-dialog>
