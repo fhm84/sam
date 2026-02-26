@@ -33,18 +33,20 @@
         <label for="collection-type">{{ 'collections.form.type' | translate }}</label>
       </p-floatlabel>
     </div>
-    <div class="form-field flex-1">
-      <p-floatlabel variant="on">
-        <p-datepicker
-          inputId="collection-date"
-          formControlName="date"
-          [showIcon]="true"
-          [showButtonBar]="true"
-          dateFormat="dd.mm.yy"
-        />
-        <label for="collection-date">{{ 'collections.form.date' | translate }}</label>
-      </p-floatlabel>
-    </div>
+    @if (isSetlist) {
+      <div class="form-field flex-1">
+        <p-floatlabel variant="on">
+          <p-datepicker
+            inputId="collection-date"
+            formControlName="date"
+            [showIcon]="true"
+            [showButtonBar]="true"
+            dateFormat="dd.mm.yy"
+          />
+          <label for="collection-date">{{ 'collections.form.date' | translate }}</label>
+        </p-floatlabel>
+      </div>
+    }
   </div>
 
   <div class="form-actions">

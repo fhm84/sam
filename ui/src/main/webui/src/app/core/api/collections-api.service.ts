@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {
   CollectionSheet,
+  CreateCollectionSheet,
   PaginatedResponse,
   PaginationRequest,
   SheetCollection,
@@ -58,11 +59,11 @@ export class CollectionsApiService {
     );
   }
 
-  addSheet(collectionId: string, data: CollectionSheet): Observable<void> {
+  addSheet(collectionId: string, data: CreateCollectionSheet): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/${collectionId}/sheets`, data);
   }
 
-  updateSheet(collectionId: string, sheetId: string, data: CollectionSheet): Observable<void> {
+  updateSheet(collectionId: string, sheetId: string, data: CreateCollectionSheet): Observable<void> {
     return this.http.put<void>(`${this.baseUrl}/${collectionId}/sheets/${sheetId}`, data);
   }
 

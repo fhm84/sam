@@ -25,6 +25,13 @@ export const routes: Routes = [
     loadComponent: () => import('./features/collections/collections').then((m) => m.Collections),
   },
   {
+    path: 'collections/:id',
+    loadComponent: () =>
+      import('./features/collections/collection-detail-page').then(
+        (m) => m.CollectionDetailPage,
+      ),
+  },
+  {
     path: 'uploads',
     loadComponent: () => import('./features/uploads/uploads').then((m) => m.Uploads),
   },

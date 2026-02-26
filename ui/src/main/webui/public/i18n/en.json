@@ -255,7 +255,46 @@
     "search": "Search collections",
     "empty": "No collections found",
     "save": "Save",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "detail": {
+      "backToList": "Back to Collections",
+      "actions": {
+        "label": "Actions",
+        "generateToc": "Generate Table of Contents"
+      }
+    },
+    "sheets": {
+      "title": "Sheets",
+      "add": "Add Sheet",
+      "edit": "Edit Entry",
+      "columns": {
+        "identifier": "#",
+        "title": "Title",
+        "genre": "Genre",
+        "actions": "Actions"
+      },
+      "form": {
+        "sheet": "Sheet",
+        "sheetPlaceholder": "Search for a sheet…",
+        "identifier": "Position",
+        "identifierTooltip": "Position or label within the collection, e.g. 1, A1, or Intro.",
+        "noResults": "No sheets found"
+      },
+      "delete": {
+        "confirm": "Remove \"{title}\" from this collection?",
+        "header": "Confirm removal"
+      },
+      "messages": {
+        "added": "Sheet added to collection",
+        "updated": "Entry updated",
+        "removed": "Sheet removed from collection",
+        "error": "An error occurred"
+      },
+      "empty": "No sheets in this collection yet",
+      "preview": "View sheet details",
+      "save": "Save",
+      "cancel": "Cancel"
+    }
   },
   "uploads": {
     "title": "Uploads",

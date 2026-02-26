@@ -82,7 +82,7 @@
       <ng-template #body let-collection>
         <tr>
           <td>
-            <span class="collection-name-cell">{{ collection.name }}</span>
+            <a class="collection-name-cell collection-name-link" (click)="navigateToDetail(collection)">{{ collection.name }}</a>
             @if (collection.description) {
               <span class="collection-desc-cell">{{ collection.description }}</span>
             }
@@ -131,8 +131,8 @@
       <div class="collection-cards">
         @for (collection of items(); track collection.id) {
           <div class="collection-card">
-            <div class="card-header">
-              <span class="card-title">{{ collection.name }}</span>
+            <div class="card-header" (click)="navigateToDetail(collection)" style="cursor: pointer;">
+              <span class="card-title card-title-link">{{ collection.name }}</span>
               @if (collection.description) {
                 <span class="card-subtitle">{{ collection.description }}</span>
               }

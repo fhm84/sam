@@ -1,4 +1,4 @@
-import { Component, inject, Input } from '@angular/core';
+import { Component, DestroyRef, inject, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FloatLabel } from 'primeng/floatlabel';
 import { InputText } from 'primeng/inputtext';
@@ -11,6 +11,7 @@ import { CollectionsApiService } from '../../core/api';
 import { convertEmptyStringsToNull } from '../../shared/utils/object.utils';
 import { CollectionType, SheetCollection } from '../../model/datamodels';
 import { map, Observable } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { BaseForm } from '../../shared/base/base-form';
 
 @Component({
@@ -19,8 +20,9 @@ import { BaseForm } from '../../shared/base/base-form';
   templateUrl: './collection-form.html',
   styleUrl: './collection-form.scss',
 })
-export class CollectionForm extends BaseForm<SheetCollection> {
+export class CollectionForm extends BaseForm<SheetCollection> implements OnInit {
   private readonly api = inject(CollectionsApiService);
+  private readonly destroyRef = inject(DestroyRef);
 
   @Input() collection: SheetCollection | null = null;
 
@@ -35,6 +37,20 @@ export class CollectionForm extends BaseForm<SheetCollection> {
     type: new FormControl<CollectionType | null>(null),
     date: new FormControl<Date | null>(null),
   });
+
+  protected get isSetlist(): boolean {
+    return this.form.controls.type.value === 'SETLIST';
+  }
+
+  ngOnInit(): void {
+    this.form.controls.type.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((type) => {
+        if (type !== 'SETLIST') {
+          this.form.controls.date.setValue(null);
+        }
+      });
+  }
 
   getEntity = () => this.collection;
 

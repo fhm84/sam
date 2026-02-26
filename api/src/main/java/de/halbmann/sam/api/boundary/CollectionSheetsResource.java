@@ -1,6 +1,7 @@
 package de.halbmann.sam.api.boundary;
 
 import de.halbmann.sam.api.entity.CollectionSheet;
+import de.halbmann.sam.api.entity.CreateCollectionSheet;
 import de.halbmann.sam.api.entity.PaginatedResponse;
 import de.halbmann.sam.api.entity.PaginationRequest;
 import jakarta.ws.rs.*;
@@ -14,7 +15,7 @@ public interface CollectionSheetsResource {
     PaginatedResponse<CollectionSheet> listAll(final @BeanParam PaginationRequest paginationRequest);
 
     @POST
-    void addSheet(final CollectionSheet collectionSheet);
+    void addSheet(final CreateCollectionSheet createCollectionSheet);
 
     @PUT
     @Path("{sheetId}")

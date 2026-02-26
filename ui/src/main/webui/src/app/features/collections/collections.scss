@@ -11,6 +11,25 @@
   font-weight: 500;
 }
 
+.collection-name-link {
+  color: var(--p-primary-color);
+  cursor: pointer;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.card-title-link {
+  color: var(--p-primary-color);
+  transition: color 0.15s;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 .collection-desc-cell {
   display: block;
   font-size: 0.85rem;

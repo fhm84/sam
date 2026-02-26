@@ -255,7 +255,46 @@
     "search": "Sammlungen suchen",
     "empty": "Keine Sammlungen gefunden",
     "save": "Speichern",
-    "cancel": "Abbrechen"
+    "cancel": "Abbrechen",
+    "detail": {
+      "backToList": "Zurück zu Sammlungen",
+      "actions": {
+        "label": "Aktionen",
+        "generateToc": "Inhaltsverzeichnis erstellen"
+      }
+    },
+    "sheets": {
+      "title": "Noten",
+      "add": "Note hinzufügen",
+      "edit": "Eintrag bearbeiten",
+      "columns": {
+        "identifier": "Nr.",
+        "title": "Titel",
+        "genre": "Genre",
+        "actions": "Aktionen"
+      },
+      "form": {
+        "sheet": "Notenblatt",
+        "sheetPlaceholder": "Notenblatt suchen…",
+        "identifier": "Position",
+        "identifierTooltip": "Positionsnummer oder Bezeichner innerhalb der Sammlung, z.B. 1, A1 oder Intro.",
+        "noResults": "Keine Noten gefunden"
+      },
+      "delete": {
+        "confirm": "\"{title}\" aus dieser Sammlung entfernen?",
+        "header": "Entfernen bestätigen"
+      },
+      "messages": {
+        "added": "Notenblatt zur Sammlung hinzugefügt",
+        "updated": "Eintrag aktualisiert",
+        "removed": "Notenblatt aus Sammlung entfernt",
+        "error": "Ein Fehler ist aufgetreten"
+      },
+      "empty": "Noch keine Noten in dieser Sammlung",
+      "preview": "Notendetails anzeigen",
+      "save": "Speichern",
+      "cancel": "Abbrechen"
+    }
   },
   "uploads": {
     "title": "Uploads",

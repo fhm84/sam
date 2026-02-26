@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 3.2.1263 on 2026-02-23 23:00:53.
+// Generated using typescript-generator version 3.2.1263 on 2026-02-26 21:35:45.
 
 export interface Attachment {
     checksum?: string;
@@ -25,9 +25,14 @@ export interface BookletFilterRequest extends PaginationRequest {
 }
 
 export interface CollectionSheet {
+    duration?: long;
+    genre?: Genre;
     id?: string;
     identifier: string;
-    sheetMusic: SheetMusic;
+    sheetId?: string;
+    style?: Style;
+    subtitle?: string;
+    title?: string;
 }
 
 export interface CoverageResult {
@@ -40,6 +45,11 @@ export interface CoverageResult {
     playable?: boolean;
     sheetMusicId?: string;
     status?: CoverageStatus;
+}
+
+export interface CreateCollectionSheet {
+    identifier: string;
+    sheetId: string;
 }
 
 export interface CreateEnsemble {

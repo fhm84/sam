@@ -1,8 +1,8 @@
 package de.halbmann.sam.api.entity;
 
-import jakarta.validation.Valid;
+import jakarta.json.bind.annotation.JsonbTypeAdapter;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import java.time.Duration;
 import java.util.UUID;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -26,7 +26,22 @@ public class CollectionSheet {
     @NotBlank
     String identifier;
 
-    @NotNull
-    @Valid
-    SheetMusic sheetMusic;
+    UUID sheetId;
+
+    /**
+     * The title of the music sheet/piece.
+     */
+    String title;
+
+    /**
+     * (Optional) Subtitle of the piece.
+     */
+    String subtitle;
+
+    Genre genre;
+
+    Style style;
+
+    @JsonbTypeAdapter(DurationJsonbAdapter.class)
+    Duration duration;
 }

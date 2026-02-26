@@ -1,5 +1,6 @@
 import { LowerCasePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { TableModule } from 'primeng/table';
 import { Dialog } from 'primeng/dialog';
 import { ConfirmDialog } from 'primeng/confirmdialog';
@@ -46,6 +47,7 @@ Button,
 export class Collections extends BaseCrudList<SheetCollection, SheetCollectionFilterRequest> {
   api: CrudApi<SheetCollection, SheetCollectionFilterRequest> = inject(CollectionsApiService);
   private readonly layoutPref = inject(LayoutPreferenceService);
+  private readonly router = inject(Router);
   translationPrefix = 'collections';
   getItemId = (c: SheetCollection) => c.id!;
   getItemName = (c: SheetCollection) => c.name;
@@ -97,6 +99,10 @@ export class Collections extends BaseCrudList<SheetCollection, SheetCollectionFi
     this.layoutPref.setViewMode('collections', this.viewMode());
     this.currentPage = 0;
     this.loadData();
+  }
+
+  protected navigateToDetail(collection: SheetCollection): void {
+    this.router.navigate(['/collections', collection.id]);
   }
 
   protected formatDate(date?: Date): string {
