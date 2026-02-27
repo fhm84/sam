@@ -1,10 +1,15 @@
 @use 'pages';
 @use 'details';
 
-.detail-header-actions {
+.detail-title-row {
   display: flex;
   align-items: center;
   gap: 0.25rem;
+
+  h2 {
+    flex: 1;
+    min-width: 0;
+  }
 }
 
 .open-fullpage-link {
@@ -14,6 +19,18 @@
 
 .detail-top-row {
   display: contents;
+}
+
+.tab-panels {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-top: 0.75rem;
+}
+
+.instrumentations-toolbar {
+  display: flex;
+  justify-content: flex-end;
 }
 
 :host(.mode-full) {

@@ -14,10 +14,10 @@
     </div>
   } @else {
     <div class="detail-header">
-      <div class="detail-title-group">
+      <div class="page-title-group">
         <h2>{{ (isEdit ? 'sheets.edit' : 'sheets.new') | translate }}</h2>
         @if (isEdit && sheet(); as s) {
-          <span class="detail-subtitle">{{ s.title }}</span>
+          <p class="page-subtitle">{{ s.title }}</p>
         }
       </div>
     </div>

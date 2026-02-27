@@ -17,8 +17,8 @@
   </div>
 
   @if (collection(); as col) {
-    <div class="collection-header">
-      <div class="collection-title-row">
+    <div class="detail-header">
+      <div class="detail-title-row">
         <h1>{{ col.name }}</h1>
         @if (col.type) {
           <span class="type-badge type-{{ col.type | lowercase }}">
@@ -27,7 +27,7 @@
         }
       </div>
       @if (col.description) {
-        <p class="collection-description">{{ col.description }}</p>
+        <p class="detail-description">{{ col.description }}</p>
       }
       @if (col.date) {
         <span class="collection-date">

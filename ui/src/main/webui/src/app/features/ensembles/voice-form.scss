@@ -1,10 +1,2 @@
 @use 'forms';
 
-.form-field {
-  &--checkbox {
-    flex-direction: row;
-    align-items: center;
-    gap: 0.5rem;
-    padding-top: 1.5rem;
-  }
-}

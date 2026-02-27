@@ -29,6 +29,19 @@
   padding: 1.5rem !important;
 }
 
+// ── Edit dialog (tabs) ───────────────────────────────────
+
+.voice-edit-tabs {
+  // Remove default tab panel padding so the options table spans full width
+  :host-context(.p-tabpanel) {
+    padding: 0;
+  }
+}
+
+.tab-form {
+  padding-top: 0.5rem;
+}
+
 // ── Edit dialog ──────────────────────────────────────────
 
 .editing-voice-info {
@@ -55,13 +68,3 @@
   }
 }
 
-// ── Form ─────────────────────────────────────────────────
-
-.form-field {
-  &--checkbox {
-    flex-direction: row;
-    align-items: center;
-    gap: 0.5rem;
-    padding-top: 1.5rem;
-  }
-}

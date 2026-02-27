@@ -11,6 +11,7 @@ import { FloatLabel } from 'primeng/floatlabel';
 import { InputText } from 'primeng/inputtext';
 import { InputNumber } from 'primeng/inputnumber';
 import { Checkbox } from 'primeng/checkbox';
+import { Tabs, TabList, Tab, TabPanels, TabPanel } from 'primeng/tabs';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../core/translation.service';
 import { EnsemblesApiService } from '../../core/api';
@@ -32,6 +33,11 @@ import { VoiceOptions } from './voice-options';
     InputText,
     InputNumber,
     Checkbox,
+    Tabs,
+    TabList,
+    Tab,
+    TabPanels,
+    TabPanel,
     TranslatePipe,
     VoiceOptions,
   ],
@@ -61,18 +67,15 @@ export class EnsembleVoices implements OnChanges {
     required: new FormControl(false, { nonNullable: true }),
   });
 
-  // ── Edit dialog ────────────────────────────────────────
+  // ── Edit dialog (tabbed) ───────────────────────────────
   protected editDialogVisible = false;
   protected editingVoice: EnsembleVoice | null = null;
+  protected activeTab: number = 0;
 
   protected readonly editForm = new FormGroup({
     weight: new FormControl<number | null>(null),
     required: new FormControl(false, { nonNullable: true }),
   });
-
-  // ── Options dialog ─────────────────────────────────────
-  protected optionsDialogVisible = false;
-  protected optionsVoice: EnsembleVoice | null = null;
 
   ngOnChanges(): void {
     if (this.ensembleId) {
@@ -91,7 +94,7 @@ export class EnsembleVoices implements OnChanges {
     const raw = convertEmptyStringsToNull(this.addForm.getRawValue()) as CreateEnsembleVoice;
     this.saving = true;
     this.api.createVoice(this.ensembleId, raw).subscribe({
-      next: () => {
+      next: (created) => {
         this.saving = false;
         this.addDialogVisible = false;
         this.messageService.add({
@@ -99,6 +102,12 @@ export class EnsembleVoices implements OnChanges {
           summary: this.t.t('ensembles.voices.messages.created'),
         });
         this.loadVoices();
+        // Transition to the tabbed edit dialog, landing on the Options tab
+        // so the user can immediately start adding instrument options.
+        this.editingVoice = created;
+        this.editForm.reset({ weight: created.weight ?? null, required: created.required ?? false });
+        this.activeTab = 1;
+        this.editDialogVisible = true;
       },
       error: () => {
         this.saving = false;
@@ -106,10 +115,18 @@ export class EnsembleVoices implements OnChanges {
     });
   }
 
-  // ── Edit ──────────────────────────────────────────────
+  // ── Edit / Options ────────────────────────────────────
   protected openEditVoice(voice: EnsembleVoice): void {
     this.editingVoice = { ...voice };
     this.editForm.reset({ weight: voice.weight ?? null, required: voice.required ?? false });
+    this.activeTab = 0;
+    this.editDialogVisible = true;
+  }
+
+  protected openOptions(voice: EnsembleVoice): void {
+    this.editingVoice = { ...voice };
+    this.editForm.reset({ weight: voice.weight ?? null, required: voice.required ?? false });
+    this.activeTab = 1;
     this.editDialogVisible = true;
   }
 
@@ -139,12 +156,6 @@ export class EnsembleVoices implements OnChanges {
         this.saving = false;
       },
     });
-  }
-
-  // ── Options ───────────────────────────────────────────
-  protected openOptions(voice: EnsembleVoice): void {
-    this.optionsVoice = voice;
-    this.optionsDialogVisible = true;
   }
 
   // ── Delete ────────────────────────────────────────────

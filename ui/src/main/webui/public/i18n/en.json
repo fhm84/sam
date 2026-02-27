@@ -98,6 +98,10 @@
       "error": "An error occurred"
     },
     "detail": {
+      "tabs": {
+        "details": "Details",
+        "instrumentations": "Instrumentations"
+      },
       "baseData": "Base Data",
       "documents": "Documents",
       "legalMisc": "Legal / Misc",
@@ -393,6 +397,10 @@
       "title": "Voices",
       "new": "New voice",
       "edit": "Edit voice",
+      "tabs": {
+        "details": "Details",
+        "options": "Options"
+      },
       "columns": {
         "label": "Label",
         "weight": "Weight",

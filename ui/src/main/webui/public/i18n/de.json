@@ -98,6 +98,10 @@
       "error": "Ein Fehler ist aufgetreten"
     },
     "detail": {
+      "tabs": {
+        "details": "Details",
+        "instrumentations": "Besetzung"
+      },
       "baseData": "Stammdaten",
       "documents": "Dokumente",
       "legalMisc": "Rechtliches / Sonstiges",
@@ -393,6 +397,10 @@
       "title": "Stimmen",
       "new": "Neue Stimme",
       "edit": "Stimme bearbeiten",
+      "tabs": {
+        "details": "Details",
+        "options": "Optionen"
+      },
       "columns": {
         "label": "Bezeichnung",
         "weight": "Gewichtung",

@@ -55,3 +55,96 @@
     font-size: 1.2rem;
   }
 }
+
+// ── Detail page header ─────────────────────────────────
+
+.detail-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  h1 {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--sam-text);
+  }
+}
+
+.detail-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.detail-description {
+  margin: 0;
+  color: var(--sam-text-secondary);
+  font-size: 0.95rem;
+}
+
+// ── Filter panel ───────────────────────────────────────
+
+.filter-panel {
+  background: var(--sam-surface);
+  padding: 1rem 1.25rem;
+  border-radius: var(--p-border-radius);
+  border: 1px solid var(--sam-border);
+}
+
+.filter-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+
+  label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--sam-text-secondary);
+  }
+}
+
+.clear-filters {
+  color: var(--p-primary-color);
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding-bottom: 0.5rem;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// ── Table helpers ──────────────────────────────────────
+
+.clickable-row {
+  cursor: pointer;
+}
+
+// ── Type badge ─────────────────────────────────────────
+
+.type-badge {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--p-border-radius);
+  font-size: 0.8rem;
+  font-weight: 500;
+
+  &.type-folder {
+    background: color-mix(in srgb, var(--p-blue-500) 15%, transparent);
+    color: var(--p-blue-500);
+  }
+
+  &.type-setlist {
+    background: color-mix(in srgb, var(--p-green-500) 15%, transparent);
+    color: var(--p-green-500);
+  }
+}

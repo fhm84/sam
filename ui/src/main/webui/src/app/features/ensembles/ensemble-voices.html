@@ -75,7 +75,7 @@
   [header]="t.t('ensembles.voices.new')"
   [(visible)]="addDialogVisible"
   [modal]="true"
-  [style]="{ width: '26rem' }"
+  [style]="{ width: '26rem', 'min-height': '28rem' }"
 >
   @if (addDialogVisible) {
     <form [formGroup]="addForm" (ngSubmit)="onAdd()" class="sam-form">
@@ -138,84 +138,90 @@
   }
 </p-dialog>
 
-<!-- ── Edit dialog ─────────────────────────────────────── -->
+<!-- ── Edit dialog (tabbed) ───────────────────────────── -->
 <p-dialog
-  [header]="t.t('ensembles.voices.edit')"
+  [header]="editingVoice?.label ?? ''"
   [(visible)]="editDialogVisible"
   [modal]="true"
-  [style]="{ width: '26rem' }"
+  [style]="{ width: '44rem' }"
+  [breakpoints]="{ '768px': '95vw' }"
 >
   @if (editDialogVisible && editingVoice) {
-    <form [formGroup]="editForm" (ngSubmit)="onUpdate()" class="sam-form">
-      <div class="editing-voice-info">
-        <span class="info-label">{{ 'ensembles.voices.form.label' | translate }}</span>
-        <span class="info-value">{{ editingVoice.label }}</span>
-      </div>
+    <p-tabs [(value)]="activeTab" class="voice-edit-tabs">
+      <p-tablist>
+        <p-tab [value]="0">{{ 'ensembles.voices.tabs.details' | translate }}</p-tab>
+        <p-tab [value]="1">{{ 'ensembles.voices.options.title' | translate }}</p-tab>
+      </p-tablist>
 
-      <div class="form-row">
-        <div class="form-field">
-          <div class="field-with-hint">
-            <p-floatlabel variant="on">
-              <p-inputnumber
-                inputId="edit-voice-weight"
-                formControlName="weight"
-                [useGrouping]="false"
-                styleClass="w-full"
+      <p-tabpanels>
+        <!-- Details tab -->
+        <p-tabpanel [value]="0">
+          <form [formGroup]="editForm" (ngSubmit)="onUpdate()" class="sam-form tab-form">
+            <div class="editing-voice-info">
+              <span class="info-label">{{ 'ensembles.voices.form.label' | translate }}</span>
+              <span class="info-value">{{ editingVoice.label }}</span>
+            </div>
+
+            <div class="form-row">
+              <div class="form-field">
+                <div class="field-with-hint">
+                  <p-floatlabel variant="on">
+                    <p-inputnumber
+                      inputId="edit-voice-weight"
+                      formControlName="weight"
+                      [useGrouping]="false"
+                      styleClass="w-full"
+                    />
+                    <label for="edit-voice-weight">{{ 'ensembles.voices.form.weight' | translate }}</label>
+                  </p-floatlabel>
+                  <i
+                    class="pi pi-info-circle field-hint-icon"
+                    [pTooltip]="t.t('ensembles.voices.form.weightTooltip')"
+                    tooltipPosition="right"
+                  ></i>
+                </div>
+              </div>
+
+              <div class="form-field form-field--checkbox">
+                <p-checkbox inputId="edit-voice-required" formControlName="required" [binary]="true" />
+                <div class="checkbox-label-row">
+                  <label for="edit-voice-required">{{ 'ensembles.voices.form.required' | translate }}</label>
+                  <i
+                    class="pi pi-info-circle field-hint-icon"
+                    [pTooltip]="t.t('ensembles.voices.form.requiredTooltip')"
+                    tooltipPosition="right"
+                  ></i>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <p-button
+                [label]="t.t('ensembles.voices.cancel')"
+                severity="secondary"
+                [text]="true"
+                type="button"
+                (onClick)="editDialogVisible = false"
               />
-              <label for="edit-voice-weight">{{ 'ensembles.voices.form.weight' | translate }}</label>
-            </p-floatlabel>
-            <i
-              class="pi pi-info-circle field-hint-icon"
-              [pTooltip]="t.t('ensembles.voices.form.weightTooltip')"
-              tooltipPosition="right"
-            ></i>
-          </div>
-        </div>
+              <p-button
+                [label]="t.t('ensembles.voices.save')"
+                type="submit"
+                [disabled]="saving"
+                [loading]="saving"
+              />
+            </div>
+          </form>
+        </p-tabpanel>
 
-        <div class="form-field form-field--checkbox">
-          <p-checkbox inputId="edit-voice-required" formControlName="required" [binary]="true" />
-          <div class="checkbox-label-row">
-            <label for="edit-voice-required">{{ 'ensembles.voices.form.required' | translate }}</label>
-            <i
-              class="pi pi-info-circle field-hint-icon"
-              [pTooltip]="t.t('ensembles.voices.form.requiredTooltip')"
-              tooltipPosition="right"
-            ></i>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-actions">
-        <p-button
-          [label]="t.t('ensembles.voices.cancel')"
-          severity="secondary"
-          [text]="true"
-          type="button"
-          (onClick)="editDialogVisible = false"
-        />
-        <p-button
-          [label]="t.t('ensembles.voices.save')"
-          type="submit"
-          [disabled]="saving"
-          [loading]="saving"
-        />
-      </div>
-    </form>
-  }
-</p-dialog>
-
-<!-- ── Options dialog ──────────────────────────────────── -->
-<p-dialog
-  [header]="optionsVoice?.label + ' — ' + t.t('ensembles.voices.options.title')"
-  [(visible)]="optionsDialogVisible"
-  [modal]="true"
-  [style]="{ width: '42rem' }"
->
-  @if (optionsDialogVisible && optionsVoice) {
-    <app-voice-options
-      [ensembleId]="ensembleId"
-      [voiceId]="optionsVoice.id!"
-    />
+        <!-- Options tab -->
+        <p-tabpanel [value]="1">
+          <app-voice-options
+            [ensembleId]="ensembleId"
+            [voiceId]="editingVoice.id!"
+          />
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
   }
 </p-dialog>
 
