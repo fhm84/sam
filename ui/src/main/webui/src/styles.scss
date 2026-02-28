@@ -237,7 +237,7 @@ body.blocked-scroll {
 // ─── Mobile breakpoint ─────────────────────────────────────
 @media (max-width: 991px) {
   .layout-sidebar {
-    transform: translateX(-100%);
+    transform: translateX(-100%) !important;
   }
 
   .layout-main-container {
