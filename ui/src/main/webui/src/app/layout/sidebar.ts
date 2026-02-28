@@ -43,7 +43,7 @@ export class Sidebar {
       icon: 'pi pi-cog',
       children: [
         { labelKey: 'nav.admin.ensembles', icon: 'pi pi-users', route: '/admin/ensembles' },
-        { labelKey: 'nav.admin.instruments', icon: 'pi pi-sliders-h', route: '/admin/instruments' },
+        { labelKey: 'nav.admin.instruments', icon: 'pi pi-microphone', route: '/admin/instruments' },
         { labelKey: 'nav.admin.configuration', icon: 'pi pi-wrench', route: '/admin/configuration' },
       ],
     },

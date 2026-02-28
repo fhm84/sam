@@ -15,32 +15,52 @@
 
   <div class="form-row">
     <div class="form-field flex-1">
-      <p-floatlabel variant="on">
-        <p-select
-          inputId="sheet-composer"
-          formControlName="composerId"
-          [options]="musicians()"
-          optionLabel="name"
-          optionValue="id"
-          [filter]="true"
-          [showClear]="true"
+      <div class="field-with-hint">
+        <p-floatlabel variant="on">
+          <p-select
+            inputId="sheet-composer"
+            formControlName="composerId"
+            [options]="musicians()"
+            optionLabel="name"
+            optionValue="id"
+            [filter]="true"
+            [showClear]="true"
+          />
+          <label for="sheet-composer">{{ 'sheets.form.composer' | translate }}</label>
+        </p-floatlabel>
+        <p-button
+          icon="pi pi-plus"
+          [rounded]="true"
+          [text]="true"
+          [pTooltip]="t.t('musicians.new')"
+          tooltipPosition="top"
+          (onClick)="openMusicianDialog('composer')"
         />
-        <label for="sheet-composer">{{ 'sheets.form.composer' | translate }}</label>
-      </p-floatlabel>
+      </div>
     </div>
     <div class="form-field flex-1">
-      <p-floatlabel variant="on">
-        <p-select
-          inputId="sheet-arranger"
-          formControlName="arrangerId"
-          [options]="musicians()"
-          optionLabel="name"
-          optionValue="id"
-          [filter]="true"
-          [showClear]="true"
+      <div class="field-with-hint">
+        <p-floatlabel variant="on">
+          <p-select
+            inputId="sheet-arranger"
+            formControlName="arrangerId"
+            [options]="musicians()"
+            optionLabel="name"
+            optionValue="id"
+            [filter]="true"
+            [showClear]="true"
+          />
+          <label for="sheet-arranger">{{ 'sheets.form.arranger' | translate }}</label>
+        </p-floatlabel>
+        <p-button
+          icon="pi pi-plus"
+          [rounded]="true"
+          [text]="true"
+          [pTooltip]="t.t('musicians.new')"
+          tooltipPosition="top"
+          (onClick)="openMusicianDialog('arranger')"
         />
-        <label for="sheet-arranger">{{ 'sheets.form.arranger' | translate }}</label>
-      </p-floatlabel>
+      </div>
     </div>
   </div>
 
@@ -171,3 +191,18 @@
     />
   </div>
 </form>
+
+<p-dialog
+  [header]="t.t('musicians.new')"
+  [(visible)]="showMusicianDialog"
+  [modal]="true"
+  [style]="{ width: '28rem' }"
+>
+  @if (showMusicianDialog) {
+    <app-musician-form
+      [musician]="null"
+      (saved)="onMusicianCreated($event)"
+      (cancelled)="showMusicianDialog = false"
+    />
+  }
+</p-dialog>

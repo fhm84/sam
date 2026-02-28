@@ -7,6 +7,7 @@ import { Textarea } from 'primeng/textarea';
 import { Select } from 'primeng/select';
 import { AutoComplete } from 'primeng/autocomplete';
 import { Button } from 'primeng/button';
+import { Dialog } from 'primeng/dialog';
 import { Tooltip } from 'primeng/tooltip';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { SheetsApiService, MusiciansApiService } from '../../core/api';
@@ -15,10 +16,11 @@ import { CreateSheetMusic, Genre, Musician, SheetMusic, Style } from '../../mode
 import { map, Observable } from 'rxjs';
 import { BaseForm } from '../../shared/base/base-form';
 import { FETCH_ALL_SIZE, GENRES, STYLES } from '../../shared/constants';
+import { MusicianForm } from '../musicians/musician-form';
 
 @Component({
   selector: 'app-sheet-form',
-  imports: [ReactiveFormsModule, FloatLabel, InputText, InputNumber, Textarea, Select, AutoComplete, Button, Tooltip, TranslatePipe],
+  imports: [ReactiveFormsModule, FloatLabel, InputText, InputNumber, Textarea, Select, AutoComplete, Button, Dialog, Tooltip, TranslatePipe, MusicianForm],
   templateUrl: './sheet-form.html',
   styleUrl: './sheet-form.scss',
 })
@@ -29,6 +31,9 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
   @Input() sheet: SheetMusic | null = null;
 
   protected readonly musicians = signal<Musician[]>([]);
+
+  protected showMusicianDialog = false;
+  protected musicianDialogTarget: 'composer' | 'arranger' = 'composer';
 
   protected readonly genreOptions = computed(() =>
     GENRES.map((g) => ({ label: this.t.t(`sheets.genres.${g}`), value: g })),
@@ -78,6 +83,21 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
       additionalNotes: s.additionalNotes ?? '',
       tags: s.tags ?? [],
     });
+  }
+
+  openMusicianDialog(target: 'composer' | 'arranger'): void {
+    this.musicianDialogTarget = target;
+    this.showMusicianDialog = true;
+  }
+
+  onMusicianCreated(musician: Musician): void {
+    this.musicians.update((list) => [...list, musician].sort((a, b) => a.name.localeCompare(b.name)));
+    if (this.musicianDialogTarget === 'composer') {
+      this.form.patchValue({ composerId: musician.id! });
+    } else {
+      this.form.patchValue({ arrangerId: musician.id! });
+    }
+    this.showMusicianDialog = false;
   }
 
   buildSaveRequest(): Observable<SheetMusic> {

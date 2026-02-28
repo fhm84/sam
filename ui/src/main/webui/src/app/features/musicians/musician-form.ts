@@ -18,7 +18,7 @@ import { BaseForm } from '../../shared/base/base-form';
   templateUrl: './musician-form.html',
   styleUrl: './musician-form.scss',
 })
-export class MusicianForm extends BaseForm<Musician> {
+export class MusicianForm extends BaseForm<Musician, Musician> {
   private readonly api = inject(MusiciansApiService);
 
   @Input() musician: Musician | null = null;
@@ -41,10 +41,10 @@ export class MusicianForm extends BaseForm<Musician> {
     });
   }
 
-  buildSaveRequest(): Observable<void> {
-    const payload = convertEmptyStringsToNull(this.form.getRawValue());
+  buildSaveRequest(): Observable<Musician> {
+    const payload = convertEmptyStringsToNull(this.form.getRawValue()) as Musician;
     return this.isEdit
-      ? this.api.update(this.musician!.id!, payload as Musician)
-      : this.api.create(payload as Musician).pipe(map(() => {}));
+      ? this.api.update(this.musician!.id!, payload).pipe(map(() => ({ ...payload, id: this.musician!.id }) as Musician))
+      : this.api.create(payload);
   }
 }
