@@ -9,7 +9,11 @@ import jakarta.ws.rs.core.Response;
 public interface DocumentsResource {
 
     @GET
-    PaginatedResponse<DocumentDownload> list(@BeanParam DocumentFilterRequest filterRequest);
+    PaginatedResponse<Attachment> list(@BeanParam DocumentFilterRequest filterRequest);
+
+    @GET
+    @Path("unlinked")
+    PaginatedResponse<DocumentDownload> listUnlinkedDocuments(@BeanParam DocumentFilterRequest filterRequest);
 
     @GET
     @Path("{docIdentifier}")
@@ -18,7 +22,7 @@ public interface DocumentsResource {
 
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    Attachment uploadDocument(@BeanParam FileUploadRequest request);
+    DocumentUpload uploadDocument(@BeanParam FileUploadRequest request);
 
     @DELETE
     @Path("{docIdentifier}")

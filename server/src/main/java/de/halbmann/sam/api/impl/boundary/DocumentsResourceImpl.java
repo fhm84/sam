@@ -16,8 +16,10 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.event.Level;
 
@@ -35,8 +37,26 @@ public class DocumentsResourceImpl implements DocumentsResource {
     String sheetId;
 
     @Override
-    public PaginatedResponse<DocumentDownload> list(DocumentFilterRequest filterRequest) {
+    public PaginatedResponse<Attachment> list(DocumentFilterRequest filterRequest) {
+        List<Attachment> attachments;
+        if (instrumentationId != null) {
+            attachments = documentsService.loadAttachmentsByInstrumentation(instrumentationId);
+        } else if (sheetId != null) {
+            attachments = documentsService.loadAttachmentsBySheet(sheetId);
+        } else {
+            attachments = new ArrayList<>();
+        }
         // TODO: maybe we could/should also implement the filter to not only show unlinked documents?
+        PaginatedResponse<Attachment> response = new PaginatedResponse<>();
+        response.setData(attachments);
+        response.setPage(filterRequest.getPage());
+        response.setSize(response.getData().size());
+        response.setTotalCount(response.getData().size());
+        return response;
+    }
+
+    @Override
+    public PaginatedResponse<DocumentDownload> listUnlinkedDocuments(DocumentFilterRequest filterRequest) {
         List<DocumentEntity> unlinkedDocuments = documentsService.listUnlinkedDocuments();
         PaginatedResponse<DocumentDownload> response = new PaginatedResponse<>();
         response.setData(unlinkedDocuments.stream()
@@ -95,23 +115,34 @@ public class DocumentsResourceImpl implements DocumentsResource {
     }
 
     @Override
-    public Attachment uploadDocument(FileUploadRequest request) {
-        log.atLevel(Level.INFO)
+    public DocumentUpload uploadDocument(FileUploadRequest request) {
+        log.atLevel(Level.DEBUG)
                 .log(() -> "File-Upload ... filename: " + request.getFile().fileName());
 
         try (InputStream inputStream = Files.newInputStream(request.getFile().uploadedFile())) {
-            Attachment attachment = documentsService.save(request.getFile().fileName(), inputStream, request.getType());
+            DocumentUpload upload = documentsService.save(request.getFile().fileName(), inputStream, request.getType());
+            Attachment attachment = upload.attachment();
 
-            // Link to sheet or instrumentation if uploaded via sub-resource path
-            if (sheetId != null) {
-                documentsService.linkAttachmentToSheet(attachment.getId().toString(), sheetId);
-            }
-            if (instrumentationId != null) {
-                documentsService.linkAttachmentToInstrumentation(
-                        attachment.getId().toString(), instrumentationId);
+            if (attachment != null) {
+                // Link to sheet or instrumentation if uploaded via sub-resource path
+                if (sheetId != null) {
+                    documentsService.linkAttachmentToSheet(attachment.getId().toString(), sheetId);
+                }
+                if (instrumentationId != null) {
+                    documentsService.linkAttachmentToInstrumentation(
+                            attachment.getId().toString(), instrumentationId);
+                }
+
+                log.atLevel(Level.INFO)
+                        .log(() -> "File uploaded - filename: "
+                                + request.getFile().fileName() + " (" + attachment.getId() + ")");
+            } else {
+                log.atLevel(Level.INFO)
+                        .log(() ->
+                                "File uploaded - filename: " + request.getFile().fileName());
             }
 
-            return attachment;
+            return upload;
         } catch (IOException | NoSuchAlgorithmException e) {
             log.atWarn()
                     .setCause(e)
@@ -122,7 +153,11 @@ public class DocumentsResourceImpl implements DocumentsResource {
 
     @Override
     public void delete(String docIdentifier) {
-        documentsService.deleteAttachment(docIdentifier);
+        if (sheetId == null && instrumentationId != null) {
+            documentsService.deleteIfUnlinked(UUID.fromString(docIdentifier));
+        } else {
+            documentsService.deleteAttachment(docIdentifier);
+        }
     }
 
     private boolean etagMatches(String ifNoneMatch, String currentEtag) {

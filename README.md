@@ -96,6 +96,7 @@ sam (parent)
 - Dashboard/statistics (sheets by composer/arranger/genre)
 - Auto-convert to MusicXML format (for transposition)
 - Event logging (e.g. document downloads)
+- data-exports (single sheets, "everything") e.g. as json (as an alternative also to csv?)
 
 ### technical focused
 - more advanced file-upload (also include linking-/meta-data)

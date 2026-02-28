@@ -3,6 +3,7 @@ package de.halbmann.sam.business.controller;
 import de.halbmann.sam.api.entity.Attachment;
 import de.halbmann.sam.api.entity.AttachmentType;
 import de.halbmann.sam.api.entity.DocumentDownload;
+import de.halbmann.sam.api.entity.DocumentUpload;
 import de.halbmann.sam.business.boundary.AttachmentRepository;
 import de.halbmann.sam.business.boundary.DocumentRepository;
 import de.halbmann.sam.business.boundary.InstrumentationRepository;
@@ -65,6 +66,9 @@ public class DocumentsService {
     @Inject
     AttachmentMapper attachmentMapper;
 
+    @Inject
+    DocumentMapper documentMapper;
+
     /**
      * Save incoming document. This will also directly check the file-/content-type of and
      * automatically add related metadata.
@@ -74,8 +78,8 @@ public class DocumentsService {
      * @param filename    the (final/display filename)
      * @param inputStream the file content
      */
-    public Attachment save(String filename, InputStream inputStream) throws IOException, NoSuchAlgorithmException {
-        return save(filename, inputStream, null);
+    public DocumentEntity save(String filename, InputStream inputStream) throws IOException, NoSuchAlgorithmException {
+        return upload(filename, inputStream);
     }
 
     /**
@@ -88,11 +92,44 @@ public class DocumentsService {
      * @param inputStream    the file content
      * @param attachmentType specifies the type of the attachment
      */
-    public Attachment save(String filename, InputStream inputStream, AttachmentType attachmentType)
+    public DocumentUpload save(String filename, InputStream inputStream, AttachmentType attachmentType)
             throws IOException, NoSuchAlgorithmException {
-        AttachmentEntity uploaded = upload(
-                filename, inputStream, Optional.ofNullable(attachmentType).orElse(AttachmentType.UNSPECIFIED));
-        return attachmentMapper.toDto(uploaded);
+        DocumentEntity document = upload(filename, inputStream);
+        DocumentDownload documentDownload = documentMapper.toDto(document);
+
+        AttachmentEntity attachment;
+        if (attachmentType != null) {
+            // Create Attachment linked to SheetMusic
+            attachment = new AttachmentEntity();
+            attachment.setType(attachmentType);
+            attachment.setDisplayName(document.getFilename());
+
+            // Link to document only if this type is file-based
+            if (attachmentType != AttachmentType.EXTERNAL_LINK) {
+                attachment.setDocument(document);
+                documentRepository.incrementRefCount(document);
+            }
+
+            attachmentRepository.persistAndFlush(attachment);
+        } else {
+            attachment = null;
+        }
+
+        return new DocumentUpload(documentDownload, attachmentMapper.toDto(attachment));
+    }
+
+    public List<Attachment> loadAttachmentsByInstrumentation(String instrumentationId) {
+        if (instrumentationId == null) {
+            return null;
+        }
+
+        InstrumentationEntity instrumentation = instrumentationRepository.findById(UUID.fromString(instrumentationId));
+        if (instrumentation != null) {
+            return instrumentation.getAttachments().stream()
+                    .map(attachmentMapper::toDto)
+                    .toList();
+        }
+        return null;
     }
 
     public DocumentDownload loadAttachmentByInstrumentation(String instrumentationId, String docId) {
@@ -108,6 +145,20 @@ public class DocumentsService {
                     .findFirst();
 
             return loadAttachment(attachmentId.map(String::valueOf).orElse(null));
+        }
+        return null;
+    }
+
+    public List<Attachment> loadAttachmentsBySheet(String sheetId) {
+        if (sheetId == null) {
+            return null;
+        }
+
+        SheetMusicEntity sheetMusic = sheetRepository.findById(UUID.fromString(sheetId));
+        if (sheetMusic != null) {
+            return sheetMusic.getAttachments().stream()
+                    .map(attachmentMapper::toDto)
+                    .toList();
         }
         return null;
     }
@@ -142,8 +193,7 @@ public class DocumentsService {
     /**
      * Uploads a file with deduplication by SHA-256.
      */
-    AttachmentEntity upload(String filename, InputStream uploadStream, AttachmentType attachmentType)
-            throws IOException, NoSuchAlgorithmException {
+    DocumentEntity upload(String filename, InputStream uploadStream) throws IOException, NoSuchAlgorithmException {
         // Prepare streaming digest
         MessageDigest sha256Digest = MessageDigest.getInstance("SHA-256");
         Path tempPath = Path.of(filename + ".tmp");
@@ -192,7 +242,7 @@ public class DocumentsService {
                 doc.setSize(fileSize);
                 doc.setMimeType(mimeType);
                 doc.setSha256(sha256Hex);
-                doc.setRefCount(1);
+                doc.setRefCount(0);
                 documentRepository.persist(doc);
                 return doc;
             } catch (IOException e) {
@@ -204,18 +254,7 @@ public class DocumentsService {
             documentRepository.incrementRefCount(document);
         }
 
-        // Create Attachment linked to SheetMusic
-        AttachmentEntity attachment = new AttachmentEntity();
-        attachment.setType(attachmentType);
-        attachment.setDisplayName(filename);
-
-        // Link to document only if this type is file-based
-        if (attachmentType != AttachmentType.EXTERNAL_LINK) {
-            attachment.setDocument(document);
-        }
-
-        attachmentRepository.persistAndFlush(attachment);
-        return attachment;
+        return document;
     }
 
     DocumentDownload load(UUID documentId) {
@@ -250,6 +289,8 @@ public class DocumentsService {
         DocumentEntity document = attachment.getDocument();
         attachmentRepository.delete(attachment);
 
+        // FIXME: here we also have to remove the AttachmentEntity from Instrumentation/Sheet, if linked!!!
+
         if (document != null) {
             documentRepository.decrementRefCount(document);
         }
@@ -274,7 +315,7 @@ public class DocumentsService {
     }
 
     @Transactional
-    void deleteIfUnlinked(UUID documentId) {
+    public void deleteIfUnlinked(UUID documentId) {
         DocumentEntity doc = documentRepository
                 .findByIdOptional(documentId)
                 .orElseThrow(() -> new EntityNotFoundException("Document", documentId));

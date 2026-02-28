@@ -9,11 +9,13 @@ public interface MusicianMapper {
 
     Musician toDto(final MusicianEntity entity);
 
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "created", ignore = true)
     @Mapping(target = "lastUpdate", ignore = true)
     MusicianEntity fromDto(final Musician dto);
 
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "created", ignore = true)
     @Mapping(target = "lastUpdate", ignore = true)

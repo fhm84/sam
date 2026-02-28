@@ -1,7 +1,9 @@
 package de.halbmann.sam.business.controller;
 
 import de.halbmann.sam.api.entity.*;
+import de.halbmann.sam.business.boundary.MusicianRepository;
 import de.halbmann.sam.business.boundary.SheetRepository;
+import de.halbmann.sam.business.entity.MusicianEntity;
 import de.halbmann.sam.business.entity.PaginatedEntities;
 import de.halbmann.sam.business.entity.SheetMusicEntity;
 import de.halbmann.sam.business.exception.EntityNotFoundException;
@@ -17,6 +19,9 @@ public class SheetService {
 
     @Inject
     SheetRepository sheetRepository;
+
+    @Inject
+    MusicianRepository musicianRepository;
 
     @Inject
     SheetMusicMapper sheetMusicMapper;
@@ -99,6 +104,20 @@ public class SheetService {
 
     public SheetMusic addSheet(final CreateSheetMusic sheetMusic) {
         final SheetMusicEntity entity = sheetMusicMapper.fromDto(sheetMusic);
+        if (sheetMusic.getComposer() != null) {
+            MusicianEntity composer = Optional.ofNullable(musicianRepository.resolveMusician(sheetMusic.getComposer()))
+                    .orElse(musicianRepository
+                            .findMusicianByName(sheetMusic.getComposer().getName())
+                            .orElse(null));
+            entity.setComposer(composer);
+        }
+        if (sheetMusic.getArranger() != null) {
+            MusicianEntity arranger = Optional.ofNullable(musicianRepository.resolveMusician(sheetMusic.getArranger()))
+                    .orElse(musicianRepository
+                            .findMusicianByName(sheetMusic.getArranger().getName())
+                            .orElse(null));
+            entity.setComposer(arranger);
+        }
         sheetRepository.persistAndFlush(entity);
         return sheetMusicMapper.toDto(entity);
     }
