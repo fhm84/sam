@@ -22,13 +22,14 @@ public class InstrumentService {
     InstrumentMapper instrumentMapper;
 
     public PaginatedResponse<Instrument> findInstruments(final InstrumentFilterRequest filterRequest) {
+        final Map<String, Object> parameters = new HashMap<>();
         if (filterRequest.getName() != null && !filterRequest.getName().isEmpty()) {
-            final Map<String, Object> parameters = new HashMap<>();
             parameters.put("name", filterRequest.getName());
-            return findInstruments(filterRequest, parameters);
-        } else {
-            return findInstruments(filterRequest, Map.of());
         }
+        if (filterRequest.getTransposition() != null) {
+            parameters.put("transposition", filterRequest.getTransposition());
+        }
+        return findInstruments(filterRequest, parameters);
     }
 
     private PaginatedResponse<Instrument> findInstruments(

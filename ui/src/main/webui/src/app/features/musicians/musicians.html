@@ -4,11 +4,22 @@
       <h1>{{ 'musicians.title' | translate }}</h1>
       <p class="page-subtitle">{{ 'musicians.subtitle' | translate }}</p>
     </div>
-    <p-button
-      [label]="t.t('musicians.new')"
-      icon="pi pi-plus"
-      (onClick)="openNew()"
-    />
+    <div class="toolbar-actions">
+      <p-iconfield>
+        <p-inputicon styleClass="pi pi-search" />
+        <input
+          pInputText
+          type="text"
+          [placeholder]="t.t('musicians.search')"
+          (input)="onFilter($event)"
+        />
+      </p-iconfield>
+      <p-button
+        [label]="t.t('musicians.new')"
+        icon="pi pi-plus"
+        (onClick)="openNew()"
+      />
+    </div>
   </div>
 
   <p-table
@@ -21,18 +32,6 @@
     [rowsPerPageOptions]="[10, 25, 50]"
     (onLazyLoad)="onLazyLoad($event)"
   >
-    <ng-template #caption>
-      <p-iconfield>
-        <p-inputicon styleClass="pi pi-search" />
-        <input
-          pInputText
-          type="text"
-          [placeholder]="t.t('musicians.search')"
-          (input)="onFilter($event)"
-        />
-      </p-iconfield>
-    </ng-template>
-
     <ng-template #header>
       <tr>
         <th>{{ 'musicians.columns.name' | translate }}</th>

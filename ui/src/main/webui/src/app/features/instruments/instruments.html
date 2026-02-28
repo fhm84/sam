@@ -4,11 +4,43 @@
       <h1>{{ 'instruments.title' | translate }}</h1>
       <p class="page-subtitle">{{ 'instruments.subtitle' | translate }}</p>
     </div>
-    <p-button
-      [label]="t.t('instruments.new')"
-      icon="pi pi-plus"
-      (onClick)="openNew()"
-    />
+    <div class="toolbar-actions">
+      <p-iconfield>
+        <p-inputicon styleClass="pi pi-search" />
+        <input
+          pInputText
+          type="text"
+          [placeholder]="t.t('instruments.search')"
+          (input)="onFilter($event)"
+        />
+      </p-iconfield>
+      <p-button
+        [label]="t.t('instruments.new')"
+        icon="pi pi-plus"
+        (onClick)="openNew()"
+      />
+    </div>
+  </div>
+
+  <div class="filter-panel">
+    <div class="filter-row">
+      <div class="filter-field">
+        <label>{{ 'instruments.filters.transposition' | translate }}</label>
+        <p-select
+          [options]="transpositionOptions"
+          [ngModel]="transpositionFilter()"
+          (ngModelChange)="onTranspositionFilterChange($event)"
+          [placeholder]="t.t('instruments.filters.transpositionPlaceholder')"
+          [showClear]="true"
+          appendTo="body"
+        />
+      </div>
+      @if (transpositionFilter()) {
+        <span class="clear-filters" (click)="clearFilters()">
+          {{ 'instruments.filters.clear' | translate }}
+        </span>
+      }
+    </div>
   </div>
 
   <p-table
@@ -21,18 +53,6 @@
     [rowsPerPageOptions]="[10, 25, 50]"
     (onLazyLoad)="onLazyLoad($event)"
   >
-    <ng-template #caption>
-      <p-iconfield>
-        <p-inputicon styleClass="pi pi-search" />
-        <input
-          pInputText
-          type="text"
-          [placeholder]="t.t('instruments.search')"
-          (input)="onFilter($event)"
-        />
-      </p-iconfield>
-    </ng-template>
-
     <ng-template #header>
       <tr>
         <th>{{ 'instruments.columns.id' | translate }}</th>

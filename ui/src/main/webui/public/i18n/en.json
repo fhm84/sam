@@ -502,6 +502,11 @@
       "deleted": "Instrument deleted successfully",
       "error": "An error occurred"
     },
+    "filters": {
+      "transposition": "Transposition",
+      "transpositionPlaceholder": "All transpositions",
+      "clear": "Clear filters"
+    },
     "search": "Search by name",
     "empty": "No instruments found"
   },

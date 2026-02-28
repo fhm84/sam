@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 3.2.1263 on 2026-02-26 21:35:45.
+// Generated using typescript-generator version 3.2.1263 on 2026-02-28 14:53:51.
 
 export interface Attachment {
     checksum?: string;
@@ -163,6 +163,7 @@ export interface Instrument {
 
 export interface InstrumentFilterRequest extends PaginationRequest {
     name?: string;
+    transposition?: InstrumentTransposing;
 }
 
 export interface Instrumentation {

@@ -131,7 +131,7 @@
       <div class="collection-cards">
         @for (collection of items(); track collection.id) {
           <div class="collection-card">
-            <div class="card-header" (click)="navigateToDetail(collection)" style="cursor: pointer;">
+            <div class="card-header" (click)="navigateToDetail(collection)">
               <span class="card-title card-title-link">{{ collection.name }}</span>
               @if (collection.description) {
                 <span class="card-subtitle">{{ collection.description }}</span>
