@@ -1,10 +1,12 @@
 <div class="ensembles-page">
-  <div class="page-toolbar">
-    <div class="page-title-group">
-      <h1>{{ 'ensembles.title' | translate }}</h1>
-      <p class="page-subtitle">{{ 'ensembles.subtitle' | translate }}</p>
-    </div>
-    <div class="toolbar-actions">
+  <p-toolbar styleClass="page-toolbar">
+    <ng-template #start>
+      <div class="page-title-group">
+        <h1>{{ 'ensembles.title' | translate }}</h1>
+        <p class="page-subtitle">{{ 'ensembles.subtitle' | translate }}</p>
+      </div>
+    </ng-template>
+    <ng-template #end>
       <p-iconfield>
         <p-inputicon styleClass="pi pi-search" />
         <input
@@ -30,8 +32,8 @@
         icon="pi pi-plus"
         (onClick)="openNew()"
       />
-    </div>
-  </div>
+    </ng-template>
+  </p-toolbar>
 
   @if (viewMode() === 'list') {
     <p-table
@@ -117,11 +119,7 @@
               <p class="card-description">{{ ensemble.description }}</p>
             }
             <div class="card-footer">
-              <span class="card-tag">
-                <i class="pi pi-microphone"></i>
-                {{ ensemble.voices?.length ?? 0 }}
-                {{ 'ensembles.columns.voices' | translate }}
-              </span>
+              <p-tag icon="pi pi-microphone" [value]="(ensemble.voices?.length ?? 0) + ' ' + t.t('ensembles.columns.voices')" severity="secondary" />
             </div>
           </div>
         }

@@ -22,11 +22,18 @@ export class DocumentsApiService {
   list(
     basePath: string,
     filter: DocumentFilterRequest = {},
-  ): Observable<PaginatedResponse<DocumentDownload>> {
+  ): Observable<PaginatedResponse<Attachment>> {
     let params = new HttpParams();
     if (filter.page !== undefined) params = params.set('page', filter.page);
     if (filter.size !== undefined) params = params.set('size', filter.size);
-    return this.http.get<PaginatedResponse<DocumentDownload>>(basePath, { params });
+    return this.http.get<PaginatedResponse<Attachment>>(basePath, { params });
+  }
+
+  listUnlinked(filter: DocumentFilterRequest = {}): Observable<PaginatedResponse<DocumentDownload>> {
+    let params = new HttpParams();
+    if (filter.page !== undefined) params = params.set('page', filter.page);
+    if (filter.size !== undefined) params = params.set('size', filter.size);
+    return this.http.get<PaginatedResponse<DocumentDownload>>(`${this.forTopLevel()}/unlinked`, { params });
   }
 
   download(basePath: string, docIdentifier: string): Observable<HttpResponse<Blob>> {

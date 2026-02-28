@@ -1,29 +1,31 @@
 <div class="collection-detail-page">
-  <div class="page-toolbar">
-    <p-button
-      icon="pi pi-arrow-left"
-      [label]="t.t('collections.detail.backToList')"
-      [text]="true"
-      (onClick)="goBack()"
-    />
-    @if (collection()) {
+  <p-toolbar styleClass="page-toolbar">
+    <ng-template #start>
       <p-button
-        icon="pi pi-pencil"
-        [label]="t.t('collections.edit')"
+        icon="pi pi-arrow-left"
+        [label]="t.t('collections.detail.backToList')"
         [text]="true"
-        (onClick)="openEdit()"
+        (onClick)="goBack()"
       />
-    }
-  </div>
+    </ng-template>
+    <ng-template #end>
+      @if (collection()) {
+        <p-button
+          icon="pi pi-pencil"
+          [label]="t.t('collections.edit')"
+          [text]="true"
+          (onClick)="openEdit()"
+        />
+      }
+    </ng-template>
+  </p-toolbar>
 
   @if (collection(); as col) {
     <div class="detail-header">
       <div class="detail-title-row">
         <h1>{{ col.name }}</h1>
         @if (col.type) {
-          <span class="type-badge type-{{ col.type | lowercase }}">
-            {{ 'collections.types.' + col.type | translate }}
-          </span>
+          <p-tag [value]="'collections.types.' + col.type | translate" severity="secondary" />
         }
       </div>
       @if (col.description) {

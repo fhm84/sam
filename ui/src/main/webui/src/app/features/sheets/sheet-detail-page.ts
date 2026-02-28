@@ -2,24 +2,27 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Button } from 'primeng/button';
+import { Toolbar } from 'primeng/toolbar';
 import { TranslationService } from '../../core/translation.service';
 import { SheetMusic } from '../../model/datamodels';
 import { SheetDetail } from './sheet-detail';
 
 @Component({
   selector: 'app-sheet-detail-page',
-  imports: [SheetDetail, Button],
+  imports: [SheetDetail, Button, Toolbar],
   providers: [ConfirmationService],
   template: `
     <div class="sheet-detail-page">
-      <div class="page-toolbar">
-        <p-button
-          icon="pi pi-arrow-left"
-          [label]="t.t('sheets.detail.backToList')"
-          [text]="true"
-          (onClick)="goBack()"
-        />
-      </div>
+      <p-toolbar styleClass="page-toolbar">
+        <ng-template #start>
+          <p-button
+            icon="pi pi-arrow-left"
+            [label]="t.t('sheets.detail.backToList')"
+            [text]="true"
+            (onClick)="goBack()"
+          />
+        </ng-template>
+      </p-toolbar>
       <app-sheet-detail
         [sheetId]="sheetId()"
         mode="full"

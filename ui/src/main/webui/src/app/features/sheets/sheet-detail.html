@@ -105,7 +105,7 @@
                     <span class="detail-label">{{ 'sheets.detail.tags' | translate }}</span>
                     <div class="detail-tags">
                       @for (tag of s.tags; track tag) {
-                        <span class="detail-tag">#{{ tag }}</span>
+                        <p-tag [value]="'#' + tag" severity="secondary" />
                       }
                     </div>
                   </div>
@@ -139,8 +139,8 @@
                     @for (doc of documents(); track doc.id) {
                       <div class="document-row">
                         <i class="pi pi-file"></i>
-                        <span class="document-name">{{ doc.filename }}</span>
-                        <span class="document-size">{{ formatSize(doc.size) }}</span>
+                        <span class="document-name">{{ doc.displayName }}</span>
+                        <span class="document-size">{{ formatSize(doc.fileSize) }}</span>
                         <div class="document-actions">
                           <p-button
                             icon="pi pi-download"
@@ -338,7 +338,7 @@
                 <span class="detail-label">{{ 'sheets.detail.tags' | translate }}</span>
                 <div class="detail-tags">
                   @for (tag of s.tags; track tag) {
-                    <span class="detail-tag">#{{ tag }}</span>
+                    <p-tag [value]="'#' + tag" severity="secondary" />
                   }
                 </div>
               </div>
@@ -372,8 +372,8 @@
                 @for (doc of documents(); track doc.id) {
                   <div class="document-row">
                     <i class="pi pi-file"></i>
-                    <span class="document-name">{{ doc.filename }}</span>
-                    <span class="document-size">{{ formatSize(doc.size) }}</span>
+                    <span class="document-name">{{ doc.displayName }}</span>
+                    <span class="document-size">{{ formatSize(doc.fileSize) }}</span>
                     <div class="document-actions">
                       <p-button
                         icon="pi pi-download"

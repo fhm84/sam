@@ -1,4 +1,3 @@
-import { LowerCasePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { TableModule } from 'primeng/table';
@@ -12,6 +11,8 @@ import { InputIcon } from 'primeng/inputicon';
 import { Select } from 'primeng/select';
 import { SelectButton } from 'primeng/selectbutton';
 import { Paginator } from 'primeng/paginator';
+import { Toolbar } from 'primeng/toolbar';
+import { Tag } from 'primeng/tag';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { LayoutPreferenceService } from '../../core/layout-preference.service';
@@ -34,10 +35,11 @@ Button,
     Select,
     SelectButton,
     Paginator,
-    LowerCasePipe,
     FormsModule,
     TranslatePipe,
     CollectionForm,
+    Toolbar,
+    Tag,
   ],
   providers: [ConfirmationService],
   templateUrl: './collections.html',

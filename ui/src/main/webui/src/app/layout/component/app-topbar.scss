@@ -1,0 +1,98 @@
+:host {
+  display: contents;
+}
+
+.layout-topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--topbar-height);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0 1rem;
+  background: var(--sam-surface);
+  border-bottom: 1px solid var(--sam-border);
+}
+
+.layout-topbar-start {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.layout-topbar-breadcrumb {
+  flex: 1;
+  overflow: hidden;
+}
+
+.layout-topbar-end {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.layout-topbar-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--sam-text-muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  font-size: 0.9rem;
+
+  &:hover {
+    background: var(--sam-hover);
+    color: var(--sam-text);
+  }
+}
+
+.lang-toggle {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.theme-toggle {
+  font-size: 1rem;
+}
+
+// Override PrimeNG Breadcrumb for topbar use
+::ng-deep .topbar-breadcrumb {
+  background: transparent;
+  border: none;
+  padding: 0;
+
+  .p-breadcrumb-list {
+    gap: 0.25rem;
+  }
+
+  .p-breadcrumb-item-link {
+    font-size: 0.8125rem;
+    color: var(--sam-text-muted);
+    padding: 0.125rem 0.25rem;
+
+    &:hover {
+      color: var(--sam-text);
+    }
+  }
+
+  .p-breadcrumb-item:last-child .p-breadcrumb-item-link {
+    color: var(--sam-text);
+    font-weight: 500;
+  }
+
+  .p-breadcrumb-separator {
+    color: var(--sam-text-muted);
+    font-size: 0.6875rem;
+  }
+}

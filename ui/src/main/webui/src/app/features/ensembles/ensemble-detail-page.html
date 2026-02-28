@@ -1,20 +1,24 @@
 <div class="ensemble-detail-page">
-  <div class="page-toolbar">
-    <p-button
-      icon="pi pi-arrow-left"
-      [label]="t.t('ensembles.detail.backToList')"
-      [text]="true"
-      (onClick)="goBack()"
-    />
-    @if (ensemble()) {
+  <p-toolbar styleClass="page-toolbar">
+    <ng-template #start>
       <p-button
-        icon="pi pi-pencil"
-        [label]="t.t('ensembles.edit')"
+        icon="pi pi-arrow-left"
+        [label]="t.t('ensembles.detail.backToList')"
         [text]="true"
-        (onClick)="openEdit()"
+        (onClick)="goBack()"
       />
-    }
-  </div>
+    </ng-template>
+    <ng-template #end>
+      @if (ensemble()) {
+        <p-button
+          icon="pi pi-pencil"
+          [label]="t.t('ensembles.edit')"
+          [text]="true"
+          (onClick)="openEdit()"
+        />
+      }
+    </ng-template>
+  </p-toolbar>
 
   @if (ensemble(); as ens) {
     <div class="detail-header">

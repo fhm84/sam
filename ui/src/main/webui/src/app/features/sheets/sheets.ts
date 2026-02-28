@@ -14,6 +14,8 @@ import { Select } from 'primeng/select';
 import { Badge } from 'primeng/badge';
 import { Paginator } from 'primeng/paginator';
 import { Drawer } from 'primeng/drawer';
+import { Toolbar } from 'primeng/toolbar';
+import { Tag } from 'primeng/tag';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../core/translation.service';
@@ -40,6 +42,8 @@ Button,
     TranslatePipe,
     SheetDetail,
     Drawer,
+    Toolbar,
+    Tag,
   ],
   providers: [ConfirmationService],
   templateUrl: './sheets.html',

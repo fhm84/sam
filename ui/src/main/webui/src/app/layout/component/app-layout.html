@@ -1,0 +1,11 @@
+<p-toast />
+<div class="layout-wrapper" [ngClass]="containerClass()">
+  <app-topbar />
+  <app-sidebar />
+  <div class="layout-main-container">
+    <div class="layout-main">
+      <router-outlet />
+    </div>
+  </div>
+  <div class="layout-mask" (click)="hideMenu()"></div>
+</div>

@@ -172,25 +172,6 @@
   margin-bottom: 0.5rem;
 }
 
-.card-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-size: 0.75rem;
-  color: var(--sam-text-secondary);
-  background: var(--sam-bg);
-  padding: 0.2rem 0.5rem;
-  border-radius: 999px;
-
-  i {
-    font-size: 0.65rem;
-  }
-}
-
-.card-tag-user {
-  color: var(--p-primary-color);
-  background: color-mix(in srgb, var(--p-primary-color) 10%, transparent);
-}
 
 // reserved space for future rating / coverage indicators
 .card-indicators {

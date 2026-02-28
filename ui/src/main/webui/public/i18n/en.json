@@ -3,6 +3,7 @@
     "title": "SAM | Sheet Archive for Music"
   },
   "nav": {
+    "main": "Main",
     "sheets": "Sheets",
     "collections": "Collections",
     "uploads": "Uploads",
@@ -16,6 +17,12 @@
       "instruments": "Instruments",
       "configuration": "Configuration"
     }
+  },
+  "layout": {
+    "menuMode": "Menu Mode",
+    "static": "Static",
+    "overlay": "Overlay",
+    "slim": "Slim"
   },
   "aria": {
     "toggleSidebar": "Toggle sidebar",

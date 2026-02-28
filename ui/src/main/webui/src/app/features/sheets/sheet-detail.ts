@@ -7,6 +7,7 @@ import { Button } from 'primeng/button';
 import { Panel } from 'primeng/panel';
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from 'primeng/tabs';
 import { Tooltip } from 'primeng/tooltip';
+import { Tag } from 'primeng/tag';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { SheetsApiService, InstrumentationsApiService } from '../../core/api';
 import { Instrumentation, SheetMusic } from '../../model/datamodels';
@@ -15,7 +16,7 @@ import { InstrumentationForm } from './instrumentation-form';
 
 @Component({
   selector: 'app-sheet-detail',
-  imports: [TableModule, Dialog, ConfirmDialog, Button, Panel, Tabs, TabList, Tab, TabPanels, TabPanel, Tooltip, TranslatePipe, InstrumentationForm],
+  imports: [TableModule, Dialog, ConfirmDialog, Button, Panel, Tabs, TabList, Tab, TabPanels, TabPanel, Tooltip, TranslatePipe, InstrumentationForm, Tag],
   providers: [ConfirmationService],
   templateUrl: './sheet-detail.html',
   styleUrl: './sheet-detail.scss',

@@ -1,0 +1,50 @@
+@if (root() && isVisible()) {
+  <!-- Root section: show section title + always-visible children -->
+  <div class="layout-menuitem-root-text">{{ item().label }}</div>
+  @if (hasChildren()) {
+    <ul class="layout-root-submenulist">
+      @for (child of item().items; track child.label) {
+        <li app-menuitem [item]="child" [parentPath]="fullPath()" [root]="false"></li>
+      }
+    </ul>
+  }
+}
+
+@if (!root() && isVisible()) {
+  @if (hasChildren()) {
+    <!-- Non-root expandable parent -->
+    <a
+      class="layout-menuitem-link"
+      [pTooltip]="isCollapsed() ? item().label : undefined"
+      tooltipPosition="right"
+      (click)="itemClick($event)"
+      tabindex="0"
+    >
+      <i [ngClass]="item().icon" class="layout-menuitem-icon"></i>
+      <span class="layout-menuitem-text">{{ item().label }}</span>
+      <i class="pi pi-angle-down layout-submenu-toggler" [class.rotated]="submenuOpen()"></i>
+    </a>
+    @if (submenuOpen()) {
+      <ul class="layout-submenu">
+        @for (child of item().items; track child.label) {
+          <li app-menuitem [item]="child" [parentPath]="fullPath()" [root]="false"></li>
+        }
+      </ul>
+    }
+  } @else if (hasRouterLink()) {
+    <!-- Leaf nav item -->
+    <a
+      class="layout-menuitem-link"
+      [pTooltip]="isCollapsed() ? item().label : undefined"
+      tooltipPosition="right"
+      [routerLink]="item().routerLink"
+      routerLinkActive="active-route"
+      [routerLinkActiveOptions]="{ exact: false }"
+      (click)="itemClick($event)"
+      tabindex="0"
+    >
+      <i [ngClass]="item().icon" class="layout-menuitem-icon"></i>
+      <span class="layout-menuitem-text">{{ item().label }}</span>
+    </a>
+  }
+}

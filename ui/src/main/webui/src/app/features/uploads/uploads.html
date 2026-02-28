@@ -1,10 +1,12 @@
 <div class="uploads-page">
-  <div class="page-toolbar">
-    <div class="page-title-group">
-      <h1>{{ 'uploads.title' | translate }}</h1>
-      <p class="page-subtitle">{{ 'uploads.subtitle' | translate }}</p>
-    </div>
-  </div>
+  <p-toolbar styleClass="page-toolbar">
+    <ng-template #start>
+      <div class="page-title-group">
+        <h1>{{ 'uploads.title' | translate }}</h1>
+        <p class="page-subtitle">{{ 'uploads.subtitle' | translate }}</p>
+      </div>
+    </ng-template>
+  </p-toolbar>
 
   <div class="upload-area">
     <p-fileupload

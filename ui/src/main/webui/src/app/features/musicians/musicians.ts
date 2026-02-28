@@ -7,6 +7,7 @@ import { Button } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
+import { Toolbar } from 'primeng/toolbar';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { MusiciansApiService } from '../../core/api';
 import { Musician, MusicianFilterRequest } from '../../model/datamodels';
@@ -26,6 +27,7 @@ Button,
     InputIcon,
     TranslatePipe,
     MusicianForm,
+    Toolbar,
   ],
   providers: [ConfirmationService],
   templateUrl: './musicians.html',

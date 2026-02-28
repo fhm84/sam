@@ -3,6 +3,7 @@
     "title": "SAM | Notenarchiv für Musik"
   },
   "nav": {
+    "main": "Hauptmenü",
     "sheets": "Noten",
     "collections": "Sammlungen",
     "uploads": "Uploads",
@@ -16,6 +17,12 @@
       "instruments": "Instrumente",
       "configuration": "Konfiguration"
     }
+  },
+  "layout": {
+    "menuMode": "Menümodus",
+    "static": "Statisch",
+    "overlay": "Überlagert",
+    "slim": "Schmal"
   },
   "aria": {
     "toggleSidebar": "Seitenleiste umschalten",

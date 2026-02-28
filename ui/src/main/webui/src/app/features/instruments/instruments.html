@@ -1,10 +1,12 @@
 <div class="instruments-page">
-  <div class="page-toolbar">
-    <div class="page-title-group">
-      <h1>{{ 'instruments.title' | translate }}</h1>
-      <p class="page-subtitle">{{ 'instruments.subtitle' | translate }}</p>
-    </div>
-    <div class="toolbar-actions">
+  <p-toolbar styleClass="page-toolbar">
+    <ng-template #start>
+      <div class="page-title-group">
+        <h1>{{ 'instruments.title' | translate }}</h1>
+        <p class="page-subtitle">{{ 'instruments.subtitle' | translate }}</p>
+      </div>
+    </ng-template>
+    <ng-template #end>
       <p-iconfield>
         <p-inputicon styleClass="pi pi-search" />
         <input
@@ -19,8 +21,8 @@
         icon="pi pi-plus"
         (onClick)="openNew()"
       />
-    </div>
-  </div>
+    </ng-template>
+  </p-toolbar>
 
   <div class="filter-panel">
     <div class="filter-row">

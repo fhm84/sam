@@ -15,6 +15,11 @@
   --sam-text: #1a1a1e;
   --sam-text-secondary: #4a4a52;
   --sam-text-muted: #8a8a96;
+
+  // Layout dimensions
+  --topbar-height: 3.5rem;
+  --sidebar-width: 16rem;
+  --sidebar-slim-width: 5rem;
 }
 
 :root.dark {
@@ -42,18 +47,23 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+body.blocked-scroll {
+  overflow: hidden;
+}
+
 *,
 *::before,
 *::after {
   box-sizing: border-box;
 }
 
-// ─── Brand logo (topbar + mobile drawer) ──────────────────
+// ─── Brand logo ────────────────────────────────────────────
 .app-logo {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   color: var(--sam-accent);
+  text-decoration: none;
 }
 
 .app-logo-img {
@@ -72,10 +82,308 @@ body {
   letter-spacing: 0.05em;
 }
 
+// ─── Sakai Layout Shell ────────────────────────────────────
+.layout-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+// ─── Sidebar panel ─────────────────────────────────────────
+.layout-sidebar {
+  position: fixed;
+  top: var(--topbar-height);
+  left: 0;
+  bottom: 0;
+  width: var(--sidebar-width);
+  background: var(--sam-surface);
+  border-right: 1px solid var(--sam-border);
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 998;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0.5rem 0.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+// ─── Main container ────────────────────────────────────────
+.layout-main-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0; // allow flex child to shrink below content size
+  overflow: hidden;
+  margin-top: var(--topbar-height);
+  margin-left: var(--sidebar-width);
+  transition: margin-left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.layout-main {
+  flex: 1;
+  min-height: 0; // allow shrinking so overflow-y: auto kicks in
+  overflow-y: auto;
+  padding: 1.5rem;
+  background: var(--sam-bg);
+}
+
+// ─── Layout mask (mobile overlay) ──────────────────────────
+.layout-mask {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 997;
+  animation: fadein 0.15s;
+}
+
+// ─── Static mode ───────────────────────────────────────────
+.layout-static {
+  .layout-sidebar {
+    transform: translateX(0);
+  }
+
+  &.layout-static-inactive {
+    .layout-sidebar {
+      width: var(--sidebar-slim-width);
+
+      .layout-menuitem-text,
+      .layout-submenu-toggler,
+      .layout-menuitem-root-text {
+        display: none;
+      }
+
+      .layout-menuitem-link {
+        justify-content: center;
+        padding: 0.625rem;
+        gap: 0;
+      }
+
+      .layout-submenu {
+        display: none;
+      }
+
+      .layout-root-menuitem + .layout-root-menuitem {
+        border-top: 1px solid var(--sam-border);
+        margin-top: 0.25rem;
+        padding-top: 0.25rem;
+      }
+    }
+
+    .layout-main-container {
+      margin-left: var(--sidebar-slim-width);
+    }
+  }
+}
+
+// ─── Overlay mode ──────────────────────────────────────────
+.layout-overlay {
+  .layout-sidebar {
+    transform: translateX(-100%);
+  }
+
+  .layout-main-container {
+    margin-left: 0;
+  }
+
+  &.layout-overlay-active {
+    .layout-sidebar {
+      transform: translateX(0);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .layout-mask {
+      display: block;
+    }
+  }
+}
+
+// ─── Slim mode ─────────────────────────────────────────────
+.layout-slim {
+  .layout-sidebar {
+    width: var(--sidebar-slim-width);
+
+    .layout-menuitem-text,
+    .layout-submenu-toggler,
+    .layout-menuitem-root-text {
+      display: none;
+    }
+
+    .layout-menuitem-link {
+      justify-content: center;
+      padding: 0.625rem;
+      gap: 0;
+    }
+
+    // Don't show submenus in slim mode (icons only at root level)
+    .layout-submenu {
+      display: none;
+    }
+
+    .layout-root-menuitem + .layout-root-menuitem {
+      border-top: 1px solid var(--sam-border);
+      margin-top: 0.25rem;
+      padding-top: 0.25rem;
+    }
+  }
+
+  .layout-main-container {
+    margin-left: var(--sidebar-slim-width);
+  }
+}
+
+// ─── Mobile breakpoint ─────────────────────────────────────
+@media (max-width: 991px) {
+  .layout-sidebar {
+    transform: translateX(-100%);
+  }
+
+  .layout-main-container {
+    margin-left: 0 !important;
+  }
+
+  .layout-mobile-active {
+    .layout-sidebar {
+      transform: translateX(0) !important;
+      width: var(--sidebar-width) !important;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+
+      .layout-menuitem-text,
+      .layout-submenu-toggler,
+      .layout-menuitem-root-text {
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        display: block !important;
+      }
+    }
+
+    .layout-mask {
+      display: block;
+    }
+  }
+}
+
+// ─── Navigation Menu ───────────────────────────────────────
+.layout-menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.menu-separator {
+  height: 1px;
+  background: var(--sam-border);
+  margin: 0.5rem 0.5rem;
+}
+
+// Root menu item (section)
+.layout-root-menuitem {
+  margin-top: 0.5rem;
+
+  &:first-child {
+    margin-top: 0;
+  }
+}
+
+.layout-menuitem-root-text {
+  font-family: var(--sam-font-display);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--sam-text-muted);
+  padding: 0.5rem 0.75rem 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  transition: opacity 0.2s;
+}
+
+// Submenu list
+.layout-root-submenulist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.layout-submenu {
+  list-style: none;
+  margin: 0.125rem 0 0 1rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  border-left: 1px solid var(--sam-border);
+  padding-left: 0.5rem;
+}
+
+// Menu item link
+.layout-menuitem-link {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  color: var(--sam-text-secondary);
+  text-decoration: none;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+  overflow: hidden;
+  user-select: none;
+
+  &:hover {
+    background: var(--sam-hover);
+    color: var(--sam-text);
+  }
+}
+
+.active-menuitem > .layout-menuitem-link,
+.layout-menuitem-link.active-route {
+  background: var(--sam-active-bg);
+  color: var(--sam-accent);
+  font-weight: 600;
+}
+
+.layout-menuitem-icon {
+  font-size: 1rem;
+  width: 1.25rem;
+  text-align: center;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+
+.layout-menuitem-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: opacity 0.2s;
+}
+
+.layout-submenu-toggler {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: var(--sam-text-muted);
+  transition: transform 0.2s, opacity 0.2s;
+
+  &.rotated {
+    transform: rotate(-180deg);
+  }
+}
+
 // ─── PrimeNG overrides ────────────────────────────────────
-.user-menu.p-menu {
-  bottom: 100%;
-  top: auto !important;
+// Allow InputNumber to shrink in flex layouts
+.p-inputnumber {
+  min-width: 0;
 }
 
 // ─── Scrollbar styling ────────────────────────────────────
@@ -93,5 +401,14 @@ body {
 
   &:hover {
     background: var(--sam-text-muted);
+  }
+}
+
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }

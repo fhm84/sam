@@ -1,10 +1,4 @@
 .page-toolbar {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-
   h1 {
     margin: 0;
     font-size: 1.5rem;
@@ -25,12 +19,6 @@
   color: var(--sam-text-muted);
 }
 
-.toolbar-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
 
 .actions-cell {
   display: flex;
@@ -129,22 +117,3 @@
   cursor: pointer;
 }
 
-// ── Type badge ─────────────────────────────────────────
-
-.type-badge {
-  display: inline-block;
-  padding: 0.2rem 0.5rem;
-  border-radius: var(--p-border-radius);
-  font-size: 0.8rem;
-  font-weight: 500;
-
-  &.type-folder {
-    background: color-mix(in srgb, var(--p-blue-500) 15%, transparent);
-    color: var(--p-blue-500);
-  }
-
-  &.type-setlist {
-    background: color-mix(in srgb, var(--p-green-500) 15%, transparent);
-    color: var(--p-green-500);
-  }
-}

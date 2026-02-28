@@ -1,9 +1,10 @@
-import { LowerCasePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { Button } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
+import { Tag } from 'primeng/tag';
+import { Toolbar } from 'primeng/toolbar';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../core/translation.service';
 import { CollectionsApiService } from '../../core/api';
@@ -13,7 +14,7 @@ import { CollectionSheets } from './collection-sheets';
 
 @Component({
   selector: 'app-collection-detail-page',
-  imports: [LowerCasePipe, TranslatePipe, Button, Dialog, CollectionForm, CollectionSheets],
+  imports: [TranslatePipe, Button, Dialog, Tag, CollectionForm, CollectionSheets, Toolbar],
   templateUrl: './collection-detail-page.html',
   styleUrl: './collection-detail-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

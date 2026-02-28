@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { Button } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
+import { Toolbar } from 'primeng/toolbar';
 import { TranslationService } from '../../core/translation.service';
 import { EnsemblesApiService } from '../../core/api';
 import { Ensemble } from '../../model/datamodels';
@@ -11,7 +12,7 @@ import { EnsembleForm } from './ensemble-form';
 
 @Component({
   selector: 'app-ensemble-detail-page',
-  imports: [EnsembleVoices, EnsembleForm, Button, Dialog],
+  imports: [EnsembleVoices, EnsembleForm, Button, Dialog, Toolbar],
   templateUrl: './ensemble-detail-page.html',
   styleUrl: './ensemble-detail-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

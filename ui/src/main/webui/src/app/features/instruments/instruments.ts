@@ -8,6 +8,7 @@ import { InputText } from 'primeng/inputtext';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
 import { Select } from 'primeng/select';
+import { Toolbar } from 'primeng/toolbar';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { InstrumentsApiService } from '../../core/api';
@@ -30,6 +31,7 @@ import { InstrumentForm } from './instrument-form';
     FormsModule,
     TranslatePipe,
     InstrumentForm,
+    Toolbar,
   ],
   providers: [ConfirmationService],
   templateUrl: './instruments.html',

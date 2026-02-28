@@ -5,6 +5,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { Button } from 'primeng/button';
 import { ProgressBar } from 'primeng/progressbar';
 import { FileUpload, FileSelectEvent } from 'primeng/fileupload';
+import { Toolbar } from 'primeng/toolbar';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../core/translation.service';
 import { DocumentsApiService, UploadProgress } from '../../core/api/documents-api.service';
@@ -25,6 +26,7 @@ interface ActiveUpload {
     ProgressBar,
     FileUpload,
     TranslatePipe,
+    Toolbar,
   ],
   providers: [ConfirmationService],
   templateUrl: './uploads.html',
@@ -122,7 +124,7 @@ export class Uploads implements OnInit {
 
   private loadDocuments(): void {
     this.loading.set(true);
-    this.documentsApi.list(this.basePath).subscribe({
+    this.documentsApi.listUnlinked().subscribe({
       next: (res) => {
         this.documents.set(res.data ?? []);
         this.totalRecords.set(res.totalCount ?? 0);

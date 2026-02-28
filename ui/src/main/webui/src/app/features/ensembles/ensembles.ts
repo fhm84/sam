@@ -10,6 +10,8 @@ import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
 import { SelectButton } from 'primeng/selectbutton';
 import { Paginator } from 'primeng/paginator';
+import { Toolbar } from 'primeng/toolbar';
+import { Tag } from 'primeng/tag';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { LayoutPreferenceService } from '../../core/layout-preference.service';
@@ -34,6 +36,8 @@ import { EnsembleForm } from './ensemble-form';
     FormsModule,
     TranslatePipe,
     EnsembleForm,
+    Toolbar,
+    Tag,
   ],
   providers: [ConfirmationService],
   templateUrl: './ensembles.html',

@@ -1,0 +1,62 @@
+<div class="layout-topbar">
+  <div class="layout-topbar-start">
+    <button
+      class="layout-menu-button layout-topbar-action"
+      (click)="layoutService.onMenuToggle()"
+      [attr.aria-label]="'aria.toggleSidebar' | translate"
+    >
+      <i class="pi pi-bars"></i>
+    </button>
+
+    <a class="app-logo" routerLink="/">
+      <span class="app-logo-img" role="img" [attr.aria-label]="'aria.samLogo' | translate"></span>
+      <span class="app-title">SAM</span>
+    </a>
+  </div>
+
+  <div class="layout-topbar-breadcrumb">
+    <p-breadcrumb [model]="breadcrumbItems()" [home]="breadcrumbHome" styleClass="topbar-breadcrumb" />
+  </div>
+
+  <div class="layout-topbar-end">
+    <!-- Menu mode switcher -->
+    <button
+      class="layout-topbar-action"
+      (click)="modeMenu.toggle($event)"
+      [pTooltip]="i18n.t('layout.menuMode')"
+      tooltipPosition="bottom"
+      [attr.aria-label]="i18n.t('layout.menuMode')"
+    >
+      <i class="pi pi-layout"></i>
+    </button>
+    <p-menu #modeMenu [model]="menuModeItems()" [popup]="true" appendTo="body" />
+
+    <!-- Language toggle -->
+    <button
+      class="layout-topbar-action lang-toggle"
+      (click)="i18n.toggleLocale()"
+      [attr.aria-label]="'aria.switchLanguage' | translate"
+    >
+      <span class="lang-label">{{ i18n.localeLabel() }}</span>
+    </button>
+
+    <!-- Theme toggle -->
+    <button
+      class="layout-topbar-action theme-toggle"
+      (click)="theme.toggle()"
+      [attr.aria-label]="(theme.dark() ? 'aria.switchToLight' : 'aria.switchToDark') | translate"
+    >
+      <i [class]="darkIcon()"></i>
+    </button>
+
+    <!-- User menu -->
+    <button
+      class="layout-topbar-action"
+      (click)="userMenu.toggle($event)"
+      [attr.aria-label]="'aria.openUserMenu' | translate"
+    >
+      <i class="pi pi-user"></i>
+    </button>
+    <p-menu #userMenu [model]="userMenuItems()" [popup]="true" appendTo="body" />
+  </div>
+</div>

@@ -1,10 +1,12 @@
 <div class="sheets-page">
-  <div class="page-toolbar">
-    <div class="page-title-group">
-      <h1>{{ 'sheets.title' | translate }}</h1>
-      <p class="page-subtitle">{{ 'sheets.subtitle' | translate }}</p>
-    </div>
-    <div class="toolbar-actions">
+  <p-toolbar styleClass="page-toolbar">
+    <ng-template #start>
+      <div class="page-title-group">
+        <h1>{{ 'sheets.title' | translate }}</h1>
+        <p class="page-subtitle">{{ 'sheets.subtitle' | translate }}</p>
+      </div>
+    </ng-template>
+    <ng-template #end>
       <p-iconfield>
         <p-inputicon styleClass="pi pi-search" />
         <input
@@ -41,8 +43,8 @@
         icon="pi pi-plus"
         (onClick)="openNew()"
       />
-    </div>
-  </div>
+    </ng-template>
+  </p-toolbar>
 
   @if (!hasTextSearch()) {
     <div class="alpha-bar">
@@ -227,22 +229,16 @@
             </div>
             <div class="card-tags">
               @if (sheet.genre) {
-                <span class="card-tag">
-                  <i class="pi pi-tag"></i> {{ 'sheets.genres.' + sheet.genre | translate }}
-                </span>
+                <p-tag icon="pi pi-tag" [value]="'sheets.genres.' + sheet.genre | translate" severity="secondary" />
               }
               @if (sheet.style) {
-                <span class="card-tag">
-                  <i class="pi pi-palette"></i> {{ 'sheets.styles.' + sheet.style | translate }}
-                </span>
+                <p-tag icon="pi pi-palette" [value]="'sheets.styles.' + sheet.style | translate" severity="secondary" />
               }
               @if (sheet.yearOfComposition) {
-                <span class="card-tag">
-                  <i class="pi pi-calendar"></i> {{ sheet.yearOfComposition }}
-                </span>
+                <p-tag icon="pi pi-calendar" [value]="'' + sheet.yearOfComposition" severity="secondary" />
               }
               @for (tag of sheet.tags; track tag) {
-                <span class="card-tag card-tag-user">#{{ tag }}</span>
+                <p-tag [value]="'#' + tag" severity="secondary" />
               }
             </div>
             <!-- reserved: rating & coverage indicators -->

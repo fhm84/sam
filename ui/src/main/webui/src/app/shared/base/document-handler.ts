@@ -2,7 +2,7 @@ import { Directive, inject, signal } from '@angular/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { TranslationService } from '../../core/translation.service';
 import { DocumentsApiService } from '../../core/api/documents-api.service';
-import { DocumentDownload } from '../../model/datamodels';
+import { Attachment, DocumentDownload } from '../../model/datamodels';
 import { formatSize } from '../utils/format.utils';
 
 @Directive()
@@ -12,7 +12,7 @@ export abstract class DocumentHandler {
   protected readonly confirmationService = inject(ConfirmationService);
   protected readonly messageService = inject(MessageService);
 
-  protected readonly documents = signal<DocumentDownload[]>([]);
+  protected readonly documents = signal<Attachment[]>([]);
   protected readonly documentsLoading = signal(false);
   protected readonly dragging = signal(false);
 

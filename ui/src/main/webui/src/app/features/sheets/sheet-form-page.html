@@ -1,12 +1,14 @@
 <div class="sheet-form-page">
-  <div class="page-toolbar">
-    <p-button
-      icon="pi pi-arrow-left"
-      [label]="t.t('sheets.detail.backToList')"
-      [text]="true"
-      (onClick)="onCancelled()"
-    />
-  </div>
+  <p-toolbar styleClass="page-toolbar">
+    <ng-template #start>
+      <p-button
+        icon="pi pi-arrow-left"
+        [label]="t.t('sheets.detail.backToList')"
+        [text]="true"
+        (onClick)="onCancelled()"
+      />
+    </ng-template>
+  </p-toolbar>
 
   @if (loading()) {
     <div class="loading-indicator">
@@ -60,8 +62,8 @@
                   @for (doc of documents(); track doc.id) {
                     <div class="document-row">
                       <i class="pi pi-file"></i>
-                      <span class="document-name">{{ doc.filename }}</span>
-                      <span class="document-size">{{ formatSize(doc.size) }}</span>
+                      <span class="document-name">{{ doc.displayName }}</span>
+                      <span class="document-size">{{ formatSize(doc.fileSize) }}</span>
                       <div class="document-actions">
                         <p-button
                           icon="pi pi-download"

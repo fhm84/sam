@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Panel } from 'primeng/panel';
+import { Toolbar } from 'primeng/toolbar';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { Button } from 'primeng/button';
@@ -12,7 +13,7 @@ import { SheetForm } from './sheet-form';
 
 @Component({
   selector: 'app-sheet-form-page',
-  imports: [SheetForm, Button, Panel, ConfirmDialog, TranslatePipe],
+  imports: [SheetForm, Button, Panel, ConfirmDialog, TranslatePipe, Toolbar],
   providers: [ConfirmationService],
   templateUrl: './sheet-form-page.html',
   styleUrl: './sheet-form-page.scss',
