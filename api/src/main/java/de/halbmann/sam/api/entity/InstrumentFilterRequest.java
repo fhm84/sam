@@ -10,4 +10,7 @@ public class InstrumentFilterRequest extends PaginationRequest {
 
     @QueryParam("name")
     private String name;
+
+    @QueryParam("transposition")
+    private InstrumentTransposing transposition;
 }
