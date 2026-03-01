@@ -88,7 +88,7 @@
       "edition": "Ausgabe",
       "editionTooltip": "Die spezifische Verlagsausgabe oder Auflage, z.B. 'Revidierte Ausgabe 2010' oder 'Partitur & Stimmen'.",
       "difficultyLevel": "Schwierigkeitsgrad",
-      "difficultyLevelTooltip": "Freitext zur Schwierigkeit, z.B. '3/5', 'Stufe 4' oder 'Leicht'.",
+      "difficultyLevelTooltip": "Gesamtschwierigkeit des Stückes für das Ensemble.",
       "copyright": "Urheberrecht",
       "additionalNotes": "Zusätzliche Anmerkungen",
       "tags": "Tags",
@@ -213,6 +213,14 @@
       "TRADITIONAL": "Traditionell",
       "FOLKLORISTIC": "Folkloristisch",
       "EXPERIMENTAL": "Experimentell"
+    },
+    "difficultyLevels": {
+      "VERY_EASY": "Sehr leicht",
+      "EASY": "Leicht",
+      "MEDIUM": "Mittel",
+      "ADVANCED": "Fortgeschritten",
+      "DIFFICULT": "Schwierig",
+      "VERY_DIFFICULT": "Sehr schwierig"
     },
     "filters": {
       "toggle": "Filter",

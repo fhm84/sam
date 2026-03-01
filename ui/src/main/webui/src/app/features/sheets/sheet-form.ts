@@ -15,7 +15,7 @@ import { convertEmptyStringsToNull } from '../../shared/utils/object.utils';
 import { CreateSheetMusic, Genre, Musician, SheetMusic, Style } from '../../model/datamodels';
 import { map, Observable } from 'rxjs';
 import { BaseForm } from '../../shared/base/base-form';
-import { FETCH_ALL_SIZE, GENRES, STYLES } from '../../shared/constants';
+import { DIFFICULTY_LEVELS, FETCH_ALL_SIZE, GENRES, STYLES } from '../../shared/constants';
 import { MusicianForm } from '../musicians/musician-form';
 
 @Component({
@@ -43,6 +43,10 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
     STYLES.map((s) => ({ label: this.t.t(`sheets.styles.${s}`), value: s })),
   );
 
+  protected readonly difficultyOptions = computed(() =>
+    DIFFICULTY_LEVELS.map((key, i) => ({ label: this.t.t(`sheets.difficultyLevels.${key}`), value: i + 1 })),
+  );
+
   readonly form = new FormGroup({
     title: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     subtitle: new FormControl('', { nonNullable: true }),
@@ -52,7 +56,7 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
     style: new FormControl<Style | null>(null),
     yearOfComposition: new FormControl<number | null>(null),
     publisher: new FormControl('', { nonNullable: true }),
-    difficultyLevel: new FormControl('', { nonNullable: true }),
+    difficultyLevel: new FormControl<number | null>(null),
     edition: new FormControl('', { nonNullable: true }),
     copyright: new FormControl('', { nonNullable: true }),
     additionalNotes: new FormControl('', { nonNullable: true }),
@@ -77,7 +81,7 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
       style: s.style ?? null,
       yearOfComposition: s.yearOfComposition ?? null,
       publisher: s.publisher ?? '',
-      difficultyLevel: s.difficultyLevel ?? '',
+      difficultyLevel: s.difficultyLevel ?? null,
       edition: s.edition ?? '',
       copyright: s.copyright ?? '',
       additionalNotes: s.additionalNotes ?? '',
@@ -120,7 +124,7 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
       style: raw.style ?? undefined,
       yearOfComposition: raw.yearOfComposition ?? undefined,
       publisher: raw.publisher,
-      difficultyLevel: raw.difficultyLevel,
+      difficultyLevel: raw.difficultyLevel ?? undefined,
       edition: raw.edition,
       copyright: raw.copyright,
       additionalNotes: raw.additionalNotes,

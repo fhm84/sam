@@ -1,5 +1,11 @@
 import { AttachmentType, Genre, Style } from '../model/datamodels';
 
+/** DifficultyLevel enum values in grade order (grade = index + 1). */
+export const DIFFICULTY_LEVELS = [
+  'VERY_EASY', 'EASY', 'MEDIUM', 'ADVANCED', 'DIFFICULT', 'VERY_DIFFICULT',
+] as const;
+export type DifficultyLevelKey = (typeof DIFFICULTY_LEVELS)[number];
+
 /** Page size used when fetching all items for dropdown/select lists. */
 export const FETCH_ALL_SIZE = 1000;
 

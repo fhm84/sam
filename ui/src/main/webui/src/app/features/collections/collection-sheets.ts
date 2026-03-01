@@ -17,6 +17,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../core/translation.service';
 import { CollectionsApiService, SheetsApiService } from '../../core/api';
 import { CollectionSheet, SheetMusic, SheetMusicSearchResult } from '../../model/datamodels';
+import { DIFFICULTY_LEVELS } from '../../shared/constants';
 
 @Component({
   selector: 'app-collection-sheets',
@@ -126,6 +127,10 @@ export class CollectionSheets implements OnInit, OnChanges {
 
   protected isSelected(sheet: SheetMusicSearchResult): boolean {
     return this.selectedSheet?.id === sheet.id;
+  }
+
+  protected difficultyLevelKey(grade: number): string {
+    return DIFFICULTY_LEVELS[grade - 1] ?? '';
   }
 
   protected get canAdd(): boolean {

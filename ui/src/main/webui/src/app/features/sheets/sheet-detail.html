@@ -97,7 +97,7 @@
                 @if (s.difficultyLevel) {
                   <div class="meta-entry">
                     <span class="detail-label">{{ 'sheets.detail.difficulty' | translate }}</span>
-                    <span class="detail-value">{{ s.difficultyLevel }}</span>
+                    <span class="detail-value">{{ 'sheets.difficultyLevels.' + difficultyLevelKey(s.difficultyLevel) | translate }}</span>
                   </div>
                 }
                 @if (s.tags && s.tags.length > 0) {
@@ -330,7 +330,7 @@
             @if (s.difficultyLevel) {
               <div class="meta-entry">
                 <span class="detail-label">{{ 'sheets.detail.difficulty' | translate }}</span>
-                <span class="detail-value">{{ s.difficultyLevel }}</span>
+                <span class="detail-value">{{ 'sheets.difficultyLevels.' + difficultyLevelKey(s.difficultyLevel) | translate }}</span>
               </div>
             }
             @if (s.tags && s.tags.length > 0) {

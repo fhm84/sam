@@ -88,7 +88,7 @@
       "edition": "Edition",
       "editionTooltip": "The specific publisher edition or print run, e.g. 'Revised Edition 2010' or 'Score & Parts'.",
       "difficultyLevel": "Difficulty Level",
-      "difficultyLevelTooltip": "Free-form text, e.g. '3/5', 'Grade 4', or 'Easy'.",
+      "difficultyLevelTooltip": "Overall difficulty rating of the piece for the ensemble.",
       "copyright": "Copyright",
       "additionalNotes": "Additional Notes",
       "tags": "Tags",
@@ -213,6 +213,14 @@
       "TRADITIONAL": "Traditional",
       "FOLKLORISTIC": "Folkloristic",
       "EXPERIMENTAL": "Experimental"
+    },
+    "difficultyLevels": {
+      "VERY_EASY": "Very Easy",
+      "EASY": "Easy",
+      "MEDIUM": "Medium",
+      "ADVANCED": "Advanced",
+      "DIFFICULT": "Difficult",
+      "VERY_DIFFICULT": "Very Difficult"
     },
     "filters": {
       "toggle": "Filters",

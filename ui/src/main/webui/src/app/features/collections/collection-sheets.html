@@ -299,7 +299,7 @@
       </div>
       <div class="preview-field">
         <span class="field-label">{{ 'sheets.detail.difficulty' | translate }}</span>
-        <span class="field-value">{{ sheet.difficultyLevel ?? '—' }}</span>
+        <span class="field-value">{{ sheet.difficultyLevel ? ('sheets.difficultyLevels.' + difficultyLevelKey(sheet.difficultyLevel) | translate) : '—' }}</span>
       </div>
 
       <div class="preview-field">

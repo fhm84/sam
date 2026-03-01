@@ -11,6 +11,7 @@ import { Tag } from 'primeng/tag';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { SheetsApiService, InstrumentationsApiService } from '../../core/api';
 import { Instrumentation, SheetMusic } from '../../model/datamodels';
+import { DIFFICULTY_LEVELS } from '../../shared/constants';
 import { DocumentHandler } from '../../shared/base/document-handler';
 import { InstrumentationForm } from './instrumentation-form';
 
@@ -101,6 +102,10 @@ export class SheetDetail extends DocumentHandler implements OnChanges {
       : 'sheets.instrumentations.messages.created';
     this.messageService.add({ severity: 'success', summary: this.t.t(key) });
     this.loadInstrumentations();
+  }
+
+  protected difficultyLevelKey(grade: number): string {
+    return DIFFICULTY_LEVELS[grade - 1] ?? '';
   }
 
   protected toggleFavorite(): void {

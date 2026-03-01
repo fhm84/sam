@@ -125,15 +125,18 @@
 
   <div class="form-row">
     <div class="form-field flex-1">
-      <div class="field-with-hint">
-        <p-floatlabel variant="on">
-          <input pInputText id="sheet-difficulty" formControlName="difficultyLevel" />
-          <label for="sheet-difficulty">{{ 'sheets.form.difficultyLevel' | translate }}</label>
-        </p-floatlabel>
-        <i class="pi pi-info-circle field-hint-icon"
-           [pTooltip]="t.t('sheets.form.difficultyLevelTooltip')"
-           tooltipPosition="right"></i>
-      </div>
+      <p-floatlabel variant="on">
+        <p-select
+          inputId="sheet-difficulty"
+          formControlName="difficultyLevel"
+          [options]="difficultyOptions()"
+          optionLabel="label"
+          optionValue="value"
+          [showClear]="true"
+          styleClass="w-full"
+        />
+        <label for="sheet-difficulty">{{ 'sheets.form.difficultyLevel' | translate }}</label>
+      </p-floatlabel>
     </div>
     <div class="form-field flex-1">
       <p-floatlabel variant="on">
