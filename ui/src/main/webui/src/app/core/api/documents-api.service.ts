@@ -69,6 +69,22 @@ export class DocumentsApiService {
       );
   }
 
+  /**
+   * Link an existing (unlinked) document to a sheet and optionally an instrumentation.
+   * Expects: POST /api/documents/{documentId}/link  { sheetId, instrumentationId?, type? }
+   */
+  linkToSheet(
+    documentId: string,
+    sheetId: string,
+    instrumentationId?: string,
+    type?: AttachmentType,
+  ): Observable<void> {
+    const body: Record<string, string> = { sheetId };
+    if (instrumentationId) body['instrumentationId'] = instrumentationId;
+    if (type) body['type'] = type;
+    return this.http.post<void>(`${this.forTopLevel()}/${documentId}/link`, body);
+  }
+
   delete(basePath: string, docIdentifier: string): Observable<void> {
     return this.http.delete<void>(`${basePath}/${docIdentifier}`);
   }

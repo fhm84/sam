@@ -84,6 +84,32 @@
 >
   @if (addDialogVisible) {
     <div class="add-sheet-dialog">
+
+      <!-- Selected sheet + identifier (shown when a sheet is selected) -->
+      @if (selectedSheet) {
+        <div class="selected-block">
+          <div class="selected-indicator">
+            <i class="pi pi-check-circle"></i>
+            <span>{{ selectedSheet.title }}</span>
+            @if (selectedSheet.composer?.name) {
+              <span class="selected-composer">— {{ selectedSheet.composer!.name }}</span>
+            }
+          </div>
+          <form [formGroup]="identifierForm" (ngSubmit)="onAdd()" class="identifier-form">
+            <p-floatlabel variant="on">
+              <input
+                pInputText
+                id="add-identifier"
+                formControlName="identifier"
+                [pTooltip]="t.t('collections.sheets.form.identifierTooltip')"
+                tooltipPosition="right"
+              />
+              <label for="add-identifier">{{ 'collections.sheets.form.identifier' | translate }}</label>
+            </p-floatlabel>
+          </form>
+        </div>
+      }
+
       <!-- Search -->
       <div class="search-bar">
         <p-iconfield class="search-field">
@@ -160,50 +186,23 @@
           </tr>
         </ng-template>
       </p-table>
-
-      <!-- Selected sheet indicator -->
-      @if (selectedSheet) {
-        <div class="selected-indicator">
-          <i class="pi pi-check-circle"></i>
-          <span>{{ selectedSheet.title }}</span>
-          @if (selectedSheet.composer?.name) {
-            <span class="selected-composer">— {{ selectedSheet.composer!.name }}</span>
-          }
-        </div>
-      }
-
-      <!-- Identifier + actions -->
-      <form [formGroup]="identifierForm" (ngSubmit)="onAdd()" class="add-footer">
-        <div class="identifier-field">
-          <p-floatlabel variant="on">
-            <input
-              pInputText
-              id="add-identifier"
-              formControlName="identifier"
-              [pTooltip]="t.t('collections.sheets.form.identifierTooltip')"
-              tooltipPosition="top"
-            />
-            <label for="add-identifier">{{ 'collections.sheets.form.identifier' | translate }}</label>
-          </p-floatlabel>
-        </div>
-        <div class="dialog-actions">
-          <p-button
-            [label]="t.t('collections.sheets.cancel')"
-            severity="secondary"
-            [text]="true"
-            type="button"
-            (onClick)="addDialogVisible = false"
-          />
-          <p-button
-            [label]="t.t('collections.sheets.save')"
-            type="submit"
-            [disabled]="!canAdd || saving"
-            [loading]="saving"
-          />
-        </div>
-      </form>
     </div>
   }
+
+  <ng-template #footer>
+    <p-button
+      [label]="t.t('collections.sheets.cancel')"
+      severity="secondary"
+      [text]="true"
+      (onClick)="addDialogVisible = false"
+    />
+    <p-button
+      [label]="t.t('collections.sheets.save')"
+      [disabled]="!canAdd || saving"
+      [loading]="saving"
+      (onClick)="onAdd()"
+    />
+  </ng-template>
 </p-dialog>
 
 <!-- ── Edit dialog ─────────────────────────────────────── -->
@@ -233,23 +232,23 @@
         </p-floatlabel>
       </div>
 
-      <div class="form-actions">
-        <p-button
-          [label]="t.t('collections.sheets.cancel')"
-          severity="secondary"
-          [text]="true"
-          type="button"
-          (onClick)="editDialogVisible = false"
-        />
-        <p-button
-          [label]="t.t('collections.sheets.save')"
-          type="submit"
-          [disabled]="identifierForm.invalid || saving"
-          [loading]="saving"
-        />
-      </div>
     </form>
   }
+
+  <ng-template #footer>
+    <p-button
+      [label]="t.t('collections.sheets.cancel')"
+      severity="secondary"
+      [text]="true"
+      (onClick)="editDialogVisible = false"
+    />
+    <p-button
+      [label]="t.t('collections.sheets.save')"
+      [disabled]="identifierForm.invalid || saving"
+      [loading]="saving"
+      (onClick)="onUpdate()"
+    />
+  </ng-template>
 </p-dialog>
 
 <!-- ── Preview dialog ───────────────────────────────────── -->

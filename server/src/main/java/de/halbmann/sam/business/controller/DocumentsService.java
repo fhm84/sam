@@ -1,9 +1,6 @@
 package de.halbmann.sam.business.controller;
 
-import de.halbmann.sam.api.entity.Attachment;
-import de.halbmann.sam.api.entity.AttachmentType;
-import de.halbmann.sam.api.entity.DocumentDownload;
-import de.halbmann.sam.api.entity.DocumentUpload;
+import de.halbmann.sam.api.entity.*;
 import de.halbmann.sam.business.boundary.AttachmentRepository;
 import de.halbmann.sam.business.boundary.DocumentRepository;
 import de.halbmann.sam.business.boundary.InstrumentationRepository;
@@ -331,5 +328,38 @@ public class DocumentsService {
         }
 
         documentRepository.delete(doc);
+    }
+
+    public void linkDocument(String docIdentifier, DocumentLinkRequest documentLink) {
+        DocumentEntity document = documentRepository
+                .findByIdOptional(UUID.fromString(docIdentifier))
+                .orElseThrow(() -> new EntityNotFoundException("Document", docIdentifier));
+
+        AttachmentEntity attachment = new AttachmentEntity();
+        attachment.setType(Optional.ofNullable(documentLink.getAttachmentType()).orElse(AttachmentType.UNSPECIFIED));
+        attachment.setDisplayName(document.getFilename());
+
+        // Link to document only if this type is file-based
+        if (documentLink.getAttachmentType() != AttachmentType.EXTERNAL_LINK) {
+            attachment.setDocument(document);
+            documentRepository.incrementRefCount(document);
+        }
+
+        if (documentLink.getSheetId() != null) {
+            SheetMusicEntity sheet = sheetRepository
+                    .findByIdOptional(documentLink.getSheetId())
+                    .orElseThrow(() -> new EntityNotFoundException("Sheet", documentLink.getSheetId()));
+            sheet.getAttachments().add(attachment);
+            sheetRepository.persist(sheet);
+        }
+        if (documentLink.getInstrumentationId() != null) {
+            InstrumentationEntity instrumentation = instrumentationRepository
+                    .findByIdOptional(documentLink.getInstrumentationId())
+                    .orElseThrow(
+                            () -> new EntityNotFoundException("Instrumentation", documentLink.getInstrumentationId()));
+            instrumentation.getAttachments().add(attachment);
+            instrumentationRepository.persist(instrumentation);
+        }
+        attachmentRepository.persistAndFlush(attachment);
     }
 }

@@ -119,23 +119,23 @@
         </div>
       </div>
 
-      <div class="form-actions">
-        <p-button
-          [label]="t.t('ensembles.voices.cancel')"
-          severity="secondary"
-          [text]="true"
-          type="button"
-          (onClick)="addDialogVisible = false"
-        />
-        <p-button
-          [label]="t.t('ensembles.voices.save')"
-          type="submit"
-          [disabled]="addForm.invalid || saving"
-          [loading]="saving"
-        />
-      </div>
     </form>
   }
+
+  <ng-template #footer>
+    <p-button
+      [label]="t.t('ensembles.voices.cancel')"
+      severity="secondary"
+      [text]="true"
+      (onClick)="addDialogVisible = false"
+    />
+    <p-button
+      [label]="t.t('ensembles.voices.save')"
+      [disabled]="addForm.invalid || saving"
+      [loading]="saving"
+      (onClick)="onAdd()"
+    />
+  </ng-template>
 </p-dialog>
 
 <!-- ── Edit dialog (tabbed) ───────────────────────────── -->
@@ -195,21 +195,6 @@
               </div>
             </div>
 
-            <div class="form-actions">
-              <p-button
-                [label]="t.t('ensembles.voices.cancel')"
-                severity="secondary"
-                [text]="true"
-                type="button"
-                (onClick)="editDialogVisible = false"
-              />
-              <p-button
-                [label]="t.t('ensembles.voices.save')"
-                type="submit"
-                [disabled]="saving"
-                [loading]="saving"
-              />
-            </div>
           </form>
         </p-tabpanel>
 
@@ -223,6 +208,23 @@
       </p-tabpanels>
     </p-tabs>
   }
+
+  <ng-template #footer>
+    @if (activeTab === 0) {
+      <p-button
+        [label]="t.t('ensembles.voices.cancel')"
+        severity="secondary"
+        [text]="true"
+        (onClick)="editDialogVisible = false"
+      />
+      <p-button
+        [label]="t.t('ensembles.voices.save')"
+        [disabled]="saving"
+        [loading]="saving"
+        (onClick)="onUpdate()"
+      />
+    }
+  </ng-template>
 </p-dialog>
 
 <p-confirmdialog />

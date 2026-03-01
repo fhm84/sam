@@ -309,7 +309,47 @@
   },
   "uploads": {
     "title": "Uploads",
-    "subtitle": "Documents not yet linked to any sheet — upload files here and assign them later.",
+    "subtitle": "Staging area for documents — upload files and assign them to sheets or instrumentations.",
+    "target": {
+      "label": "Upload to:",
+      "select": "Select sheet…",
+      "change": "Change",
+      "clear": "Clear",
+      "unlinked": "Unlinked pool",
+      "pickerTitle": "Select upload target",
+      "confirm": "Set as target"
+    },
+    "assign": {
+      "title": "Assign document",
+      "action": "Assign to sheet",
+      "confirm": "Assign"
+    },
+    "picker": {
+      "searchPlaceholder": "Search sheets…",
+      "noResults": "No sheets found",
+      "instrumentation": "Instrumentation (optional)",
+      "type": "Document type (optional)",
+      "cancel": "Cancel"
+    },
+    "attachmentTypes": {
+      "FULL_SCORE": "Full Score",
+      "PART": "Part",
+      "COVER": "Cover",
+      "LYRICS": "Lyrics",
+      "MIDI": "MIDI",
+      "AUDIO": "Audio",
+      "ANNOTATIONS": "Annotations",
+      "IMAGE": "Image",
+      "ANALYSIS": "Analysis",
+      "TRANSCRIPTION": "Transcription",
+      "MUSIC_XML": "MusicXML",
+      "OTHER": "Other",
+      "UNSPECIFIED": "Unspecified"
+    },
+    "table": {
+      "title": "Unlinked documents"
+    },
+    "download": "Download",
     "upload": "Upload",
     "dragDrop": "Drag & drop files here or click Browse to upload",
     "browse": "Browse",
@@ -326,6 +366,7 @@
     },
     "messages": {
       "uploaded": "File uploaded successfully",
+      "assigned": "Document assigned successfully",
       "deleted": "Document deleted successfully",
       "error": "An error occurred",
       "downloadError": "Failed to download document"

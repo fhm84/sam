@@ -71,7 +71,61 @@
   [breakpoints]="{ '768px': '95vw' }"
 >
   @if (addDialogVisible) {
-    <div class="add-option-dialog">
+    <form [formGroup]="addForm" (ngSubmit)="onAdd()" class="add-option-dialog">
+
+      <!-- Selected indicator + type + factor (shown when instrument is selected) -->
+      @if (selectedInstrument) {
+        <div class="selected-block">
+          <div class="selected-indicator">
+            <i class="pi pi-check-circle"></i>
+            <span>{{ selectedInstrument.name }}</span>
+            @if (selectedInstrument.transposition) {
+              <span class="selected-transposition">— {{ selectedInstrument.transposition }}</span>
+            }
+          </div>
+          <div class="footer-fields">
+            <div class="field-with-hint">
+              <p-floatlabel variant="on">
+                <p-select
+                  inputId="add-type"
+                  formControlName="type"
+                  [options]="typeOptions"
+                  [showClear]="true"
+                  styleClass="w-full"
+                />
+                <label for="add-type">{{ 'ensembles.voices.options.form.type' | translate }}</label>
+              </p-floatlabel>
+              <i
+                class="pi pi-info-circle field-hint-icon"
+                [pTooltip]="t.t('ensembles.voices.options.form.typeTooltip')"
+                tooltipPosition="top"
+              ></i>
+            </div>
+            <div class="field-with-hint">
+              <p-floatlabel variant="on">
+                <p-inputnumber
+                  inputId="add-factor"
+                  formControlName="factor"
+                  [useGrouping]="false"
+                  [min]="0"
+                  [max]="1"
+                  [step]="0.1"
+                  [minFractionDigits]="1"
+                  [maxFractionDigits]="2"
+                  styleClass="w-full"
+                />
+                <label for="add-factor">{{ 'ensembles.voices.options.form.factor' | translate }}</label>
+              </p-floatlabel>
+              <i
+                class="pi pi-info-circle field-hint-icon"
+                [pTooltip]="t.t('ensembles.voices.options.form.factorTooltip')"
+                tooltipPosition="top"
+              ></i>
+            </div>
+          </div>
+        </div>
+      }
+
       <!-- Filter -->
       <div class="filter-bar">
         <p-iconfield class="filter-field">
@@ -118,77 +172,23 @@
         </ng-template>
       </p-table>
 
-      <!-- Selected indicator -->
-      @if (selectedInstrument) {
-        <div class="selected-indicator">
-          <i class="pi pi-check-circle"></i>
-          <span>{{ selectedInstrument.name }}</span>
-          @if (selectedInstrument.transposition) {
-            <span class="selected-transposition">— {{ selectedInstrument.transposition }}</span>
-          }
-        </div>
-      }
-
-      <!-- Type + factor + actions -->
-      <form [formGroup]="addForm" (ngSubmit)="onAdd()" class="add-footer">
-        <div class="footer-fields">
-          <div class="field-with-hint">
-            <p-floatlabel variant="on">
-              <p-select
-                inputId="add-type"
-                formControlName="type"
-                [options]="typeOptions"
-                [showClear]="true"
-                styleClass="w-full"
-              />
-              <label for="add-type">{{ 'ensembles.voices.options.form.type' | translate }}</label>
-            </p-floatlabel>
-            <i
-              class="pi pi-info-circle field-hint-icon"
-              [pTooltip]="t.t('ensembles.voices.options.form.typeTooltip')"
-              tooltipPosition="top"
-            ></i>
-          </div>
-          <div class="field-with-hint">
-            <p-floatlabel variant="on">
-              <p-inputnumber
-                inputId="add-factor"
-                formControlName="factor"
-                [useGrouping]="false"
-                [min]="0"
-                [max]="1"
-                [step]="0.1"
-                [minFractionDigits]="1"
-                [maxFractionDigits]="2"
-                styleClass="w-full"
-              />
-              <label for="add-factor">{{ 'ensembles.voices.options.form.factor' | translate }}</label>
-            </p-floatlabel>
-            <i
-              class="pi pi-info-circle field-hint-icon"
-              [pTooltip]="t.t('ensembles.voices.options.form.factorTooltip')"
-              tooltipPosition="top"
-            ></i>
-          </div>
-        </div>
-        <div class="dialog-actions">
-          <p-button
-            [label]="t.t('ensembles.voices.options.cancel')"
-            severity="secondary"
-            [text]="true"
-            type="button"
-            (onClick)="addDialogVisible = false"
-          />
-          <p-button
-            [label]="t.t('ensembles.voices.options.save')"
-            type="submit"
-            [disabled]="!canAdd || saving"
-            [loading]="saving"
-          />
-        </div>
-      </form>
-    </div>
+    </form>
   }
+
+  <ng-template #footer>
+    <p-button
+      [label]="t.t('ensembles.voices.options.cancel')"
+      severity="secondary"
+      [text]="true"
+      (onClick)="addDialogVisible = false"
+    />
+    <p-button
+      [label]="t.t('ensembles.voices.options.save')"
+      [disabled]="!canAdd || saving"
+      [loading]="saving"
+      (onClick)="onAdd()"
+    />
+  </ng-template>
 </p-dialog>
 
 <!-- ── Edit dialog ─────────────────────────────────────── -->
@@ -251,23 +251,23 @@
         </div>
       </div>
 
-      <div class="form-actions">
-        <p-button
-          [label]="t.t('ensembles.voices.options.cancel')"
-          severity="secondary"
-          [text]="true"
-          type="button"
-          (onClick)="editDialogVisible = false"
-        />
-        <p-button
-          [label]="t.t('ensembles.voices.options.save')"
-          type="submit"
-          [disabled]="saving"
-          [loading]="saving"
-        />
-      </div>
     </form>
   }
+
+  <ng-template #footer>
+    <p-button
+      [label]="t.t('ensembles.voices.options.cancel')"
+      severity="secondary"
+      [text]="true"
+      (onClick)="editDialogVisible = false"
+    />
+    <p-button
+      [label]="t.t('ensembles.voices.options.save')"
+      [disabled]="saving"
+      [loading]="saving"
+      (onClick)="onUpdate()"
+    />
+  </ng-template>
 </p-dialog>
 
 <p-confirmdialog />

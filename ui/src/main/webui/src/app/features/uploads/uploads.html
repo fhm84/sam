@@ -8,7 +8,56 @@
     </ng-template>
   </p-toolbar>
 
-  <div class="upload-area">
+  <!-- ── Upload card ──────────────────────────────────────────────── -->
+  <div class="upload-card">
+
+    <!-- Target row -->
+    <div class="upload-target-row">
+      <span class="upload-target-label">{{ 'uploads.target.label' | translate }}</span>
+
+      @if (uploadTargetSheet()) {
+        <!-- Target is set: show chips + change -->
+        <div class="target-chips">
+          <p-tag
+            [value]="uploadTargetLabel()!"
+            icon="pi pi-file-music"
+            severity="info"
+          />
+          <p-button
+            icon="pi pi-pencil"
+            [label]="t.t('uploads.target.change')"
+            size="small"
+            severity="secondary"
+            [text]="true"
+            (onClick)="openUploadPicker()"
+          />
+          <p-button
+            icon="pi pi-times"
+            [label]="t.t('uploads.target.clear')"
+            size="small"
+            severity="secondary"
+            [text]="true"
+            (onClick)="clearUploadTarget()"
+          />
+        </div>
+      } @else {
+        <!-- No target: show prompt + unlinked indicator -->
+        <p-button
+          icon="pi pi-search"
+          [label]="t.t('uploads.target.select')"
+          severity="secondary"
+          size="small"
+          (onClick)="openUploadPicker()"
+        />
+        <p-tag
+          [value]="t.t('uploads.target.unlinked')"
+          icon="pi pi-inbox"
+          severity="secondary"
+        />
+      }
+    </div>
+
+    <!-- Drop zone -->
     <p-fileupload
       mode="advanced"
       [multiple]="true"
@@ -27,26 +76,31 @@
         </div>
       </ng-template>
     </p-fileupload>
+
+    <!-- Active upload progress -->
+    @if (activeUploads().length > 0) {
+      <div class="active-uploads">
+        <span class="active-uploads-label">{{ 'uploads.activeUploads' | translate }}</span>
+        @for (upload of activeUploads(); track upload.filename) {
+          <div class="upload-item">
+            <span class="upload-filename">{{ upload.filename }}</span>
+            <p-progressbar [value]="upload.progress" [style]="{ height: '0.4rem', flex: 1 }" />
+            <span class="upload-percent">{{ upload.progress }}%</span>
+          </div>
+        }
+      </div>
+    }
   </div>
 
-  @if (uploads().length > 0) {
-    <div class="active-uploads">
-      <h3>{{ 'uploads.activeUploads' | translate }}</h3>
-      @for (upload of uploads(); track upload.filename) {
-        <div class="upload-item">
-          <span class="upload-filename">{{ upload.filename }}</span>
-          <p-progressbar [value]="upload.progress" [style]="{ height: '0.5rem', flex: 1 }" />
-          <span class="upload-percent">{{ upload.progress }}%</span>
-        </div>
-      }
-    </div>
-  }
+  <!-- ── Unlinked documents table ───────────────────────────────── -->
+  <p-table [value]="documents()" [loading]="loading()" [rows]="20">
+    <ng-template #caption>
+      <div class="table-caption">
+        <span class="table-caption-title">{{ 'uploads.table.title' | translate }}</span>
+        <span class="table-caption-count">{{ totalRecords() }}</span>
+      </div>
+    </ng-template>
 
-  <p-table
-    [value]="documents()"
-    [loading]="loading()"
-    [rows]="20"
-  >
     <ng-template #header>
       <tr>
         <th>{{ 'uploads.columns.filename' | translate }}</th>
@@ -65,9 +119,18 @@
         <td [title]="doc.checksumSha256">{{ truncateChecksum(doc.checksumSha256) }}</td>
         <td class="actions-cell">
           <p-button
+            icon="pi pi-link"
+            [rounded]="true"
+            [text]="true"
+            severity="info"
+            [pTooltip]="t.t('uploads.assign.action')"
+            (onClick)="openAssignPicker(doc)"
+          />
+          <p-button
             icon="pi pi-download"
             [rounded]="true"
             [text]="true"
+            [pTooltip]="t.t('uploads.download')"
             (onClick)="onDownload(doc)"
           />
           <p-button
@@ -88,5 +151,164 @@
     </ng-template>
   </p-table>
 </div>
+
+<!-- ── Sheet picker dialog (upload target + assign) ──────────────── -->
+<p-dialog
+  [visible]="pickerVisible()"
+  (visibleChange)="pickerVisible.set($event)"
+  [header]="pickerContext === 'assign'
+    ? t.t('uploads.assign.title')
+    : t.t('uploads.target.pickerTitle')"
+  [modal]="true"
+  [style]="{ width: '56rem' }"
+  [breakpoints]="{ '768px': '95vw' }"
+  [draggable]="false"
+>
+  @if (pickerVisible()) {
+    <div class="picker-dialog">
+
+      <!-- Assign context: show filename being assigned -->
+      @if (pickerContext === 'assign' && pickerDoc()) {
+        <div class="picker-doc-name">
+          <i class="pi pi-file"></i>
+          <span>{{ pickerDoc()!.filename }}</span>
+        </div>
+      }
+
+      <!-- Selection summary + instrumentation (shown above search once a sheet is picked) -->
+      @if (pickerSelectedSheet()) {
+        <div class="picker-selection">
+          <div class="picker-selected-sheet">
+            <i class="pi pi-check-circle"></i>
+            <span class="picker-selected-title">{{ pickerSelectedSheet()!.title }}</span>
+            @if (pickerSelectedSheet()!.composer?.name) {
+              <span class="picker-selected-meta">— {{ pickerSelectedSheet()!.composer!.name }}</span>
+            }
+          </div>
+
+          @if (pickerInstrsLoading()) {
+            <span class="picker-instrs-loading">
+              <i class="pi pi-spin pi-spinner"></i>
+            </span>
+          } @else if (pickerInstrOptions().length > 0) {
+            <p-floatlabel variant="on" class="picker-instr-field">
+              <p-select
+                inputId="picker-instr"
+                [(ngModel)]="pickerInstrModel"
+                [options]="pickerInstrOptions()"
+                optionLabel="label"
+                optionValue="value"
+                [showClear]="true"
+                styleClass="w-full"
+                (onChange)="onPickerInstrChange($event)"
+                (onClear)="onPickerInstrClear()"
+              />
+              <label for="picker-instr">
+                {{ 'uploads.picker.instrumentation' | translate }}
+              </label>
+            </p-floatlabel>
+          }
+
+          <p-floatlabel variant="on" class="picker-instr-field">
+            <p-select
+              inputId="picker-type"
+              [(ngModel)]="pickerTypeModel"
+              [options]="pickerTypeOptions()"
+              optionLabel="label"
+              optionValue="value"
+              [showClear]="true"
+              styleClass="w-full"
+            />
+            <label for="picker-type">{{ 'uploads.picker.type' | translate }}</label>
+          </p-floatlabel>
+        </div>
+      }
+
+      <!-- Search -->
+      <p-iconfield class="picker-search">
+        <p-inputicon styleClass="pi pi-search" />
+        <input
+          pInputText
+          type="text"
+          [placeholder]="t.t('uploads.picker.searchPlaceholder')"
+          [value]="pickerQuery"
+          (input)="onPickerSearchInput($event)"
+        />
+      </p-iconfield>
+
+      <!-- Results table -->
+      <p-table
+        [value]="pickerResults()"
+        [lazy]="true"
+        [paginator]="true"
+        [rows]="pickerRows"
+        [totalRecords]="pickerTotal()"
+        [loading]="pickerLoading()"
+        [rowsPerPageOptions]="[10, 25]"
+        [rowHover]="true"
+        styleClass="picker-results-table"
+        (onLazyLoad)="onPickerLazyLoad($event)"
+      >
+        <ng-template #header>
+          <tr>
+            <th>{{ 'sheets.columns.title' | translate }}</th>
+            <th class="col-composer">{{ 'sheets.columns.composer' | translate }}</th>
+            <th class="col-genre">{{ 'sheets.columns.genre' | translate }}</th>
+          </tr>
+        </ng-template>
+
+        <ng-template #body let-sheet>
+          <tr
+            class="picker-row"
+            [class.picker-row--selected]="isPickerSheetSelected(sheet)"
+            (click)="selectPickerSheet(sheet)"
+          >
+            <td>
+              <span class="picker-title">{{ sheet.title }}</span>
+              @if (sheet.subtitle) {
+                <span class="picker-subtitle">{{ sheet.subtitle }}</span>
+              }
+            </td>
+            <td>{{ sheet.composer?.name ?? '—' }}</td>
+            <td>
+              @if (sheet.genre) {
+                {{ 'sheets.genres.' + sheet.genre | translate }}
+              } @else {
+                —
+              }
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template #emptymessage>
+          <tr>
+            <td colspan="3" class="empty-message">
+              {{ 'uploads.picker.noResults' | translate }}
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+
+    </div>
+  }
+
+  <ng-template #footer>
+    <p-button
+      [label]="t.t('uploads.picker.cancel')"
+      severity="secondary"
+      [text]="true"
+      (onClick)="pickerVisible.set(false)"
+    />
+    <p-button
+      [label]="pickerContext === 'assign'
+        ? t.t('uploads.assign.confirm')
+        : t.t('uploads.target.confirm')"
+      [icon]="pickerContext === 'assign' ? 'pi pi-link' : 'pi pi-check'"
+      [disabled]="!pickerSelectedSheet()"
+      [loading]="assigning()"
+      (onClick)="confirmPicker()"
+    />
+  </ng-template>
+</p-dialog>
 
 <p-confirmdialog />

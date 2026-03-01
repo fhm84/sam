@@ -1,4 +1,4 @@
-import { Genre, Style } from '../model/datamodels';
+import { AttachmentType, Genre, Style } from '../model/datamodels';
 
 /** Page size used when fetching all items for dropdown/select lists. */
 export const FETCH_ALL_SIZE = 1000;
@@ -17,3 +17,14 @@ export const STYLES = [
   'POP', 'ROCK', 'FUNK', 'SWING', 'LATIN',
   'TRADITIONAL', 'FOLKLORISTIC', 'EXPERIMENTAL',
 ] as const satisfies readonly Style[];
+
+/**
+ * Selectable attachment types for file uploads.
+ * EXTERNAL_LINK is omitted (URL-based, not a file upload).
+ * UNSPECIFIED is last so it reads as a fallback choice.
+ */
+export const ATTACHMENT_TYPES = [
+  'FULL_SCORE', 'PART', 'COVER', 'LYRICS',
+  'MIDI', 'AUDIO', 'ANNOTATIONS', 'IMAGE',
+  'ANALYSIS', 'TRANSCRIPTION', 'MUSIC_XML', 'OTHER', 'UNSPECIFIED',
+] as const satisfies readonly AttachmentType[];

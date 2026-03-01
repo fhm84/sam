@@ -152,6 +152,11 @@ public class DocumentsResourceImpl implements DocumentsResource {
     }
 
     @Override
+    public void linkDocument(String docIdentifier, DocumentLinkRequest documentLink) {
+        documentsService.linkDocument(docIdentifier, documentLink);
+    }
+
+    @Override
     public void delete(String docIdentifier) {
         if (sheetId == null && instrumentationId != null) {
             documentsService.deleteIfUnlinked(UUID.fromString(docIdentifier));

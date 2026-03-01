@@ -24,6 +24,10 @@ public interface DocumentsResource {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     DocumentUpload uploadDocument(@BeanParam FileUploadRequest request);
 
+    @POST
+    @Path("{docIdentifier}/link")
+    void linkDocument(@PathParam("docIdentifier") String docIdentifier, DocumentLinkRequest documentLink);
+
     @DELETE
     @Path("{docIdentifier}")
     void delete(@PathParam("docIdentifier") String docIdentifier);

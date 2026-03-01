@@ -309,7 +309,47 @@
   },
   "uploads": {
     "title": "Uploads",
-    "subtitle": "Dokumente, die noch keinem Notenblatt zugeordnet sind – hier hochladen und später verknüpfen.",
+    "subtitle": "Staging-Bereich für Dokumente – Dateien hochladen und Notenblättern oder Instrumentierungen zuordnen.",
+    "target": {
+      "label": "Hochladen nach:",
+      "select": "Notenblatt auswählen…",
+      "change": "Ändern",
+      "clear": "Zurücksetzen",
+      "unlinked": "Nicht verknüpft",
+      "pickerTitle": "Upload-Ziel auswählen",
+      "confirm": "Als Ziel setzen"
+    },
+    "assign": {
+      "title": "Dokument zuordnen",
+      "action": "Notenblatt zuordnen",
+      "confirm": "Zuordnen"
+    },
+    "picker": {
+      "searchPlaceholder": "Notenblätter suchen…",
+      "noResults": "Keine Notenblätter gefunden",
+      "instrumentation": "Instrumentierung (optional)",
+      "type": "Dokumenttyp (optional)",
+      "cancel": "Abbrechen"
+    },
+    "attachmentTypes": {
+      "FULL_SCORE": "Partitur",
+      "PART": "Stimme",
+      "COVER": "Titelblatt",
+      "LYRICS": "Liedtext",
+      "MIDI": "MIDI",
+      "AUDIO": "Audio",
+      "ANNOTATIONS": "Anmerkungen",
+      "IMAGE": "Bild",
+      "ANALYSIS": "Analyse",
+      "TRANSCRIPTION": "Transkription",
+      "MUSIC_XML": "MusicXML",
+      "OTHER": "Sonstiges",
+      "UNSPECIFIED": "Nicht angegeben"
+    },
+    "table": {
+      "title": "Nicht verknüpfte Dokumente"
+    },
+    "download": "Herunterladen",
     "upload": "Hochladen",
     "dragDrop": "Dateien hierher ziehen oder auf Durchsuchen klicken",
     "browse": "Durchsuchen",
@@ -326,6 +366,7 @@
     },
     "messages": {
       "uploaded": "Datei erfolgreich hochgeladen",
+      "assigned": "Dokument erfolgreich zugeordnet",
       "deleted": "Dokument erfolgreich gelöscht",
       "error": "Ein Fehler ist aufgetreten",
       "downloadError": "Dokument konnte nicht heruntergeladen werden"
