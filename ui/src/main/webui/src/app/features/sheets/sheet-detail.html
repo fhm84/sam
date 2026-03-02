@@ -237,22 +237,55 @@
               />
             </div>
             <p-table
+              #dtCompact
               [value]="instrumentations()"
               [loading]="instrumentationsLoading()"
+              dataKey="id"
+              [expandedRowKeys]="expandedRows"
             >
               <ng-template #header>
                 <tr>
+                  <th class="expand-col"></th>
                   <th>{{ 'sheets.instrumentations.columns.instrument' | translate }}</th>
                   <th>{{ 'sheets.instrumentations.columns.partLabel' | translate }}</th>
                   <th>{{ 'sheets.instrumentations.columns.clef' | translate }}</th>
+                  <th class="docs-col">{{ 'sheets.instrumentations.columns.documents' | translate }}</th>
                   <th>{{ 'sheets.instrumentations.columns.actions' | translate }}</th>
                 </tr>
               </ng-template>
-              <ng-template #body let-instr>
+              <ng-template #body let-instr let-expanded="expanded">
                 <tr>
+                  <td class="expand-col">
+                    <p-button
+                      [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+                      [rounded]="true"
+                      [text]="true"
+                      size="small"
+                      (onClick)="dtCompact.toggleRow(instr, $event)"
+                    />
+                  </td>
                   <td>{{ instr.instrument?.name }}</td>
                   <td>{{ instr.partLabel }}</td>
                   <td>{{ instr.clef }}</td>
+                  <td class="docs-col">
+                    <div class="doc-badges">
+                      @for (badge of instrDocBadges(instr.id!); track badge.type) {
+                        <span
+                          class="doc-badge"
+                          [pTooltip]="'uploads.attachmentTypes.' + badge.type | translate"
+                          tooltipPosition="top"
+                        >
+                          <i [class]="badge.icon"></i>
+                          @if (badge.count > 1) {
+                            <span class="doc-badge-count">{{ badge.count }}</span>
+                          }
+                        </span>
+                      }
+                      @if (instrDocBadges(instr.id!).length === 0 && instrDocCount(instr.id!) === 0 && !expandedRows[instr.id!]) {
+                        <span class="doc-badge-empty">—</span>
+                      }
+                    </div>
+                  </td>
                   <td class="actions-cell">
                     <p-button
                       icon="pi pi-pencil"
@@ -272,12 +305,79 @@
                   </td>
                 </tr>
               </ng-template>
+              <ng-template #expandedrow let-instr>
+                <tr class="expansion-row">
+                  <td colspan="6" class="expansion-cell">
+                    <app-instrumentation-documents
+                      [sheetId]="sheetId"
+                      [instrumentation]="instr"
+                      [selectedIds]="getSelectedIdsForInstr(instr.id!)"
+                      (docsLoaded)="onDocsLoaded($event)"
+                      (docToggle)="onToggleDoc($event)"
+                    />
+                  </td>
+                </tr>
+              </ng-template>
               <ng-template #emptymessage>
                 <tr>
-                  <td colspan="4" class="empty-message">{{ 'sheets.instrumentations.empty' | translate }}</td>
+                  <td colspan="6" class="empty-message">{{ 'sheets.instrumentations.empty' | translate }}</td>
                 </tr>
               </ng-template>
             </p-table>
+
+            <!-- Batch toolbar -->
+            @if (availableTypes().length > 0 || allSelectedDocs().length > 0) {
+              <div class="batch-toolbar">
+                @if (availableTypes().length > 0) {
+                  <div class="batch-quick-select">
+                    <span class="batch-label">{{ 'sheets.instrumentations.batch.selectAll' | translate }}:</span>
+                    @for (type of availableTypes(); track type) {
+                      <p-button
+                        size="small"
+                        [outlined]="true"
+                        [pTooltip]="'uploads.attachmentTypes.' + type | translate"
+                        tooltipPosition="top"
+                        (onClick)="selectAllByType(type)"
+                      >
+                        <i [class]="attachmentTypeIcon(type)"></i>
+                        <span>{{ 'uploads.attachmentTypes.' + type | translate }}</span>
+                      </p-button>
+                    }
+                  </div>
+                }
+                @if (allSelectedDocs().length > 0) {
+                  <div class="batch-actions">
+                    <span class="batch-count">
+                      {{ allSelectedDocs().length }}&nbsp;{{ 'sheets.instrumentations.batch.documentsSelected' | translate }}
+                    </span>
+                    <p-button
+                      icon="pi pi-download"
+                      [label]="t.t('sheets.instrumentations.batch.downloadAll')"
+                      size="small"
+                      (onClick)="downloadSelected()"
+                    />
+                    @if (allSelectedArePdf()) {
+                      <p-button
+                        icon="pi pi-file-pdf"
+                        [label]="t.t('sheets.instrumentations.batch.mergePdf')"
+                        size="small"
+                        [outlined]="true"
+                        (onClick)="mergePdfSelected()"
+                      />
+                    }
+                    <p-button
+                      icon="pi pi-times"
+                      [rounded]="true"
+                      [text]="true"
+                      size="small"
+                      [pTooltip]="t.t('sheets.instrumentations.batch.clearSelection')"
+                      tooltipPosition="top"
+                      (onClick)="clearSelection()"
+                    />
+                  </div>
+                }
+              </div>
+            }
           </div>
         </p-tabpanel>
 
@@ -422,22 +522,55 @@
           />
         </ng-template>
         <p-table
+          #dtFull
           [value]="instrumentations()"
           [loading]="instrumentationsLoading()"
+          dataKey="id"
+          [expandedRowKeys]="expandedRows"
         >
           <ng-template #header>
             <tr>
+              <th class="expand-col"></th>
               <th>{{ 'sheets.instrumentations.columns.instrument' | translate }}</th>
               <th>{{ 'sheets.instrumentations.columns.partLabel' | translate }}</th>
               <th>{{ 'sheets.instrumentations.columns.clef' | translate }}</th>
+              <th class="docs-col">{{ 'sheets.instrumentations.columns.documents' | translate }}</th>
               <th>{{ 'sheets.instrumentations.columns.actions' | translate }}</th>
             </tr>
           </ng-template>
-          <ng-template #body let-instr>
+          <ng-template #body let-instr let-expanded="expanded">
             <tr>
+              <td class="expand-col">
+                <p-button
+                  [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+                  [rounded]="true"
+                  [text]="true"
+                  size="small"
+                  (onClick)="dtFull.toggleRow(instr, $event)"
+                />
+              </td>
               <td>{{ instr.instrument?.name }}</td>
               <td>{{ instr.partLabel }}</td>
               <td>{{ instr.clef }}</td>
+              <td class="docs-col">
+                <div class="doc-badges">
+                  @for (badge of instrDocBadges(instr.id!); track badge.type) {
+                    <span
+                      class="doc-badge"
+                      [pTooltip]="'uploads.attachmentTypes.' + badge.type | translate"
+                      tooltipPosition="top"
+                    >
+                      <i [class]="badge.icon"></i>
+                      @if (badge.count > 1) {
+                        <span class="doc-badge-count">{{ badge.count }}</span>
+                      }
+                    </span>
+                  }
+                  @if (instrDocBadges(instr.id!).length === 0 && !expandedRows[instr.id!]) {
+                    <span class="doc-badge-empty">—</span>
+                  }
+                </div>
+              </td>
               <td class="actions-cell">
                 <p-button
                   icon="pi pi-pencil"
@@ -457,12 +590,79 @@
               </td>
             </tr>
           </ng-template>
+          <ng-template #expandedrow let-instr>
+            <tr class="expansion-row">
+              <td colspan="6" class="expansion-cell">
+                <app-instrumentation-documents
+                  [sheetId]="sheetId"
+                  [instrumentation]="instr"
+                  [selectedIds]="getSelectedIdsForInstr(instr.id!)"
+                  (docsLoaded)="onDocsLoaded($event)"
+                  (docToggle)="onToggleDoc($event)"
+                />
+              </td>
+            </tr>
+          </ng-template>
           <ng-template #emptymessage>
             <tr>
-              <td colspan="4" class="empty-message">{{ 'sheets.instrumentations.empty' | translate }}</td>
+              <td colspan="6" class="empty-message">{{ 'sheets.instrumentations.empty' | translate }}</td>
             </tr>
           </ng-template>
         </p-table>
+
+        <!-- Batch toolbar -->
+        @if (availableTypes().length > 0 || allSelectedDocs().length > 0) {
+          <div class="batch-toolbar">
+            @if (availableTypes().length > 0) {
+              <div class="batch-quick-select">
+                <span class="batch-label">{{ 'sheets.instrumentations.batch.selectAll' | translate }}:</span>
+                @for (type of availableTypes(); track type) {
+                  <p-button
+                    size="small"
+                    [outlined]="true"
+                    [pTooltip]="'uploads.attachmentTypes.' + type | translate"
+                    tooltipPosition="top"
+                    (onClick)="selectAllByType(type)"
+                  >
+                    <i [class]="attachmentTypeIcon(type)"></i>
+                    <span>{{ 'uploads.attachmentTypes.' + type | translate }}</span>
+                  </p-button>
+                }
+              </div>
+            }
+            @if (allSelectedDocs().length > 0) {
+              <div class="batch-actions">
+                <span class="batch-count">
+                  {{ allSelectedDocs().length }}&nbsp;{{ 'sheets.instrumentations.batch.documentsSelected' | translate }}
+                </span>
+                <p-button
+                  icon="pi pi-download"
+                  [label]="t.t('sheets.instrumentations.batch.downloadAll')"
+                  size="small"
+                  (onClick)="downloadSelected()"
+                />
+                @if (allSelectedArePdf()) {
+                  <p-button
+                    icon="pi pi-file-pdf"
+                    [label]="t.t('sheets.instrumentations.batch.mergePdf')"
+                    size="small"
+                    [outlined]="true"
+                    (onClick)="mergePdfSelected()"
+                  />
+                }
+                <p-button
+                  icon="pi pi-times"
+                  [rounded]="true"
+                  [text]="true"
+                  size="small"
+                  [pTooltip]="t.t('sheets.instrumentations.batch.clearSelection')"
+                  tooltipPosition="top"
+                  (onClick)="clearSelection()"
+                />
+              </div>
+            }
+          </div>
+        }
       </p-panel>
 
       <!-- Notes -->

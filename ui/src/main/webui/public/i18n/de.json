@@ -149,6 +149,7 @@
         "instrument": "Instrument",
         "partLabel": "Stimmenbezeichnung",
         "clef": "Notenschlüssel",
+        "documents": "Anhänge",
         "actions": "Aktionen"
       },
       "form": {
@@ -175,7 +176,17 @@
       },
       "empty": "Noch keine Instrumentierungen definiert",
       "save": "Speichern",
-      "cancel": "Abbrechen"
+      "cancel": "Abbrechen",
+      "documents": {
+        "empty": "Noch keine Anhänge vorhanden"
+      },
+      "batch": {
+        "selectAll": "Alle auswählen",
+        "documentsSelected": "Dokumente ausgewählt",
+        "downloadAll": "Auswahl herunterladen",
+        "mergePdf": "PDF zusammenführen",
+        "clearSelection": "Auswahl aufheben"
+      }
     },
     "genres": {
       "MARCH": "Marsch",
@@ -350,6 +361,7 @@
       "IMAGE": "Bild",
       "ANALYSIS": "Analyse",
       "TRANSCRIPTION": "Transkription",
+      "EXTERNAL_LINK": "Externer Link",
       "MUSIC_XML": "MusicXML",
       "OTHER": "Sonstiges",
       "UNSPECIFIED": "Nicht angegeben"

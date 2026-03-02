@@ -6,6 +6,7 @@ import {
   AttachmentType,
   DocumentDownload,
   DocumentFilterRequest,
+  DownloadFormat,
   PaginatedResponse,
 } from '../../model/datamodels';
 
@@ -83,6 +84,34 @@ export class DocumentsApiService {
     if (instrumentationId) body['instrumentationId'] = instrumentationId;
     if (type) body['type'] = type;
     return this.http.post<void>(`${this.forTopLevel()}/${documentId}/link`, body);
+  }
+
+  downloadBatch(
+    basePath: string,
+    type?: AttachmentType,
+    includeInstrumentations = false,
+    format: DownloadFormat = 'ZIP',
+  ): Observable<HttpResponse<Blob>> {
+    let params = new HttpParams();
+    if (type) params = params.set('type', type);
+    if (includeInstrumentations) params = params.set('includeInstrumentations', 'true');
+    if (format !== 'ZIP') params = params.set('format', format);
+    return this.http.get(`${basePath}/batch`, {
+      observe: 'response',
+      responseType: 'blob',
+      params,
+    });
+  }
+
+  downloadBatchByIds(
+    ids: string[],
+    format: DownloadFormat = 'ZIP',
+    baseName?: string,
+  ): Observable<HttpResponse<Blob>> {
+    return this.http.post(`${this.forTopLevel()}/batch`, { ids, format, baseName }, {
+      observe: 'response',
+      responseType: 'blob',
+    });
   }
 
   delete(basePath: string, docIdentifier: string): Observable<void> {

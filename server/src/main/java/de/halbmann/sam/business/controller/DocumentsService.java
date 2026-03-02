@@ -18,6 +18,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.core.StreamingOutput;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -25,11 +26,13 @@ import java.nio.file.Path;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.HexFormat;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.multipdf.PDFMergerUtility;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.tika.Tika;
 
 @Slf4j
@@ -283,13 +286,15 @@ public class DocumentsService {
                 .findByIdOptional(UUID.fromString(attachmentId))
                 .orElseThrow(() -> new EntityNotFoundException("Attachment", UUID.fromString(attachmentId)));
 
+        instrumentationRepository.removeAttachment(attachment);
+        sheetRepository.removeAttachment(attachment);
+
         DocumentEntity document = attachment.getDocument();
         attachmentRepository.delete(attachment);
 
-        // FIXME: here we also have to remove the AttachmentEntity from Instrumentation/Sheet, if linked!!!
-
         if (document != null) {
             documentRepository.decrementRefCount(document);
+            deleteIfUnlinked(document);
         }
     }
 
@@ -311,6 +316,147 @@ public class DocumentsService {
         }
     }
 
+    void deleteIfUnlinked(DocumentEntity doc) {
+        if (doc.getRefCount() > 0) {
+            return;
+        }
+
+        try {
+            filesystem.delete(doc.getPath());
+        } catch (IOException e) {
+            throw new StorageException("Failed to delete physical file", e);
+        }
+
+        documentRepository.delete(doc);
+    }
+
+    // ── Batch download helpers ────────────────────────────────────────────────
+
+    /**
+     * Load all attachment entities for a sheet, optionally filtered by type.
+     */
+    public List<AttachmentEntity> loadAttachmentEntitiesBySheet(String sheetId, AttachmentType type) {
+        SheetMusicEntity sheet = sheetRepository.findById(UUID.fromString(sheetId));
+        if (sheet == null) return List.of();
+        return sheet.getAttachments().stream()
+                .filter(a -> type == null || type == a.getType())
+                .toList();
+    }
+
+    /**
+     * Load all attachment entities for a single instrumentation, optionally filtered by type.
+     */
+    public List<AttachmentEntity> loadAttachmentEntitiesByInstrumentation(
+            String instrumentationId, AttachmentType type) {
+        InstrumentationEntity instr = instrumentationRepository.findById(UUID.fromString(instrumentationId));
+        if (instr == null) return List.of();
+        return instr.getAttachments().stream()
+                .filter(a -> type == null || type == a.getType())
+                .toList();
+    }
+
+    /**
+     * Load attachment entities from ALL instrumentations of a sheet, optionally filtered by type.
+     * Results are sorted by instrument name then partLabel for natural ordering.
+     */
+    public List<AttachmentEntity> loadAttachmentEntitiesBySheetInstrumentations(String sheetId, AttachmentType type) {
+        SheetMusicEntity sheet = sheetRepository.findById(UUID.fromString(sheetId));
+        if (sheet == null) return List.of();
+        return sheet.getInstrumentations().stream()
+                .sorted(Comparator.comparing(
+                                (InstrumentationEntity i) -> i.getInstrument().getName())
+                        .thenComparing(
+                                i -> Optional.ofNullable(i.getPartLabel()).orElse("")))
+                .flatMap(i -> i.getAttachments().stream())
+                .filter(a -> type == null || type == a.getType())
+                .toList();
+    }
+
+    /**
+     * Load attachment entities by explicit IDs.
+     */
+    public List<AttachmentEntity> loadAttachmentEntitiesByIds(List<UUID> ids) {
+        if (ids == null || ids.isEmpty()) return List.of();
+        return ids.stream()
+                .map(id -> attachmentRepository.findByIdOptional(id).orElse(null))
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    /**
+     * Build a streaming ZIP archive from a list of attachments.
+     * EXTERNAL_LINK attachments (no physical file) are silently skipped.
+     * Duplicate filenames are disambiguated with a counter suffix.
+     */
+    public StreamingOutput buildZip(List<AttachmentEntity> attachments, String zipFilename) {
+        return outputStream -> {
+            try (ZipOutputStream zip = new ZipOutputStream(outputStream)) {
+                Set<String> usedNames = new LinkedHashSet<>();
+                for (AttachmentEntity att : attachments) {
+                    if (att.getDocument() == null) continue;
+                    String entryName = uniqueZipName(att.getDisplayName(), usedNames);
+                    zip.putNextEntry(new ZipEntry(entryName));
+                    try (InputStream in =
+                            filesystem.openForRead(att.getDocument().getPath())) {
+                        in.transferTo(zip);
+                    }
+                    zip.closeEntry();
+                }
+            }
+        };
+    }
+
+    /**
+     * Build a streaming merged PDF from a list of attachments.
+     * Only attachments with mimeType {@code application/pdf} are included; others are skipped.
+     * Returns {@code null} if no PDF attachments are present.
+     */
+    public StreamingOutput buildMergedPdf(List<AttachmentEntity> attachments) {
+        List<AttachmentEntity> pdfAtts = attachments.stream()
+                .filter(a -> a.getDocument() != null)
+                .filter(a -> "application/pdf".equals(a.getDocument().getMimeType()))
+                .toList();
+        if (pdfAtts.isEmpty()) {
+            return null;
+        }
+
+        return outputStream -> {
+            PDFMergerUtility merger = new PDFMergerUtility();
+            List<PDDocument> sources = new ArrayList<>();
+            try (PDDocument target = new PDDocument()) {
+                for (AttachmentEntity att : pdfAtts) {
+                    try (InputStream in =
+                            filesystem.openForRead(att.getDocument().getPath())) {
+                        PDDocument src = Loader.loadPDF(in.readAllBytes());
+                        sources.add(src);
+                        merger.appendDocument(target, src);
+                    }
+                }
+                target.save(outputStream);
+            } finally {
+                for (PDDocument src : sources) {
+                    try {
+                        src.close();
+                    } catch (IOException ignored) {
+                    }
+                }
+            }
+        };
+    }
+
+    private String uniqueZipName(String displayName, Set<String> used) {
+        String base = displayName != null && !displayName.isBlank() ? displayName : "document";
+        String candidate = base;
+        int i = 1;
+        while (used.contains(candidate)) {
+            int dot = base.lastIndexOf('.');
+            candidate = dot > 0 ? base.substring(0, dot) + " (" + i + ")" + base.substring(dot) : base + " (" + i + ")";
+            i++;
+        }
+        used.add(candidate);
+        return candidate;
+    }
+
     @Transactional
     public void deleteIfUnlinked(UUID documentId) {
         DocumentEntity doc = documentRepository
@@ -330,9 +476,9 @@ public class DocumentsService {
         documentRepository.delete(doc);
     }
 
-    public void linkDocument(String docIdentifier, DocumentLinkRequest documentLink) {
+    public Attachment linkDocument(UUID docIdentifier, DocumentLinkRequest documentLink) {
         DocumentEntity document = documentRepository
-                .findByIdOptional(UUID.fromString(docIdentifier))
+                .findByIdOptional(docIdentifier)
                 .orElseThrow(() -> new EntityNotFoundException("Document", docIdentifier));
 
         AttachmentEntity attachment = new AttachmentEntity();
@@ -345,21 +491,24 @@ public class DocumentsService {
             documentRepository.incrementRefCount(document);
         }
 
-        if (documentLink.getSheetId() != null) {
-            SheetMusicEntity sheet = sheetRepository
-                    .findByIdOptional(documentLink.getSheetId())
-                    .orElseThrow(() -> new EntityNotFoundException("Sheet", documentLink.getSheetId()));
-            sheet.getAttachments().add(attachment);
-            sheetRepository.persist(sheet);
-        }
+        // link the document ...
         if (documentLink.getInstrumentationId() != null) {
+            // ... to either instrumentation ...
             InstrumentationEntity instrumentation = instrumentationRepository
                     .findByIdOptional(documentLink.getInstrumentationId())
                     .orElseThrow(
                             () -> new EntityNotFoundException("Instrumentation", documentLink.getInstrumentationId()));
             instrumentation.getAttachments().add(attachment);
             instrumentationRepository.persist(instrumentation);
+        } else if (documentLink.getSheetId() != null) {
+            // ... or sheetMusic
+            SheetMusicEntity sheet = sheetRepository
+                    .findByIdOptional(documentLink.getSheetId())
+                    .orElseThrow(() -> new EntityNotFoundException("Sheet", documentLink.getSheetId()));
+            sheet.getAttachments().add(attachment);
+            sheetRepository.persist(sheet);
         }
         attachmentRepository.persistAndFlush(attachment);
+        return attachmentMapper.toDto(attachment);
     }
 }

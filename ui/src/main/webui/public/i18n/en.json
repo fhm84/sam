@@ -149,6 +149,7 @@
         "instrument": "Instrument",
         "partLabel": "Part Label",
         "clef": "Clef",
+        "documents": "Attachments",
         "actions": "Actions"
       },
       "form": {
@@ -175,7 +176,17 @@
       },
       "empty": "No instrumentations defined yet",
       "save": "Save",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "documents": {
+        "empty": "No attachments yet"
+      },
+      "batch": {
+        "selectAll": "Select all",
+        "documentsSelected": "documents selected",
+        "downloadAll": "Download selected",
+        "mergePdf": "Merge PDF",
+        "clearSelection": "Clear selection"
+      }
     },
     "genres": {
       "MARCH": "March",
@@ -350,6 +361,7 @@
       "IMAGE": "Image",
       "ANALYSIS": "Analysis",
       "TRANSCRIPTION": "Transcription",
+      "EXTERNAL_LINK": "External Link",
       "MUSIC_XML": "MusicXML",
       "OTHER": "Other",
       "UNSPECIFIED": "Unspecified"

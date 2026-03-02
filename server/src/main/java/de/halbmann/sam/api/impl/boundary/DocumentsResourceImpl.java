@@ -3,6 +3,7 @@ package de.halbmann.sam.api.impl.boundary;
 import de.halbmann.sam.api.boundary.DocumentsResource;
 import de.halbmann.sam.api.entity.*;
 import de.halbmann.sam.business.controller.DocumentsService;
+import de.halbmann.sam.business.entity.AttachmentEntity;
 import de.halbmann.sam.business.entity.DocumentEntity;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
@@ -16,10 +17,8 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.event.Level;
 
@@ -67,6 +66,78 @@ public class DocumentsResourceImpl implements DocumentsResource {
         response.setSize(response.getData().size());
         response.setTotalCount(response.getData().size());
         return response;
+    }
+
+    @Override
+    public Response downloadBatch(AttachmentType type, boolean includeInstrumentations, DownloadFormat format) {
+        List<AttachmentEntity> attachments;
+        String zipName;
+
+        if (instrumentationId != null) {
+            attachments = documentsService.loadAttachmentEntitiesByInstrumentation(instrumentationId, type);
+            zipName = "instrumentation-" + instrumentationId;
+        } else if (sheetId != null) {
+            List<AttachmentEntity> sheetAtts = documentsService.loadAttachmentEntitiesBySheet(sheetId, type);
+            if (includeInstrumentations) {
+                List<AttachmentEntity> instrAtts =
+                        documentsService.loadAttachmentEntitiesBySheetInstrumentations(sheetId, type);
+                attachments =
+                        Stream.concat(sheetAtts.stream(), instrAtts.stream()).toList();
+            } else {
+                attachments = sheetAtts;
+            }
+            zipName = "sheet-" + sheetId + (type != null ? "-" + type.name().toLowerCase() : "");
+        } else {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
+        if (attachments.isEmpty()) {
+            return Response.noContent().build();
+        }
+
+        return buildResponse(attachments, format, zipName);
+    }
+
+    @Override
+    public Response downloadBatchByIds(BatchDownloadRequest request) {
+        if (request == null || request.getIds() == null || request.getIds().isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
+        List<AttachmentEntity> attachments = documentsService.loadAttachmentEntitiesByIds(request.getIds());
+        if (attachments.isEmpty()) {
+            return Response.noContent().build();
+        }
+
+        String baseName =
+                request.getBaseName() != null && !request.getBaseName().isBlank() ? request.getBaseName() : "documents";
+        return buildResponse(attachments, request.getFormat(), baseName);
+    }
+
+    private Response buildResponse(List<AttachmentEntity> attachments, DownloadFormat format, String baseName) {
+        if (format == DownloadFormat.MERGED_PDF) {
+            StreamingOutput pdf = documentsService.buildMergedPdf(attachments);
+            if (pdf != null) {
+                String filename = URLEncoder.encode(baseName + ".pdf", StandardCharsets.UTF_8)
+                        .replace("+", "%20");
+                return Response.ok(pdf)
+                        .type("application/pdf")
+                        .header("Content-Disposition", "attachment; filename*=utf-8''" + filename)
+                        .header("Cache-Control", "no-store")
+                        .build();
+            }
+            // Fall through to ZIP if no PDFs found
+            log.info("No PDF attachments found for merged-pdf request — falling back to ZIP");
+        }
+
+        StreamingOutput zip = documentsService.buildZip(attachments, baseName);
+        String filename =
+                URLEncoder.encode(baseName + ".zip", StandardCharsets.UTF_8).replace("+", "%20");
+        return Response.ok(zip)
+                .type("application/zip")
+                .header("Content-Disposition", "attachment; filename*=utf-8''" + filename)
+                .header("Cache-Control", "no-store")
+                .build();
     }
 
     @Override
@@ -121,28 +192,22 @@ public class DocumentsResourceImpl implements DocumentsResource {
 
         try (InputStream inputStream = Files.newInputStream(request.getFile().uploadedFile())) {
             DocumentUpload upload = documentsService.save(request.getFile().fileName(), inputStream, request.getType());
-            Attachment attachment = upload.attachment();
 
-            if (attachment != null) {
-                // Link to sheet or instrumentation if uploaded via sub-resource path
-                if (sheetId != null) {
-                    documentsService.linkAttachmentToSheet(attachment.getId().toString(), sheetId);
-                }
-                if (instrumentationId != null) {
-                    documentsService.linkAttachmentToInstrumentation(
-                            attachment.getId().toString(), instrumentationId);
-                }
+            if (request.getType() != null) {
+                DocumentLinkRequest documentLinkRequest = new DocumentLinkRequest();
+                Attachment attachment =
+                        documentsService.linkDocument(upload.document().id(), documentLinkRequest);
 
                 log.atLevel(Level.INFO)
                         .log(() -> "File uploaded - filename: "
                                 + request.getFile().fileName() + " (" + attachment.getId() + ")");
+                return new DocumentUpload(upload.document(), attachment);
             } else {
                 log.atLevel(Level.INFO)
                         .log(() ->
                                 "File uploaded - filename: " + request.getFile().fileName());
+                return upload;
             }
-
-            return upload;
         } catch (IOException | NoSuchAlgorithmException e) {
             log.atWarn()
                     .setCause(e)
@@ -153,7 +218,7 @@ public class DocumentsResourceImpl implements DocumentsResource {
 
     @Override
     public void linkDocument(String docIdentifier, DocumentLinkRequest documentLink) {
-        documentsService.linkDocument(docIdentifier, documentLink);
+        documentsService.linkDocument(UUID.fromString(docIdentifier), documentLink);
     }
 
     @Override

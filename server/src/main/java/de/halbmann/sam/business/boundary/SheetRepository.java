@@ -3,10 +3,12 @@ package de.halbmann.sam.business.boundary;
 import de.halbmann.sam.api.entity.Genre;
 import de.halbmann.sam.api.entity.PaginationRequest;
 import de.halbmann.sam.api.entity.SortOrder;
+import de.halbmann.sam.business.entity.AttachmentEntity;
 import de.halbmann.sam.business.entity.PaginatedEntities;
 import de.halbmann.sam.business.entity.SheetMusicEntity;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
+import io.quarkus.panache.common.Parameters;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
@@ -129,5 +131,13 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
             }
         }
         return Sort.ascending("title");
+    }
+
+    public void removeAttachment(AttachmentEntity attachment) {
+        find(
+                        "SELECT s FROM SheetMusicEntity s JOIN s.attachments a WHERE a.id = :id",
+                        Parameters.with("id", attachment.getId()))
+                .list()
+                .forEach(s -> s.getAttachments().remove(attachment));
     }
 }

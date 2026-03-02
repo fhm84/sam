@@ -21,12 +21,6 @@ public class DocumentRepository implements PanacheRepositoryBase<DocumentEntity,
 
     public void decrementRefCount(DocumentEntity document) {
         document.setRefCount(document.getRefCount() - 1);
-        if (document.getRefCount() <= 0) {
-            delete(document); // deletes from DB
-            // TODO: delete physical file from FileSystemWrapper
-        } else {
-            persist(document);
-        }
     }
 
     public List<DocumentEntity> findUnlinked() {

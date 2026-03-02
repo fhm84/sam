@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 3.2.1263 on 2026-03-01 22:09:25.
+// Generated using typescript-generator version 3.2.1263 on 2026-03-02 23:24:20.
 
 export interface Attachment {
     checksum?: string;
@@ -10,6 +10,11 @@ export interface Attachment {
     mimeType?: string;
     type?: AttachmentType;
     uploadedAt?: Date;
+}
+
+export interface BatchDownloadRequest {
+    format?: DownloadFormat;
+    ids?: string[];
 }
 
 export interface Booklet {
@@ -315,6 +320,8 @@ export type Clef = "TREBLE" | "ALTO" | "TENOR" | "BASS";
 export type CollectionType = "FOLDER" | "SETLIST";
 
 export type CoverageStatus = "COMPLETE" | "PLAYABLE" | "INCOMPLETE";
+
+export type DownloadFormat = "ZIP" | "MERGED_PDF";
 
 export type Genre = "MARCH" | "MARCHING_SHOW" | "CONCERT_WORK" | "OVERTURE" | "SUITE" | "SYMPHONY" | "FANTASY" | "VARIATIONS" | "DANCE" | "WALTZ" | "POLKA" | "FOLK_SONG" | "HYMN_CHORALE" | "FILM_MUSIC" | "SHOW_MUSIC" | "POP_ROCK" | "JAZZ" | "LATIN" | "CHRISTMAS" | "SACRED" | "SOLO_WITH_BAND";
 

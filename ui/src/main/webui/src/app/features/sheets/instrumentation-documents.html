@@ -1,0 +1,61 @@
+@if (documentsLoading()) {
+  <div class="loading-indicator small">
+    <i class="pi pi-spinner pi-spin"></i>
+  </div>
+} @else {
+  @if (documents().length === 0) {
+    <span class="instr-docs-empty">{{ 'sheets.instrumentations.documents.empty' | translate }}</span>
+  } @else {
+    <div class="instr-doc-list">
+      @for (doc of documents(); track doc.id) {
+        <div class="instr-doc-row" [class.is-selected]="isSelected(doc)">
+          <p-checkbox
+            [binary]="true"
+            [ngModel]="isSelected(doc)"
+            (onChange)="toggleDoc(doc)"
+          />
+          <span class="instr-doc-name" [pTooltip]="doc.displayName" tooltipPosition="top">
+            {{ doc.displayName }}
+          </span>
+          @if (doc.type) {
+            <span class="instr-doc-type-label">{{ 'uploads.attachmentTypes.' + doc.type | translate }}</span>
+          }
+          <span class="instr-doc-size">{{ formatSize(doc.fileSize) }}</span>
+          <div class="instr-doc-actions">
+            <p-button
+              icon="pi pi-download"
+              [rounded]="true"
+              [text]="true"
+              size="small"
+              [pTooltip]="'uploads.download' | translate"
+              tooltipPosition="top"
+              (onClick)="downloadAttachment(doc)"
+            />
+            <p-button
+              icon="pi pi-trash"
+              [rounded]="true"
+              [text]="true"
+              size="small"
+              severity="danger"
+              (onClick)="confirmDeleteDocument(doc)"
+            />
+          </div>
+        </div>
+      }
+    </div>
+  }
+  <div class="instr-docs-upload">
+    <input #fileInput type="file" hidden (change)="uploadFile($event)" />
+    <div
+      class="instr-drop-zone"
+      [class.drop-zone-active]="dragging()"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave($event)"
+      (drop)="onDrop($event)"
+      (click)="fileInput.click()"
+    >
+      <i class="pi pi-upload"></i>
+      <span>{{ 'sheets.detail.dropFiles' | translate }}</span>
+    </div>
+  </div>
+}

@@ -1,0 +1,98 @@
+:host {
+  display: block;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  background: var(--p-surface-50);
+  border-top: 1px solid var(--p-surface-200);
+}
+
+.instr-docs-empty {
+  display: block;
+  color: var(--sam-text-muted);
+  font-size: 0.875rem;
+  margin-bottom: 0.75rem;
+}
+
+.instr-doc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.instr-doc-row {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.375rem 0.5rem;
+  border-radius: var(--p-border-radius-md, 6px);
+  transition: background 0.15s;
+
+  &:hover {
+    background: var(--p-surface-100);
+  }
+
+  &.is-selected {
+    background: var(--p-primary-50);
+  }
+}
+
+.instr-doc-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.875rem;
+  color: var(--sam-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.instr-doc-type-label {
+  font-size: 0.75rem;
+  color: var(--sam-text-muted);
+  background: var(--p-surface-200);
+  border-radius: 4px;
+  padding: 0.1rem 0.4rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.instr-doc-size {
+  font-size: 0.75rem;
+  color: var(--sam-text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.instr-doc-actions {
+  display: flex;
+  gap: 0.125rem;
+  flex-shrink: 0;
+}
+
+.instr-docs-upload {
+  margin-top: 0.25rem;
+}
+
+.instr-drop-zone {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px dashed var(--p-surface-300);
+  border-radius: var(--p-border-radius-md, 6px);
+  color: var(--sam-text-muted);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+
+  &:hover,
+  &.drop-zone-active {
+    border-color: var(--p-primary-color);
+    background: var(--p-primary-50);
+    color: var(--p-primary-color);
+  }
+
+  i {
+    font-size: 0.9rem;
+  }
+}
