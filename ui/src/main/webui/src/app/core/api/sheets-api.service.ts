@@ -20,7 +20,7 @@ export class SheetsApiService {
     let params = new HttpParams();
     if (filter.page !== undefined) params = params.set('page', filter.page);
     if (filter.size !== undefined) params = params.set('size', filter.size);
-    if (filter.query) params = params.set('query', filter.query);
+    if (filter.query) params = params.set('q', filter.query);
     if (filter.title) params = params.set('title', filter.title);
     if (filter.composer) params = params.set('composer', filter.composer);
     if (filter.genre) params = params.set('genre', filter.genre);

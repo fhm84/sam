@@ -139,22 +139,8 @@
     width: 1rem;
     text-align: center;
     flex-shrink: 0;
+    cursor: default;
   }
-}
-
-.people-detail {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.people-role {
-  font-size: 0.65rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  color: var(--sam-text-muted);
-  line-height: 1.2;
 }
 
 .people-name {
@@ -173,9 +159,75 @@
 }
 
 
-// reserved space for future rating / coverage indicators
 .card-indicators {
   min-height: 0;
+}
+
+.score-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-family: monospace;
+  padding: 0.15rem 0.5rem;
+  border-radius: 1rem;
+  letter-spacing: 0.03em;
+
+  &.good {
+    background: color-mix(in srgb, var(--p-green-500) 15%, transparent);
+    color: var(--p-green-600);
+    border: 1px solid color-mix(in srgb, var(--p-green-500) 30%, transparent);
+  }
+
+  &.fair {
+    background: color-mix(in srgb, var(--p-amber-500) 12%, transparent);
+    color: var(--p-amber-700);
+    border: 1px solid color-mix(in srgb, var(--p-amber-500) 30%, transparent);
+  }
+
+  &.low {
+    background: var(--p-surface-100);
+    color: var(--sam-text-muted);
+    border: 1px solid var(--sam-border);
+  }
+
+  .pi {
+    font-size: 0.65rem;
+  }
+}
+
+.score-breakdown {
+  margin-top: 0.375rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.375rem 0.625rem;
+  background: var(--p-surface-50);
+  border-radius: var(--p-border-radius);
+  border: 1px solid var(--sam-border);
+}
+
+.breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  font-size: 0.68rem;
+  font-family: monospace;
+
+  > span:first-child {
+    color: var(--sam-text-muted);
+  }
+
+  > span:last-child {
+    color: var(--sam-text);
+    font-weight: 600;
+  }
+}
+
+.score-col {
+  width: 5rem;
+  text-align: center !important;
 }
 
 .card-actions {

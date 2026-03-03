@@ -16,6 +16,16 @@
           (input)="onFilter($event)"
         />
       </p-iconfield>
+      @if (hasTextSearch()) {
+        <p-button
+          icon="pi pi-chart-bar"
+          [outlined]="true"
+          [severity]="debugMode() ? 'primary' : 'secondary'"
+          [pTooltip]="debugMode() ? 'Hide match details' : 'Show match details'"
+          tooltipPosition="bottom"
+          (onClick)="toggleDebugMode()"
+        />
+      }
       <p-button
         [outlined]="true"
         [severity]="activeFilterCount() > 0 ? 'primary' : 'secondary'"
@@ -104,6 +114,9 @@
           <th>{{ 'sheets.columns.genre' | translate }}</th>
           <th>{{ 'sheets.columns.style' | translate }}</th>
           <th>{{ 'sheets.columns.year' | translate }}</th>
+          @if (hasTextSearch()) {
+            <th class="score-col">Match</th>
+          }
           <th>{{ 'sheets.columns.actions' | translate }}</th>
         </tr>
       </ng-template>
@@ -130,6 +143,19 @@
           <td>{{ sheet.genre ? ('sheets.genres.' + sheet.genre | translate) : '' }}</td>
           <td>{{ sheet.style ? ('sheets.styles.' + sheet.style | translate) : '' }}</td>
           <td>{{ sheet.yearOfComposition }}</td>
+          @if (hasTextSearch()) {
+            <td class="score-col">
+              @if (sheet.metrics) {
+                <span
+                  class="score-pill"
+                  [class]="scoreSeverity(sheet.metrics.finalRank!)"
+                  [pTooltip]="debugMode() ? metricsTooltip(sheet.metrics) : ''"
+                  [escape]="false"
+                  tooltipPosition="left"
+                >{{ formatScore(sheet.metrics.finalRank!) }}</span>
+              }
+            </td>
+          }
           <td class="actions-cell">
             <p-button
               icon="pi pi-pencil"
@@ -201,29 +227,20 @@
             <div class="card-people">
               @if (sheet.composer?.name) {
                 <div class="people-item">
-                  <i class="pi pi-user"></i>
-                  <div class="people-detail">
-                    <span class="people-role">{{ 'sheets.detail.composer' | translate }}</span>
-                    <span class="people-name">{{ sheet.composer?.name }}</span>
-                  </div>
+                  <i class="pi pi-user" [pTooltip]="'sheets.detail.composer' | translate" tooltipPosition="right"></i>
+                  <span class="people-name">{{ sheet.composer?.name }}</span>
                 </div>
               }
               @if (sheet.arranger?.name) {
                 <div class="people-item">
-                  <i class="pi pi-users"></i>
-                  <div class="people-detail">
-                    <span class="people-role">{{ 'sheets.detail.arranger' | translate }}</span>
-                    <span class="people-name">{{ sheet.arranger?.name }}</span>
-                  </div>
+                  <i class="pi pi-users" [pTooltip]="'sheets.detail.arranger' | translate" tooltipPosition="right"></i>
+                  <span class="people-name">{{ sheet.arranger?.name }}</span>
                 </div>
               }
               @if (sheet.publisher) {
                 <div class="people-item">
-                  <i class="pi pi-building"></i>
-                  <div class="people-detail">
-                    <span class="people-role">{{ 'sheets.detail.publisher' | translate }}</span>
-                    <span class="people-name">{{ sheet.publisher }}</span>
-                  </div>
+                  <i class="pi pi-building" [pTooltip]="'sheets.detail.publisher' | translate" tooltipPosition="right"></i>
+                  <span class="people-name">{{ sheet.publisher }}</span>
                 </div>
               }
             </div>
@@ -241,8 +258,34 @@
                 <p-tag [value]="'#' + tag" severity="secondary" />
               }
             </div>
-            <!-- reserved: rating & coverage indicators -->
-            <div class="card-indicators"></div>
+            <!-- rating & coverage indicators -->
+            <div class="card-indicators">
+              @if (hasTextSearch() && sheet.metrics) {
+                <span
+                  class="score-pill"
+                  [class]="scoreSeverity(sheet.metrics.finalRank!)"
+                >
+                  <i class="pi pi-chart-bar"></i>
+                  {{ formatScore(sheet.metrics.finalRank!) }}
+                </span>
+                @if (debugMode()) {
+                  <div class="score-breakdown">
+                    <div class="breakdown-row">
+                      <span>FTS rank</span><span>{{ sheet.metrics.ftsRank?.toFixed(3) }}</span>
+                    </div>
+                    <div class="breakdown-row">
+                      <span>Title sim.</span><span>{{ pct(sheet.metrics.titleSimilarity) }}</span>
+                    </div>
+                    <div class="breakdown-row">
+                      <span>Composer sim.</span><span>{{ pct(sheet.metrics.composerSimilarity) }}</span>
+                    </div>
+                    <div class="breakdown-row">
+                      <span>Phonetic</span><span>{{ sheet.metrics.phoneticMatch ? '✓' : '–' }}</span>
+                    </div>
+                  </div>
+                }
+              }
+            </div>
           </div>
         }
       </div>
@@ -259,7 +302,7 @@
 <p-drawer
   [(visible)]="detailDrawerVisible"
   position="right"
-  [style]="{ width: '36rem' }"
+  [style]="{ width: '42rem' }"
 >
   @if (detailDrawerVisible && selectedSheetId) {
     <app-sheet-detail

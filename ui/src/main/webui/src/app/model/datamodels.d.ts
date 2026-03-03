@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 3.2.1263 on 2026-03-02 23:24:20.
+// Generated using typescript-generator version 3.2.1263 on 2026-03-03 20:57:36.
 
 export interface Attachment {
     checksum?: string;
@@ -13,6 +13,7 @@ export interface Attachment {
 }
 
 export interface BatchDownloadRequest {
+    baseName?: string;
     format?: DownloadFormat;
     ids?: string[];
 }

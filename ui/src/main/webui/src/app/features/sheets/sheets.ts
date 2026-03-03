@@ -16,12 +16,13 @@ import { Paginator } from 'primeng/paginator';
 import { Drawer } from 'primeng/drawer';
 import { Toolbar } from 'primeng/toolbar';
 import { Tag } from 'primeng/tag';
+import { Tooltip } from 'primeng/tooltip';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../core/translation.service';
 import { LayoutPreferenceService } from '../../core/layout-preference.service';
 import { SheetsApiService } from '../../core/api';
-import { Genre, SheetMusic, SheetMusicSearchResult } from '../../model/datamodels';
+import { Genre, SearchResultMetrics, SheetMusic, SheetMusicSearchResult } from '../../model/datamodels';
 import { GENRES, STYLES } from '../../shared/constants';
 import { SheetDetail } from './sheet-detail';
 
@@ -44,6 +45,7 @@ Button,
     Drawer,
     Toolbar,
     Tag,
+    Tooltip,
   ],
   providers: [ConfirmationService],
   templateUrl: './sheets.html',
@@ -80,6 +82,7 @@ export class Sheets implements OnInit {
   protected readonly selectedLetter = signal<string | null>(null);
   protected readonly availableLetters = signal<string[]>([]);
   protected readonly hasTextSearch = signal(false);
+  protected readonly debugMode = signal(false);
   protected readonly activeFilterCount = computed(
     () => (this.selectedGenre() ? 1 : 0) + (this.selectedLetter() ? 1 : 0),
   );
@@ -129,6 +132,41 @@ export class Sheets implements OnInit {
 
   protected onFilter(event: Event): void {
     this.filterSubject.next((event.target as HTMLInputElement).value);
+  }
+
+  protected toggleDebugMode(): void {
+    this.debugMode.update((v) => !v);
+  }
+
+  protected formatScore(rank: number): string {
+    return Math.min(Math.round(rank * 100), 100) + '%';
+  }
+
+  protected scoreSeverity(rank: number): 'good' | 'fair' | 'low' {
+    if (rank >= 0.4) return 'good';
+    if (rank >= 0.15) return 'fair';
+    return 'low';
+  }
+
+  protected pct(val: number | undefined): string {
+    return Math.round((val ?? 0) * 100) + '%';
+  }
+
+  protected metricsTooltip(m: SearchResultMetrics): string {
+    const rows: [string, string][] = [
+      ['FTS rank', m.ftsRank?.toFixed(3) ?? '–'],
+      ['Title', this.pct(m.titleSimilarity)],
+      ['Composer', this.pct(m.composerSimilarity)],
+      ['Phonetic', m.phoneticMatch ? '✓' : '–'],
+    ];
+    const rowsHtml = rows
+      .map(
+        ([k, v]) =>
+          `<div style="display:flex;justify-content:space-between;gap:1.5rem">` +
+          `<span style="opacity:.65">${k}</span><strong>${v}</strong></div>`,
+      )
+      .join('');
+    return `<div style="font-family:monospace;font-size:.75rem;line-height:1.7">${rowsHtml}</div>`;
   }
 
   protected onViewModeChange(): void {
