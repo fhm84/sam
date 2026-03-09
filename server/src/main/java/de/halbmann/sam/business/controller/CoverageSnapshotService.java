@@ -1,8 +1,6 @@
 package de.halbmann.sam.business.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.halbmann.sam.api.entity.CoverageResult;
 import de.halbmann.sam.api.entity.CoverageSnapshotSummary;
 import de.halbmann.sam.api.entity.EnsembleCoverageStatus;
@@ -16,6 +14,7 @@ import de.halbmann.sam.business.entity.SheetMusicEntity;
 import de.halbmann.sam.business.exception.EntityNotFoundException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.json.bind.Jsonb;
 import jakarta.transaction.Transactional;
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -41,7 +40,7 @@ public class CoverageSnapshotService {
     CoverageSnapshotRepository coverageSnapshotRepository;
 
     @Inject
-    ObjectMapper objectMapper;
+    Jsonb jsonb;
 
     public EnsembleCoverageStatus compute(final String ensembleId) {
         final EnsembleEntity ensemble = ensembleRepository
@@ -99,21 +98,13 @@ public class CoverageSnapshotService {
     }
 
     private String serializeDetails(List<VoiceCoverageDetail> details) {
-        try {
-            return objectMapper.writeValueAsString(details);
-        } catch (JsonProcessingException e) {
-            return "[]";
-        }
+        return jsonb.toJson(details);
     }
 
     private List<VoiceCoverageDetail> deserializeDetails(String json) {
         if (json == null || json.isBlank()) {
             return List.of();
         }
-        try {
-            return objectMapper.readValue(json, new TypeReference<List<VoiceCoverageDetail>>() {});
-        } catch (JsonProcessingException e) {
-            return List.of();
-        }
+        return jsonb.fromJson(json, new TypeReference<List<VoiceCoverageDetail>>() {}.getType());
     }
 }
