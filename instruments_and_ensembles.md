@@ -52,25 +52,45 @@ SAM bewertet Notensätze (SheetMusic) im Kontext von Ensembles hinsichtlich ihre
 
 ### Matching & Bewertung
 
-* Matching ist **Score-basiert**
-* Kriterien:
+**Instrument-Matching** (exakt, kein automatisches Alias/Transpositions-Fallback):
 
-    * Instrument / Alias
-    * Transposition
-    * Clef
-    * NotationType (optional)
-* Scores werden **multipliziert**
-* Untergrenze (z.B. < 0.3) = nicht sinnvoll
+* Matching erfolgt ausschließlich auf Basis der **Instrument-ID** (exakter Treffer)
+* Ersatzinstrumente werden über explizite `VoiceOption`-Einträge (ALTERNATE / FALLBACK) mit eigenem `factor` konfiguriert
+* Sekundäre Korrekturfaktoren (werden auf den Match-Score multipliziert):
+    * *Clef-Faktor*: 0,7 bei nicht-transponierenden Instrumenten mit gesetztem Clef, sonst 1,0
+    * *Notation-Typ-Faktor*: 1,0 Standard/Lead-Sheet, 0,8 Schlagzeug, 0,7 Tabulatur/Grafik
+* Score < 0,3 → kein sinnvoller Treffer (wird als 0 gewertet)
+* Stimmen ohne Optionen können keiner Instrumentation zugeordnet werden
 
-**Vollständigkeit:**
+**Zuteilung (greedy, priorisiert):**
+
+Stimmen werden in Prioritätsreihenfolge verarbeitet (Pflichtstimmen zuerst, dann nach Gewicht absteigend). Jede Instrumentation kann nur einer Stimme zugeordnet werden.
+
+**Score pro Stimme:**
 
 ```
-Summe(voiceWeight × optionFactor × matchScore)
----------------------------------------------
-        Summe(voiceWeight)
+effectiveCount = Σ (matchScore × option.factor)   ← für alle zugeteilten Instrumentierungen
+normalized     = min(effectiveCount / targetCount, 1.0)
+countScore     = baseScore + (1 − baseScore) × normalized
 ```
 
-Pflichtstimmen fehlen → Warnung, unabhängig vom Prozentwert
+`baseScore` (Standard: **0,7**, konfigurierbar via `sam.coverage.base-score`): eine einzige passende Stimme erreicht sofort mindestens 70 % des Stimmenbeitrags.
+
+**Gesamt-Coverage:**
+
+```
+coverageScore = Σ(countScore × voice.weight) / Σ(voice.weight)
+```
+
+**Status:**
+
+| Status | Bedingung |
+|--------|-----------|
+| `INCOMPLETE` | Mindestens eine Pflichtstimme fehlt |
+| `PLAYABLE` | Alle Pflichtstimmen abgedeckt; `coverageScore < 0,85` |
+| `COMPLETE` | Alle Pflichtstimmen abgedeckt; `coverageScore ≥ 0,85` |
+
+Pflichtstimmen fehlen → Stück als nicht spielbar markiert, unabhängig vom Gesamtscore
 
 ---
 
@@ -81,19 +101,16 @@ Pflichtstimmen fehlen → Warnung, unabhängig vom Prozentwert
 * Zweck: Listenansichten, Sortierung, Filter
 * Inhalte:
 
-    * coverageScore (gerundet)
+    * coverageScore
     * status (COMPLETE / PLAYABLE / INCOMPLETE)
     * missingRequired
-    * evaluatedAt
+    * details (JSONB – vollständige Stimmen-Aufschlüsselung inkl. Begründungen)
+    * lastUpdate (Zeitpunkt der letzten Berechnung, aus AbstractBaseEntity)
 
 **Regeln**
 
-* Snapshots werden **gelöscht oder ersetzt**, nicht gepflegt
-* Invalidierung bei:
-
-    * Änderung SheetMusic / Instrumentation
-    * Änderung Ensemble
-    * Regeländerung (via ruleVersion)
+* Snapshots werden per **Upsert** aktualisiert (INSERT … ON CONFLICT DO UPDATE)
+* **Keine automatische Invalidierung** – manuelle Neuberechnung via `POST /api/ensembles/{id}/coverage/compute`
 
 ---
 
@@ -115,47 +132,29 @@ Pflichtstimmen fehlen → Warnung, unabhängig vom Prozentwert
 
 **CoverageEvaluationService**
 
-* Live-Berechnung der Vollständigkeit
-* Liefert Detailergebnisse inkl. Begründungen
+* Live-Berechnung der Vollständigkeit eines Notensatzes gegen ein Ensemble
+* Greedy-Zuteilung der Instrumentierungen (Pflichtstimmen zuerst)
+* Liefert `CoverageResult` mit `coverageScore`, `status`, `missingRequired` und Detailergebnissen pro Stimme inkl. menschenlesbarer Begründungen
 
 **MatchingService**
 
-* Instrument ↔ Instrument-Matching
-* Alias-, Transpositions-, Clef-Scoring
+* Instrument-Matching (exakter ID-Vergleich)
+* Korrekturfaktoren für Clef und NotationType
 
 **CoverageSnapshotService**
 
-* Lesen / Erzeugen / Löschen von Snapshots
-* Lazy-Recompute-Strategie
-
----
-
-### Admin
-
-**InstrumentAdminService**
-
-* CRUD Instrumente
-* Aktiv / Inaktiv
-
-**AliasAdminService**
-
-* Pflege von Ersatzbeziehungen
-* Faktor-Änderungen
-
-**SimulationService**
-
-* Testet Matching ohne Persistenz
-* Nutzt exakt gleiche Logik wie Produktivcode
+* Massenberechnung aller Notensätze gegen ein Ensemble (`compute`)
+* Snapshot-Abfrage für Listen-Queries (`findSummaries`)
+* Gibt `EnsembleCoverageStatus` zurück (Anzahl Snapshots + Zeitpunkt der letzten Berechnung)
 
 ---
 
 ### API (Auszug)
 
-* `GET /sheetmusic/{id}/coverage?ensemble=…`
-* `GET /sheetmusic?ensemble=…`
-* `POST /admin/instruments`
-* `POST /admin/aliases`
-* `POST /admin/simulate`
+* `GET /api/sheets/{id}/coverage?ensemble=…` — Live-Auswertung eines Notensatzes
+* `GET /api/sheets?ensemble=…` — Notensatz-Suche mit Snapshot-Coverage je Ergebnis
+* `POST /api/ensembles/{id}/coverage/compute` — Snapshots für alle Notensätze neu berechnen
+* `GET /api/ensembles/{id}/coverage/status` — Zeitpunkt und Anzahl vorhandener Snapshots
 
 ---
 
@@ -163,37 +162,36 @@ Pflichtstimmen fehlen → Warnung, unabhängig vom Prozentwert
 
 ### Phase 1 – Fundament
 
-* [ ] Instrument-Entity inkl. ID-Strategie
-* [ ] Instrumentation → Link auf Instrument
-* [ ] Basis-Ensemble-Modelle
+* [x] Instrument-Entity inkl. ID-Strategie
+* [x] Instrumentation → Link auf Instrument
+* [x] Basis-Ensemble-Modelle
 
 ### Phase 2 – Matching & Bewertung
 
-* [ ] MatchingService (Score-basiert)
-* [ ] Alias-Modell inkl. Typ & Faktor
-* [ ] CoverageEvaluationService
-* [ ] Pflichtstimmen-Logik
+* [x] MatchingService (exakter ID-Vergleich + Clef/NotationType-Faktoren)
+* [x] VoiceOption-Modell mit Typ (PRIMARY/ALTERNATE/FALLBACK) & Faktor
+* [x] CoverageEvaluationService (greedy, priorisiert, baseScore-Floor)
+* [x] Pflichtstimmen-Logik
 
 ### Phase 3 – Snapshot & Performance
 
-* [ ] CoverageSnapshot-Entity
-* [ ] SnapshotService (Lazy Recompute)
-* [ ] Invalidierung bei Änderungen
+* [x] CoverageSnapshot-Entity (JSONB-Details, Upsert)
+* [x] CoverageSnapshotService (Massenberechnung, Listenabfrage)
+* [ ] Automatische Invalidierung bei Änderungen (aktuell: manuelle Neuberechnung)
 * [ ] Regel-Versionierung
 
 ### Phase 4 – Admin-UI
 
 * [ ] Instrumentenverwaltung
-* [ ] Alias-/Ersatzpflege
-* [ ] Ensemble-Stimmen-Konfiguration
-* [ ] Test & Simulation View
+* [x] Ensemble-Stimmen-Konfiguration (Voices + VoiceOptions)
+* [ ] Simulations-/Test-Ansicht
 
 ### Phase 5 – UX & Feinschliff
 
-* [ ] Ampel-Logik & Tooltips
-* [ ] Detail-Breakdown pro Stimme
+* [x] Ampel-Logik (COMPLETE / PLAYABLE / INCOMPLETE) mit Badges
+* [x] Detail-Breakdown pro Stimme (Coverage-Tab im Sheet-Detail)
 * [ ] Audit-Log für Regeländerungen
-* [ ] Basis-Statistiken (häufige Ersetzungen)
+* [ ] Basis-Statistiken
 
 ---
 

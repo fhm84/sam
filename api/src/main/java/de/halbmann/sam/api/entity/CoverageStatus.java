@@ -7,13 +7,13 @@ package de.halbmann.sam.api.entity;
 public enum CoverageStatus {
 
     /**
-     * All voices are covered with high-quality matches (score >= 0.9, no missing required voices).
+     * All required voices are covered and the overall coverage score is >= 0.85.
      */
     COMPLETE,
 
     /**
-     * Enough voices are covered to perform the piece, though some gaps exist (score >= 0.5, no
-     * missing required voices).
+     * No required voices are missing, but the overall coverage score is below 0.85
+     * (some voices are under-covered or only partially matched).
      */
     PLAYABLE,
 

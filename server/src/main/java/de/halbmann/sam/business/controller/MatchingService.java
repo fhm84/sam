@@ -15,28 +15,13 @@ public class MatchingService {
      */
     public double score(final VoiceOptionEntity option, final InstrumentationEntity instrumentation) {
         // Instrument ID exact match
-        double instrumentMatch = option.getInstrument()
-                        .getId()
-                        .equals(instrumentation.getInstrument().getId())
-                ? 1.0
-                : 0.0;
-
-        if (instrumentMatch == 0.0) {
-            // Different instruments — check transposition compatibility
-            if (option.getInstrument().getTransposition() != null
-                    && instrumentation.getInstrument().getTransposition() != null
-                    && option.getInstrument().getTransposition()
-                            == instrumentation.getInstrument().getTransposition()) {
-                instrumentMatch = 0.5;
-            } else {
-                return 0.0;
-            }
+        if (!option.getInstrument()
+                .getId()
+                .equals(instrumentation.getInstrument().getId())) {
+            return 0.0;
         }
 
-        double score = instrumentMatch;
-
-        // Transposition match factor
-        score *= transpositionFactor(option, instrumentation);
+        double score = 1.0;
 
         // Clef match factor
         score *= clefFactor(option, instrumentation);
@@ -45,17 +30,6 @@ public class MatchingService {
         score *= notationTypeFactor(instrumentation);
 
         return score < THRESHOLD ? 0.0 : score;
-    }
-
-    private double transpositionFactor(final VoiceOptionEntity option, final InstrumentationEntity instrumentation) {
-        if (option.getInstrument().getTransposition() == null
-                || instrumentation.getInstrument().getTransposition() == null) {
-            return 1.0;
-        }
-        return option.getInstrument().getTransposition()
-                        == instrumentation.getInstrument().getTransposition()
-                ? 1.0
-                : 0.5;
     }
 
     private double clefFactor(final VoiceOptionEntity option, final InstrumentationEntity instrumentation) {

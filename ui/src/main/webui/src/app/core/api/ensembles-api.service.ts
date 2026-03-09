@@ -6,6 +6,7 @@ import {
   CreateEnsembleVoice,
   CreateVoiceOption,
   Ensemble,
+  EnsembleCoverageStatus,
   EnsembleFilterRequest,
   EnsembleVoice,
   PaginatedResponse,
@@ -41,6 +42,20 @@ export class EnsemblesApiService {
 
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
+  // ── Coverage ──────────────────────────────────────────
+  computeCoverage(ensembleId: string): Observable<EnsembleCoverageStatus> {
+    return this.http.post<EnsembleCoverageStatus>(
+      `${this.baseUrl}/${ensembleId}/coverage/compute`,
+      null,
+    );
+  }
+
+  getCoverageStatus(ensembleId: string): Observable<EnsembleCoverageStatus> {
+    return this.http.get<EnsembleCoverageStatus>(
+      `${this.baseUrl}/${ensembleId}/coverage/status`,
+    );
   }
 
   // ── Voices ────────────────────────────────────────────

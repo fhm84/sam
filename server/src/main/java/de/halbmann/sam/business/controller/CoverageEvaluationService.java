@@ -9,9 +9,8 @@ import de.halbmann.sam.business.exception.EntityNotFoundException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @ApplicationScoped
@@ -49,8 +48,10 @@ public class CoverageEvaluationService {
         double totalWeight = 0;
         double coveredWeight = 0;
         boolean missingRequired = false;
-        List<VoiceCoverageDetail> details = new ArrayList<>();
 
+        // Pre-build detail stubs in original voice order so the output order is stable
+        // regardless of the processing order we use below.
+        Map<EnsembleVoiceEntity, VoiceCoverageDetail> detailMap = new LinkedHashMap<>();
         for (EnsembleVoiceEntity voice : voices) {
             totalWeight += voice.getWeight();
 
@@ -61,29 +62,58 @@ public class CoverageEvaluationService {
             detail.setWeight(voice.getWeight());
             detail.setMinCount(voice.getMinCount());
             detail.setTargetCount(voice.getTargetCount());
+            detailMap.put(voice, detail);
+        }
+
+        // Process voices in priority order: required voices first, then by weight descending.
+        // This ensures that important seats get first pick of available instrumentations.
+        List<EnsembleVoiceEntity> priorityOrder = voices.stream()
+                .sorted(Comparator.comparing((EnsembleVoiceEntity v) -> v.isRequired() ? 0 : 1)
+                        .thenComparing(Comparator.comparing(EnsembleVoiceEntity::getWeight)
+                                .reversed()))
+                .collect(Collectors.toList());
+
+        // Use identity-based set so the tracker works with entities that have no JPA-assigned id
+        // (e.g. in unit tests) as well as with fully-persisted entities.
+        Set<InstrumentationEntity> consumed = Collections.newSetFromMap(new IdentityHashMap<>());
+
+        for (EnsembleVoiceEntity voice : priorityOrder) {
+            VoiceCoverageDetail detail = detailMap.get(voice);
+
+            // Fix 1: voice options are mandatory for matching.
+            // A voice without options cannot be covered by any instrumentation.
+            if (voice.getOptions().isEmpty()) {
+                detail.setEffectiveCount(0.0);
+                detail.setScore(0.0);
+                detail.setExplanation("No voice options defined — cannot be matched");
+                if (voice.isRequired()) {
+                    missingRequired = true;
+                }
+                continue;
+            }
 
             double effectiveCount = 0.0;
             List<String> explanations = new ArrayList<>();
 
-            List<VoiceOptionEntity> options =
-                    voice.getOptions().isEmpty() ? List.of(VoiceOptionEntity.defaultOption()) : voice.getOptions();
-
             for (InstrumentationEntity instrumentation : instrumentations) {
+                // Fix 4: each instrumentation can only contribute to one voice.
+                // Higher-priority voices have already claimed whatever they matched.
+                if (consumed.contains(instrumentation)) {
+                    continue;
+                }
+
                 double bestContribution = 0.0;
                 VoiceOptionEntity bestOption = null;
                 double bestMatchScore = 0.0;
 
-                for (VoiceOptionEntity option : options) {
+                for (VoiceOptionEntity option : voice.getOptions()) {
                     double matchScore = matchingService.score(option, instrumentation);
                     if (matchScore > 0) {
                         double contribution = matchScore * option.getFactor();
-
                         if (contribution > bestContribution) {
                             bestContribution = contribution;
                             bestOption = option;
                             bestMatchScore = matchScore;
-
-                            // perfekt → besser geht nicht
                             if (matchScore == 1.0 && option.getFactor() == 1.0) {
                                 break;
                             }
@@ -93,41 +123,41 @@ public class CoverageEvaluationService {
 
                 if (bestContribution > 0) {
                     effectiveCount += bestContribution;
+                    consumed.add(instrumentation);
                     explanations.add(buildExplanation(bestOption, instrumentation, bestMatchScore));
                 }
             }
 
             detail.setEffectiveCount(effectiveCount);
 
-            // Pflichtprüfung (hart)
+            // Hard required check: a required voice needs at least minCount effective players.
             if (voice.isRequired() && effectiveCount < voice.getMinCount()) {
                 missingRequired = true;
-                detail.setScore(0);
+                detail.setScore(0.0);
                 detail.setExplanation("Required voice missing");
-                details.add(detail);
                 continue;
             }
 
-            // Count-basierter Score mit Amateur-Baseline
+            // Fix 3: remove the cliff at effectiveCount >= 1.0.
+            // Any positive effectiveCount awards credit; the normalized ratio scales it.
             double countScore = 0.0;
-            if (effectiveCount >= 1.0) {
+            if (effectiveCount > 0) {
                 double normalized = Math.min(effectiveCount / voice.getTargetCount(), 1.0);
                 countScore = baseScore + (1.0 - baseScore) * normalized;
             }
 
-            double voiceScore = countScore * voice.getWeight();
-            coveredWeight += voiceScore;
+            coveredWeight += countScore * voice.getWeight();
 
-            detail.setScore(voiceScore);
+            // Fix 2: store the per-voice coverage ratio (0–1), not the weighted contribution.
+            // Weighted contribution is only used for the aggregate coverageScore above.
+            detail.setScore(countScore);
             detail.setExplanation(
                     explanations.isEmpty() ? "No matching instrumentation found" : String.join("; ", explanations));
-
-            details.add(detail);
         }
 
         CoverageResult result = new CoverageResult();
         result.setCoverageScore(totalWeight > 0 ? coveredWeight / totalWeight : 0);
-        result.setDetails(details);
+        result.setDetails(new ArrayList<>(detailMap.values()));
         result.setMissingRequired(missingRequired);
 
         return result;

@@ -10,7 +10,7 @@ import { Tooltip } from 'primeng/tooltip';
 import { Tag } from 'primeng/tag';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { SheetsApiService, InstrumentationsApiService } from '../../core/api';
-import { Attachment, AttachmentType, DownloadFormat, Instrumentation, SheetMusic } from '../../model/datamodels';
+import { Attachment, AttachmentType, CoverageSnapshotSummary, DownloadFormat, Instrumentation, SheetMusic } from '../../model/datamodels';
 import { DIFFICULTY_LEVELS } from '../../shared/constants';
 import { DocumentHandler } from '../../shared/base/document-handler';
 import { InstrumentationForm } from './instrumentation-form';
@@ -50,6 +50,8 @@ export class SheetDetail extends DocumentHandler implements OnChanges {
   private readonly instrumentationsApi = inject(InstrumentationsApiService);
 
   @Input({ required: true }) sheetId!: string;
+  @Input() coverage: CoverageSnapshotSummary | null = null;
+  @Input() ensembleName?: string;
   @Output() edit = new EventEmitter<SheetMusic>();
   @Output() deleted = new EventEmitter<void>();
 
@@ -157,6 +159,17 @@ export class SheetDetail extends DocumentHandler implements OnChanges {
       : 'sheets.instrumentations.messages.created';
     this.messageService.add({ severity: 'success', summary: this.t.t(key) });
     this.loadInstrumentations();
+  }
+
+  protected pct(val?: number): string {
+    return Math.round((val ?? 0) * 100) + '%';
+  }
+
+  protected coverageIcon(d: { missingRequired?: boolean; score?: number }): string {
+    if (d.missingRequired) return 'pi pi-times-circle';
+    if ((d.score ?? 0) >= 0.85) return 'pi pi-check-circle';
+    if ((d.score ?? 0) > 0) return 'pi pi-minus-circle';
+    return 'pi pi-circle';
   }
 
   protected difficultyLevelKey(grade: number): string {

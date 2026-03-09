@@ -11,6 +11,8 @@ public class SheetMusicSearchResult extends SheetMusic {
 
     SearchResultMetrics metrics;
 
+    CoverageSnapshotSummary coverage;
+
     public SheetMusicSearchResult(SheetMusic sheetMusic) {
         super(
                 sheetMusic.getId(),

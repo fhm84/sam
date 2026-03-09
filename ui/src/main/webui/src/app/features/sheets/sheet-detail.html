@@ -49,6 +49,9 @@
       <p-tablist>
         <p-tab [value]="0">{{ 'sheets.detail.tabs.details' | translate }}</p-tab>
         <p-tab [value]="1">{{ 'sheets.instrumentations.title' | translate }}</p-tab>
+        @if (coverage) {
+          <p-tab [value]="2">{{ 'sheets.detail.tabs.coverage' | translate }}</p-tab>
+        }
       </p-tablist>
       <p-tabpanels>
 
@@ -381,6 +384,47 @@
           </div>
         </p-tabpanel>
 
+        <!-- Tab 3: Coverage -->
+        @if (coverage) {
+          <p-tabpanel [value]="2">
+            <div class="tab-panels">
+              <div class="coverage-summary">
+                <span class="coverage-badge" [class]="coverage.status!.toLowerCase()">
+                  <i [class]="'pi ' + (coverage.status === 'COMPLETE' ? 'pi-check-circle' : coverage.status === 'PLAYABLE' ? 'pi-minus-circle' : 'pi-times-circle')"></i>
+                  {{ pct(coverage.coverageScore) }}
+                </span>
+                @if (ensembleName) {
+                  <span class="coverage-ensemble-name">{{ ensembleName }}</span>
+                }
+              </div>
+              <div class="coverage-voice-list">
+                @for (d of coverage.details; track d.voiceId) {
+                  <div class="coverage-voice-row" [class.is-missing]="d.missingRequired">
+                    <i [class]="coverageIcon(d)"
+                       [class.icon-ok]="!d.missingRequired && (d.score ?? 0) >= 0.85"
+                       [class.icon-partial]="!d.missingRequired && (d.score ?? 0) > 0 && (d.score ?? 0) < 0.85"
+                       [class.icon-missing]="d.missingRequired"></i>
+                    <div class="coverage-voice-body">
+                      <div class="coverage-voice-title">
+                        <span class="coverage-voice-name">{{ d.voiceLabel }}</span>
+                        @if (d.required) {
+                          <span class="coverage-voice-req">req.</span>
+                        }
+                        <span class="coverage-voice-score" [class.score-missing]="d.missingRequired">
+                          {{ d.missingRequired ? '✗' : pct(d.score) }}
+                        </span>
+                      </div>
+                      @if (d.explanation) {
+                        <div class="coverage-voice-expl">{{ d.explanation }}</div>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </p-tabpanel>
+        }
+
       </p-tabpanels>
     </p-tabs>
 
@@ -664,6 +708,45 @@
           </div>
         }
       </p-panel>
+
+      <!-- Coverage -->
+      @if (coverage) {
+        <p-panel [header]="'sheets.detail.tabs.coverage' | translate" [toggleable]="true">
+          <ng-template pTemplate="headeractions">
+            <span class="coverage-badge" [class]="coverage.status!.toLowerCase()">
+              <i [class]="'pi ' + (coverage.status === 'COMPLETE' ? 'pi-check-circle' : coverage.status === 'PLAYABLE' ? 'pi-minus-circle' : 'pi-times-circle')"></i>
+              {{ pct(coverage.coverageScore) }}
+            </span>
+            @if (ensembleName) {
+              <span class="coverage-ensemble-name">{{ ensembleName }}</span>
+            }
+          </ng-template>
+          <div class="coverage-voice-list">
+            @for (d of coverage.details; track d.voiceId) {
+              <div class="coverage-voice-row" [class.is-missing]="d.missingRequired">
+                <i [class]="coverageIcon(d)"
+                   [class.icon-ok]="!d.missingRequired && (d.score ?? 0) >= 0.85"
+                   [class.icon-partial]="!d.missingRequired && (d.score ?? 0) > 0 && (d.score ?? 0) < 0.85"
+                   [class.icon-missing]="d.missingRequired"></i>
+                <div class="coverage-voice-body">
+                  <div class="coverage-voice-title">
+                    <span class="coverage-voice-name">{{ d.voiceLabel }}</span>
+                    @if (d.required) {
+                      <span class="coverage-voice-req">req.</span>
+                    }
+                    <span class="coverage-voice-score" [class.score-missing]="d.missingRequired">
+                      {{ d.missingRequired ? '✗' : pct(d.score) }}
+                    </span>
+                  </div>
+                  @if (d.explanation) {
+                    <div class="coverage-voice-expl">{{ d.explanation }}</div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </p-panel>
+      }
 
       <!-- Notes -->
       <p-panel [header]="t.t('sheets.detail.notes')" [toggleable]="true" [collapsed]="true">

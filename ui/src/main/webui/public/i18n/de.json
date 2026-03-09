@@ -70,7 +70,19 @@
       "genre": "Genre",
       "style": "Stil",
       "year": "Jahr",
+      "coverage": "Besetzung",
       "actions": "Aktionen"
+    },
+    "ensemble": {
+      "placeholder": "Besetzungsanalyse…",
+      "clear": "Ensemble entfernen"
+    },
+    "coverage": {
+      "notComputed": "Besetzungsanalyse für {{name}} noch nicht berechnet.",
+      "computeNow": "Jetzt berechnen",
+      "asOf": "Besetzungsanalyse vom {{time}}.",
+      "recompute": "Neu berechnen",
+      "computing": "Wird berechnet…"
     },
     "form": {
       "title": "Titel",
@@ -107,7 +119,8 @@
     "detail": {
       "tabs": {
         "details": "Details",
-        "instrumentations": "Besetzung"
+        "instrumentations": "Besetzung",
+        "coverage": "Abdeckung"
       },
       "baseData": "Stammdaten",
       "documents": "Dokumente",

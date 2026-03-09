@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 3.2.1263 on 2026-03-03 20:57:36.
+// Generated using typescript-generator version 3.2.1263 on 2026-03-09 21:58:02.
 
 export interface Attachment {
     checksum?: string;
@@ -50,6 +50,14 @@ export interface CoverageResult {
     missingRequiredCount?: number;
     playable?: boolean;
     sheetMusicId?: string;
+    status?: CoverageStatus;
+}
+
+export interface CoverageSnapshotSummary {
+    computedAt?: Date;
+    coverageScore?: number;
+    details?: VoiceCoverageDetail[];
+    missingRequired?: boolean;
     status?: CoverageStatus;
 }
 
@@ -151,6 +159,11 @@ export interface Ensemble {
     voices?: EnsembleVoice[];
 }
 
+export interface EnsembleCoverageStatus {
+    computedAt?: Date;
+    sheetCount?: number;
+}
+
 export interface EnsembleFilterRequest extends PaginationRequest {
     name?: string;
 }
@@ -244,6 +257,7 @@ export interface SheetCollectionFilterRequest extends PaginationRequest {
 
 export interface SheetFilterRequest extends PaginationRequest {
     composer?: string;
+    ensemble?: string;
     favorite?: boolean;
     genre?: string;
     query?: string;
@@ -278,6 +292,7 @@ export interface SheetMusic {
 }
 
 export interface SheetMusicSearchResult extends SheetMusic {
+    coverage?: CoverageSnapshotSummary;
     metrics?: SearchResultMetrics;
 }
 

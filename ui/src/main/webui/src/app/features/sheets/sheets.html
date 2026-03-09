@@ -16,6 +16,15 @@
           (input)="onFilter($event)"
         />
       </p-iconfield>
+      <p-select
+        [options]="ensembles()"
+        optionLabel="name"
+        [ngModel]="selectedEnsemble()"
+        (ngModelChange)="onEnsembleChange($event)"
+        [placeholder]="t.t('sheets.ensemble.placeholder')"
+        [showClear]="true"
+        [style]="{ minWidth: '180px' }"
+      />
       @if (hasTextSearch()) {
         <p-button
           icon="pi pi-chart-bar"
@@ -55,6 +64,29 @@
       />
     </ng-template>
   </p-toolbar>
+
+  @if (selectedEnsemble()) {
+    @if (!coverageStatus()?.computedAt) {
+      <div class="coverage-notice">
+        <i class="pi pi-info-circle"></i>
+        <span>{{ t.t('sheets.coverage.notComputed').replace('{{name}}', selectedEnsemble()!.name) }}</span>
+        <p-button
+          [label]="t.t('sheets.coverage.computeNow')"
+          size="small"
+          [loading]="coverageComputing()"
+          (onClick)="computeCoverage()"
+        />
+      </div>
+    } @else {
+      <div class="coverage-notice coverage-notice--computed">
+        <i class="pi pi-check-circle"></i>
+        <span>{{ t.t('sheets.coverage.asOf').replace('{{time}}', formatComputedAt(coverageStatus()!.computedAt!)) }}</span>
+        <a class="coverage-recompute" (click)="computeCoverage()">
+          {{ coverageComputing() ? t.t('sheets.coverage.computing') : t.t('sheets.coverage.recompute') }}
+        </a>
+      </div>
+    }
+  }
 
   @if (!hasTextSearch()) {
     <div class="alpha-bar">
@@ -117,6 +149,9 @@
           @if (hasTextSearch()) {
             <th class="score-col">Match</th>
           }
+          @if (selectedEnsemble()) {
+            <th class="score-col">{{ 'sheets.columns.coverage' | translate }}</th>
+          }
           <th>{{ 'sheets.columns.actions' | translate }}</th>
         </tr>
       </ng-template>
@@ -153,6 +188,22 @@
                   [escape]="false"
                   tooltipPosition="left"
                 >{{ formatScore(sheet.metrics.finalRank!) }}</span>
+              }
+            </td>
+          }
+          @if (selectedEnsemble()) {
+            <td class="score-col">
+              @if (sheet.coverage) {
+                <span
+                  class="coverage-badge"
+                  [class]="sheet.coverage.status!.toLowerCase()"
+                  [pTooltip]="coverageTooltip(sheet.coverage)"
+                  [escape]="false"
+                  tooltipPosition="left"
+                >
+                  <i [class]="'pi ' + (sheet.coverage.status === 'COMPLETE' ? 'pi-check-circle' : sheet.coverage.status === 'PLAYABLE' ? 'pi-minus-circle' : 'pi-times-circle')"></i>
+                  {{ sheet.coverage.status === 'COMPLETE' ? pct(sheet.coverage.coverageScore) : sheet.coverage.status }}
+                </span>
               }
             </td>
           }
@@ -258,8 +309,20 @@
                 <p-tag [value]="'#' + tag" severity="secondary" />
               }
             </div>
-            <!-- rating & coverage indicators -->
+            <!-- match score & coverage indicators -->
             <div class="card-indicators">
+              @if (selectedEnsemble() && sheet.coverage) {
+                <span
+                  class="coverage-badge"
+                  [class]="sheet.coverage.status!.toLowerCase()"
+                  [pTooltip]="coverageTooltip(sheet.coverage)"
+                  [escape]="false"
+                  tooltipPosition="left"
+                >
+                  <i [class]="'pi ' + (sheet.coverage.status === 'COMPLETE' ? 'pi-check-circle' : sheet.coverage.status === 'PLAYABLE' ? 'pi-minus-circle' : 'pi-times-circle')"></i>
+                  {{ pct(sheet.coverage.coverageScore) }}
+                </span>
+              }
               @if (hasTextSearch() && sheet.metrics) {
                 <span
                   class="score-pill"
@@ -307,6 +370,8 @@
   @if (detailDrawerVisible && selectedSheetId) {
     <app-sheet-detail
       [sheetId]="selectedSheetId"
+      [coverage]="selectedSheetCoverage()"
+      [ensembleName]="selectedEnsemble()?.name"
       (edit)="onDetailEdit($event)"
       (deleted)="onDetailDeleted()"
     />

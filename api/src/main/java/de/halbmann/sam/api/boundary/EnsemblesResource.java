@@ -68,4 +68,26 @@ public interface EnsemblesResource {
      */
     @Path("{ensembleId}/voices")
     EnsembleVoicesResource voices(final @PathParam("ensembleId") String ensembleId);
+
+    /**
+     * Precomputes coverage for all sheets against the given ensemble and stores the results as a
+     * snapshot. Subsequent calls overwrite the existing snapshot.
+     *
+     * @param ensembleId the ID of the ensemble
+     * @return the computed snapshot status including sheet count and timestamp
+     */
+    @POST
+    @Path("{ensembleId}/coverage/compute")
+    EnsembleCoverageStatus computeCoverage(final @PathParam("ensembleId") String ensembleId);
+
+    /**
+     * Returns the current coverage snapshot status for the given ensemble, or 404 if no snapshot
+     * has been computed yet.
+     *
+     * @param ensembleId the ID of the ensemble
+     * @return the snapshot status
+     */
+    @GET
+    @Path("{ensembleId}/coverage/status")
+    EnsembleCoverageStatus getCoverageStatus(final @PathParam("ensembleId") String ensembleId);
 }

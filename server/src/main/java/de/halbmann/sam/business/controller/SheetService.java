@@ -26,12 +26,17 @@ public class SheetService {
     @Inject
     SheetMusicMapper sheetMusicMapper;
 
+    @Inject
+    CoverageSnapshotService coverageSnapshotService;
+
     public PaginatedResponse<SheetMusicSearchResult> findSheets(final SheetFilterRequest filterRequest) {
+        PaginatedResponse<SheetMusicSearchResult> response;
+
         if (filterRequest.getQuery() != null) {
             List<Object[]> results = sheetRepository.searchSheets(
                     filterRequest.getQuery(), filterRequest.getPage(), filterRequest.getSize());
 
-            PaginatedResponse<SheetMusicSearchResult> response = new PaginatedResponse<>();
+            response = new PaginatedResponse<>();
             response.setData(results.stream()
                     .map(r -> new SheetMusicSearchResult(
                             sheetMusicMapper.toDto((SheetMusicEntity) r[0]),
@@ -52,7 +57,6 @@ public class SheetService {
                     .toList());
             response.setPage(filterRequest.getPage());
             response.setSize(response.getData().size());
-            return response;
         } else {
             final Map<String, Object> parameters = new HashMap<>();
             if (filterRequest.getTitle() != null) {
@@ -70,14 +74,26 @@ public class SheetService {
 
             PaginatedResponse<SheetMusic> sheets =
                     getAllSheets(filterRequest, parameters, filterRequest.getTitleStartsWith());
-            PaginatedResponse<SheetMusicSearchResult> response = new PaginatedResponse<>();
+            response = new PaginatedResponse<>();
             response.setPage(filterRequest.getPage());
             response.setSize(sheets.getSize());
             response.setTotalCount(sheets.getTotalCount());
             response.setData(
                     sheets.getData().stream().map(SheetMusicSearchResult::new).toList());
-            return response;
         }
+
+        if (filterRequest.getEnsemble() != null) {
+            attachCoverage(response, filterRequest.getEnsemble());
+        }
+
+        return response;
+    }
+
+    private void attachCoverage(PaginatedResponse<SheetMusicSearchResult> response, String ensembleId) {
+        List<UUID> sheetIds = response.getData().stream().map(SheetMusic::getId).toList();
+        Map<UUID, CoverageSnapshotSummary> coverageMap =
+                coverageSnapshotService.findSummaries(UUID.fromString(ensembleId), sheetIds);
+        response.getData().forEach(r -> r.setCoverage(coverageMap.get(r.getId())));
     }
 
     private PaginatedResponse<SheetMusic> getAllSheets(

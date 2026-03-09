@@ -70,7 +70,19 @@
       "genre": "Genre",
       "style": "Style",
       "year": "Year",
+      "coverage": "Coverage",
       "actions": "Actions"
+    },
+    "ensemble": {
+      "placeholder": "Coverage ensemble…",
+      "clear": "Clear ensemble"
+    },
+    "coverage": {
+      "notComputed": "Coverage not yet computed for {{name}}.",
+      "computeNow": "Compute now",
+      "asOf": "Coverage as of {{time}}.",
+      "recompute": "Recompute",
+      "computing": "Computing…"
     },
     "form": {
       "title": "Title",
@@ -107,7 +119,8 @@
     "detail": {
       "tabs": {
         "details": "Details",
-        "instrumentations": "Instrumentations"
+        "instrumentations": "Instrumentations",
+        "coverage": "Coverage"
       },
       "baseData": "Base Data",
       "documents": "Documents",

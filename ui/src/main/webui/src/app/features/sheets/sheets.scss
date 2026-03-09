@@ -223,7 +223,13 @@
     color: var(--sam-text);
     font-weight: 600;
   }
+
+  .missing-required {
+    color: var(--p-red-500) !important;
+    font-weight: 600;
+  }
 }
+
 
 .score-col {
   width: 5rem;
@@ -243,4 +249,79 @@
   border-radius: var(--p-border-radius);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
   padding: 0.125rem;
+}
+
+// Coverage notice banner
+.coverage-notice {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.5rem 0.875rem;
+  border-radius: var(--p-border-radius);
+  font-size: 0.85rem;
+  background: color-mix(in srgb, var(--p-amber-500) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--p-amber-500) 25%, transparent);
+  color: var(--p-amber-800);
+
+  > i {
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+
+  > span {
+    flex: 1;
+  }
+
+  &.coverage-notice--computed {
+    background: color-mix(in srgb, var(--p-green-500) 8%, transparent);
+    border-color: color-mix(in srgb, var(--p-green-500) 20%, transparent);
+    color: var(--p-green-800);
+  }
+}
+
+.coverage-recompute {
+  cursor: pointer;
+  font-size: 0.8rem;
+  text-decoration: underline;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  &:hover {
+    opacity: 0.75;
+  }
+}
+
+// Coverage badge (mirrors score-pill design)
+.coverage-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-family: monospace;
+  padding: 0.15rem 0.5rem;
+  border-radius: 1rem;
+  letter-spacing: 0.03em;
+
+  &.complete {
+    background: color-mix(in srgb, var(--p-green-500) 15%, transparent);
+    color: var(--p-green-600);
+    border: 1px solid color-mix(in srgb, var(--p-green-500) 30%, transparent);
+  }
+
+  &.playable {
+    background: color-mix(in srgb, var(--p-amber-500) 12%, transparent);
+    color: var(--p-amber-700);
+    border: 1px solid color-mix(in srgb, var(--p-amber-500) 30%, transparent);
+  }
+
+  &.incomplete {
+    background: color-mix(in srgb, var(--p-red-500) 10%, transparent);
+    color: var(--p-red-600);
+    border: 1px solid color-mix(in srgb, var(--p-red-500) 25%, transparent);
+  }
+
+  .pi {
+    font-size: 0.65rem;
+  }
 }

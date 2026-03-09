@@ -21,8 +21,16 @@ import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../core/translation.service';
 import { LayoutPreferenceService } from '../../core/layout-preference.service';
-import { SheetsApiService } from '../../core/api';
-import { Genre, SearchResultMetrics, SheetMusic, SheetMusicSearchResult } from '../../model/datamodels';
+import { EnsemblesApiService, SheetsApiService } from '../../core/api';
+import {
+  CoverageSnapshotSummary,
+  Ensemble,
+  EnsembleCoverageStatus,
+  Genre,
+  SearchResultMetrics,
+  SheetMusic,
+  SheetMusicSearchResult,
+} from '../../model/datamodels';
 import { GENRES, STYLES } from '../../shared/constants';
 import { SheetDetail } from './sheet-detail';
 
@@ -57,6 +65,7 @@ export class Sheets implements OnInit {
 
   protected readonly t = inject(TranslationService);
   private readonly api = inject(SheetsApiService);
+  private readonly ensemblesApi = inject(EnsemblesApiService);
   private readonly router = inject(Router);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly messageService = inject(MessageService);
@@ -88,8 +97,15 @@ export class Sheets implements OnInit {
   );
   protected rows = 20;
 
+  // ── Ensemble context ──────────────────────────────────
+  protected readonly ensembles = signal<Ensemble[]>([]);
+  protected readonly selectedEnsemble = signal<Ensemble | null>(null);
+  protected readonly coverageStatus = signal<EnsembleCoverageStatus | null>(null);
+  protected readonly coverageComputing = signal(false);
+
   protected detailDrawerVisible = false;
   protected selectedSheetId: string | null = null;
+  protected selectedSheetCoverage = signal<CoverageSnapshotSummary | null>(null);
 
   protected readonly viewOptions = [
     { icon: 'pi pi-th-large', value: 'cards' },
@@ -116,6 +132,7 @@ export class Sheets implements OnInit {
     this.viewMode.set(this.layoutPref.getViewMode('sheets'));
     this.loadAvailableLetters();
     this.loadData();
+    this.loadEnsembles();
   }
 
   protected onLazyLoad(event: TableLazyLoadEvent): void {
@@ -167,6 +184,29 @@ export class Sheets implements OnInit {
       )
       .join('');
     return `<div style="font-family:monospace;font-size:.75rem;line-height:1.7">${rowsHtml}</div>`;
+  }
+
+  protected coverageTooltip(c: CoverageSnapshotSummary): string {
+    if (!c.details?.length) return '';
+    const cells = c.details
+      .map((d) => {
+        const scoreColor = d.missingRequired
+          ? '#e53e3e'
+          : (d.score ?? 0) >= 0.85
+            ? '#38a169'
+            : (d.score ?? 0) > 0
+              ? '#d97706'
+              : '#718096';
+        return (
+          `<span style="opacity:.75;padding-right:1.5rem">${d.voiceLabel ?? '?'}</span>` +
+          `<strong style="color:${scoreColor}">${d.missingRequired ? '✗' : this.pct(d.score)}</strong>`
+        );
+      })
+      .join('');
+    return (
+      `<div style="display:grid;grid-template-columns:1fr auto;align-items:center;` +
+      `font-family:monospace;font-size:.73rem;line-height:1.9">${cells}</div>`
+    );
   }
 
   protected onViewModeChange(): void {
@@ -239,6 +279,7 @@ export class Sheets implements OnInit {
   protected openDetail(sheet: SheetMusicSearchResult): void {
     if (window.matchMedia(Sheets.DRAWER_BREAKPOINT).matches) {
       this.selectedSheetId = sheet.id!;
+      this.selectedSheetCoverage.set(sheet.coverage ?? null);
       this.detailDrawerVisible = true;
     } else {
       this.router.navigate(['/sheets', sheet.id]);
@@ -266,6 +307,53 @@ export class Sheets implements OnInit {
     });
   }
 
+  // ── Ensemble context ──────────────────────────────────
+
+  private loadEnsembles(): void {
+    this.ensemblesApi.find({ size: 200 }).subscribe((res) => this.ensembles.set(res.data ?? []));
+  }
+
+  protected onEnsembleChange(ensemble: Ensemble | null): void {
+    this.selectedEnsemble.set(ensemble ?? null);
+    this.coverageStatus.set(null);
+    this.currentPage = 0;
+    if (ensemble?.id) {
+      this.loadCoverageStatus(ensemble.id);
+    }
+    this.loadData();
+  }
+
+  private loadCoverageStatus(ensembleId: string): void {
+    this.ensemblesApi.getCoverageStatus(ensembleId).subscribe({
+      next: (status) => this.coverageStatus.set(status),
+      error: () => this.coverageStatus.set({}),
+    });
+  }
+
+  protected computeCoverage(): void {
+    const ensemble = this.selectedEnsemble();
+    if (!ensemble?.id || this.coverageComputing()) return;
+    this.coverageComputing.set(true);
+    this.ensemblesApi.computeCoverage(ensemble.id).subscribe({
+      next: (status) => {
+        this.coverageStatus.set(status);
+        this.coverageComputing.set(false);
+        this.loadData();
+      },
+      error: () => this.coverageComputing.set(false),
+    });
+  }
+
+  protected formatComputedAt(date: Date | string | null | undefined): string {
+    if (!date) return '';
+    const d = new Date(date as string);
+    const diff = Math.floor((Date.now() - d.getTime()) / 1000);
+    if (diff < 60) return 'just now';
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+    return `${Math.floor(diff / 86400)}d ago`;
+  }
+
   private loadData(): void {
     this.loading.set(true);
     this.api
@@ -275,6 +363,7 @@ export class Sheets implements OnInit {
         query: this.searchFilter || undefined,
         genre: this.selectedGenre() || undefined,
         titleStartsWith: this.selectedLetter() || undefined,
+        ensemble: this.selectedEnsemble()?.id || undefined,
       })
       .subscribe({
         next: (res) => {

@@ -153,6 +153,120 @@
   padding: 0 !important;
 }
 
+// ── Coverage panel ───────────────────────────────────────────────────
+
+.coverage-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-family: monospace;
+  padding: 0.15rem 0.5rem;
+  border-radius: 1rem;
+  letter-spacing: 0.03em;
+
+  &.complete {
+    background: color-mix(in srgb, var(--p-green-500) 15%, transparent);
+    color: var(--p-green-600);
+    border: 1px solid color-mix(in srgb, var(--p-green-500) 30%, transparent);
+  }
+  &.playable {
+    background: color-mix(in srgb, var(--p-amber-500) 12%, transparent);
+    color: var(--p-amber-700);
+    border: 1px solid color-mix(in srgb, var(--p-amber-500) 30%, transparent);
+  }
+  &.incomplete {
+    background: color-mix(in srgb, var(--p-red-500) 10%, transparent);
+    color: var(--p-red-600);
+    border: 1px solid color-mix(in srgb, var(--p-red-500) 25%, transparent);
+  }
+
+  .pi { font-size: 0.65rem; }
+}
+
+.coverage-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--sam-border);
+  margin-bottom: 0.25rem;
+}
+
+.coverage-ensemble-name {
+  font-size: 0.8rem;
+  color: var(--sam-text-muted);
+}
+
+.coverage-voice-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.coverage-voice-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--sam-border);
+
+  &:last-child { border-bottom: none; }
+
+  > .pi {
+    font-size: 0.8rem;
+    margin-top: 0.2rem;
+    flex-shrink: 0;
+  }
+
+  .icon-ok      { color: var(--p-green-500); }
+  .icon-partial { color: var(--p-amber-500); }
+  .icon-missing { color: var(--p-red-500); }
+}
+
+.coverage-voice-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.coverage-voice-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.coverage-voice-name {
+  flex: 1;
+  font-size: 0.875rem;
+}
+
+.coverage-voice-req {
+  font-size: 0.7rem;
+  color: var(--sam-text-muted);
+  background: var(--p-surface-100);
+  border: 1px solid var(--sam-border);
+  padding: 0.05rem 0.3rem;
+  border-radius: 0.25rem;
+  flex-shrink: 0;
+}
+
+.coverage-voice-score {
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: monospace;
+  flex-shrink: 0;
+
+  &.score-missing { color: var(--p-red-500); }
+}
+
+.coverage-voice-expl {
+  font-size: 0.75rem;
+  color: var(--sam-text-muted);
+  margin-top: 0.15rem;
+  word-break: break-word;
+  line-height: 1.4;
+}
+
 // ── Batch toolbar ────────────────────────────────────────────────────
 
 .batch-toolbar {

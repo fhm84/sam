@@ -25,6 +25,7 @@ export class SheetsApiService {
     if (filter.composer) params = params.set('composer', filter.composer);
     if (filter.genre) params = params.set('genre', filter.genre);
     if (filter.titleStartsWith) params = params.set('titleStartsWith', filter.titleStartsWith);
+    if (filter.ensemble) params = params.set('ensemble', filter.ensemble);
     return this.http.get<PaginatedResponse<SheetMusicSearchResult>>(this.baseUrl, { params });
   }
 

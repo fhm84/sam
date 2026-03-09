@@ -43,4 +43,10 @@ public class SheetFilterRequest extends PaginationRequest {
      */
     @QueryParam("favorite")
     private Boolean favorite;
+
+    /**
+     * Ensemble context — when set, coverage snapshots are attached to each result.
+     */
+    @QueryParam("ensemble")
+    private String ensemble;
 }
