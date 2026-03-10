@@ -71,6 +71,28 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
                 .getResultList();
     }
 
+    public Optional<SheetMusicEntity> findByTitle(String title) {
+        return find("lower(title) = lower(:title)", Parameters.with("title", title))
+                .firstResultOptional();
+    }
+
+    /**
+     * Returns up to {@code limit} sheets whose title is similar to {@code title},
+     * ordered by trigram similarity. Requires the {@code pg_trgm} extension.
+     */
+    public List<SheetMusicEntity> findCandidatesByTitle(String title, double threshold, int limit) {
+        return getEntityManager()
+                .createQuery("""
+                        SELECT s FROM SheetMusicEntity s
+                        WHERE FUNCTION('similarity', LOWER(s.title), LOWER(:title)) >= :threshold
+                        ORDER BY FUNCTION('similarity', LOWER(s.title), LOWER(:title)) DESC
+                        """, SheetMusicEntity.class)
+                .setParameter("title", title)
+                .setParameter("threshold", threshold)
+                .setMaxResults(limit)
+                .getResultList();
+    }
+
     public List<String> listAvailableFirstLetters(String genre) {
         String jpql = genre != null
                 ? "SELECT DISTINCT UPPER(SUBSTRING(s.title, 1, 1)) FROM SheetMusicEntity s WHERE s.genre.name = :genre"

@@ -6,13 +6,13 @@ import dev.langchain4j.data.image.Image;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.Base64;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
 
 @Slf4j
 @ApplicationScoped
@@ -29,21 +29,34 @@ public class ClassificationService {
     }
 
     public SheetAnalyzerResult analyzePdf(InputStream fileInputStream) {
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            // in case of a pdf sheet, we first "prepare" the pdf for analyzing (we just need the top and
-            // bottom parts
-            // of the file ... and delegate to image analyzation then)
-            DocumentUtils.pdfToImage(fileInputStream, baos);
-            // in case of debugging, we write out the (temporary) generated image file
-            // TODO: write out generated image file in case of debugging
-            if (debug) {
-                Files.write(Files.createTempFile("sam-sheet-upload", ".png"), baos.toByteArray());
+        try {
+            byte[] pdfBytes = fileInputStream.readAllBytes();
+
+            // Try text extraction first — no vision tokens needed for digital PDFs
+            String extractedText = DocumentUtils.extractText(new ByteArrayInputStream(pdfBytes));
+            if (isMeaningfulText(extractedText)) {
+                log.debug("PDF text extraction succeeded ({} chars), using text path", extractedText.length());
+                return analyzer.analyzeText(extractedText);
             }
 
-            return analyzeImage(IOUtils.copy(baos));
+            // Scanned / image-only PDF: fall back to vision
+            log.debug("PDF text extraction insufficient, falling back to vision path");
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                DocumentUtils.pdfToImage(new ByteArrayInputStream(pdfBytes), baos);
+                if (debug) {
+                    Files.write(Files.createTempFile("sam-sheet-upload", ".png"), baos.toByteArray());
+                }
+                return analyzeImage(new ByteArrayInputStream(baos.toByteArray()));
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static boolean isMeaningfulText(String text) {
+        if (text == null) return false;
+        long printable = text.chars().filter(c -> c > 32 && c != 65533).count();
+        return printable >= 50;
     }
 
     public SheetAnalyzerResult analyzeImage(InputStream fileInputStream) {

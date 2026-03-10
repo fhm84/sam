@@ -9,6 +9,7 @@ import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.tools.imageio.ImageIOUtil;
 
 /**
@@ -25,6 +26,19 @@ import org.apache.pdfbox.tools.imageio.ImageIOUtil;
 public class DocumentUtils {
 
     static final int dpi = 90; // DPI for rendering the PDF
+
+    /**
+     * Extracts plain text from the first page of a PDF using PDFTextStripper.
+     * Returns an empty string for scanned/image-only PDFs (no embedded text).
+     */
+    public static String extractText(InputStream pdfStream) throws IOException {
+        try (PDDocument document = Loader.loadPDF(pdfStream.readAllBytes())) {
+            PDFTextStripper stripper = new PDFTextStripper();
+            stripper.setStartPage(1);
+            stripper.setEndPage(1);
+            return stripper.getText(document);
+        }
+    }
 
     public static void pdfToImage(InputStream pdfFile, OutputStream outputStream) throws IOException {
         // Load the PDF document (incl. auto-close)

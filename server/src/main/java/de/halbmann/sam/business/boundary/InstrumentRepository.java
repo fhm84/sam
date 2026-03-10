@@ -1,21 +1,56 @@
 package de.halbmann.sam.business.boundary;
 
+import de.halbmann.sam.api.entity.InstrumentMatch;
 import de.halbmann.sam.api.entity.PaginationRequest;
 import de.halbmann.sam.api.entity.SortOrder;
 import de.halbmann.sam.business.entity.InstrumentEntity;
 import de.halbmann.sam.business.entity.PaginatedEntities;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
+import io.quarkus.panache.common.Parameters;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.persistence.NoResultException;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
 @Transactional
 public class InstrumentRepository implements PanacheRepositoryBase<InstrumentEntity, String> {
+
+    /**
+     * Returns up to {@code limit} instruments whose name is similar to {@code name},
+     * ordered by trigram similarity (best match first). Only instruments with a similarity
+     * score ≥ {@code threshold} are included. Requires the {@code pg_trgm} extension.
+     */
+    @SuppressWarnings("unchecked")
+    public List<InstrumentMatch> findCandidates(String name, double threshold, int limit) {
+        List<Object[]> rows = getEntityManager()
+                .createNativeQuery("SELECT id, name, similarity(lower(name), lower(:name)) AS score"
+                        + " FROM instruments"
+                        + " WHERE similarity(lower(name), lower(:name)) >= :threshold"
+                        + " ORDER BY score DESC"
+                        + " LIMIT :limit")
+                .setParameter("name", name)
+                .setParameter("threshold", threshold)
+                .setParameter("limit", limit)
+                .getResultList();
+        return rows.stream()
+                .map(r -> new InstrumentMatch((String) r[0], (String) r[1], ((Number) r[2]).doubleValue()))
+                .toList();
+    }
+
+    public Optional<InstrumentEntity> findByName(String name) {
+        try {
+            return Optional.ofNullable(find("lower(name) = lower(:name)", Parameters.with("name", name))
+                    .firstResult());
+        } catch (NoResultException e) {
+            return Optional.empty();
+        }
+    }
 
     public PaginatedEntities<InstrumentEntity> findInstrumentEntities(
             final PaginationRequest paginationRequest, final Map<String, Object> parameters) {

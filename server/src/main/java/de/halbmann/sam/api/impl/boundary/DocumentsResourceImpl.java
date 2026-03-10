@@ -5,6 +5,7 @@ import de.halbmann.sam.api.entity.*;
 import de.halbmann.sam.business.controller.DocumentsService;
 import de.halbmann.sam.business.entity.AttachmentEntity;
 import de.halbmann.sam.business.entity.DocumentEntity;
+import de.halbmann.sam.classification.controller.DocumentClassificationService;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.InternalServerErrorException;
@@ -28,6 +29,9 @@ public class DocumentsResourceImpl implements DocumentsResource {
 
     @Inject
     DocumentsService documentsService;
+
+    @Inject
+    DocumentClassificationService classificationService;
 
     @PathParam("instrumentationId")
     String instrumentationId;
@@ -219,6 +223,16 @@ public class DocumentsResourceImpl implements DocumentsResource {
     @Override
     public void linkDocument(String docIdentifier, DocumentLinkRequest documentLink) {
         documentsService.linkDocument(UUID.fromString(docIdentifier), documentLink);
+    }
+
+    @Override
+    public SheetClassification classify(String docIdentifier) {
+        return classificationService.classify(UUID.fromString(docIdentifier));
+    }
+
+    @Override
+    public ClassificationApplyResult applyClassification(String docIdentifier, ClassificationApplyRequest request) {
+        return classificationService.apply(UUID.fromString(docIdentifier), request);
     }
 
     @Override

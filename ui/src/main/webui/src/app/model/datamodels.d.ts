@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 3.2.1263 on 2026-03-09 21:58:02.
+// Generated using typescript-generator version 3.2.1263 on 2026-03-10 22:18:15.
 
 export interface Attachment {
     checksum?: string;
@@ -28,6 +28,30 @@ export interface Booklet {
 export interface BookletFilterRequest extends PaginationRequest {
     name?: string;
     query?: string;
+}
+
+export interface ClassificationApplyRequest {
+    arrangerId?: string;
+    arrangerName?: string;
+    attachmentType?: AttachmentType;
+    clef?: Clef;
+    composerId?: string;
+    composerName?: string;
+    edition?: string;
+    genre?: Genre;
+    instrumentId?: string;
+    instrumentName?: string;
+    iswc?: string;
+    notationType?: NotationType;
+    partLabel?: string;
+    publisher?: string;
+    sheetId?: string;
+    subtitle?: string;
+    title?: string;
+    yearOfComposition?: number;
+}
+
+export interface ClassificationApplyResult {
 }
 
 export interface CollectionSheet {
@@ -238,6 +262,9 @@ export interface SearchResultMetrics {
     ftsRank?: number;
     phoneticMatch?: boolean;
     titleSimilarity?: number;
+}
+
+export interface SheetClassification {
 }
 
 export interface SheetCollection {

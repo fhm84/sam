@@ -44,7 +44,7 @@ Six Maven modules under parent `de.halbmann:sam`:
 - **api** — JAX-RS interfaces (`SamResources` as root), DTOs/entities, and MicroProfile REST Client annotations. Also generates TypeScript types into `ui/src/main/webui/src/app/model/datamodels.d.ts` via `typescript-generator-maven-plugin`.
 - **core** — Shared business logic and storage SDK integration (CDI beans, no Quarkus runtime dependency).
 - **storage** — Parent POM for storage abstraction with three sub-modules: `storage-sdk` (SPI), `storage-local` (filesystem), `storage-s3` (AWS S3).
-- **server** — Quarkus runtime: REST resource implementations, Hibernate/Panache entities, Flyway migrations, MapStruct mappers, LangChain4j AI integration, document management. Requires PostgreSQL.
+- **server** — Quarkus runtime: REST resource implementations, Hibernate/Panache entities, Flyway migrations, MapStruct mappers, LangChain4j AI integration, document management, AI-based document classification. Requires PostgreSQL.
 - **ui** — Angular frontend served via Quarkus Quinoa. Source lives in `ui/src/main/webui/`.
 - **cli** — Quarkus PicoCLI application for importing sheet music data. Uses the `api` module as a REST client.
 
@@ -57,6 +57,7 @@ Six Maven modules under parent `de.halbmann:sam`:
 - **Full-text search**: PostgreSQL `tsvector`, trigram (`pg_trgm`), and phonetic (`dmetaphone`) search on sheets — see `V1.0.0__Initial_schema.sql`.
 - **Fingerprinting**: `FingerprintService`/`FingerprintFactory` generate content-based fingerprints for deduplication of sheet music.
 - **Sub-resources**: JAX-RS sub-resource pattern — e.g. `SheetsResource.instrumentations(sheetId)` returns `InstrumentationsResource`.
+- **Document classification**: Two-step AI workflow triggered after upload. `POST /documents/{id}/classify` runs the LangChain4j analyzer and returns `SheetClassification` with detected metadata and pre-matched entity references. `POST /documents/{id}/apply` accepts a reviewed `ClassificationApplyRequest` and creates/resolves musician, instrument, sheet, and instrumentation entities, then links the document as an attachment. For PDFs, text is extracted with `PDFTextStripper` first (cheaper); only scanned/image-only PDFs fall back to GPT-4o vision. Key classes: `server/src/main/java/de/halbmann/sam/classification/`.
 
 ## Database
 

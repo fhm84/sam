@@ -1,6 +1,7 @@
 package de.halbmann.sam.business.boundary;
 
 import de.halbmann.sam.api.entity.Musician;
+import de.halbmann.sam.api.entity.MusicianMatch;
 import de.halbmann.sam.api.entity.PaginationRequest;
 import de.halbmann.sam.api.entity.SortOrder;
 import de.halbmann.sam.business.entity.MusicianEntity;
@@ -21,6 +22,27 @@ import java.util.stream.Collectors;
 @ApplicationScoped
 @Transactional
 public class MusicianRepository implements PanacheRepositoryBase<MusicianEntity, UUID> {
+
+    /**
+     * Returns up to {@code limit} musicians whose name is similar to {@code name},
+     * ordered by trigram similarity (best match first). Requires the {@code pg_trgm} extension.
+     */
+    @SuppressWarnings("unchecked")
+    public List<MusicianMatch> findCandidates(String name, double threshold, int limit) {
+        List<Object[]> rows = getEntityManager()
+                .createNativeQuery("SELECT id, name, similarity(lower(name), lower(:name)) AS score"
+                        + " FROM musicians"
+                        + " WHERE similarity(lower(name), lower(:name)) >= :threshold"
+                        + " ORDER BY score DESC"
+                        + " LIMIT :limit")
+                .setParameter("name", name)
+                .setParameter("threshold", threshold)
+                .setParameter("limit", limit)
+                .getResultList();
+        return rows.stream()
+                .map(r -> new MusicianMatch((UUID) r[0], (String) r[1], ((Number) r[2]).doubleValue()))
+                .collect(Collectors.toList());
+    }
 
     public Optional<MusicianEntity> findMusicianByName(final String name) {
         try {

@@ -58,6 +58,27 @@ public interface DocumentsResource {
     void linkDocument(@PathParam("docIdentifier") String docIdentifier, DocumentLinkRequest documentLink);
 
     /**
+     * Run AI-based classification on the stored document.
+     * Returns detected metadata and pre-matched entity references.
+     * Only applicable to documents with MIME type {@code application/pdf} or image types.
+     */
+    @POST
+    @Path("{docIdentifier}/classify")
+    @Produces(MediaType.APPLICATION_JSON)
+    SheetClassification classify(@PathParam("docIdentifier") String docIdentifier);
+
+    /**
+     * Apply a reviewed classification result: creates/resolves entities and links the document
+     * as an attachment to the resulting sheet or instrumentation.
+     */
+    @POST
+    @Path("{docIdentifier}/apply")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    ClassificationApplyResult applyClassification(
+            @PathParam("docIdentifier") String docIdentifier, ClassificationApplyRequest request);
+
+    /**
      * Delete the document identified by given identifier. If sheetId and/or instrumentationId is set, given id is interpreted as attachment id (only removing the "business" link - the attachment), else it's interpreted as documentId. If and only if the document is not linked anywhere (refCount = 0), the document is physically deleted.
      *
      * @param docIdentifier
