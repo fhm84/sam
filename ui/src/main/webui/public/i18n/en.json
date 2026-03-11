@@ -603,11 +603,61 @@
     "choose": "Choose",
     "upload": "Upload",
     "cancel": "Cancel",
-    "dayNames": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-    "dayNamesShort": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-    "dayNamesMin": ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
-    "monthNames": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-    "monthNamesShort": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    "dayNames": [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday"
+    ],
+    "dayNamesShort": [
+      "Sun",
+      "Mon",
+      "Tue",
+      "Wed",
+      "Thu",
+      "Fri",
+      "Sat"
+    ],
+    "dayNamesMin": [
+      "Su",
+      "Mo",
+      "Tu",
+      "We",
+      "Th",
+      "Fr",
+      "Sa"
+    ],
+    "monthNames": [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ],
+    "monthNamesShort": [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec"
+    ],
     "today": "Today",
     "clear": "Clear",
     "weekHeader": "Wk",
@@ -669,5 +719,57 @@
       "saveEdit": "Save Edit",
       "cancelEdit": "Cancel Edit"
     }
+  },
+  "classification": {
+    "title": "Classify Document",
+    "action": "Classify with AI",
+    "analyzing": "Analyzing document with AI…",
+    "analyzeError": "Failed to analyze document.",
+    "matched": "matched",
+    "apply": "Apply",
+    "retry": "Retry",
+    "sheet": {
+      "title": "Sheet Music",
+      "existingMode": "Use existing",
+      "newMode": "Create new",
+      "titleField": "Title",
+      "subtitle": "Subtitle",
+      "publisher": "Publisher",
+      "genre": "Genre",
+      "year": "Year of Composition",
+      "edition": "Edition"
+    },
+    "composer": {
+      "title": "Composer",
+      "name": "Composer name"
+    },
+    "arranger": {
+      "title": "Arranger",
+      "name": "Arranger name"
+    },
+    "instr": {
+      "title": "Instrumentation",
+      "none": "None",
+      "existing": "Use existing",
+      "new": "Create new",
+      "select": "Instrument",
+      "name": "Instrument name",
+      "partLabel": "Part label",
+      "clef": "Clef",
+      "notation": "Notation type"
+    },
+    "attachmentType": "Document type",
+    "person": {
+      "none": "None",
+      "existing": "Existing",
+      "new": "New"
+    },
+    "messages": {
+      "classifyError": "Failed to classify document.",
+      "applied": "Classification applied successfully.",
+      "applyError": "Failed to apply classification."
+    },
+    "loadingPreview": "Loading document…",
+    "previewUnavailable": "Preview unavailable"
   }
 }

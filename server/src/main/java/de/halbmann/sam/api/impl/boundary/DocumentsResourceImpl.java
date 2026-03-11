@@ -152,7 +152,8 @@ public class DocumentsResourceImpl implements DocumentsResource {
         } else if (sheetId != null) {
             attachment = documentsService.loadAttachmentBySheet(sheetId, docIdentifier);
         } else {
-            attachment = documentsService.loadAttachment(docIdentifier);
+            attachment = Optional.ofNullable(documentsService.loadAttachment(docIdentifier))
+                    .orElse(documentsService.load(UUID.fromString(docIdentifier)));
         }
         if (attachment == null) {
             log.info("Document ({}) not found", docIdentifier);

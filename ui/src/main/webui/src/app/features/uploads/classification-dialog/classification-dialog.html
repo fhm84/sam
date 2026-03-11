@@ -1,0 +1,309 @@
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="visibleChange.emit($event)"
+  [header]="'classification.title' | translate"
+  [modal]="true"
+  [style]="{ width: 'min(1400px, 92vw)', height: '88vh' }"
+  [contentStyle]="{ padding: '0', display: 'flex', overflow: 'hidden', flex: '1' }"
+  [breakpoints]="{ '900px': '98vw' }"
+  [draggable]="false"
+  [closable]="phase() !== 'loading' || !!(previewUrl())"
+>
+
+  <!-- ── Split layout ───────────────────────────────────────────── -->
+  <div class="classify-layout">
+
+    <!-- Left: document preview -->
+    <div class="preview-panel">
+      @if (previewLoading()) {
+        <div class="preview-placeholder">
+          <i class="pi pi-spin pi-spinner"></i>
+          <span>{{ 'classification.loadingPreview' | translate }}</span>
+        </div>
+      } @else if (previewUrl()) {
+        @if (isPdf()) {
+          <iframe
+            class="preview-iframe"
+            [src]="previewUrl()!"
+            type="application/pdf"
+          ></iframe>
+        } @else {
+          <div class="preview-image-wrap">
+            <img class="preview-image" [src]="previewUrl()!" [alt]="doc().filename" />
+          </div>
+        }
+      } @else {
+        <div class="preview-placeholder preview-placeholder--unavailable">
+          <i class="pi pi-eye-slash"></i>
+          <span>{{ 'classification.previewUnavailable' | translate }}</span>
+        </div>
+      }
+    </div>
+
+    <!-- Right: form / status -->
+    <div class="form-panel">
+
+      <!-- Loading (AI analysis) -->
+      @if (phase() === 'loading') {
+        <div class="classify-loading">
+          <i class="pi pi-spin pi-spinner classify-spinner"></i>
+          <span>{{ 'classification.analyzing' | translate }}</span>
+          <span class="classify-loading-filename">{{ doc().filename }}</span>
+        </div>
+      }
+
+      <!-- Error -->
+      @if (phase() === 'error') {
+        <div class="classify-error">
+          <i class="pi pi-exclamation-circle"></i>
+          <span>{{ 'classification.analyzeError' | translate }}</span>
+        </div>
+      }
+
+      <!-- Review form -->
+      @if (phase() === 'review' && classification()) {
+        <div class="classify-form">
+
+          <!-- ── SHEET ─────────────────────────────────────────── -->
+          <p-divider align="left">
+            <span class="section-label">{{ 'classification.sheet.title' | translate }}</span>
+          </p-divider>
+
+          <div class="field-row">
+            <p-selectbutton
+              [(ngModel)]="sheetMode"
+              [options]="sheetModeOptions()"
+              optionLabel="label"
+              optionValue="value"
+            />
+          </div>
+
+          @if (sheetMode === 'existing') {
+            <div class="existing-tag">
+              <i class="pi pi-check-circle"></i>
+              <span>{{ classification()!.matchedSheetTitle }}</span>
+              <p-tag [value]="'classification.matched' | translate" severity="success" />
+            </div>
+          }
+
+          @if (sheetMode === 'new') {
+            <div class="fields-grid">
+              <p-floatlabel variant="on" class="field-full">
+                <input pInputText id="sheet-title" [(ngModel)]="sheetTitle" />
+                <label for="sheet-title">{{ 'classification.sheet.titleField' | translate }} *</label>
+              </p-floatlabel>
+
+              <p-floatlabel variant="on">
+                <input pInputText id="sheet-subtitle" [(ngModel)]="sheetSubtitle" />
+                <label for="sheet-subtitle">{{ 'classification.sheet.subtitle' | translate }}</label>
+              </p-floatlabel>
+
+              <p-floatlabel variant="on">
+                <input pInputText id="sheet-publisher" [(ngModel)]="sheetPublisher" />
+                <label for="sheet-publisher">{{ 'classification.sheet.publisher' | translate }}</label>
+              </p-floatlabel>
+
+              <p-floatlabel variant="on">
+                <p-select
+                  inputId="sheet-genre"
+                  [(ngModel)]="sheetGenre"
+                  [options]="genreOptions()"
+                  optionLabel="label"
+                  optionValue="value"
+                  [showClear]="true"
+                  styleClass="w-full"
+                />
+                <label for="sheet-genre">{{ 'classification.sheet.genre' | translate }}</label>
+              </p-floatlabel>
+
+              <p-floatlabel variant="on">
+                <p-inputnumber
+                  inputId="sheet-year"
+                  [(ngModel)]="sheetYear"
+                  [useGrouping]="false"
+                  [min]="1000"
+                  [max]="2100"
+                />
+                <label for="sheet-year">{{ 'classification.sheet.year' | translate }}</label>
+              </p-floatlabel>
+
+              <p-floatlabel variant="on">
+                <input pInputText id="sheet-edition" [(ngModel)]="sheetEdition" />
+                <label for="sheet-edition">{{ 'classification.sheet.edition' | translate }}</label>
+              </p-floatlabel>
+            </div>
+          }
+
+          <!-- ── COMPOSER ───────────────────────────────────────── -->
+          <p-divider align="left">
+            <span class="section-label">{{ 'classification.composer.title' | translate }}</span>
+          </p-divider>
+
+          <div class="field-row">
+            <p-selectbutton
+              [(ngModel)]="composerMode"
+              [options]="composerModeOptions()"
+              optionLabel="label"
+              optionValue="value"
+            />
+          </div>
+
+          @if (composerMode === 'existing') {
+            <div class="existing-tag">
+              <i class="pi pi-user"></i>
+              <span>{{ classification()!.composer }}</span>
+              <p-tag [value]="'classification.matched' | translate" severity="success" />
+            </div>
+          }
+          @if (composerMode === 'new') {
+            <p-floatlabel variant="on">
+              <input pInputText id="composer-name" [(ngModel)]="composerName" />
+              <label for="composer-name">{{ 'classification.composer.name' | translate }} *</label>
+            </p-floatlabel>
+          }
+
+          <!-- ── ARRANGER ───────────────────────────────────────── -->
+          <p-divider align="left">
+            <span class="section-label">{{ 'classification.arranger.title' | translate }}</span>
+          </p-divider>
+
+          <div class="field-row">
+            <p-selectbutton
+              [(ngModel)]="arrangerMode"
+              [options]="composerModeOptions()"
+              optionLabel="label"
+              optionValue="value"
+            />
+          </div>
+
+          @if (arrangerMode === 'existing') {
+            <div class="existing-tag">
+              <i class="pi pi-user"></i>
+              <span>{{ classification()!.arranger }}</span>
+              <p-tag [value]="'classification.matched' | translate" severity="success" />
+            </div>
+          }
+          @if (arrangerMode === 'new') {
+            <p-floatlabel variant="on">
+              <input pInputText id="arranger-name" [(ngModel)]="arrangerName" />
+              <label for="arranger-name">{{ 'classification.arranger.name' | translate }} *</label>
+            </p-floatlabel>
+          }
+
+          <!-- ── INSTRUMENTATION ────────────────────────────────── -->
+          <p-divider align="left">
+            <span class="section-label">{{ 'classification.instr.title' | translate }}</span>
+          </p-divider>
+
+          <div class="field-row">
+            <p-selectbutton
+              [(ngModel)]="instrMode"
+              [options]="instrModeOptions()"
+              optionLabel="label"
+              optionValue="value"
+            />
+          </div>
+
+          @if (instrMode === 'existing') {
+            <p-floatlabel variant="on">
+              <p-select
+                inputId="instr-id"
+                [(ngModel)]="instrId"
+                [options]="instrumentCandidateOptions()"
+                optionLabel="label"
+                optionValue="value"
+                styleClass="w-full"
+              />
+              <label for="instr-id">{{ 'classification.instr.select' | translate }} *</label>
+            </p-floatlabel>
+          }
+          @if (instrMode === 'new') {
+            <p-floatlabel variant="on">
+              <input pInputText id="instr-name" [(ngModel)]="instrName" />
+              <label for="instr-name">{{ 'classification.instr.name' | translate }} *</label>
+            </p-floatlabel>
+          }
+
+          @if (instrMode !== 'none') {
+            <div class="fields-grid fields-grid--instr">
+              <p-floatlabel variant="on">
+                <input pInputText id="instr-part" [(ngModel)]="instrPartLabel" />
+                <label for="instr-part">{{ 'classification.instr.partLabel' | translate }}</label>
+              </p-floatlabel>
+
+              <p-floatlabel variant="on">
+                <p-select
+                  inputId="instr-clef"
+                  [(ngModel)]="instrClef"
+                  [options]="clefOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  [showClear]="true"
+                  styleClass="w-full"
+                />
+                <label for="instr-clef">{{ 'classification.instr.clef' | translate }}</label>
+              </p-floatlabel>
+
+              <p-floatlabel variant="on">
+                <p-select
+                  inputId="instr-notation"
+                  [(ngModel)]="instrNotation"
+                  [options]="notationOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  [showClear]="true"
+                  styleClass="w-full"
+                />
+                <label for="instr-notation">{{ 'classification.instr.notation' | translate }}</label>
+              </p-floatlabel>
+            </div>
+          }
+
+          <!-- ── ATTACHMENT TYPE ────────────────────────────────── -->
+          <p-divider align="left">
+            <span class="section-label">{{ 'classification.attachmentType' | translate }}</span>
+          </p-divider>
+
+          <p-floatlabel variant="on">
+            <p-select
+              inputId="attachment-type"
+              [(ngModel)]="attachmentType"
+              [options]="typeOptions()"
+              optionLabel="label"
+              optionValue="value"
+              styleClass="w-full"
+            />
+            <label for="attachment-type">{{ 'classification.attachmentType' | translate }}</label>
+          </p-floatlabel>
+
+        </div>
+      }
+    </div>
+  </div>
+
+  <ng-template #footer>
+    @if (phase() === 'error') {
+      <p-button
+        [label]="'classification.retry' | translate"
+        icon="pi pi-refresh"
+        severity="secondary"
+        (onClick)="retry()"
+      />
+    }
+    <p-button
+      [label]="'uploads.picker.cancel' | translate"
+      severity="secondary"
+      [text]="true"
+      (onClick)="close()"
+    />
+    @if (phase() === 'review') {
+      <p-button
+        [label]="'classification.apply' | translate"
+        icon="pi pi-check"
+        [disabled]="!canApply()"
+        [loading]="applying()"
+        (onClick)="apply()"
+      />
+    }
+  </ng-template>
+</p-dialog>

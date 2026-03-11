@@ -4,10 +4,13 @@ import {
   computed,
   DestroyRef,
   inject,
+  OnDestroy,
   OnInit,
   signal,
 } from '@angular/core';
+import { SafeResourceUrl } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
+import { NgTemplateOutlet } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subject, debounceTime } from 'rxjs';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
@@ -32,10 +35,13 @@ import { SheetsApiService } from '../../core/api/sheets-api.service';
 import { InstrumentationsApiService } from '../../core/api/instrumentations-api.service';
 import {
   AttachmentType,
+  ClassificationApplyResult,
   DocumentDownload,
   Instrumentation,
   SheetMusicSearchResult,
 } from '../../model/datamodels';
+import { ClassificationDialog } from './classification-dialog/classification-dialog';
+import { DocumentPreviewService } from '../../core/document-preview.service';
 import { formatSize } from '../../shared/utils/format.utils';
 import { ATTACHMENT_TYPES } from '../../shared/constants';
 
@@ -51,6 +57,7 @@ type PickerContext = 'upload' | 'assign';
   selector: 'app-uploads',
   imports: [
     FormsModule,
+    NgTemplateOutlet,
     TableModule,
     ConfirmDialog,
     Dialog,
@@ -66,17 +73,19 @@ type PickerContext = 'upload' | 'assign';
     Tag,
     Tooltip,
     TranslatePipe,
+    ClassificationDialog,
   ],
   providers: [ConfirmationService],
   templateUrl: './uploads.html',
   styleUrl: './uploads.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Uploads implements OnInit {
+export class Uploads implements OnInit, OnDestroy {
   protected readonly t = inject(TranslationService);
   private readonly documentsApi = inject(DocumentsApiService);
   private readonly sheetsApi = inject(SheetsApiService);
   private readonly instrumentationsApi = inject(InstrumentationsApiService);
+  private readonly previewService = inject(DocumentPreviewService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly messageService = inject(MessageService);
   private readonly destroyRef = inject(DestroyRef);
@@ -137,7 +146,21 @@ export class Uploads implements OnInit {
 
   protected readonly assigning = signal(false);
 
+  // ── Assign dialog preview ─────────────────────────────────────────
+  protected readonly pickerPreviewUrl = signal<SafeResourceUrl | null>(null);
+  protected readonly pickerPreviewLoading = signal(false);
+  protected readonly pickerPreviewIsPdf = signal(false);
+  private pickerBlobUrl: string | null = null;
+
+  // ── Classification dialog ─────────────────────────────────────────
+  protected readonly classifyDoc = signal<DocumentDownload | null>(null);
+  protected readonly classifyVisible = signal(false);
+
   private readonly topLevelPath = this.documentsApi.forTopLevel();
+
+  ngOnDestroy(): void {
+    this.revokePickerPreview();
+  }
 
   ngOnInit(): void {
     this.loadDocuments();
@@ -176,8 +199,34 @@ export class Uploads implements OnInit {
     this.pickerInstrModel = null;
     this.pickerSelectedInstr.set(null);
     this.pickerTypeModel = null;
+    this.revokePickerPreview();
+    if (context === 'assign' && doc) {
+      this.pickerPreviewLoading.set(true);
+      this.pickerPreviewIsPdf.set(doc.mimeType === 'application/pdf');
+      this.previewService.load(doc.id!).subscribe({
+        next: ({ safeUrl, rawUrl }) => {
+          this.pickerBlobUrl = rawUrl;
+          this.pickerPreviewUrl.set(safeUrl);
+          this.pickerPreviewLoading.set(false);
+        },
+        error: () => this.pickerPreviewLoading.set(false),
+      });
+    }
     this.pickerVisible.set(true);
     this.doPickerSearch();
+  }
+
+  protected onPickerVisibleChange(visible: boolean): void {
+    if (!visible) this.revokePickerPreview();
+    this.pickerVisible.set(visible);
+  }
+
+  private revokePickerPreview(): void {
+    if (this.pickerBlobUrl) {
+      URL.revokeObjectURL(this.pickerBlobUrl);
+      this.pickerBlobUrl = null;
+      this.pickerPreviewUrl.set(null);
+    }
   }
 
   protected onPickerSearchInput(event: Event): void {
@@ -246,6 +295,8 @@ export class Uploads implements OnInit {
         this.messageService.add({
           severity: 'success',
           summary: this.t.t('uploads.messages.assigned'),
+          detail: this.assignDetail(sheet, instr),
+          life: 6000,
         });
         this.loadDocuments();
       },
@@ -354,7 +405,25 @@ export class Uploads implements OnInit {
     });
   }
 
+  protected openClassify(doc: DocumentDownload): void {
+    this.classifyDoc.set(doc);
+    this.classifyVisible.set(true);
+  }
+
+  protected onClassificationApplied(_result: ClassificationApplyResult): void {
+    this.classifyVisible.set(false);
+    this.classifyDoc.set(null);
+    this.loadDocuments();
+  }
+
   protected formatSize = formatSize;
+
+  private assignDetail(sheet: SheetMusicSearchResult, instr: Instrumentation | null): string {
+    const parts: string[] = [sheet.title];
+    if (sheet.composer?.name) parts.push(`— ${sheet.composer.name}`);
+    if (instr) parts.push(`· ${this.instrLabel(instr)}`);
+    return parts.join(' ');
+  }
 
   private instrLabel(i: Instrumentation): string {
     const name = i.instrument.displayName || i.instrument.name;

@@ -52,6 +52,21 @@ export interface ClassificationApplyRequest {
 }
 
 export interface ClassificationApplyResult {
+    attachmentId?: string;
+    instrumentationId?: string;
+    sheetId?: string;
+}
+
+export interface InstrumentMatch {
+    id?: string;
+    name?: string;
+    score?: number;
+}
+
+export interface MusicianMatch {
+    id?: string;
+    name?: string;
+    score?: number;
 }
 
 export interface CollectionSheet {
@@ -265,6 +280,33 @@ export interface SearchResultMetrics {
 }
 
 export interface SheetClassification {
+    documentId?: string;
+    status?: ClassificationStatus;
+    // AI-detected sheet metadata
+    title?: string;
+    subtitle?: string;
+    publisher?: string;
+    composer?: string;
+    arranger?: string;
+    genre?: string;
+    yearOfComposition?: number;
+    edition?: string;
+    iswc?: string;
+    // AI-detected instrumentation
+    instrumentName?: string;
+    partLabel?: string;
+    transposition?: string;
+    clef?: Clef;
+    notationType?: NotationType;
+    // Pre-matched existing entities
+    matchedSheetId?: string;
+    matchedSheetTitle?: string;
+    matchedComposerId?: string;
+    matchedArrangerId?: string;
+    // Instrument candidates ordered by trigram similarity
+    instrumentCandidates?: InstrumentMatch[];
+    // Pre-filled apply request for user review
+    suggested?: ClassificationApplyRequest;
 }
 
 export interface SheetCollection {

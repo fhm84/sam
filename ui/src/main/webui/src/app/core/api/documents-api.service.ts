@@ -4,10 +4,13 @@ import { Observable, map } from 'rxjs';
 import {
   Attachment,
   AttachmentType,
+  ClassificationApplyRequest,
+  ClassificationApplyResult,
   DocumentDownload,
   DocumentFilterRequest,
   DownloadFormat,
   PaginatedResponse,
+  SheetClassification,
 } from '../../model/datamodels';
 
 export interface UploadProgress {
@@ -112,6 +115,20 @@ export class DocumentsApiService {
       observe: 'response',
       responseType: 'blob',
     });
+  }
+
+  classify(documentId: string): Observable<SheetClassification> {
+    return this.http.post<SheetClassification>(
+      `${this.forTopLevel()}/${documentId}/classify`,
+      null,
+    );
+  }
+
+  apply(documentId: string, request: ClassificationApplyRequest): Observable<ClassificationApplyResult> {
+    return this.http.post<ClassificationApplyResult>(
+      `${this.forTopLevel()}/${documentId}/apply`,
+      request,
+    );
   }
 
   delete(basePath: string, docIdentifier: string): Observable<void> {

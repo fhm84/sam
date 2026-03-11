@@ -183,7 +183,7 @@ public class DocumentsService {
     public DocumentDownload loadAttachment(String docIdentifier) {
         if (docIdentifier != null) {
             AttachmentEntity attachment = attachmentRepository.findById(UUID.fromString(docIdentifier));
-            if (attachment.getDocument() != null) {
+            if (attachment != null && attachment.getDocument() != null) {
                 return load(attachment.getDocument().getId());
             }
         }
@@ -257,7 +257,7 @@ public class DocumentsService {
         return document;
     }
 
-    DocumentDownload load(UUID documentId) {
+    public DocumentDownload load(UUID documentId) {
         DocumentEntity doc = documentRepository
                 .findByIdOptional(documentId)
                 .orElseThrow(() -> new EntityNotFoundException("Document", documentId));

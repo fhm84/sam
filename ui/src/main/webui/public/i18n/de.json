@@ -603,11 +603,61 @@
     "choose": "Auswählen",
     "upload": "Hochladen",
     "cancel": "Abbrechen",
-    "dayNames": ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"],
-    "dayNamesShort": ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"],
-    "dayNamesMin": ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"],
-    "monthNames": ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"],
-    "monthNamesShort": ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"],
+    "dayNames": [
+      "Sonntag",
+      "Montag",
+      "Dienstag",
+      "Mittwoch",
+      "Donnerstag",
+      "Freitag",
+      "Samstag"
+    ],
+    "dayNamesShort": [
+      "So",
+      "Mo",
+      "Di",
+      "Mi",
+      "Do",
+      "Fr",
+      "Sa"
+    ],
+    "dayNamesMin": [
+      "So",
+      "Mo",
+      "Di",
+      "Mi",
+      "Do",
+      "Fr",
+      "Sa"
+    ],
+    "monthNames": [
+      "Januar",
+      "Februar",
+      "März",
+      "April",
+      "Mai",
+      "Juni",
+      "Juli",
+      "August",
+      "September",
+      "Oktober",
+      "November",
+      "Dezember"
+    ],
+    "monthNamesShort": [
+      "Jan",
+      "Feb",
+      "Mär",
+      "Apr",
+      "Mai",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Okt",
+      "Nov",
+      "Dez"
+    ],
     "today": "Heute",
     "clear": "Löschen",
     "weekHeader": "KW",
@@ -669,5 +719,57 @@
       "saveEdit": "Bearbeitung speichern",
       "cancelEdit": "Bearbeitung abbrechen"
     }
+  },
+  "classification": {
+    "title": "Dokument klassifizieren",
+    "action": "Mit KI klassifizieren",
+    "analyzing": "Dokument wird mit KI analysiert…",
+    "analyzeError": "Dokument konnte nicht analysiert werden.",
+    "matched": "gefunden",
+    "apply": "Anwenden",
+    "retry": "Wiederholen",
+    "sheet": {
+      "title": "Notenblatt",
+      "existingMode": "Vorhandenes verwenden",
+      "newMode": "Neues erstellen",
+      "titleField": "Titel",
+      "subtitle": "Untertitel",
+      "publisher": "Verlag",
+      "genre": "Genre",
+      "year": "Entstehungsjahr",
+      "edition": "Ausgabe"
+    },
+    "composer": {
+      "title": "Komponist",
+      "name": "Name des Komponisten"
+    },
+    "arranger": {
+      "title": "Arrangeur",
+      "name": "Name des Arrangeurs"
+    },
+    "instr": {
+      "title": "Instrumentierung",
+      "none": "Keine",
+      "existing": "Vorhanden",
+      "new": "Neu",
+      "select": "Instrument",
+      "name": "Instrumentname",
+      "partLabel": "Stimmbezeichnung",
+      "clef": "Schlüssel",
+      "notation": "Notationstyp"
+    },
+    "attachmentType": "Dokumenttyp",
+    "person": {
+      "none": "Keine",
+      "existing": "Vorhanden",
+      "new": "Neu"
+    },
+    "messages": {
+      "classifyError": "Klassifizierung fehlgeschlagen.",
+      "applied": "Klassifizierung erfolgreich angewendet.",
+      "applyError": "Klassifizierung konnte nicht angewendet werden."
+    },
+    "loadingPreview": "Dokument wird geladen…",
+    "previewUnavailable": "Vorschau nicht verfügbar"
   }
 }

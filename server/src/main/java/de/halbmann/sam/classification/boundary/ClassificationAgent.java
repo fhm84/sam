@@ -15,9 +15,7 @@ import io.quarkiverse.langchain4j.RegisterAiService;
  * <p>Uses tool calls to search for existing sheets, musicians, and instruments in the archive
  * before deciding whether to link to an existing entity or create a new one.
  */
-@RegisterAiService(
-        tools = {InstrumentSearchTool.class, MusicianSearchTool.class, SheetSearchTool.class},
-        chatMemoryProviderSupplier = RegisterAiService.NoChatMemoryProviderSupplier.class)
+@RegisterAiService(tools = {InstrumentSearchTool.class, MusicianSearchTool.class, SheetSearchTool.class})
 public interface ClassificationAgent {
 
     @SystemMessage("""
