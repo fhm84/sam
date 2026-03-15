@@ -222,8 +222,8 @@ public class DocumentsResourceImpl implements DocumentsResource {
     }
 
     @Override
-    public void linkDocument(String docIdentifier, DocumentLinkRequest documentLink) {
-        documentsService.linkDocument(UUID.fromString(docIdentifier), documentLink);
+    public Attachment linkDocument(String docIdentifier, DocumentLinkRequest documentLink) {
+        return documentsService.linkDocument(UUID.fromString(docIdentifier), documentLink);
     }
 
     @Override

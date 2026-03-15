@@ -71,7 +71,12 @@
       "style": "Style",
       "year": "Year",
       "coverage": "Coverage",
-      "actions": "Actions"
+      "actions": "Actions",
+      "attachments": "Attachments",
+      "attachmentsTooltip": {
+        "sheetLevel": "{{count}} sheet-level",
+        "instrLevel": "{{count}} instrumentation"
+      }
     },
     "ensemble": {
       "placeholder": "Coverage ensemble…",
@@ -149,6 +154,18 @@
         "header": "Confirm deletion"
       },
       "documentDeleted": "Document deleted",
+      "relinkDocument": {
+        "tooltip": "Edit link",
+        "header": "Edit document link",
+        "type": "Attachment type",
+        "target": "Move to",
+        "targetSheet": "Sheet level",
+        "targetInstrumentation": "Instrumentation",
+        "selectInstrumentation": "Select instrumentation…",
+        "save": "Save",
+        "cancel": "Cancel",
+        "success": "Document link updated"
+      },
       "uploadComplete": "Upload complete",
       "dropFiles": "Drop files here or click to browse",
       "documentsAfterSave": "Save the sheet first to attach documents.",

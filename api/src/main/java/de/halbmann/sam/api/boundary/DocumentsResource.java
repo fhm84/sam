@@ -53,9 +53,22 @@ public interface DocumentsResource {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     DocumentUpload uploadDocument(@BeanParam FileUploadRequest request);
 
+    /**
+     * Link or relink a document/attachment to a sheet or instrumentation.
+     * <ul>
+     *   <li>If {@code docIdentifier} is an existing <em>attachment</em> ID, the attachment is moved
+     *       to the new target and its type is updated if provided (relink / correct a wrong link).</li>
+     *   <li>If {@code docIdentifier} is a <em>document</em> ID, a new attachment is created and
+     *       linked to the specified target (original behaviour).</li>
+     * </ul>
+     * Passing neither {@code sheetId} nor {@code instrumentationId} in the body moves the attachment
+     * to the unlinked pool without deleting the physical file.
+     */
     @POST
     @Path("{docIdentifier}/link")
-    void linkDocument(@PathParam("docIdentifier") String docIdentifier, DocumentLinkRequest documentLink);
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    Attachment linkDocument(@PathParam("docIdentifier") String docIdentifier, DocumentLinkRequest documentLink);
 
     /**
      * Run AI-based classification on the stored document.

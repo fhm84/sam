@@ -5,13 +5,15 @@ import { ConfirmDialog } from 'primeng/confirmdialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Button } from 'primeng/button';
 import { Panel } from 'primeng/panel';
+import { Select } from 'primeng/select';
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from 'primeng/tabs';
 import { Tooltip } from 'primeng/tooltip';
 import { Tag } from 'primeng/tag';
+import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { SheetsApiService, InstrumentationsApiService } from '../../core/api';
 import { Attachment, AttachmentType, CoverageSnapshotSummary, DownloadFormat, Instrumentation, SheetMusic } from '../../model/datamodels';
-import { DIFFICULTY_LEVELS } from '../../shared/constants';
+import { ATTACHMENT_TYPES, DIFFICULTY_LEVELS } from '../../shared/constants';
 import { DocumentHandler } from '../../shared/base/document-handler';
 import { InstrumentationForm } from './instrumentation-form';
 import { InstrumentationDocuments, DocToggleEvent, DocsLoadedEvent } from './instrumentation-documents';
@@ -24,6 +26,7 @@ import { InstrumentationDocuments, DocToggleEvent, DocsLoadedEvent } from './ins
     ConfirmDialog,
     Button,
     Panel,
+    Select,
     Tabs,
     TabList,
     Tab,
@@ -31,6 +34,7 @@ import { InstrumentationDocuments, DocToggleEvent, DocsLoadedEvent } from './ins
     TabPanel,
     Tooltip,
     TranslatePipe,
+    FormsModule,
     InstrumentationForm,
     Tag,
     InstrumentationDocuments,
@@ -62,6 +66,24 @@ export class SheetDetail extends DocumentHandler implements OnChanges {
 
   protected instrumentationDialogVisible = false;
   protected editingInstrumentation: Instrumentation | null = null;
+
+  // Relink dialog state
+  protected relinkDialogVisible = false;
+  protected relinkingDoc: Attachment | null = null;
+  protected relinkTargetType: 'sheet' | 'instrumentation' = 'sheet';
+  protected relinkInstrumentationId: string | null = null;
+  protected relinkAttachmentType: AttachmentType | null = null;
+
+  protected readonly attachmentTypeOptions = computed(() =>
+    ATTACHMENT_TYPES.map((v) => ({ label: this.t.t(`uploads.attachmentTypes.${v}`), value: v }))
+  );
+
+  protected readonly instrumentationOptions = computed(() =>
+    this.instrumentations().map((i) => ({
+      label: i.instrument?.name + (i.partLabel ? ` (${i.partLabel})` : ''),
+      value: i.id!,
+    }))
+  );
 
   // Row expansion state for the instrumentations table
   protected expandedRows: { [key: string]: boolean } = {};
@@ -185,6 +207,33 @@ export class SheetDetail extends DocumentHandler implements OnChanges {
     req.subscribe({
       error: () => this.sheet.update((current) => (current ? { ...current, favorite: wasFavorite } : current)),
     });
+  }
+
+  // --- Relink document ---
+
+  protected openRelinkDialog(doc: Attachment): void {
+    this.relinkingDoc = doc;
+    this.relinkAttachmentType = doc.type ?? null;
+    this.relinkTargetType = 'sheet';
+    this.relinkInstrumentationId = null;
+    this.relinkDialogVisible = true;
+  }
+
+  protected saveRelink(): void {
+    if (!this.relinkingDoc?.id) return;
+    const instrId =
+      this.relinkTargetType === 'instrumentation' ? (this.relinkInstrumentationId ?? undefined) : undefined;
+    this.documentsApi
+      .linkToSheet(this.relinkingDoc.id, this.sheetId, instrId, this.relinkAttachmentType ?? undefined)
+      .subscribe({
+        next: () => {
+          this.relinkDialogVisible = false;
+          this.messageService.add({ severity: 'success', summary: this.t.t('sheets.detail.relinkDocument.success') });
+          this.loadDocuments();
+          this.loadInstrumentations();
+        },
+        error: () => {},
+      });
   }
 
   // --- Instrumentation document handlers ---

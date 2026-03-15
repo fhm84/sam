@@ -312,3 +312,35 @@
   color: var(--p-primary-color);
   flex: 1;
 }
+
+.relink-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.relink-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.relink-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--p-text-muted-color);
+}
+
+.relink-target-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.relink-radio-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+}

@@ -476,7 +476,36 @@ public class DocumentsService {
         documentRepository.delete(doc);
     }
 
+    /**
+     * Link or relink a document/attachment identified by {@code docIdentifier}.
+     * <ul>
+     *   <li>If the ID resolves to an existing {@link AttachmentEntity} the attachment is moved to
+     *       the new target and its type is updated when provided (relink / correct a wrong link).
+     *       The physical file is never deleted — {@code refCount} stays unchanged.</li>
+     *   <li>Otherwise the ID is treated as a {@link DocumentEntity} and a new attachment is created
+     *       and linked to the given target (original behaviour).</li>
+     * </ul>
+     */
     public Attachment linkDocument(UUID docIdentifier, DocumentLinkRequest documentLink) {
+        // Relink path: id belongs to an existing attachment
+        Optional<AttachmentEntity> existingAttachment = attachmentRepository.findByIdOptional(docIdentifier);
+        if (existingAttachment.isPresent()) {
+            AttachmentEntity attachment = existingAttachment.get();
+
+            // Remove from current location (both junction tables, no-op if already unlinked)
+            instrumentationRepository.removeAttachment(attachment);
+            sheetRepository.removeAttachment(attachment);
+
+            if (documentLink.getAttachmentType() != null) {
+                attachment.setType(documentLink.getAttachmentType());
+            }
+
+            linkToTarget(attachment, documentLink);
+            attachmentRepository.persistAndFlush(attachment);
+            return attachmentMapper.toDto(attachment);
+        }
+
+        // Create path: id belongs to a document — original behaviour
         DocumentEntity document = documentRepository
                 .findByIdOptional(docIdentifier)
                 .orElseThrow(() -> new EntityNotFoundException("Document", docIdentifier));
@@ -485,30 +514,30 @@ public class DocumentsService {
         attachment.setType(Optional.ofNullable(documentLink.getAttachmentType()).orElse(AttachmentType.UNSPECIFIED));
         attachment.setDisplayName(document.getFilename());
 
-        // Link to document only if this type is file-based
         if (documentLink.getAttachmentType() != AttachmentType.EXTERNAL_LINK) {
             attachment.setDocument(document);
             documentRepository.incrementRefCount(document);
         }
 
-        // link the document ...
-        if (documentLink.getInstrumentationId() != null) {
-            // ... to either instrumentation ...
+        linkToTarget(attachment, documentLink);
+        attachmentRepository.persistAndFlush(attachment);
+        return attachmentMapper.toDto(attachment);
+    }
+
+    private void linkToTarget(AttachmentEntity attachment, DocumentLinkRequest request) {
+        if (request.getInstrumentationId() != null) {
             InstrumentationEntity instrumentation = instrumentationRepository
-                    .findByIdOptional(documentLink.getInstrumentationId())
-                    .orElseThrow(
-                            () -> new EntityNotFoundException("Instrumentation", documentLink.getInstrumentationId()));
+                    .findByIdOptional(request.getInstrumentationId())
+                    .orElseThrow(() -> new EntityNotFoundException("Instrumentation", request.getInstrumentationId()));
             instrumentation.getAttachments().add(attachment);
             instrumentationRepository.persist(instrumentation);
-        } else if (documentLink.getSheetId() != null) {
-            // ... or sheetMusic
+        } else if (request.getSheetId() != null) {
             SheetMusicEntity sheet = sheetRepository
-                    .findByIdOptional(documentLink.getSheetId())
-                    .orElseThrow(() -> new EntityNotFoundException("Sheet", documentLink.getSheetId()));
+                    .findByIdOptional(request.getSheetId())
+                    .orElseThrow(() -> new EntityNotFoundException("Sheet", request.getSheetId()));
             sheet.getAttachments().add(attachment);
             sheetRepository.persist(sheet);
         }
-        attachmentRepository.persistAndFlush(attachment);
-        return attachmentMapper.toDto(attachment);
+        // Neither → attachment stays/becomes unlinked (physical file preserved)
     }
 }

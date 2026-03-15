@@ -71,7 +71,12 @@
       "style": "Stil",
       "year": "Jahr",
       "coverage": "Besetzung",
-      "actions": "Aktionen"
+      "actions": "Aktionen",
+      "attachments": "Anhänge",
+      "attachmentsTooltip": {
+        "sheetLevel": "{{count}} Notenblatt-Ebene",
+        "instrLevel": "{{count}} Instrumentierung"
+      }
     },
     "ensemble": {
       "placeholder": "Besetzungsanalyse…",
@@ -149,6 +154,18 @@
         "header": "Löschen bestätigen"
       },
       "documentDeleted": "Dokument gelöscht",
+      "relinkDocument": {
+        "tooltip": "Verknüpfung bearbeiten",
+        "header": "Dokumentverknüpfung bearbeiten",
+        "type": "Anhangstyp",
+        "target": "Verschieben nach",
+        "targetSheet": "Notenblatt-Ebene",
+        "targetInstrumentation": "Instrumentierung",
+        "selectInstrumentation": "Instrumentierung wählen…",
+        "save": "Speichern",
+        "cancel": "Abbrechen",
+        "success": "Dokumentverknüpfung aktualisiert"
+      },
       "uploadComplete": "Upload abgeschlossen",
       "dropFiles": "Dateien hierher ziehen oder klicken zum Durchsuchen",
       "documentsAfterSave": "Speichern Sie das Notenblatt, um Dokumente anzuhängen.",

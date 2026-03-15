@@ -146,6 +146,7 @@
           <th>{{ 'sheets.columns.genre' | translate }}</th>
           <th>{{ 'sheets.columns.style' | translate }}</th>
           <th>{{ 'sheets.columns.year' | translate }}</th>
+          <th class="attachments-col" [pTooltip]="'sheets.columns.attachments' | translate" tooltipPosition="top"><i class="pi pi-paperclip"></i></th>
           @if (hasTextSearch()) {
             <th class="score-col">Match</th>
           }
@@ -178,6 +179,17 @@
           <td>{{ sheet.genre ? ('sheets.genres.' + sheet.genre | translate) : '' }}</td>
           <td>{{ sheet.style ? ('sheets.styles.' + sheet.style | translate) : '' }}</td>
           <td>{{ sheet.yearOfComposition }}</td>
+          <td class="attachments-col">
+            @if (totalAttachments(sheet) > 0) {
+              <span
+                class="attachment-count"
+                [pTooltip]="attachmentTooltip(sheet)"
+                tooltipPosition="left"
+              >{{ totalAttachments(sheet) }}</span>
+            } @else {
+              <span class="attachment-count-empty">—</span>
+            }
+          </td>
           @if (hasTextSearch()) {
             <td class="score-col">
               @if (sheet.metrics) {
@@ -311,6 +323,16 @@
             </div>
             <!-- match score & coverage indicators -->
             <div class="card-indicators">
+              @if (totalAttachments(sheet) > 0) {
+                <span
+                  class="attachment-count"
+                  [pTooltip]="attachmentTooltip(sheet)"
+                  tooltipPosition="left"
+                >
+                  <i class="pi pi-paperclip"></i>
+                  {{ totalAttachments(sheet) }}
+                </span>
+              }
               @if (selectedEnsemble() && sheet.coverage) {
                 <span
                   class="coverage-badge"

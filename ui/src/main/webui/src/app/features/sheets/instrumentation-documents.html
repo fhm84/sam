@@ -32,6 +32,15 @@
               (onClick)="downloadAttachment(doc)"
             />
             <p-button
+              icon="pi pi-pencil"
+              [rounded]="true"
+              [text]="true"
+              size="small"
+              [pTooltip]="'sheets.detail.relinkDocument.tooltip' | translate"
+              tooltipPosition="top"
+              (onClick)="relinkRequested.emit(doc)"
+            />
+            <p-button
               icon="pi pi-trash"
               [rounded]="true"
               [text]="true"

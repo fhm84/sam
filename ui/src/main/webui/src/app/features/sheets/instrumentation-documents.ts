@@ -31,6 +31,7 @@ export class InstrumentationDocuments extends DocumentHandler implements OnChang
 
   @Output() docsLoaded = new EventEmitter<DocsLoadedEvent>();
   @Output() docToggle = new EventEmitter<DocToggleEvent>();
+  @Output() relinkRequested = new EventEmitter<Attachment>();
 
   protected override getDocumentBasePath(): string {
     return this.documentsApi.forInstrumentations(this.sheetId, this.instrumentation.id!);

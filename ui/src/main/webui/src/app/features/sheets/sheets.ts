@@ -344,6 +344,30 @@ export class Sheets implements OnInit {
     });
   }
 
+  protected totalAttachments(sheet: SheetMusic): number {
+    const sheetLevel = sheet.attachments?.length ?? 0;
+    const instrLevel = (sheet.instrumentations ?? []).reduce(
+      (sum, i) => sum + (i.attachments?.length ?? 0),
+      0,
+    );
+    return sheetLevel + instrLevel;
+  }
+
+  protected attachmentTooltip(sheet: SheetMusic): string {
+    const sheetLevel = sheet.attachments?.length ?? 0;
+    const instrLevel = (sheet.instrumentations ?? []).reduce(
+      (sum, i) => sum + (i.attachments?.length ?? 0),
+      0,
+    );
+    if (sheetLevel === 0 && instrLevel === 0) return '';
+    const parts: string[] = [];
+    if (sheetLevel > 0)
+      parts.push(this.t.t('sheets.columns.attachmentsTooltip.sheetLevel').replace('{{count}}', String(sheetLevel)));
+    if (instrLevel > 0)
+      parts.push(this.t.t('sheets.columns.attachmentsTooltip.instrLevel').replace('{{count}}', String(instrLevel)));
+    return parts.join(', ');
+  }
+
   protected formatComputedAt(date: Date | string | null | undefined): string {
     if (!date) return '';
     const d = new Date(date as string);

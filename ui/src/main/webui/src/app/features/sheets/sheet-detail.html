@@ -153,6 +153,15 @@
                             (onClick)="downloadDocument(doc)"
                           />
                           <p-button
+                            icon="pi pi-pencil"
+                            [rounded]="true"
+                            [text]="true"
+                            size="small"
+                            [pTooltip]="t.t('sheets.detail.relinkDocument.tooltip')"
+                            tooltipPosition="top"
+                            (onClick)="openRelinkDialog(doc)"
+                          />
+                          <p-button
                             icon="pi pi-trash"
                             [rounded]="true"
                             [text]="true"
@@ -317,6 +326,7 @@
                       [selectedIds]="getSelectedIdsForInstr(instr.id!)"
                       (docsLoaded)="onDocsLoaded($event)"
                       (docToggle)="onToggleDoc($event)"
+                      (relinkRequested)="openRelinkDialog($event)"
                     />
                   </td>
                 </tr>
@@ -527,6 +537,15 @@
                         (onClick)="downloadDocument(doc)"
                       />
                       <p-button
+                        icon="pi pi-pencil"
+                        [rounded]="true"
+                        [text]="true"
+                        size="small"
+                        [pTooltip]="t.t('sheets.detail.relinkDocument.tooltip')"
+                        tooltipPosition="top"
+                        (onClick)="openRelinkDialog(doc)"
+                      />
+                      <p-button
                         icon="pi pi-trash"
                         [rounded]="true"
                         [text]="true"
@@ -643,6 +662,7 @@
                   [selectedIds]="getSelectedIdsForInstr(instr.id!)"
                   (docsLoaded)="onDocsLoaded($event)"
                   (docToggle)="onToggleDoc($event)"
+                  (relinkRequested)="openRelinkDialog($event)"
                 />
               </td>
             </tr>
@@ -822,6 +842,64 @@
       (cancelled)="instrumentationDialogVisible = false"
     />
   }
+</p-dialog>
+
+<p-dialog
+  [header]="t.t('sheets.detail.relinkDocument.header')"
+  [(visible)]="relinkDialogVisible"
+  [modal]="true"
+  [style]="{ width: '28rem' }"
+>
+  @if (relinkDialogVisible && relinkingDoc) {
+    <div class="relink-form">
+      <div class="relink-field">
+        <label class="relink-label">{{ 'sheets.detail.relinkDocument.type' | translate }}</label>
+        <p-select
+          [options]="attachmentTypeOptions()"
+          [(ngModel)]="relinkAttachmentType"
+          optionLabel="label"
+          optionValue="value"
+          [style]="{ width: '100%' }"
+        />
+      </div>
+      <div class="relink-field">
+        <label class="relink-label">{{ 'sheets.detail.relinkDocument.target' | translate }}</label>
+        <div class="relink-target-options">
+          <label class="relink-radio-label">
+            <input type="radio" name="relinkTarget" value="sheet" [(ngModel)]="relinkTargetType" />
+            {{ 'sheets.detail.relinkDocument.targetSheet' | translate }}
+          </label>
+          <label class="relink-radio-label">
+            <input type="radio" name="relinkTarget" value="instrumentation" [(ngModel)]="relinkTargetType" />
+            {{ 'sheets.detail.relinkDocument.targetInstrumentation' | translate }}
+          </label>
+        </div>
+        @if (relinkTargetType === 'instrumentation') {
+          <p-select
+            [options]="instrumentationOptions()"
+            [(ngModel)]="relinkInstrumentationId"
+            optionLabel="label"
+            optionValue="value"
+            [placeholder]="t.t('sheets.detail.relinkDocument.selectInstrumentation')"
+            [style]="{ width: '100%', marginTop: '0.5rem' }"
+          />
+        }
+      </div>
+    </div>
+  }
+  <ng-template pTemplate="footer">
+    <p-button
+      [label]="t.t('sheets.detail.relinkDocument.cancel')"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="relinkDialogVisible = false"
+    />
+    <p-button
+      [label]="t.t('sheets.detail.relinkDocument.save')"
+      (onClick)="saveRelink()"
+      [disabled]="relinkTargetType === 'instrumentation' && !relinkInstrumentationId"
+    />
+  </ng-template>
 </p-dialog>
 
 <p-confirmdialog />
