@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 4.0-SNAPSHOT on 2026-03-15 16:11:13.
+// Generated using typescript-generator version 4.0-SNAPSHOT on 2026-03-15 17:52:53.
 
 export interface Attachment {
     checksum?: string;
@@ -55,18 +55,6 @@ export interface ClassificationApplyResult {
     attachmentId?: string;
     instrumentationId?: string;
     sheetId?: string;
-}
-
-export interface InstrumentMatch {
-    id?: string;
-    name?: string;
-    score?: number;
-}
-
-export interface MusicianMatch {
-    id?: string;
-    name?: string;
-    score?: number;
 }
 
 export interface CollectionSheet {
@@ -167,11 +155,11 @@ export interface DifficultyJsonbAdapter extends JsonbAdapter<short, number> {
 }
 
 export interface DocumentDownload {
-  id?: string;
-  filename?: string;
-  size?: number;
-  mimeType?: string;
-  checksumSha256?: string;
+    checksumSha256?: string;
+    filename?: string;
+    id?: string;
+    mimeType?: string;
+    size?: number;
 }
 
 export interface DocumentFilterRequest extends PaginationRequest {
@@ -184,8 +172,8 @@ export interface DocumentLinkRequest {
 }
 
 export interface DocumentUpload {
-  document?: DocumentDownload;
-  attachment?: Attachment;
+    attachment?: Attachment;
+    document?: DocumentDownload;
 }
 
 export interface DurationJsonbAdapter extends JsonbAdapter<long, string> {
@@ -236,6 +224,9 @@ export interface InstrumentFilterRequest extends PaginationRequest {
 }
 
 export interface InstrumentMatch {
+    id?: string;
+    name?: string;
+    score?: number;
 }
 
 export interface Instrumentation {
@@ -261,6 +252,9 @@ export interface MusicianFilterRequest extends PaginationRequest {
 }
 
 export interface MusicianMatch {
+    id?: string;
+    name?: string;
+    score?: number;
 }
 
 export interface PaginatedResponse<T> {
@@ -285,42 +279,29 @@ export interface SearchResultMetrics {
     titleSimilarity?: number;
 }
 
-export interface SheetEnrichment {
-    suggestedTags?: string[];
-    suggestedStyle?: Style;
-    suggestedDifficultyLevel?: number;
-    suggestedAdditionalNotes?: string;
-    suggestedYearOfComposition?: number;
-}
-
 export interface SheetClassification {
-    documentId?: string;
-    status?: ClassificationStatus;
-    // AI-detected sheet metadata
-    title?: string;
-    subtitle?: string;
-    publisher?: string;
-    composer?: string;
     arranger?: string;
-    genre?: string;
-    yearOfComposition?: number;
-    edition?: string;
-    iswc?: string;
-    // AI-detected instrumentation
-    instrumentName?: string;
-    partLabel?: string;
-    transposition?: string;
     clef?: Clef;
-    notationType?: NotationType;
-    // Pre-matched existing entities
+    composer?: string;
+    documentId?: string;
+    edition?: string;
+    genre?: string;
+    instrumentCandidates?: InstrumentMatch[];
+    instrumentName?: string;
+    iswc?: string;
+    matchedArrangerId?: string;
+    matchedComposerId?: string;
     matchedSheetId?: string;
     matchedSheetTitle?: string;
-    matchedComposerId?: string;
-    matchedArrangerId?: string;
-    // Instrument candidates ordered by trigram similarity
-    instrumentCandidates?: InstrumentMatch[];
-    // Pre-filled apply request for user review
+    notationType?: NotationType;
+    partLabel?: string;
+    publisher?: string;
+    status?: ClassificationStatus;
+    subtitle?: string;
     suggested?: ClassificationApplyRequest;
+    title?: string;
+    transposition?: string;
+    yearOfComposition?: number;
 }
 
 export interface SheetCollection {
@@ -336,6 +317,14 @@ export interface SheetCollectionFilterRequest extends PaginationRequest {
     name?: string;
     query?: string;
     type?: CollectionType;
+}
+
+export interface SheetEnrichment {
+    suggestedAdditionalNotes?: string;
+    suggestedDifficultyLevel?: number;
+    suggestedStyle?: Style;
+    suggestedTags?: string[];
+    suggestedYearOfComposition?: number;
 }
 
 export interface SheetFilterRequest extends PaginationRequest {
