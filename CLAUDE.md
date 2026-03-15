@@ -30,8 +30,8 @@ SAM (Sheet music Archiving & Management) is a Quarkus-based application for arch
 # Check formatting without fixing
 ./mvnw spotless:check
 
-# Generate TypeScript types from API entities (runs during api module build)
-./mvnw generate-sources -pl api
+# Generate TypeScript types from API entities (opt-in via profile; skipped in normal builds)
+./mvnw generate-sources -pl api -Pgenerate-ts
 
 # Build native executable
 ./mvnw package -Dnative
@@ -41,7 +41,7 @@ SAM (Sheet music Archiving & Management) is a Quarkus-based application for arch
 
 Six Maven modules under parent `de.halbmann:sam`:
 
-- **api** — JAX-RS interfaces (`SamResources` as root), DTOs/entities, and MicroProfile REST Client annotations. Also generates TypeScript types into `ui/src/main/webui/src/app/model/datamodels.d.ts` via `typescript-generator-maven-plugin`.
+- **api** — JAX-RS interfaces (`SamResources` as root), DTOs/entities, and MicroProfile REST Client annotations. TypeScript types can be generated into `ui/src/main/webui/src/app/model/datamodels.d.ts` via `typescript-generator-maven-plugin` (opt-in with `-Pgenerate-ts`; does not run in normal builds because the plugin cannot handle Java records).
 - **core** — Shared business logic and storage SDK integration (CDI beans, no Quarkus runtime dependency).
 - **storage** — Parent POM for storage abstraction with three sub-modules: `storage-sdk` (SPI), `storage-local` (filesystem), `storage-s3` (AWS S3).
 - **server** — Quarkus runtime: REST resource implementations, Hibernate/Panache entities, Flyway migrations, MapStruct mappers, LangChain4j AI integration, document management, AI-based document classification. Requires PostgreSQL.
