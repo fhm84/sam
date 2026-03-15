@@ -36,6 +36,11 @@ import {
   NotationType,
   SheetClassification,
 } from '../../../model/datamodels';
+
+export interface ClassificationAppliedEvent {
+  result: ClassificationApplyResult;
+  isNewSheet: boolean;
+}
 import { ATTACHMENT_TYPES, GENRES } from '../../../shared/constants';
 
 type SheetMode = 'existing' | 'new';
@@ -71,7 +76,7 @@ export class ClassificationDialog implements OnDestroy {
   readonly doc = input.required<DocumentDownload>();
   readonly visible = input(false);
   readonly visibleChange = output<boolean>();
-  readonly applied = output<ClassificationApplyResult>();
+  readonly applied = output<ClassificationAppliedEvent>();
 
   // ── Preview ────────────────────────────────────────────────────────
   protected readonly previewUrl = signal<SafeResourceUrl | null>(null);
@@ -334,6 +339,7 @@ export class ClassificationDialog implements OnDestroy {
     req.attachmentType = this.attachmentType ?? 'UNSPECIFIED';
 
     const detail = this.buildApplyDetail();
+    const isNewSheet = this.sheetMode === 'new';
     this.applying.set(true);
     this.documentsApi.apply(this.doc().id!, req).subscribe({
       next: (result) => {
@@ -344,7 +350,7 @@ export class ClassificationDialog implements OnDestroy {
           detail,
           life: 6000,
         });
-        this.applied.emit(result);
+        this.applied.emit({ result, isNewSheet });
       },
       error: () => {
         this.applying.set(false);

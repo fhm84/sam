@@ -52,6 +52,26 @@
     </div>
   </div>
 
+  @if (showEnrichPrompt()) {
+    <div class="enrich-prompt">
+      <i class="pi pi-sparkles enrich-prompt-icon"></i>
+      <span class="enrich-prompt-text">{{ 'enrichment.prompt.text' | translate }}</span>
+      <p-button
+        [label]="t.t('enrichment.prompt.confirm')"
+        icon="pi pi-sparkles"
+        size="small"
+        (onClick)="openEnrichDialog()"
+      />
+      <p-button
+        [label]="t.t('enrichment.prompt.skip')"
+        size="small"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="dismissEnrichPrompt()"
+      />
+    </div>
+  }
+
   @if (mode === 'compact') {
     <!-- ── Sidebar: tabbed layout ─────────────────────── -->
     <p-tabs [value]="0" class="detail-tabs">

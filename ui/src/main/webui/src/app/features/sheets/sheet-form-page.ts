@@ -59,7 +59,7 @@ export class SheetFormPage extends DocumentHandler implements OnInit {
     this.messageService.add({ severity: 'success', summary: this.t.t(key) });
 
     if (!this.isEdit && result.id) {
-      this.router.navigate(['/sheets', result.id, 'edit']);
+      this.router.navigate(['/sheets', result.id], { queryParams: { enrich: 'true' } });
     } else {
       this.router.navigate(['/sheets']);
     }

@@ -29,6 +29,9 @@ public class SheetService {
     @Inject
     CoverageSnapshotService coverageSnapshotService;
 
+    @Inject
+    DocumentsService documentsService;
+
     public PaginatedResponse<SheetMusicSearchResult> findSheets(final SheetFilterRequest filterRequest) {
         PaginatedResponse<SheetMusicSearchResult> response;
 
@@ -120,20 +123,8 @@ public class SheetService {
 
     public SheetMusic addSheet(final CreateSheetMusic sheetMusic) {
         final SheetMusicEntity entity = sheetMusicMapper.fromDto(sheetMusic);
-        if (sheetMusic.getComposer() != null) {
-            MusicianEntity composer = Optional.ofNullable(musicianRepository.resolveMusician(sheetMusic.getComposer()))
-                    .orElse(musicianRepository
-                            .findMusicianByName(sheetMusic.getComposer().getName())
-                            .orElse(null));
-            entity.setComposer(composer);
-        }
-        if (sheetMusic.getArranger() != null) {
-            MusicianEntity arranger = Optional.ofNullable(musicianRepository.resolveMusician(sheetMusic.getArranger()))
-                    .orElse(musicianRepository
-                            .findMusicianByName(sheetMusic.getArranger().getName())
-                            .orElse(null));
-            entity.setComposer(arranger);
-        }
+        entity.setComposer(resolveOrCreateMusician(sheetMusic.getComposer()));
+        entity.setArranger(resolveOrCreateMusician(sheetMusic.getArranger()));
         sheetRepository.persistAndFlush(entity);
         return sheetMusicMapper.toDto(entity);
     }
@@ -143,6 +134,29 @@ public class SheetService {
                 .findByIdOptional(UUID.fromString(sheetId))
                 .orElseThrow(() -> new EntityNotFoundException("SheetMusic", sheetId));
         sheetMusicMapper.update(entity, sheetMusic);
+        entity.setComposer(resolveOrCreateMusician(sheetMusic.getComposer()));
+        entity.setArranger(resolveOrCreateMusician(sheetMusic.getArranger()));
+    }
+
+    private MusicianEntity resolveOrCreateMusician(final Musician dto) {
+        if (dto == null) {
+            return null;
+        }
+        if (dto.getId() != null) {
+            MusicianEntity found = musicianRepository.findByIdOptional(dto.getId()).orElse(null);
+            if (found != null) {
+                return found;
+            }
+        }
+        if (dto.getName() != null && !dto.getName().isBlank()) {
+            return musicianRepository.findMusicianByName(dto.getName()).orElseGet(() -> {
+                MusicianEntity m = new MusicianEntity();
+                m.setName(dto.getName().trim());
+                musicianRepository.persist(m);
+                return m;
+            });
+        }
+        return null;
     }
 
     public List<String> getDistinctGenres() {
@@ -157,6 +171,16 @@ public class SheetService {
         final SheetMusicEntity entity = sheetRepository
                 .findByIdOptional(UUID.fromString(sheetId))
                 .orElseThrow(() -> new EntityNotFoundException("SheetMusic", sheetId));
+        // Unlink sheet-level attachments
+        if (entity.getAttachments() != null) {
+            documentsService.unlinkAttachments(new ArrayList<>(entity.getAttachments()));
+        }
+        // Unlink instrumentation-level attachments (instrumentations are cascade-deleted next)
+        for (final var instr : entity.getInstrumentations()) {
+            if (instr.getAttachments() != null) {
+                documentsService.unlinkAttachments(new ArrayList<>(instr.getAttachments()));
+            }
+        }
         sheetRepository.delete(entity);
     }
 

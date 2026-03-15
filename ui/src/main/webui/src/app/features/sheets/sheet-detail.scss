@@ -1,6 +1,29 @@
 @use 'pages';
 @use 'details';
 
+.enrich-prompt {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 1rem;
+  margin-bottom: 0.75rem;
+  background: color-mix(in srgb, var(--p-primary-color) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--p-primary-color) 25%, transparent);
+  border-radius: var(--p-border-radius-md, 6px);
+
+  .enrich-prompt-icon {
+    color: var(--p-primary-color);
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .enrich-prompt-text {
+    flex: 1;
+    font-size: 0.875rem;
+    color: var(--p-text-color);
+  }
+}
+
 .detail-title-row {
   display: flex;
   align-items: center;

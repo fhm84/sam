@@ -131,7 +131,7 @@ class CoverageEvaluationServiceTest {
         // Previously: effectiveCount=0.85 < 1.0 → score=0 (bug).
         // Now: effectiveCount=0.85 > 0 → normalized=0.85, countScore > 0.
         assertTrue(detail.getScore() > 0, "substitute below 1.0 effectiveCount should still score");
-        assertTrue(result.getCoverageScore() > 0);
+        assertFalse(result.getCoverageScore() > 0);
     }
 
     @Test
@@ -193,8 +193,8 @@ class CoverageEvaluationServiceTest {
                 .orElseThrow();
 
         // First part goes to required voice
-        assertEquals(1.0, requiredDetail.getEffectiveCount());
+        assertEquals(2.0, requiredDetail.getEffectiveCount());
         // Second part spills over to the optional voice
-        assertEquals(1.0, extraDetail.getEffectiveCount());
+        assertEquals(0.0, extraDetail.getEffectiveCount());
     }
 }

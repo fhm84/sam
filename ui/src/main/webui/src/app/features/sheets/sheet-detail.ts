@@ -56,6 +56,7 @@ export class SheetDetail extends DocumentHandler implements OnChanges {
   private readonly instrumentationsApi = inject(InstrumentationsApiService);
 
   @Input({ required: true }) sheetId!: string;
+  @Input() autoEnrich = false;
   @Input() coverage: CoverageSnapshotSummary | null = null;
   @Input() ensembleName?: string;
   @Output() edit = new EventEmitter<SheetMusic>();
@@ -71,6 +72,7 @@ export class SheetDetail extends DocumentHandler implements OnChanges {
 
   // Enrichment dialog state
   protected enrichDialogVisible = false;
+  protected readonly showEnrichPrompt = signal(false);
 
   // Relink dialog state
   protected relinkDialogVisible = false;
@@ -141,7 +143,12 @@ export class SheetDetail extends DocumentHandler implements OnChanges {
   }
 
   protected openEnrichDialog(): void {
+    this.showEnrichPrompt.set(false);
     this.enrichDialogVisible = true;
+  }
+
+  protected dismissEnrichPrompt(): void {
+    this.showEnrichPrompt.set(false);
   }
 
   protected onEnriched(): void {
@@ -383,6 +390,10 @@ export class SheetDetail extends DocumentHandler implements OnChanges {
       next: (sheet) => {
         this.sheet.set(sheet);
         this.loading.set(false);
+        if (this.autoEnrich) {
+          this.autoEnrich = false;
+          this.showEnrichPrompt.set(true);
+        }
       },
       error: () => {
         this.loading.set(false);

@@ -238,7 +238,7 @@ public class DocumentsResourceImpl implements DocumentsResource {
 
     @Override
     public void delete(String docIdentifier) {
-        if (sheetId == null && instrumentationId != null) {
+        if (sheetId == null && instrumentationId == null) {
             documentsService.deleteIfUnlinked(UUID.fromString(docIdentifier));
         } else {
             documentsService.deleteAttachment(docIdentifier);

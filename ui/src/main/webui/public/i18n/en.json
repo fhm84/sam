@@ -760,6 +760,11 @@
     "notes": {
       "title": "Additional Notes"
     },
+    "prompt": {
+      "text": "Enrich this sheet with AI suggestions?",
+      "confirm": "Enrich now",
+      "skip": "Skip"
+    },
     "messages": {
       "applied": "Enrichment applied successfully.",
       "error": "Failed to save enrichment."

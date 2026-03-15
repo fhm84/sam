@@ -25,6 +25,7 @@ import { SheetDetail } from './sheet-detail';
       </p-toolbar>
       <app-sheet-detail
         [sheetId]="sheetId()"
+        [autoEnrich]="autoEnrich()"
         mode="full"
         (edit)="onEdit($event)"
         (deleted)="onDeleted()"
@@ -47,9 +48,11 @@ export class SheetDetailPage implements OnInit {
   private readonly router = inject(Router);
 
   protected readonly sheetId = signal('');
+  protected readonly autoEnrich = signal(false);
 
   ngOnInit(): void {
     this.sheetId.set(this.route.snapshot.paramMap.get('id')!);
+    this.autoEnrich.set(this.route.snapshot.queryParamMap.get('enrich') === 'true');
   }
 
   protected goBack(): void {

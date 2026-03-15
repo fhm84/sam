@@ -12,6 +12,7 @@ import { SafeResourceUrl } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { NgTemplateOutlet } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Router } from '@angular/router';
 import { Subject, debounceTime } from 'rxjs';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { ConfirmDialog } from 'primeng/confirmdialog';
@@ -35,12 +36,11 @@ import { SheetsApiService } from '../../core/api/sheets-api.service';
 import { InstrumentationsApiService } from '../../core/api/instrumentations-api.service';
 import {
   AttachmentType,
-  ClassificationApplyResult,
   DocumentDownload,
   Instrumentation,
   SheetMusicSearchResult,
 } from '../../model/datamodels';
-import { ClassificationDialog } from './classification-dialog/classification-dialog';
+import { ClassificationAppliedEvent, ClassificationDialog } from './classification-dialog/classification-dialog';
 import { DocumentPreviewService } from '../../core/document-preview.service';
 import { formatSize } from '../../shared/utils/format.utils';
 import { ATTACHMENT_TYPES } from '../../shared/constants';
@@ -89,6 +89,7 @@ export class Uploads implements OnInit, OnDestroy {
   private readonly confirmationService = inject(ConfirmationService);
   private readonly messageService = inject(MessageService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly router = inject(Router);
 
   // ── Unlinked documents ────────────────────────────────────────────
   protected readonly documents = signal<DocumentDownload[]>([]);
@@ -410,10 +411,14 @@ export class Uploads implements OnInit, OnDestroy {
     this.classifyVisible.set(true);
   }
 
-  protected onClassificationApplied(_result: ClassificationApplyResult): void {
+  protected onClassificationApplied(event: ClassificationAppliedEvent): void {
     this.classifyVisible.set(false);
     this.classifyDoc.set(null);
-    this.loadDocuments();
+    if (event.isNewSheet && event.result.sheetId) {
+      this.router.navigate(['/sheets', event.result.sheetId], { queryParams: { enrich: 'true' } });
+    } else {
+      this.loadDocuments();
+    }
   }
 
   protected formatSize = formatSize;

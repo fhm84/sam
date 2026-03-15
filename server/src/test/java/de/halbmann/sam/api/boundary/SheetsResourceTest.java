@@ -36,7 +36,7 @@ class SheetsResourceTest {
                     .statusCode(200)
                     .contentType(ContentType.JSON)
                     .body("title", equalTo(sheet.getTitle()))
-                    .body("genre", equalTo(sheet.getGenre()))
+                    .body("genre", equalTo(sheet.getGenre().name()))
                     .body("difficultyLevel", equalTo(sheet.getDifficultyLevel().getGrade()))
                     .body("publisher", equalTo(sheet.getPublisher()))
                     .body("yearOfComposition", equalTo(sheet.getYearOfComposition()))
@@ -72,6 +72,7 @@ class SheetsResourceTest {
         assertEquals("Kuschelpolka", sheetResponse.getTitle());
         assertEquals(Genre.POLKA, sheetResponse.getGenre());
         assertEquals("Ewoton Verlag", sheetResponse.getPublisher());
+        assertNotNull(sheetResponse.getComposer());
         assertEquals("Frank Bernaerts", sheetResponse.getComposer().getName());
 
         given().get("/api/sheets")

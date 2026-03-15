@@ -23,13 +23,14 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <compiler-plugin.version>3.13.0</compiler-plugin.version>
-        <surefire-plugin.version>3.5.2</surefire-plugin.version>
-        <jandex-maven-plugin.version>3.3.0</jandex-maven-plugin.version>
-        <spotless-maven-plugin.version>3.2.1</spotless-maven-plugin.version>
+        <compiler-plugin.version>3.15.0</compiler-plugin.version>
+        <surefire-plugin.version>3.5.5</surefire-plugin.version>
+        <jandex-maven-plugin.version>3.5.3</jandex-maven-plugin.version>
+        <spotless-maven-plugin.version>3.3.0</spotless-maven-plugin.version>
+        <palantir-java-format.version>2.89.0</palantir-java-format.version>
 
         <quarkus.platform.version>3.32.3</quarkus.platform.version>
-        <lombok.version>1.18.42</lombok.version>
+        <lombok.version>1.18.44</lombok.version>
         <org.mapstruct.version>1.6.3</org.mapstruct.version>
 
         <tika-core.version>3.2.3</tika-core.version>
@@ -81,7 +82,7 @@
                 <configuration>
                     <java>
                         <palantirJavaFormat>
-                            <version>2.87.0</version>
+                            <version>${palantir-java-format.version}</version>
                             <style>PALANTIR</style>
                             <formatJavadoc>false</formatJavadoc>
                         </palantirJavaFormat>

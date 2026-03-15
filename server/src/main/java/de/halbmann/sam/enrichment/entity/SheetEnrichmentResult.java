@@ -14,8 +14,4 @@ import java.util.List;
  * @param yearOfComposition  Year the piece was composed.
  */
 public record SheetEnrichmentResult(
-        List<String> tags,
-        String style,
-        String difficultyLevel,
-        String additionalNotes,
-        Integer yearOfComposition) {}
+        List<String> tags, String style, String difficultyLevel, String additionalNotes, Integer yearOfComposition) {}

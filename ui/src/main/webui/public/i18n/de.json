@@ -760,6 +760,11 @@
     "notes": {
       "title": "Zusätzliche Notizen"
     },
+    "prompt": {
+      "text": "Dieses Notenblatt mit KI-Vorschlägen anreichern?",
+      "confirm": "Jetzt anreichern",
+      "skip": "Überspringen"
+    },
     "messages": {
       "applied": "Anreicherung erfolgreich übernommen.",
       "error": "Anreicherung konnte nicht gespeichert werden."

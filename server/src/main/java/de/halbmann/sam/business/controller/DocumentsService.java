@@ -281,6 +281,17 @@ public class DocumentsService {
         return documentRepository.findUnlinked();
     }
 
+    public void unlinkAttachments(Collection<AttachmentEntity> attachments) {
+        for (AttachmentEntity attachment : attachments) {
+            DocumentEntity document = attachment.getDocument();
+            attachmentRepository.delete(attachment);
+            if (document != null) {
+                documentRepository.decrementRefCount(document);
+                // Intentionally no deleteIfUnlinked: document stays in the uploads pool
+            }
+        }
+    }
+
     public void deleteAttachment(String attachmentId) {
         AttachmentEntity attachment = attachmentRepository
                 .findByIdOptional(UUID.fromString(attachmentId))

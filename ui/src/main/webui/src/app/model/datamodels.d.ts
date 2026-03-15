@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 4.0-SNAPSHOT on 2026-03-15 17:52:53.
+// Generated using typescript-generator version 4.0-SNAPSHOT on 2026-03-15 18:27:15.
 
 export interface Attachment {
     checksum?: string;

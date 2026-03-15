@@ -14,6 +14,7 @@ import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,6 +33,9 @@ public class InstrumentationService {
 
     @Inject
     InstrumentRepository instrumentRepository;
+
+    @Inject
+    DocumentsService documentsService;
 
     public List<Instrumentation> getInstrumentations(final String sheetId) {
         Sort sort = Sort.ascending("instrument.name", "partLabel");
@@ -93,6 +97,9 @@ public class InstrumentationService {
         final InstrumentationEntity entity = instrumentationRepository
                 .findByIdOptional(UUID.fromString(instrumentationId))
                 .orElseThrow(() -> new EntityNotFoundException("Instrumentation", instrumentationId));
+        if (entity.getAttachments() != null) {
+            documentsService.unlinkAttachments(new ArrayList<>(entity.getAttachments()));
+        }
         instrumentationRepository.delete(entity);
     }
 }

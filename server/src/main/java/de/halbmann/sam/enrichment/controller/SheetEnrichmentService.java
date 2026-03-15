@@ -48,16 +48,24 @@ public class SheetEnrichmentService {
             sb.append("Style (already set): ").append(sheet.getStyle()).append("\n");
         }
         if (sheet.getYearOfComposition() != null) {
-            sb.append("Year of composition (already set): ").append(sheet.getYearOfComposition()).append("\n");
+            sb.append("Year of composition (already set): ")
+                    .append(sheet.getYearOfComposition())
+                    .append("\n");
         }
         if (sheet.getDifficultyLevel() != null) {
-            sb.append("Difficulty (already set): ").append(sheet.getDifficultyLevel()).append("\n");
+            sb.append("Difficulty (already set): ")
+                    .append(sheet.getDifficultyLevel())
+                    .append("\n");
         }
         if (sheet.getTags() != null && !sheet.getTags().isEmpty()) {
-            sb.append("Tags (already set): ").append(String.join(", ", sheet.getTags())).append("\n");
+            sb.append("Tags (already set): ")
+                    .append(String.join(", ", sheet.getTags()))
+                    .append("\n");
         }
         if (sheet.getAdditionalNotes() != null && !sheet.getAdditionalNotes().isBlank()) {
-            sb.append("Notes (already set): ").append(sheet.getAdditionalNotes()).append("\n");
+            sb.append("Notes (already set): ")
+                    .append(sheet.getAdditionalNotes())
+                    .append("\n");
         }
         return sb.toString();
     }
@@ -75,7 +83,8 @@ public class SheetEnrichmentService {
     private Style parseStyle(String suggested, Style existing) {
         if (suggested == null || existing != null) return null;
         try {
-            return Style.valueOf(suggested.trim().toUpperCase().replace(' ', '_').replace('-', '_'));
+            return Style.valueOf(
+                    suggested.trim().toUpperCase().replace(' ', '_').replace('-', '_'));
         } catch (IllegalArgumentException e) {
             return null;
         }
@@ -103,9 +112,8 @@ public class SheetEnrichmentService {
     }
 
     private Set<String> filterTags(java.util.List<String> suggested, Set<String> existing) {
-        Set<String> existingLower = existing != null
-                ? existing.stream().map(String::toLowerCase).collect(Collectors.toSet())
-                : Set.of();
+        Set<String> existingLower =
+                existing != null ? existing.stream().map(String::toLowerCase).collect(Collectors.toSet()) : Set.of();
         if (suggested == null) return new LinkedHashSet<>();
         return suggested.stream()
                 .map(t -> t.trim().toLowerCase())
