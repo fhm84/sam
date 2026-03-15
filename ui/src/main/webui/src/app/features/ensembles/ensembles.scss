@@ -69,17 +69,3 @@
 }
 
 
-.card-actions {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  display: flex;
-  gap: 0.125rem;
-  opacity: 0;
-  transition: opacity 0.15s;
-  background: var(--sam-surface);
-  border: 1px solid var(--sam-border);
-  border-radius: var(--p-border-radius);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-  padding: 0.125rem;
-}

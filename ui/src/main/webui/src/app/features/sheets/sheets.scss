@@ -256,21 +256,6 @@
   text-align: center !important;
 }
 
-.card-actions {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  display: flex;
-  gap: 0.125rem;
-  opacity: 0;
-  transition: opacity 0.15s;
-  background: var(--sam-surface);
-  border: 1px solid var(--sam-border);
-  border-radius: var(--p-border-radius);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-  padding: 0.125rem;
-}
-
 // Coverage notice banner
 .coverage-notice {
   display: flex;
@@ -311,37 +296,4 @@
   }
 }
 
-// Coverage badge (mirrors score-pill design)
-.coverage-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  font-size: 0.7rem;
-  font-weight: 700;
-  font-family: monospace;
-  padding: 0.15rem 0.5rem;
-  border-radius: 1rem;
-  letter-spacing: 0.03em;
 
-  &.complete {
-    background: color-mix(in srgb, var(--p-green-500) 15%, transparent);
-    color: var(--p-green-600);
-    border: 1px solid color-mix(in srgb, var(--p-green-500) 30%, transparent);
-  }
-
-  &.playable {
-    background: color-mix(in srgb, var(--p-amber-500) 12%, transparent);
-    color: var(--p-amber-700);
-    border: 1px solid color-mix(in srgb, var(--p-amber-500) 30%, transparent);
-  }
-
-  &.incomplete {
-    background: color-mix(in srgb, var(--p-red-500) 10%, transparent);
-    color: var(--p-red-600);
-    border: 1px solid color-mix(in srgb, var(--p-red-500) 25%, transparent);
-  }
-
-  .pi {
-    font-size: 0.65rem;
-  }
-}
