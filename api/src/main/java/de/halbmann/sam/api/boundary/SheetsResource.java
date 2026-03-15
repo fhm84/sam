@@ -142,4 +142,15 @@ public interface SheetsResource {
     @Path("{sheetId}/coverage")
     CoverageResult coverage(
             final @PathParam("sheetId") String sheetId, final @QueryParam("ensemble") String ensembleId);
+
+    /**
+     * Runs AI-powered data enrichment on an existing sheet music entry and returns suggestions
+     * for missing or complementary metadata (tags, style, difficulty, notes, year).
+     *
+     * @param sheetId the ID of the sheet music to enrich
+     * @return enrichment suggestions for user review
+     */
+    @POST
+    @Path("{sheetId}/enrich")
+    SheetEnrichment enrich(final @PathParam("sheetId") String sheetId);
 }

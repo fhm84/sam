@@ -35,6 +35,15 @@
             tooltipPosition="top"
             (onClick)="onEdit()"
           />
+          <p-button
+            icon="pi pi-sparkles"
+            [rounded]="true"
+            [text]="true"
+            size="small"
+            [pTooltip]="t.t('enrichment.action')"
+            tooltipPosition="top"
+            (onClick)="openEnrichDialog()"
+          />
         </div>
         @if (s.subtitle) {
           <p class="detail-subtitle">{{ s.subtitle }}</p>
@@ -901,5 +910,14 @@
     />
   </ng-template>
 </p-dialog>
+
+@if (sheet(); as s) {
+  <app-enrichment-dialog
+    [sheet]="s"
+    [visible]="enrichDialogVisible"
+    (visibleChange)="enrichDialogVisible = $event"
+    (enriched)="onEnriched()"
+  />
+}
 
 <p-confirmdialog />

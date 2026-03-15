@@ -5,6 +5,7 @@ import {
   CreateSheetMusic,
   CoverageResult,
   PaginatedResponse,
+  SheetEnrichment,
   SheetFilterRequest,
   SheetMusic,
   SheetMusicSearchResult,
@@ -74,5 +75,9 @@ export class SheetsApiService {
 
   removeTags(id: string, tags: string[]): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}/tags`, { body: tags });
+  }
+
+  enrich(id: string): Observable<SheetEnrichment> {
+    return this.http.post<SheetEnrichment>(`${this.baseUrl}/${id}/enrich`, null);
   }
 }

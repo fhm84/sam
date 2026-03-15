@@ -1,0 +1,131 @@
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="visibleChange.emit($event)"
+  [header]="'enrichment.title' | translate"
+  [modal]="true"
+  [style]="{ width: 'min(560px, 96vw)' }"
+  [draggable]="false"
+  [closable]="phase() !== 'loading'"
+>
+
+  <!-- Loading -->
+  @if (phase() === 'loading') {
+    <div class="enrich-loading">
+      <i class="pi pi-spin pi-spinner enrich-spinner"></i>
+      <span>{{ 'enrichment.analyzing' | translate }}</span>
+      <span class="enrich-loading-title">{{ sheet().title }}</span>
+    </div>
+  }
+
+  <!-- Error -->
+  @if (phase() === 'error') {
+    <div class="enrich-error">
+      <i class="pi pi-exclamation-circle"></i>
+      <span>{{ 'enrichment.analyzeError' | translate }}</span>
+    </div>
+  }
+
+  <!-- Review -->
+  @if (phase() === 'review') {
+    @if (!hasSuggestions()) {
+      <div class="enrich-empty">
+        <i class="pi pi-check-circle"></i>
+        <span>{{ 'enrichment.noSuggestions' | translate }}</span>
+      </div>
+    } @else {
+      <div class="enrich-form">
+
+        <!-- Tags -->
+        @if ((enrichment()?.suggestedTags?.length ?? 0) > 0) {
+          <p-divider align="left">
+            <span class="section-label">{{ 'enrichment.tags.title' | translate }}</span>
+          </p-divider>
+          <div class="tag-list">
+            @for (tag of enrichment()!.suggestedTags; track tag) {
+              <label class="tag-item">
+                <p-checkbox
+                  [ngModel]="isTagAccepted(tag)"
+                  [binary]="true"
+                  (ngModelChange)="toggleTag(tag, $event)"
+                />
+                <p-tag [value]="'#' + tag" severity="secondary" />
+              </label>
+            }
+          </div>
+        }
+
+        <!-- Style -->
+        @if (enrichment()?.suggestedStyle != null) {
+          <p-divider align="left">
+            <span class="section-label">{{ 'enrichment.style.title' | translate }}</span>
+          </p-divider>
+          <label class="suggestion-item">
+            <p-checkbox [(ngModel)]="acceptStyle" [binary]="true" />
+            <span class="suggestion-value">{{ styleLabel() }}</span>
+          </label>
+        }
+
+        <!-- Difficulty -->
+        @if (enrichment()?.suggestedDifficultyLevel != null) {
+          <p-divider align="left">
+            <span class="section-label">{{ 'enrichment.difficulty.title' | translate }}</span>
+          </p-divider>
+          <label class="suggestion-item">
+            <p-checkbox [(ngModel)]="acceptDifficulty" [binary]="true" />
+            <span class="suggestion-value">{{ difficultyLabel() }}</span>
+          </label>
+        }
+
+        <!-- Year of Composition -->
+        @if (enrichment()?.suggestedYearOfComposition != null) {
+          <p-divider align="left">
+            <span class="section-label">{{ 'enrichment.year.title' | translate }}</span>
+          </p-divider>
+          <label class="suggestion-item">
+            <p-checkbox [(ngModel)]="acceptYear" [binary]="true" />
+            <span class="suggestion-value">{{ enrichment()!.suggestedYearOfComposition }}</span>
+          </label>
+        }
+
+        <!-- Additional Notes -->
+        @if (enrichment()?.suggestedAdditionalNotes != null) {
+          <p-divider align="left">
+            <span class="section-label">{{ 'enrichment.notes.title' | translate }}</span>
+          </p-divider>
+          <label class="suggestion-item suggestion-item--notes">
+            <p-checkbox [(ngModel)]="acceptNotes" [binary]="true" />
+            <span class="suggestion-value suggestion-value--notes">{{ enrichment()!.suggestedAdditionalNotes }}</span>
+          </label>
+        }
+
+      </div>
+    }
+  }
+
+  <ng-template #footer>
+    @if (phase() === 'error') {
+      <p-button
+        [label]="'enrichment.retry' | translate"
+        icon="pi pi-refresh"
+        severity="secondary"
+        (onClick)="retry()"
+      />
+    }
+    <p-button
+      [label]="'sheets.cancel' | translate"
+      severity="secondary"
+      [text]="true"
+      (onClick)="close()"
+    />
+    @if (phase() === 'review' && hasSuggestions()) {
+      <p-button
+        [label]="'enrichment.apply' | translate"
+        icon="pi pi-check"
+        [disabled]="!canApply()"
+        [loading]="applying()"
+        (onClick)="apply()"
+      />
+    }
+  </ng-template>
+
+</p-dialog>

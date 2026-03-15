@@ -737,6 +737,34 @@
       "cancelEdit": "Bearbeitung abbrechen"
     }
   },
+  "enrichment": {
+    "title": "KI-Datenanreicherung",
+    "action": "Mit KI anreichern",
+    "analyzing": "Notenblatt wird mit KI analysiert…",
+    "analyzeError": "Analyse fehlgeschlagen. Bitte erneut versuchen.",
+    "noSuggestions": "Keine weiteren Vorschläge – die Metadaten sind bereits vollständig.",
+    "apply": "Auswahl übernehmen",
+    "retry": "Wiederholen",
+    "tags": {
+      "title": "Vorgeschlagene Tags"
+    },
+    "style": {
+      "title": "Stil"
+    },
+    "difficulty": {
+      "title": "Schwierigkeitsgrad"
+    },
+    "year": {
+      "title": "Entstehungsjahr"
+    },
+    "notes": {
+      "title": "Zusätzliche Notizen"
+    },
+    "messages": {
+      "applied": "Anreicherung erfolgreich übernommen.",
+      "error": "Anreicherung konnte nicht gespeichert werden."
+    }
+  },
   "classification": {
     "title": "Dokument klassifizieren",
     "action": "Mit KI klassifizieren",

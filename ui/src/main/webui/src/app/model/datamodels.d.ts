@@ -285,6 +285,14 @@ export interface SearchResultMetrics {
     titleSimilarity?: number;
 }
 
+export interface SheetEnrichment {
+    suggestedTags?: string[];
+    suggestedStyle?: Style;
+    suggestedDifficultyLevel?: number;
+    suggestedAdditionalNotes?: string;
+    suggestedYearOfComposition?: number;
+}
+
 export interface SheetClassification {
     documentId?: string;
     status?: ClassificationStatus;

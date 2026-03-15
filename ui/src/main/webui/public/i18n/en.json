@@ -737,6 +737,34 @@
       "cancelEdit": "Cancel Edit"
     }
   },
+  "enrichment": {
+    "title": "AI Data Enrichment",
+    "action": "Enrich with AI",
+    "analyzing": "Analyzing sheet with AI…",
+    "analyzeError": "Analysis failed. Please try again.",
+    "noSuggestions": "No additional suggestions found — the metadata looks complete.",
+    "apply": "Apply selected",
+    "retry": "Retry",
+    "tags": {
+      "title": "Suggested Tags"
+    },
+    "style": {
+      "title": "Style"
+    },
+    "difficulty": {
+      "title": "Difficulty Level"
+    },
+    "year": {
+      "title": "Year of Composition"
+    },
+    "notes": {
+      "title": "Additional Notes"
+    },
+    "messages": {
+      "applied": "Enrichment applied successfully.",
+      "error": "Failed to save enrichment."
+    }
+  },
   "classification": {
     "title": "Classify Document",
     "action": "Classify with AI",

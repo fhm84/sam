@@ -17,6 +17,7 @@ import { ATTACHMENT_TYPES, DIFFICULTY_LEVELS } from '../../shared/constants';
 import { DocumentHandler } from '../../shared/base/document-handler';
 import { InstrumentationForm } from './instrumentation-form';
 import { InstrumentationDocuments, DocToggleEvent, DocsLoadedEvent } from './instrumentation-documents';
+import { EnrichmentDialog } from './enrichment-dialog/enrichment-dialog';
 
 @Component({
   selector: 'app-sheet-detail',
@@ -38,6 +39,7 @@ import { InstrumentationDocuments, DocToggleEvent, DocsLoadedEvent } from './ins
     InstrumentationForm,
     Tag,
     InstrumentationDocuments,
+    EnrichmentDialog,
   ],
   providers: [ConfirmationService],
   templateUrl: './sheet-detail.html',
@@ -66,6 +68,9 @@ export class SheetDetail extends DocumentHandler implements OnChanges {
 
   protected instrumentationDialogVisible = false;
   protected editingInstrumentation: Instrumentation | null = null;
+
+  // Enrichment dialog state
+  protected enrichDialogVisible = false;
 
   // Relink dialog state
   protected relinkDialogVisible = false;
@@ -133,6 +138,15 @@ export class SheetDetail extends DocumentHandler implements OnChanges {
       this.loadInstrumentations();
       this.loadDocuments();
     }
+  }
+
+  protected openEnrichDialog(): void {
+    this.enrichDialogVisible = true;
+  }
+
+  protected onEnriched(): void {
+    this.enrichDialogVisible = false;
+    this.loadSheet();
   }
 
   protected onEdit(): void {
