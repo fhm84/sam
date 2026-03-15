@@ -143,7 +143,8 @@ public class SheetService {
             return null;
         }
         if (dto.getId() != null) {
-            MusicianEntity found = musicianRepository.findByIdOptional(dto.getId()).orElse(null);
+            MusicianEntity found =
+                    musicianRepository.findByIdOptional(dto.getId()).orElse(null);
             if (found != null) {
                 return found;
             }

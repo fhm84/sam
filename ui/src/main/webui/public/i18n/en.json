@@ -782,6 +782,7 @@
       "title": "Sheet Music",
       "existingMode": "Use existing",
       "newMode": "Create new",
+      "searchPlaceholder": "Search sheets…",
       "titleField": "Title",
       "subtitle": "Subtitle",
       "publisher": "Publisher",
@@ -812,7 +813,8 @@
     "person": {
       "none": "None",
       "existing": "Existing",
-      "new": "New"
+      "new": "New",
+      "searchPlaceholder": "Search musicians…"
     },
     "messages": {
       "classifyError": "Failed to classify document.",

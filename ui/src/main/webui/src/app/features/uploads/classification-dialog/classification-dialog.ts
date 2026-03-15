@@ -18,13 +18,15 @@ import { Select } from 'primeng/select';
 import { FloatLabel } from 'primeng/floatlabel';
 import { InputText } from 'primeng/inputtext';
 import { InputNumber } from 'primeng/inputnumber';
-import { Tag } from 'primeng/tag';
 import { Divider } from 'primeng/divider';
 import { SelectButton } from 'primeng/selectbutton';
+import { AutoComplete, AutoCompleteCompleteEvent } from 'primeng/autocomplete';
 import { MessageService } from 'primeng/api';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../../core/translation.service';
 import { DocumentsApiService } from '../../../core/api/documents-api.service';
+import { SheetsApiService } from '../../../core/api/sheets-api.service';
+import { MusiciansApiService } from '../../../core/api/musicians-api.service';
 import { DocumentPreviewService } from '../../../core/document-preview.service';
 import {
   AttachmentType,
@@ -33,8 +35,10 @@ import {
   Clef,
   DocumentDownload,
   Genre,
+  Musician,
   NotationType,
   SheetClassification,
+  SheetMusicSearchResult,
 } from '../../../model/datamodels';
 
 export interface ClassificationAppliedEvent {
@@ -57,9 +61,9 @@ type InstrMode = 'none' | 'existing' | 'new';
     FloatLabel,
     InputText,
     InputNumber,
-    Tag,
     Divider,
     SelectButton,
+    AutoComplete,
     TranslatePipe,
   ],
   templateUrl: './classification-dialog.html',
@@ -69,6 +73,8 @@ type InstrMode = 'none' | 'existing' | 'new';
 export class ClassificationDialog implements OnDestroy {
   protected readonly t = inject(TranslationService);
   private readonly documentsApi = inject(DocumentsApiService);
+  private readonly sheetsApi = inject(SheetsApiService);
+  private readonly musiciansApi = inject(MusiciansApiService);
   private readonly previewService = inject(DocumentPreviewService);
   private readonly messageService = inject(MessageService);
   private readonly destroyRef = inject(DestroyRef);
@@ -93,6 +99,16 @@ export class ClassificationDialog implements OnDestroy {
   protected composerMode: PersonMode = 'none';
   protected arrangerMode: PersonMode = 'none';
   protected instrMode: InstrMode = 'none';
+
+  // ── Autocomplete selections (for 'existing' modes) ─────────────────
+  protected sheetSearchModel: SheetMusicSearchResult | null = null;
+  protected readonly sheetSuggestions = signal<SheetMusicSearchResult[]>([]);
+
+  protected composerModel: Musician | null = null;
+  protected readonly composerSuggestions = signal<Musician[]>([]);
+
+  protected arrangerModel: Musician | null = null;
+  protected readonly arrangerSuggestions = signal<Musician[]>([]);
 
   // ── Sheet fields ───────────────────────────────────────────────────
   protected sheetTitle = '';
@@ -191,6 +207,12 @@ export class ClassificationDialog implements OnDestroy {
     this.phase.set('loading');
     this.classification.set(null);
     this.applying.set(false);
+    this.sheetSearchModel = null;
+    this.sheetSuggestions.set([]);
+    this.composerModel = null;
+    this.composerSuggestions.set([]);
+    this.arrangerModel = null;
+    this.arrangerSuggestions.set([]);
     this.loadPreview();
     this.runClassify();
   }
@@ -242,6 +264,9 @@ export class ClassificationDialog implements OnDestroy {
     if (!s) return;
 
     this.sheetMode = s.sheetId ? 'existing' : 'new';
+    if (s.sheetId) {
+      this.sheetSearchModel = { id: s.sheetId, title: c.matchedSheetTitle ?? '' } as SheetMusicSearchResult;
+    }
     this.sheetTitle = s.title ?? '';
     this.sheetSubtitle = s.subtitle ?? '';
     this.sheetPublisher = s.publisher ?? '';
@@ -252,7 +277,7 @@ export class ClassificationDialog implements OnDestroy {
 
     if (s.composerId) {
       this.composerMode = 'existing';
-      this.composerName = c.composer ?? '';
+      this.composerModel = { id: s.composerId, name: c.composer ?? '' } as Musician;
     } else if (s.composerName) {
       this.composerMode = 'new';
       this.composerName = s.composerName;
@@ -263,7 +288,7 @@ export class ClassificationDialog implements OnDestroy {
 
     if (s.arrangerId) {
       this.arrangerMode = 'existing';
-      this.arrangerName = c.arranger ?? '';
+      this.arrangerModel = { id: s.arrangerId, name: c.arranger ?? '' } as Musician;
     } else if (s.arrangerName) {
       this.arrangerMode = 'new';
       this.arrangerName = s.arrangerName;
@@ -295,8 +320,11 @@ export class ClassificationDialog implements OnDestroy {
 
   protected canApply(): boolean {
     if (this.phase() !== 'review') return false;
+    if (this.sheetMode === 'existing' && !this.sheetSearchModel?.id) return false;
     if (this.sheetMode === 'new' && !this.sheetTitle.trim()) return false;
+    if (this.composerMode === 'existing' && !this.composerModel?.id) return false;
     if (this.composerMode === 'new' && !this.composerName.trim()) return false;
+    if (this.arrangerMode === 'existing' && !this.arrangerModel?.id) return false;
     if (this.arrangerMode === 'new' && !this.arrangerName.trim()) return false;
     if (this.instrMode === 'existing' && !this.instrId) return false;
     if (this.instrMode === 'new' && !this.instrName.trim()) return false;
@@ -310,7 +338,7 @@ export class ClassificationDialog implements OnDestroy {
     const req: ClassificationApplyRequest = {};
 
     if (this.sheetMode === 'existing') {
-      req.sheetId = s.sheetId;
+      req.sheetId = this.sheetSearchModel?.id;
     } else {
       req.title = this.sheetTitle.trim();
       if (this.sheetSubtitle.trim()) req.subtitle = this.sheetSubtitle.trim();
@@ -321,10 +349,10 @@ export class ClassificationDialog implements OnDestroy {
       if (this.sheetIswc.trim()) req.iswc = this.sheetIswc.trim();
     }
 
-    if (this.composerMode === 'existing') req.composerId = s.composerId;
+    if (this.composerMode === 'existing') req.composerId = this.composerModel?.id;
     else if (this.composerMode === 'new') req.composerName = this.composerName.trim();
 
-    if (this.arrangerMode === 'existing') req.arrangerId = s.arrangerId;
+    if (this.arrangerMode === 'existing') req.arrangerId = this.arrangerModel?.id;
     else if (this.arrangerMode === 'new') req.arrangerName = this.arrangerName.trim();
 
     if (this.instrMode === 'existing') req.instrumentId = this.instrId ?? undefined;
@@ -363,12 +391,11 @@ export class ClassificationDialog implements OnDestroy {
   }
 
   private buildApplyDetail(): string {
-    const c = this.classification()!;
     const sheetTitle =
-      this.sheetMode === 'existing' ? (c.matchedSheetTitle ?? '') : this.sheetTitle;
+      this.sheetMode === 'existing' ? (this.sheetSearchModel?.title ?? '') : this.sheetTitle;
     const composerName =
       this.composerMode === 'existing'
-        ? c.composer
+        ? (this.composerModel?.name ?? null)
         : this.composerMode === 'new'
           ? this.composerName
           : null;
@@ -377,11 +404,31 @@ export class ClassificationDialog implements OnDestroy {
     if (this.instrMode !== 'none') {
       const instrName =
         this.instrMode === 'existing'
-          ? (c.instrumentCandidates?.find((ic) => ic.id === this.instrId)?.name ?? '')
+          ? (this.classification()?.instrumentCandidates?.find((ic) => ic.id === this.instrId)?.name ?? '')
           : this.instrName;
       if (instrName) parts.push(`· ${instrName}${this.instrPartLabel ? ` (${this.instrPartLabel})` : ''}`);
     }
     return parts.join(' ');
+  }
+
+  protected onSheetSearch(event: AutoCompleteCompleteEvent): void {
+    this.sheetsApi.find({ query: event.query || undefined, size: 10 }).subscribe({
+      next: (res) => this.sheetSuggestions.set(res.data ?? []),
+      error: () => this.sheetSuggestions.set([]),
+    });
+  }
+
+  protected onMusicianSearch(event: AutoCompleteCompleteEvent, role: 'composer' | 'arranger'): void {
+    this.musiciansApi.find({ name: event.query || undefined, size: 10 }).subscribe({
+      next: (res) => {
+        if (role === 'composer') this.composerSuggestions.set(res.data ?? []);
+        else this.arrangerSuggestions.set(res.data ?? []);
+      },
+      error: () => {
+        if (role === 'composer') this.composerSuggestions.set([]);
+        else this.arrangerSuggestions.set([]);
+      },
+    });
   }
 
   protected close(): void {

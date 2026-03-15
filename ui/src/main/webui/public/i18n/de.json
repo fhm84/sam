@@ -782,6 +782,7 @@
       "title": "Notenblatt",
       "existingMode": "Vorhandenes verwenden",
       "newMode": "Neues erstellen",
+      "searchPlaceholder": "Notenblätter suchen…",
       "titleField": "Titel",
       "subtitle": "Untertitel",
       "publisher": "Verlag",
@@ -812,7 +813,8 @@
     "person": {
       "none": "Keine",
       "existing": "Vorhanden",
-      "new": "Neu"
+      "new": "Neu",
+      "searchPlaceholder": "Musiker suchen…"
     },
     "messages": {
       "classifyError": "Klassifizierung fehlgeschlagen.",

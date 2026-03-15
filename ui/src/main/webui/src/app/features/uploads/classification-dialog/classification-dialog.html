@@ -79,11 +79,15 @@
           </div>
 
           @if (sheetMode === 'existing') {
-            <div class="existing-tag">
-              <i class="pi pi-check-circle"></i>
-              <span>{{ classification()!.matchedSheetTitle }}</span>
-              <p-tag [value]="'classification.matched' | translate" severity="success" />
-            </div>
+            <p-autocomplete
+              [(ngModel)]="sheetSearchModel"
+              [suggestions]="sheetSuggestions()"
+              (completeMethod)="onSheetSearch($event)"
+              field="title"
+              [minLength]="1"
+              styleClass="w-full"
+              [placeholder]="t.t('classification.sheet.searchPlaceholder')"
+            />
           }
 
           @if (sheetMode === 'new') {
@@ -149,11 +153,15 @@
           </div>
 
           @if (composerMode === 'existing') {
-            <div class="existing-tag">
-              <i class="pi pi-user"></i>
-              <span>{{ classification()!.composer }}</span>
-              <p-tag [value]="'classification.matched' | translate" severity="success" />
-            </div>
+            <p-autocomplete
+              [(ngModel)]="composerModel"
+              [suggestions]="composerSuggestions()"
+              (completeMethod)="onMusicianSearch($event, 'composer')"
+              field="name"
+              [minLength]="1"
+              styleClass="w-full"
+              [placeholder]="t.t('classification.person.searchPlaceholder')"
+            />
           }
           @if (composerMode === 'new') {
             <p-floatlabel variant="on">
@@ -177,11 +185,15 @@
           </div>
 
           @if (arrangerMode === 'existing') {
-            <div class="existing-tag">
-              <i class="pi pi-user"></i>
-              <span>{{ classification()!.arranger }}</span>
-              <p-tag [value]="'classification.matched' | translate" severity="success" />
-            </div>
+            <p-autocomplete
+              [(ngModel)]="arrangerModel"
+              [suggestions]="arrangerSuggestions()"
+              (completeMethod)="onMusicianSearch($event, 'arranger')"
+              field="name"
+              [minLength]="1"
+              styleClass="w-full"
+              [placeholder]="t.t('classification.person.searchPlaceholder')"
+            />
           }
           @if (arrangerMode === 'new') {
             <p-floatlabel variant="on">
