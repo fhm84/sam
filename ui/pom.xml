@@ -21,4 +21,30 @@
         </dependency>
     </dependencies>
 
+    <profiles>
+        <profile>
+            <id>dependency-check</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.owasp</groupId>
+                        <artifactId>dependency-check-maven</artifactId>
+                        <configuration>
+                            <!-- Erlaubt dem Plugin, Dateien außerhalb des Standard-Java-Scopes zu finden -->
+                            <scanSet>
+                                <fileSet>
+                                    <directory>${project.basedir}</directory>
+                                    <includes>
+                                        <include>package.json</include>
+                                        <include>package-lock.json</include>
+                                    </includes>
+                                </fileSet>
+                            </scanSet>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
 </project>

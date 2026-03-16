@@ -166,6 +166,11 @@
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <version>12.2.0</version>
+            </plugin>
         </plugins>
     </build>
 
@@ -181,6 +186,47 @@
                 <skipITs>false</skipITs>
                 <quarkus.native.enabled>true</quarkus.native.enabled>
             </properties>
+        </profile>
+
+        <profile>
+            <id>dependency-check</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.owasp</groupId>
+                        <artifactId>dependency-check-maven</artifactId>
+                        <configuration>
+                            <nvdApiServerId>nvd-api</nvdApiServerId>
+                            <ossindexAnalyzerEnabled>false</ossindexAnalyzerEnabled>
+                            <!-- Fail build on CVSS score >= 7.0 (High or Critical) -->
+                            <failBuildOnCVSS>7</failBuildOnCVSS>
+                            <!-- Skip test-scoped dependencies -->
+                            <skipTestScope>true</skipTestScope>
+                            <!-- Scan the Angular project as well -->
+                            <nodePackageSkip>false</nodePackageSkip>
+                            <nodePackageAnalyzerEnabled>true</nodePackageAnalyzerEnabled>
+                            <nodeAuditSkip>false</nodeAuditSkip>
+                            <nodeAuditAnalyzerEnabled>true</nodeAuditAnalyzerEnabled>
+                            <formats>
+                                <format>HTML</format>
+                                <format>JSON</format>
+                            </formats>
+                            <!-- Aggregate report at root level -->
+                            <aggregate>true</aggregate>
+                            <outputDirectory>${maven.multiModuleProjectDirectory}/target/dependency-check-report
+                            </outputDirectory>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>aggregate</goal>
+                                </goals>
+                                <phase>verify</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>

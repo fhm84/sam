@@ -35,6 +35,12 @@ SAM (Sheet music Archiving & Management) is a Quarkus-based application for arch
 
 # Build native executable
 ./mvnw package -Dnative
+
+# Scan dependencies for CVEs (OWASP Dependency-Check; first run downloads NVD DB ~200MB)
+./mvnw verify -Pdependency-check
+# With NVD API key for faster DB updates (free key at https://nvd.nist.gov/developers/request-an-api-key)
+./mvnw verify -Pdependency-check -DnvdApiKey=YOUR_KEY
+# Report output: target/dependency-check-report/dependency-check-report.html
 ```
 
 ## Module Architecture
