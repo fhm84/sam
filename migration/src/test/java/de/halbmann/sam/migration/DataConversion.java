@@ -29,7 +29,7 @@ public class DataConversion {
     void shouldConvert() throws Exception {
         JsonArray jsonValues;
         try (Jsonb jsonb = JsonbBuilder.create()) {
-            Path dataFile = Paths.get("", "src", "test", "resources", "noten_mkn.json");
+            Path dataFile = Paths.get("", "src", "test", "resources", "src/migration-data/noten_mkn.json");
             jsonValues = jsonb.fromJson(Files.newBufferedReader(dataFile), JsonArray.class);
 
             List<LegacyMapping> mappings = List.of(jsonb.fromJson(
@@ -50,8 +50,8 @@ public class DataConversion {
                 .collect(Collectors.toSet());
 
         // prepare directories
-        Files.createDirectories(Paths.get("", "src", "test", "resources", "data", "sheets"));
-        Files.createDirectories(Paths.get("", "src", "test", "resources", "data", "instruments"));
+        Files.createDirectories(Paths.get("", "src", "test", "resources", "src/migration-data/data", "sheets"));
+        Files.createDirectories(Paths.get("", "src", "test", "resources", "src/migration-data/data", "instruments"));
 
         // write data
         // write instruments json files
@@ -97,12 +97,12 @@ public class DataConversion {
         OutputStream outputStream;
         try {
             outputStream = Files.newOutputStream(
-                    Paths.get("", "src", "test", "resources", "data", "sheets", filename),
+                    Paths.get("", "src", "test", "resources", "src/migration-data/data", "sheets", filename),
                     StandardOpenOption.CREATE_NEW);
         } catch (final FileAlreadyExistsException e) {
             filename = prepareFilename(sheetMusic.getTitle() + "-" + sheetMusic.getPublisher());
             outputStream = Files.newOutputStream(
-                    Paths.get("", "src", "test", "resources", "data", "sheets", filename),
+                    Paths.get("", "src", "test", "resources", "src/migration-data/data", "sheets", filename),
                     StandardOpenOption.CREATE_NEW);
         }
         jsonb.toJson(sheetMusic, outputStream);
@@ -113,7 +113,7 @@ public class DataConversion {
         OutputStream outputStream;
         try {
             outputStream = Files.newOutputStream(
-                    Paths.get("", "src", "test", "resources", "data", "instruments", filename),
+                    Paths.get("", "src", "test", "resources", "src/migration-data/data", "instruments", filename),
                     StandardOpenOption.CREATE_NEW);
             jsonb.toJson(instrument, outputStream);
         } catch (final FileAlreadyExistsException e) {
