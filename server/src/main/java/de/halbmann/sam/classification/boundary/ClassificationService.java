@@ -3,6 +3,8 @@ package de.halbmann.sam.classification.boundary;
 import de.halbmann.sam.classification.controller.DocumentUtils;
 import de.halbmann.sam.classification.entity.SheetAnalyzerResult;
 import dev.langchain4j.data.image.Image;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -20,12 +22,14 @@ import lombok.extern.slf4j.Slf4j;
 public class ClassificationService {
 
     private final SheetAnalyzer analyzer;
+    private final MeterRegistry registry;
 
     private final boolean debug = true;
 
     @Inject
-    public ClassificationService(SheetAnalyzer analyzer) {
+    public ClassificationService(SheetAnalyzer analyzer, MeterRegistry registry) {
         this.analyzer = analyzer;
+        this.registry = registry;
     }
 
     public SheetAnalyzerResult analyzePdf(InputStream fileInputStream) {
@@ -36,7 +40,7 @@ public class ClassificationService {
             String extractedText = DocumentUtils.extractText(new ByteArrayInputStream(pdfBytes));
             if (isMeaningfulText(extractedText)) {
                 log.debug("PDF text extraction succeeded ({} chars), using text path", extractedText.length());
-                return analyzer.analyzeText(extractedText);
+                return time("text", () -> analyzer.analyzeText(extractedText));
             }
 
             // Scanned / image-only PDF: fall back to vision
@@ -46,7 +50,7 @@ public class ClassificationService {
                 if (debug) {
                     Files.write(Files.createTempFile("sam-sheet-upload", ".png"), baos.toByteArray());
                 }
-                return analyzeImage(new ByteArrayInputStream(baos.toByteArray()));
+                return time("vision", () -> analyzeImageInternal(new ByteArrayInputStream(baos.toByteArray())));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -60,10 +64,28 @@ public class ClassificationService {
     }
 
     public SheetAnalyzerResult analyzeImage(InputStream fileInputStream) {
+        return time("vision", () -> analyzeImageInternal(fileInputStream));
+    }
+
+    private SheetAnalyzerResult analyzeImageInternal(InputStream fileInputStream) {
         return analyzer.analyze(Image.builder()
                 .base64Data(encodeFileToBase64(fileInputStream))
                 .mimeType("image/png")
                 .build());
+    }
+
+    private SheetAnalyzerResult time(String mode, java.util.concurrent.Callable<SheetAnalyzerResult> action) {
+        Timer timer = Timer.builder("sam.classification.duration")
+                .tag("mode", mode)
+                .description("Time spent on AI-based sheet classification")
+                .register(registry);
+        registry.counter("sam.classification.requests", "mode", mode).increment();
+        try {
+            return timer.recordCallable(action);
+        } catch (Exception e) {
+            if (e instanceof RuntimeException re) throw re;
+            throw new RuntimeException(e);
+        }
     }
 
     String encodeFileToBase64(InputStream fileInputStream) {

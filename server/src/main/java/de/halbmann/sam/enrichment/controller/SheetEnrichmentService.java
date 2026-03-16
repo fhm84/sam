@@ -4,6 +4,8 @@ import de.halbmann.sam.api.entity.*;
 import de.halbmann.sam.business.controller.SheetService;
 import de.halbmann.sam.enrichment.boundary.SheetEnricher;
 import de.halbmann.sam.enrichment.entity.SheetEnrichmentResult;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.LinkedHashSet;
@@ -19,10 +21,17 @@ public class SheetEnrichmentService {
     @Inject
     SheetService sheetService;
 
+    @Inject
+    MeterRegistry registry;
+
     public SheetEnrichment enrich(String sheetId) {
         SheetMusic sheet = sheetService.getSheet(sheetId);
         String metadata = buildMetadataText(sheet);
-        SheetEnrichmentResult result = enricher.enrich(metadata);
+        Timer timer = Timer.builder("sam.enrichment.duration")
+                .description("Time spent on AI-based sheet enrichment")
+                .register(registry);
+        registry.counter("sam.enrichment.requests").increment();
+        SheetEnrichmentResult result = timer.record(() -> enricher.enrich(metadata));
         return toEnrichment(result, sheet);
     }
 

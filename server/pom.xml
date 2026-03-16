@@ -15,7 +15,7 @@
 
     <properties>
         <aws-java-nio-spi-s3.version>2.2.1</aws-java-nio-spi-s3.version>
-        <quarkus-langchain4j.version>1.7.1</quarkus-langchain4j.version>
+        <quarkus-langchain4j.version>1.7.4</quarkus-langchain4j.version>
         <pdfbox-tools.version>3.0.7</pdfbox-tools.version>
     </properties>
 
@@ -89,6 +89,11 @@
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-container-image-jib</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-micrometer-registry-prometheus</artifactId>
         </dependency>
 
         <dependency>

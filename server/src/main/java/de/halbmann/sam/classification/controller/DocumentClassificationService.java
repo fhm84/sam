@@ -8,6 +8,7 @@ import de.halbmann.sam.classification.boundary.ClassificationAgent;
 import de.halbmann.sam.classification.boundary.ClassificationService;
 import de.halbmann.sam.classification.entity.SheetAnalyzerResult;
 import de.halbmann.storage.api.FileSystemWrapper;
+import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -65,6 +66,9 @@ public class DocumentClassificationService {
     @Inject
     InstrumentationRepository instrumentationRepository;
 
+    @Inject
+    MeterRegistry registry;
+
     @ConfigProperty(name = "sam.classification.agentic", defaultValue = "false")
     boolean agenticMode;
 
@@ -78,6 +82,7 @@ public class DocumentClassificationService {
 
         log.info("Classifying document {} ({})", documentId, doc.getMimeType());
 
+        String docType = "application/pdf".equals(doc.getMimeType()) ? "pdf" : "image";
         SheetAnalyzerResult result;
         try (InputStream stream = filesystem.openForRead(doc.getPath())) {
             if ("application/pdf".equals(doc.getMimeType())) {
@@ -88,6 +93,9 @@ public class DocumentClassificationService {
         } catch (IOException e) {
             throw new RuntimeException("Failed to read document for classification", e);
         }
+
+        registry.counter("sam.documents.classified", "type", docType, "agentic", String.valueOf(agenticMode))
+                .increment();
 
         log.info("Classification result for {}: title={}, composer={}", documentId, result.title(), result.composer());
 
@@ -191,6 +199,16 @@ public class DocumentClassificationService {
             sheet.getAttachments().add(attachment);
             sheetRepository.persist(sheet);
         }
+
+        boolean newSheet = request.getSheetId() == null;
+        boolean newInstrumentation = instrumentation != null;
+        registry.counter(
+                        "sam.documents.applied",
+                        "new_sheet",
+                        String.valueOf(newSheet),
+                        "with_instrumentation",
+                        String.valueOf(newInstrumentation))
+                .increment();
 
         log.info(
                 "Applied classification for document {}: sheet={}, instrumentation={}, attachment={}",
