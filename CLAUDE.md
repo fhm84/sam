@@ -65,6 +65,22 @@ Six Maven modules under parent `de.halbmann:sam`:
 - **Sub-resources**: JAX-RS sub-resource pattern — e.g. `SheetsResource.instrumentations(sheetId)` returns `InstrumentationsResource`.
 - **Document classification**: Two-step AI workflow triggered after upload. `POST /documents/{id}/classify` runs the LangChain4j analyzer and returns `SheetClassification` with detected metadata and pre-matched entity references. `POST /documents/{id}/apply` accepts a reviewed `ClassificationApplyRequest` and creates/resolves musician, instrument, sheet, and instrumentation entities, then links the document as an attachment. For PDFs, text is extracted with `PDFTextStripper` first (cheaper); only scanned/image-only PDFs fall back to GPT-4o vision. Key classes: `server/src/main/java/de/halbmann/sam/classification/`.
 
+## Monitoring
+
+Prometheus + Grafana stack, opt-in via a separate compose file (does not affect the main app):
+
+```bash
+# Start Prometheus (:9090) and Grafana (:3000) — app must be running on :8080
+docker compose -f docker-compose.monitoring.yml up
+
+# Grafana: http://localhost:3000  (admin / admin)
+# Prometheus raw metrics: http://localhost:8080/q/metrics
+```
+
+- Prometheus scrape config: `monitoring/prometheus.yml`
+- Grafana dashboard (auto-provisioned): `monitoring/grafana/dashboards/sam.json`
+- Dashboard covers: HTTP request rate/latency/errors, JVM heap/GC/threads, HikariCP pool, AI classification (text vs vision mode, duration), LLM token usage
+
 ## Database
 
 - PostgreSQL with Flyway migrations in `server/src/main/resources/db/migration/`
