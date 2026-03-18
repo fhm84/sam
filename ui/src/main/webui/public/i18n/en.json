@@ -166,6 +166,15 @@
         "cancel": "Cancel",
         "success": "Document link updated"
       },
+      "alsoLinkDocument": {
+        "tooltip": "Also link to…",
+        "header": "Also link to",
+        "sheetLevel": "Sheet (general)",
+        "empty": "No other instrumentations available",
+        "apply": "Link",
+        "cancel": "Cancel",
+        "success": "Document linked to additional targets"
+      },
       "uploadComplete": "Upload complete",
       "dropFiles": "Drop files here or click to browse",
       "documentsAfterSave": "Save the sheet first to attach documents.",
@@ -378,7 +387,10 @@
       "noResults": "No sheets found",
       "instrumentation": "Instrumentation (optional)",
       "type": "Document type (optional)",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "sheetLevel": "Sheet (general)",
+      "selectAll": "Select all",
+      "targets": "targets linked"
     },
     "attachmentTypes": {
       "FULL_SCORE": "Full Score",
@@ -606,7 +618,30 @@
       "clear": "Clear filters"
     },
     "search": "Search by name",
-    "empty": "No instruments found"
+    "empty": "No instruments found",
+    "clef": {
+      "TREBLE": "Treble",
+      "ALTO": "Alto",
+      "TENOR": "Tenor",
+      "BASS": "Bass"
+    },
+    "notationType": {
+      "STANDARD": "Standard",
+      "TABLATURE": "Tablature",
+      "PERCUSSION": "Percussion",
+      "LEAD_SHEET": "Lead Sheet",
+      "GRAPHIC": "Graphic"
+    }
+  },
+  "common": {
+    "edit": "Edit",
+    "delete": "Delete",
+    "download": "Download",
+    "addToFavorites": "Add to favourites",
+    "removeFromFavorites": "Remove from favourites",
+    "openInNewTab": "Open in new tab",
+    "expandRow": "Expand",
+    "collapseRow": "Collapse"
   },
   "errors": {
     "requestFailed": "Request failed"
@@ -822,6 +857,11 @@
       "applyError": "Failed to apply classification."
     },
     "loadingPreview": "Loading document…",
-    "previewUnavailable": "Preview unavailable"
+    "previewUnavailable": "Preview unavailable",
+    "additionalLinks": {
+      "title": "Also link to",
+      "loading": "Loading instrumentations…",
+      "empty": "No instrumentations on this sheet yet."
+    }
   }
 }

@@ -41,11 +41,22 @@
               (onClick)="relinkRequested.emit(doc)"
             />
             <p-button
+              icon="pi pi-share-alt"
+              [rounded]="true"
+              [text]="true"
+              size="small"
+              [pTooltip]="'sheets.detail.alsoLinkDocument.tooltip' | translate"
+              tooltipPosition="top"
+              (onClick)="alsoLinkRequested.emit(doc)"
+            />
+            <p-button
               icon="pi pi-trash"
               [rounded]="true"
               [text]="true"
               size="small"
               severity="danger"
+              [pTooltip]="'common.delete' | translate"
+              tooltipPosition="top"
               (onClick)="confirmDeleteDocument(doc)"
             />
           </div>

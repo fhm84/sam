@@ -1,4 +1,5 @@
 import { Component, computed, EventEmitter, HostBinding, inject, Input, OnChanges, Output, signal } from '@angular/core';
+import { forkJoin } from 'rxjs';
 import { TableModule } from 'primeng/table';
 import { Dialog } from 'primeng/dialog';
 import { ConfirmDialog } from 'primeng/confirmdialog';
@@ -6,6 +7,8 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { Button } from 'primeng/button';
 import { Panel } from 'primeng/panel';
 import { Select } from 'primeng/select';
+import { Checkbox } from 'primeng/checkbox';
+import { Divider } from 'primeng/divider';
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from 'primeng/tabs';
 import { Tooltip } from 'primeng/tooltip';
 import { Tag } from 'primeng/tag';
@@ -28,6 +31,8 @@ import { EnrichmentDialog } from './enrichment-dialog/enrichment-dialog';
     Button,
     Panel,
     Select,
+    Checkbox,
+    Divider,
     Tabs,
     TabList,
     Tab,
@@ -80,6 +85,13 @@ export class SheetDetail extends DocumentHandler implements OnChanges {
   protected relinkTargetType: 'sheet' | 'instrumentation' = 'sheet';
   protected relinkInstrumentationId: string | null = null;
   protected relinkAttachmentType: AttachmentType | null = null;
+
+  // Also-link dialog state
+  protected alsoLinkDialogVisible = false;
+  protected alsoLinkDoc: Attachment | null = null;
+  protected alsoLinkSourceInstrId: string | null = null;
+  protected alsoLinkSelectedIds = new Set<string>();
+  protected alsoLinkApplying = false;
 
   protected readonly attachmentTypeOptions = computed(() =>
     ATTACHMENT_TYPES.map((v) => ({ label: this.t.t(`uploads.attachmentTypes.${v}`), value: v }))
@@ -255,6 +267,57 @@ export class SheetDetail extends DocumentHandler implements OnChanges {
         },
         error: () => {},
       });
+  }
+
+  // --- Also-link document ---
+
+  protected get alsoLinkOptions(): { id: string; label: string }[] {
+    const srcId = this.alsoLinkSourceInstrId;
+    return this.instrumentations()
+      .filter((i) => i.id !== srcId)
+      .map((i) => ({
+        id: i.id!,
+        label: (i.instrument?.name ?? '') + (i.partLabel ? ` (${i.partLabel})` : ''),
+      }));
+  }
+
+  protected openAlsoLinkDialog(doc: Attachment, sourceInstrId: string): void {
+    this.alsoLinkDoc = doc;
+    this.alsoLinkSourceInstrId = sourceInstrId;
+    this.alsoLinkSelectedIds = new Set();
+    this.alsoLinkApplying = false;
+    this.alsoLinkDialogVisible = true;
+  }
+
+  protected alsoLinkIsSelected(id: string): boolean {
+    return this.alsoLinkSelectedIds.has(id);
+  }
+
+  protected toggleAlsoLink(id: string): void {
+    const next = new Set(this.alsoLinkSelectedIds);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    this.alsoLinkSelectedIds = next;
+  }
+
+  protected saveAlsoLink(): void {
+    const doc = this.alsoLinkDoc;
+    if (!doc?.id || this.alsoLinkSelectedIds.size === 0) return;
+    const calls = [...this.alsoLinkSelectedIds].map((id) =>
+      this.documentsApi.linkToSheet(doc.id!, this.sheetId, id === 'sheet' ? undefined : id)
+    );
+    this.alsoLinkApplying = true;
+    forkJoin(calls).subscribe({
+      next: () => {
+        this.alsoLinkDialogVisible = false;
+        this.alsoLinkApplying = false;
+        this.messageService.add({ severity: 'success', summary: this.t.t('sheets.detail.alsoLinkDocument.success') });
+        this.loadInstrumentations();
+      },
+      error: () => {
+        this.alsoLinkApplying = false;
+      },
+    });
   }
 
   // --- Instrumentation document handlers ---

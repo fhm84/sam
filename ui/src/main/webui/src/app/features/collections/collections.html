@@ -101,6 +101,8 @@
               icon="pi pi-pencil"
               [rounded]="true"
               [text]="true"
+              [pTooltip]="'collections.edit' | translate"
+              tooltipPosition="top"
               (onClick)="openEdit(collection)"
             />
             <p-button
@@ -108,6 +110,8 @@
               [rounded]="true"
               [text]="true"
               severity="danger"
+              [pTooltip]="'common.delete' | translate"
+              tooltipPosition="top"
               (onClick)="confirmDelete(collection)"
             />
           </td>
@@ -157,6 +161,8 @@
                 [rounded]="true"
                 [text]="true"
                 size="small"
+                [pTooltip]="'collections.edit' | translate"
+                tooltipPosition="top"
                 (onClick)="openEdit(collection)"
               />
               <p-button
@@ -165,6 +171,8 @@
                 [text]="true"
                 severity="danger"
                 size="small"
+                [pTooltip]="'common.delete' | translate"
+                tooltipPosition="top"
                 (onClick)="confirmDelete(collection)"
               />
             </div>

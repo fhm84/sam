@@ -1,3 +1,9 @@
+/** Builds a human-readable instrument label including transposition when present. */
+export function instrumentLabel(i: { name: string; displayName?: string; transposition?: string }): string {
+  const name = i.displayName || i.name;
+  return i.transposition ? `${name} (${i.transposition})` : name;
+}
+
 export function formatSize(bytes?: number): string {
   if (bytes == null || bytes === 0) return '0 B';
   const units = ['B', 'KB', 'MB', 'GB'];

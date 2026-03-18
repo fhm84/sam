@@ -5,6 +5,7 @@ import { Dialog } from 'primeng/dialog';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { Button } from 'primeng/button';
+import { Tooltip } from 'primeng/tooltip';
 import { InputText } from 'primeng/inputtext';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
@@ -29,6 +30,7 @@ import { CollectionForm } from './collection-form';
     Dialog,
     ConfirmDialog,
 Button,
+    Tooltip,
     InputText,
     IconField,
     InputIcon,

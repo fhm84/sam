@@ -198,13 +198,17 @@ public class DocumentsResourceImpl implements DocumentsResource {
         try (InputStream inputStream = Files.newInputStream(request.getFile().uploadedFile())) {
             DocumentUpload upload = documentsService.save(request.getFile().fileName(), inputStream, request.getType());
 
-            if (request.getType() != null) {
+            if (sheetId != null || instrumentationId != null) {
                 DocumentLinkRequest documentLinkRequest = new DocumentLinkRequest();
+                if (sheetId != null) documentLinkRequest.setSheetId(UUID.fromString(sheetId));
+                if (instrumentationId != null)
+                    documentLinkRequest.setInstrumentationId(UUID.fromString(instrumentationId));
+                if (request.getType() != null) documentLinkRequest.setAttachmentType(request.getType());
                 Attachment attachment =
                         documentsService.linkDocument(upload.document().id(), documentLinkRequest);
 
                 log.atLevel(Level.INFO)
-                        .log(() -> "File uploaded - filename: "
+                        .log(() -> "File uploaded and linked - filename: "
                                 + request.getFile().fileName() + " (" + attachment.getId() + ")");
                 return new DocumentUpload(upload.document(), attachment);
             } else {

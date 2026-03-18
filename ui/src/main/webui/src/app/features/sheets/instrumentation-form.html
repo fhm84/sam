@@ -32,7 +32,9 @@
         <p-select
           inputId="instr-clef"
           formControlName="clef"
-          [options]="clefOptions"
+          [options]="clefOptions()"
+          optionLabel="label"
+          optionValue="value"
           [showClear]="true"
           styleClass="w-full"
         />
@@ -46,7 +48,9 @@
           <p-select
             inputId="instr-notationType"
             formControlName="notationType"
-            [options]="notationTypeOptions"
+            [options]="notationTypeOptions()"
+            optionLabel="label"
+            optionValue="value"
             [showClear]="true"
             styleClass="w-full"
           />

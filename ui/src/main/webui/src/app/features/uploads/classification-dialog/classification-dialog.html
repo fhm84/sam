@@ -75,6 +75,7 @@
               [options]="sheetModeOptions()"
               optionLabel="label"
               optionValue="value"
+              (ngModelChange)="onSheetModeChange($event)"
             />
           </div>
 
@@ -83,7 +84,9 @@
               [(ngModel)]="sheetSearchModel"
               [suggestions]="sheetSuggestions()"
               (completeMethod)="onSheetSearch($event)"
-              field="title"
+              (onSelect)="onSheetSelect($event)"
+              (onClear)="onSheetClear()"
+              optionLabel="title"
               [minLength]="1"
               styleClass="w-full"
               [placeholder]="t.t('classification.sheet.searchPlaceholder')"
@@ -157,7 +160,7 @@
               [(ngModel)]="composerModel"
               [suggestions]="composerSuggestions()"
               (completeMethod)="onMusicianSearch($event, 'composer')"
-              field="name"
+              optionLabel="name"
               [minLength]="1"
               styleClass="w-full"
               [placeholder]="t.t('classification.person.searchPlaceholder')"
@@ -189,7 +192,7 @@
               [(ngModel)]="arrangerModel"
               [suggestions]="arrangerSuggestions()"
               (completeMethod)="onMusicianSearch($event, 'arranger')"
-              field="name"
+              optionLabel="name"
               [minLength]="1"
               styleClass="w-full"
               [placeholder]="t.t('classification.person.searchPlaceholder')"
@@ -247,7 +250,7 @@
                 <p-select
                   inputId="instr-clef"
                   [(ngModel)]="instrClef"
-                  [options]="clefOptions"
+                  [options]="clefOptions()"
                   optionLabel="label"
                   optionValue="value"
                   [showClear]="true"
@@ -260,7 +263,7 @@
                 <p-select
                   inputId="instr-notation"
                   [(ngModel)]="instrNotation"
-                  [options]="notationOptions"
+                  [options]="notationOptions()"
                   optionLabel="label"
                   optionValue="value"
                   [showClear]="true"
@@ -287,6 +290,41 @@
             />
             <label for="attachment-type">{{ 'classification.attachmentType' | translate }}</label>
           </p-floatlabel>
+
+          <!-- ── ADDITIONAL INSTRUMENTATION LINKS ──────────────── -->
+          @if (sheetMode === 'existing' && sheetSearchModel?.id) {
+            <p-divider align="left">
+              <span class="section-label">{{ 'classification.additionalLinks.title' | translate }}</span>
+            </p-divider>
+
+            @if (additionalInstrsLoading()) {
+              <span class="additional-instrs-loading">
+                <i class="pi pi-spin pi-spinner"></i>
+                {{ 'classification.additionalLinks.loading' | translate }}
+              </span>
+            } @else if (additionalInstrs().length === 0) {
+              <span class="additional-instrs-empty">{{ 'classification.additionalLinks.empty' | translate }}</span>
+            } @else {
+              <div class="additional-instr-checklist">
+                @for (instr of additionalInstrs(); track instr.id) {
+                  <div class="additional-instr-check-item">
+                    <p-checkbox
+                      [inputId]="'add-instr-' + instr.id"
+                      [binary]="true"
+                      [ngModel]="additionalInstrIsSelected(instr.id!)"
+                      (ngModelChange)="toggleAdditionalInstr(instr.id!)"
+                    />
+                    <label [for]="'add-instr-' + instr.id" class="additional-instr-check-label">
+                      {{ instr.partLabel ? instr.partLabel + ' – ' : '' }}{{ instr.instrument.displayName || instr.instrument.name }}
+                      @if (instr.instrument.transposition) {
+                        <span class="additional-instr-transposition">· {{ instr.instrument.transposition }}</span>
+                      }
+                    </label>
+                  </div>
+                }
+              </div>
+            }
+          }
 
         </div>
       }

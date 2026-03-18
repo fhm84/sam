@@ -29,17 +29,19 @@ public class InstrumentRepository implements PanacheRepositoryBase<InstrumentEnt
     @SuppressWarnings("unchecked")
     public List<InstrumentMatch> findCandidates(String name, double threshold, int limit) {
         List<Object[]> rows = getEntityManager()
-                .createNativeQuery("SELECT id, name, similarity(lower(name), lower(:name)) AS score"
-                        + " FROM instruments"
-                        + " WHERE similarity(lower(name), lower(:name)) >= :threshold"
-                        + " ORDER BY score DESC"
-                        + " LIMIT :limit")
+                .createNativeQuery(
+                        "SELECT id, name, displayname, transposition, similarity(lower(name), lower(:name)) AS score"
+                                + " FROM instruments"
+                                + " WHERE similarity(lower(name), lower(:name)) >= :threshold"
+                                + " ORDER BY score DESC"
+                                + " LIMIT :limit")
                 .setParameter("name", name)
                 .setParameter("threshold", threshold)
                 .setParameter("limit", limit)
                 .getResultList();
         return rows.stream()
-                .map(r -> new InstrumentMatch((String) r[0], (String) r[1], ((Number) r[2]).doubleValue()))
+                .map(r -> new InstrumentMatch(
+                        (String) r[0], (String) r[1], (String) r[2], (String) r[3], ((Number) r[4]).doubleValue()))
                 .toList();
     }
 

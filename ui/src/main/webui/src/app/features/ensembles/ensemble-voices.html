@@ -48,6 +48,8 @@
             [rounded]="true"
             [text]="true"
             size="small"
+            [pTooltip]="'ensembles.voices.edit' | translate"
+            tooltipPosition="top"
             (onClick)="openEditVoice(voice)"
           />
           <p-button
@@ -56,6 +58,8 @@
             [text]="true"
             size="small"
             severity="danger"
+            [pTooltip]="'common.delete' | translate"
+            tooltipPosition="top"
             (onClick)="confirmDeleteVoice(voice)"
           />
         </td>

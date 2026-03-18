@@ -70,6 +70,8 @@
                           [rounded]="true"
                           [text]="true"
                           size="small"
+                          [pTooltip]="'common.download' | translate"
+                          tooltipPosition="top"
                           (onClick)="downloadDocument(doc)"
                         />
                         <p-button
@@ -78,6 +80,8 @@
                           [text]="true"
                           size="small"
                           severity="danger"
+                          [pTooltip]="'common.delete' | translate"
+                          tooltipPosition="top"
                           (onClick)="confirmDeleteDocument(doc)"
                         />
                       </div>

@@ -12,6 +12,7 @@ import {
 } from '@angular/core';
 import { SafeResourceUrl } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
+import { forkJoin, of, switchMap, map } from 'rxjs';
 import { Dialog } from 'primeng/dialog';
 import { Button } from 'primeng/button';
 import { Select } from 'primeng/select';
@@ -20,13 +21,15 @@ import { InputText } from 'primeng/inputtext';
 import { InputNumber } from 'primeng/inputnumber';
 import { Divider } from 'primeng/divider';
 import { SelectButton } from 'primeng/selectbutton';
-import { AutoComplete, AutoCompleteCompleteEvent } from 'primeng/autocomplete';
+import { AutoComplete, AutoCompleteCompleteEvent, AutoCompleteSelectEvent } from 'primeng/autocomplete';
+import { Checkbox } from 'primeng/checkbox';
 import { MessageService } from 'primeng/api';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../../core/translation.service';
 import { DocumentsApiService } from '../../../core/api/documents-api.service';
 import { SheetsApiService } from '../../../core/api/sheets-api.service';
 import { MusiciansApiService } from '../../../core/api/musicians-api.service';
+import { InstrumentationsApiService } from '../../../core/api/instrumentations-api.service';
 import { DocumentPreviewService } from '../../../core/document-preview.service';
 import {
   AttachmentType,
@@ -35,6 +38,7 @@ import {
   Clef,
   DocumentDownload,
   Genre,
+  Instrumentation,
   Musician,
   NotationType,
   SheetClassification,
@@ -45,7 +49,8 @@ export interface ClassificationAppliedEvent {
   result: ClassificationApplyResult;
   isNewSheet: boolean;
 }
-import { ATTACHMENT_TYPES, GENRES } from '../../../shared/constants';
+import { ATTACHMENT_TYPES, CLEFS, GENRES, NOTATION_TYPES } from '../../../shared/constants';
+import { instrumentLabel } from '../../../shared/utils/format.utils';
 
 type SheetMode = 'existing' | 'new';
 type PersonMode = 'none' | 'existing' | 'new';
@@ -64,6 +69,7 @@ type InstrMode = 'none' | 'existing' | 'new';
     Divider,
     SelectButton,
     AutoComplete,
+    Checkbox,
     TranslatePipe,
   ],
   templateUrl: './classification-dialog.html',
@@ -75,6 +81,7 @@ export class ClassificationDialog implements OnDestroy {
   private readonly documentsApi = inject(DocumentsApiService);
   private readonly sheetsApi = inject(SheetsApiService);
   private readonly musiciansApi = inject(MusiciansApiService);
+  private readonly instrumentationsApi = inject(InstrumentationsApiService);
   private readonly previewService = inject(DocumentPreviewService);
   private readonly messageService = inject(MessageService);
   private readonly destroyRef = inject(DestroyRef);
@@ -93,6 +100,11 @@ export class ClassificationDialog implements OnDestroy {
   protected readonly phase = signal<'loading' | 'review' | 'error'>('loading');
   protected readonly classification = signal<SheetClassification | null>(null);
   protected readonly applying = signal(false);
+
+  // ── Additional instrumentation links (existing sheet only) ────────
+  protected readonly additionalInstrs = signal<Instrumentation[]>([]);
+  protected readonly additionalInstrsLoading = signal(false);
+  protected readonly additionalInstrIds = signal<Set<string>>(new Set());
 
   // ── Form modes ─────────────────────────────────────────────────────
   protected sheetMode: SheetMode = 'new';
@@ -153,20 +165,13 @@ export class ClassificationDialog implements OnDestroy {
     GENRES.map((g) => ({ label: this.t.t(`sheets.genres.${g}`), value: g })),
   );
 
-  protected readonly clefOptions: { label: string; value: Clef }[] = [
-    { label: 'Treble', value: 'TREBLE' },
-    { label: 'Alto', value: 'ALTO' },
-    { label: 'Tenor', value: 'TENOR' },
-    { label: 'Bass', value: 'BASS' },
-  ];
+  protected readonly clefOptions = computed(() =>
+    CLEFS.map((c) => ({ label: this.t.t(`instruments.clef.${c}`), value: c })),
+  );
 
-  protected readonly notationOptions: { label: string; value: NotationType }[] = [
-    { label: 'Standard', value: 'STANDARD' },
-    { label: 'Tablature', value: 'TABLATURE' },
-    { label: 'Percussion', value: 'PERCUSSION' },
-    { label: 'Lead Sheet', value: 'LEAD_SHEET' },
-    { label: 'Graphic', value: 'GRAPHIC' },
-  ];
+  protected readonly notationOptions = computed(() =>
+    NOTATION_TYPES.map((n) => ({ label: this.t.t(`instruments.notationType.${n}`), value: n })),
+  );
 
   protected readonly typeOptions = computed(() =>
     ATTACHMENT_TYPES.map((a) => ({
@@ -179,7 +184,7 @@ export class ClassificationDialog implements OnDestroy {
     const c = this.classification();
     if (!c?.instrumentCandidates?.length) return [];
     return c.instrumentCandidates.map((ic) => ({
-      label: `${ic.name} (${Math.round((ic.score ?? 0) * 100)}%)`,
+      label: `${instrumentLabel({ name: ic.name ?? '', displayName: ic.displayName ?? undefined, transposition: ic.transposition ?? undefined })} (${Math.round((ic.score ?? 0) * 100)}%)`,
       value: ic.id ?? '',
     }));
   });
@@ -213,6 +218,8 @@ export class ClassificationDialog implements OnDestroy {
     this.composerSuggestions.set([]);
     this.arrangerModel = null;
     this.arrangerSuggestions.set([]);
+    this.additionalInstrs.set([]);
+    this.additionalInstrIds.set(new Set());
     this.loadPreview();
     this.runClassify();
   }
@@ -266,6 +273,7 @@ export class ClassificationDialog implements OnDestroy {
     this.sheetMode = s.sheetId ? 'existing' : 'new';
     if (s.sheetId) {
       this.sheetSearchModel = { id: s.sheetId, title: c.matchedSheetTitle ?? '' } as SheetMusicSearchResult;
+      this.loadAdditionalInstrs(s.sheetId);
     }
     this.sheetTitle = s.title ?? '';
     this.sheetSubtitle = s.subtitle ?? '';
@@ -368,26 +376,40 @@ export class ClassificationDialog implements OnDestroy {
 
     const detail = this.buildApplyDetail();
     const isNewSheet = this.sheetMode === 'new';
+    const extraIds = [...this.additionalInstrIds()];
+    const attachType = this.attachmentType ?? undefined;
+
     this.applying.set(true);
-    this.documentsApi.apply(this.doc().id!, req).subscribe({
-      next: (result) => {
-        this.applying.set(false);
-        this.messageService.add({
-          severity: 'success',
-          summary: this.t.t('classification.messages.applied'),
-          detail,
-          life: 6000,
-        });
-        this.applied.emit({ result, isNewSheet });
-      },
-      error: () => {
-        this.applying.set(false);
-        this.messageService.add({
-          severity: 'error',
-          summary: this.t.t('classification.messages.applyError'),
-        });
-      },
-    });
+    this.documentsApi
+      .apply(this.doc().id!, req)
+      .pipe(
+        switchMap((result) => {
+          if (extraIds.length === 0) return of(result);
+          const links = extraIds.map((id) =>
+            this.documentsApi.linkToSheet(this.doc().id!, result.sheetId!, id, attachType),
+          );
+          return forkJoin(links).pipe(map(() => result));
+        }),
+      )
+      .subscribe({
+        next: (result) => {
+          this.applying.set(false);
+          this.messageService.add({
+            severity: 'success',
+            summary: this.t.t('classification.messages.applied'),
+            detail,
+            life: 6000,
+          });
+          this.applied.emit({ result, isNewSheet });
+        },
+        error: () => {
+          this.applying.set(false);
+          this.messageService.add({
+            severity: 'error',
+            summary: this.t.t('classification.messages.applyError'),
+          });
+        },
+      });
   }
 
   private buildApplyDetail(): string {
@@ -415,6 +437,49 @@ export class ClassificationDialog implements OnDestroy {
     this.sheetsApi.find({ query: event.query || undefined, size: 10 }).subscribe({
       next: (res) => this.sheetSuggestions.set(res.data ?? []),
       error: () => this.sheetSuggestions.set([]),
+    });
+  }
+
+  protected onSheetSelect(event: AutoCompleteSelectEvent): void {
+    const sheet = event.value as SheetMusicSearchResult;
+    this.loadAdditionalInstrs(sheet.id!);
+  }
+
+  protected onSheetClear(): void {
+    this.additionalInstrs.set([]);
+    this.additionalInstrIds.set(new Set());
+  }
+
+  protected onSheetModeChange(mode: SheetMode): void {
+    if (mode === 'new') {
+      this.additionalInstrs.set([]);
+      this.additionalInstrIds.set(new Set());
+    }
+  }
+
+  protected additionalInstrIsSelected(id: string): boolean {
+    return this.additionalInstrIds().has(id);
+  }
+
+  protected toggleAdditionalInstr(id: string): void {
+    this.additionalInstrIds.update((set) => {
+      const next = new Set(set);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  private loadAdditionalInstrs(sheetId: string): void {
+    this.additionalInstrs.set([]);
+    this.additionalInstrIds.set(new Set());
+    this.additionalInstrsLoading.set(true);
+    this.instrumentationsApi.list(sheetId).subscribe({
+      next: (list) => {
+        this.additionalInstrs.set(list);
+        this.additionalInstrsLoading.set(false);
+      },
+      error: () => this.additionalInstrsLoading.set(false),
     });
   }
 

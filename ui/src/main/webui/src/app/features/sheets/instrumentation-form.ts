@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FloatLabel } from 'primeng/floatlabel';
 import { Select } from 'primeng/select';
@@ -9,10 +9,11 @@ import { Tooltip } from 'primeng/tooltip';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { InstrumentationsApiService, InstrumentsApiService } from '../../core/api';
 import { convertEmptyStringsToNull } from '../../shared/utils/object.utils';
+import { instrumentLabel } from '../../shared/utils/format.utils';
 import { Clef, CreateInstrumentation, Instrument, Instrumentation, NotationType } from '../../model/datamodels';
 import { map, Observable } from 'rxjs';
 import { BaseForm } from '../../shared/base/base-form';
-import { FETCH_ALL_SIZE } from '../../shared/constants';
+import { CLEFS, FETCH_ALL_SIZE, NOTATION_TYPES } from '../../shared/constants';
 
 interface InstrumentOption {
   label: string;
@@ -34,14 +35,12 @@ export class InstrumentationForm extends BaseForm<Instrumentation> implements On
 
   protected readonly instrumentOptions = signal<InstrumentOption[]>([]);
 
-  protected readonly clefOptions: Clef[] = ['TREBLE', 'ALTO', 'TENOR', 'BASS'];
-  protected readonly notationTypeOptions: NotationType[] = [
-    'STANDARD',
-    'TABLATURE',
-    'PERCUSSION',
-    'LEAD_SHEET',
-    'GRAPHIC',
-  ];
+  protected readonly clefOptions = computed(() =>
+    CLEFS.map((c) => ({ label: this.t.t(`instruments.clef.${c}`), value: c })),
+  );
+  protected readonly notationTypeOptions = computed(() =>
+    NOTATION_TYPES.map((n) => ({ label: this.t.t(`instruments.notationType.${n}`), value: n })),
+  );
 
   readonly form = new FormGroup({
     instrumentId: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
@@ -56,7 +55,7 @@ export class InstrumentationForm extends BaseForm<Instrumentation> implements On
   ngOnInit(): void {
     this.instrumentsApi.find({ size: FETCH_ALL_SIZE }).subscribe((res) => {
       this.instrumentOptions.set(
-        (res.data ?? []).map((i: Instrument) => ({ label: i.name, value: i.id! })),
+        (res.data ?? []).map((i: Instrument) => ({ label: instrumentLabel(i), value: i.id! })),
       );
     });
   }

@@ -13,7 +13,7 @@ import { FormsModule } from '@angular/forms';
 import { NgTemplateOutlet } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { Subject, debounceTime } from 'rxjs';
+import { Subject, debounceTime, forkJoin } from 'rxjs';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Dialog } from 'primeng/dialog';
@@ -29,6 +29,7 @@ import { InputIcon } from 'primeng/inputicon';
 import { InputText } from 'primeng/inputtext';
 import { Tag } from 'primeng/tag';
 import { Tooltip } from 'primeng/tooltip';
+import { Checkbox } from 'primeng/checkbox';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../core/translation.service';
 import { DocumentsApiService, UploadProgress } from '../../core/api/documents-api.service';
@@ -72,6 +73,7 @@ type PickerContext = 'upload' | 'assign';
     InputText,
     Tag,
     Tooltip,
+    Checkbox,
     TranslatePipe,
     ClassificationDialog,
   ],
@@ -129,6 +131,7 @@ export class Uploads implements OnInit, OnDestroy {
   protected readonly pickerSelectedSheet = signal<SheetMusicSearchResult | null>(null);
   protected readonly pickerInstrs = signal<Instrumentation[]>([]);
   protected readonly pickerInstrsLoading = signal(false);
+  // upload context: single dropdown
   protected pickerInstrModel: Instrumentation | null = null;
   protected readonly pickerSelectedInstr = signal<Instrumentation | null>(null);
   protected readonly pickerInstrOptions = computed(() =>
@@ -137,6 +140,14 @@ export class Uploads implements OnInit, OnDestroy {
       value: i,
     })),
   );
+  // assign context: multi-checkbox (id = instrumentation UUID or 'sheet' for sheet-level)
+  protected readonly pickerSelectedInstrIds = signal<Set<string>>(new Set());
+  protected readonly pickerAllSelected = computed(() => {
+    const ids = this.pickerSelectedInstrIds();
+    if (!ids.has('sheet')) return false;
+    return this.pickerInstrs().every((i) => ids.has(i.id!));
+  });
+
   protected pickerTypeModel: AttachmentType | null = null;
   protected readonly pickerTypeOptions = computed(() =>
     ATTACHMENT_TYPES.map((t) => ({
@@ -199,6 +210,7 @@ export class Uploads implements OnInit, OnDestroy {
     this.pickerInstrs.set([]);
     this.pickerInstrModel = null;
     this.pickerSelectedInstr.set(null);
+    this.pickerSelectedInstrIds.set(new Set());
     this.pickerTypeModel = null;
     this.revokePickerPreview();
     if (context === 'assign' && doc) {
@@ -246,6 +258,7 @@ export class Uploads implements OnInit, OnDestroy {
     this.pickerSelectedSheet.set(sheet);
     this.pickerInstrModel = null;
     this.pickerSelectedInstr.set(null);
+    this.pickerSelectedInstrIds.set(new Set());
     this.pickerInstrs.set([]);
     this.pickerInstrsLoading.set(true);
     this.instrumentationsApi.list(sheet.id!).subscribe({
@@ -255,6 +268,27 @@ export class Uploads implements OnInit, OnDestroy {
       },
       error: () => this.pickerInstrsLoading.set(false),
     });
+  }
+
+  protected pickerInstrIsSelected(id: string): boolean {
+    return this.pickerSelectedInstrIds().has(id);
+  }
+
+  protected togglePickerInstr(id: string): void {
+    this.pickerSelectedInstrIds.update((set) => {
+      const next = new Set(set);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  protected toggleSelectAllInstrs(): void {
+    if (this.pickerAllSelected()) {
+      this.pickerSelectedInstrIds.set(new Set());
+    } else {
+      this.pickerSelectedInstrIds.set(new Set(['sheet', ...this.pickerInstrs().map((i) => i.id!)]));
+    }
   }
 
   protected isPickerSheetSelected(sheet: SheetMusicSearchResult): boolean {
@@ -273,30 +307,41 @@ export class Uploads implements OnInit, OnDestroy {
   protected confirmPicker(): void {
     const sheet = this.pickerSelectedSheet();
     if (!sheet) return;
-    const instr = this.pickerSelectedInstr();
-
     const type = this.pickerTypeModel ?? undefined;
 
     if (this.pickerContext === 'upload') {
       this.uploadTargetSheet.set(sheet);
-      this.uploadTargetInstr.set(instr);
+      this.uploadTargetInstr.set(this.pickerSelectedInstr());
       this.uploadTargetType.set(type ?? null);
       this.pickerVisible.set(false);
       return;
     }
 
-    // assign context
+    // assign context — link to every selected target (sheet-level and/or instrumentations)
     const doc = this.pickerDoc();
     if (!doc) return;
+    const selectedIds = [...this.pickerSelectedInstrIds()];
+    if (selectedIds.length === 0) return;
+
     this.assigning.set(true);
-    this.documentsApi.linkToSheet(doc.id!, sheet.id!, instr?.id ?? undefined, type).subscribe({
+    const calls = selectedIds.map((id) =>
+      id === 'sheet'
+        ? this.documentsApi.linkToSheet(doc.id!, sheet.id!, undefined, type)
+        : this.documentsApi.linkToSheet(doc.id!, sheet.id!, id, type),
+    );
+
+    forkJoin(calls).subscribe({
       next: () => {
         this.assigning.set(false);
         this.pickerVisible.set(false);
+        const detail =
+          selectedIds.length === 1
+            ? this.assignDetail(sheet, this.resolveInstr(selectedIds[0]))
+            : `${sheet.title} · ${selectedIds.length} ${this.t.t('uploads.picker.targets')}`;
         this.messageService.add({
           severity: 'success',
           summary: this.t.t('uploads.messages.assigned'),
-          detail: this.assignDetail(sheet, instr),
+          detail,
           life: 6000,
         });
         this.loadDocuments();
@@ -306,6 +351,11 @@ export class Uploads implements OnInit, OnDestroy {
         this.messageService.add({ severity: 'error', summary: this.t.t('uploads.messages.error') });
       },
     });
+  }
+
+  private resolveInstr(id: string): Instrumentation | null {
+    if (id === 'sheet') return null;
+    return this.pickerInstrs().find((i) => i.id === id) ?? null;
   }
 
   private doPickerSearch(): void {
@@ -430,7 +480,7 @@ export class Uploads implements OnInit, OnDestroy {
     return parts.join(' ');
   }
 
-  private instrLabel(i: Instrumentation): string {
+  protected instrLabel(i: Instrumentation): string {
     const name = i.instrument.displayName || i.instrument.name;
     const part = i.partLabel ? `${i.partLabel} ` : '';
     const transposition = i.instrument.transposition ? ` · ${i.instrument.transposition}` : '';

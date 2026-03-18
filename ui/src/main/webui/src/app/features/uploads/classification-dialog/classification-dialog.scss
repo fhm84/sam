@@ -157,6 +157,55 @@
   margin-top: 0.5rem;
 }
 
+// ── Additional instrumentation links ──────────────────────────────────────
+
+.additional-instrs-loading,
+.additional-instrs-empty {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--p-text-muted-color);
+}
+
+.additional-instr-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  padding: 0.375rem;
+  background: var(--p-surface-0);
+  border: 1px solid var(--p-content-border-color);
+  border-radius: var(--p-border-radius);
+  max-height: 10rem;
+  overflow-y: auto;
+}
+
+.additional-instr-check-item {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.3rem 0.5rem;
+  border-radius: calc(var(--p-border-radius) - 2px);
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover {
+    background: var(--sam-hover);
+  }
+}
+
+.additional-instr-check-label {
+  font-size: 0.9375rem;
+  cursor: pointer;
+  flex: 1;
+}
+
+.additional-instr-transposition {
+  font-size: 0.8125rem;
+  color: var(--sam-text-muted);
+  margin-left: 0.25rem;
+}
+
 // ── PrimeNG overrides ─────────────────────────────────────────────────────
 
 :host ::ng-deep {

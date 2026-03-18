@@ -146,6 +146,8 @@
             [rounded]="true"
             [text]="true"
             severity="danger"
+            [pTooltip]="'common.delete' | translate"
+            tooltipPosition="top"
             (onClick)="confirmDelete(doc)"
           />
         </td>
@@ -240,27 +242,77 @@
             }
           </div>
 
-          @if (pickerInstrsLoading()) {
-            <span class="picker-instrs-loading">
-              <i class="pi pi-spin pi-spinner"></i>
-            </span>
-          } @else if (pickerInstrOptions().length > 0) {
-            <p-floatlabel variant="on" class="picker-instr-field">
-              <p-select
-                inputId="picker-instr"
-                [(ngModel)]="pickerInstrModel"
-                [options]="pickerInstrOptions()"
-                optionLabel="label"
-                optionValue="value"
-                [showClear]="true"
-                styleClass="w-full"
-                (onChange)="onPickerInstrChange($event)"
-                (onClear)="onPickerInstrClear()"
-              />
-              <label for="picker-instr">
-                {{ 'uploads.picker.instrumentation' | translate }}
-              </label>
-            </p-floatlabel>
+          <!-- Assign context: multi-checkbox list -->
+          @if (pickerContext === 'assign') {
+            @if (pickerInstrsLoading()) {
+              <span class="picker-instrs-loading">
+                <i class="pi pi-spin pi-spinner"></i>
+              </span>
+            } @else {
+              <div class="picker-instr-checklist">
+                <div class="picker-instr-check-all">
+                  <p-checkbox
+                    inputId="instr-all"
+                    [binary]="true"
+                    [ngModel]="pickerAllSelected()"
+                    (ngModelChange)="toggleSelectAllInstrs()"
+                  />
+                  <label for="instr-all">{{ 'uploads.picker.selectAll' | translate }}</label>
+                </div>
+                <div class="picker-instr-check-divider"></div>
+                <div class="picker-instr-check-item">
+                  <p-checkbox
+                    inputId="instr-sheet"
+                    [binary]="true"
+                    [ngModel]="pickerInstrIsSelected('sheet')"
+                    (ngModelChange)="togglePickerInstr('sheet')"
+                  />
+                  <label for="instr-sheet" class="picker-instr-check-label">
+                    <i class="pi pi-file-music"></i>
+                    <span>{{ 'uploads.picker.sheetLevel' | translate }}</span>
+                  </label>
+                </div>
+                @for (instr of pickerInstrs(); track instr.id) {
+                  <div class="picker-instr-check-item">
+                    <p-checkbox
+                      [inputId]="'instr-' + instr.id"
+                      [binary]="true"
+                      [ngModel]="pickerInstrIsSelected(instr.id!)"
+                      (ngModelChange)="togglePickerInstr(instr.id!)"
+                    />
+                    <label [for]="'instr-' + instr.id" class="picker-instr-check-label">
+                      {{ instrLabel(instr) }}
+                    </label>
+                  </div>
+                }
+              </div>
+            }
+          }
+
+          <!-- Upload context: single dropdown (unchanged) -->
+          @if (pickerContext === 'upload') {
+            @if (pickerInstrsLoading()) {
+              <span class="picker-instrs-loading">
+                <i class="pi pi-spin pi-spinner"></i>
+              </span>
+            } @else if (pickerInstrOptions().length > 0) {
+              <p-floatlabel variant="on" class="picker-instr-field">
+                <p-select
+                  inputId="picker-instr"
+                  [(ngModel)]="pickerInstrModel"
+                  [options]="pickerInstrOptions()"
+                  optionLabel="label"
+                  optionValue="value"
+                  [showClear]="true"
+                  styleClass="w-full"
+                  (onChange)="onPickerInstrChange($event)"
+                  (onClear)="onPickerInstrClear()"
+                />
+                <label for="picker-instr">
+                  {{ 'uploads.picker.instrumentation' | translate }}
+                </label>
+              </p-floatlabel>
+            }
           }
 
           <p-floatlabel variant="on" class="picker-instr-field">
@@ -358,7 +410,7 @@
         ? t.t('uploads.assign.confirm')
         : t.t('uploads.target.confirm')"
       [icon]="pickerContext === 'assign' ? 'pi pi-link' : 'pi pi-check'"
-      [disabled]="!pickerSelectedSheet()"
+      [disabled]="!pickerSelectedSheet() || (pickerContext === 'assign' && pickerSelectedInstrIds().size === 0)"
       [loading]="assigning()"
       (onClick)="confirmPicker()"
     />

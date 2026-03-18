@@ -8,6 +8,7 @@ import { Tooltip } from 'primeng/tooltip';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { EnsemblesApiService, InstrumentsApiService } from '../../core/api';
 import { convertEmptyStringsToNull } from '../../shared/utils/object.utils';
+import { instrumentLabel } from '../../shared/utils/format.utils';
 import { CreateVoiceOption, Instrument, VoiceOption, VoiceOptionType } from '../../model/datamodels';
 import { map, Observable } from 'rxjs';
 import { BaseForm } from '../../shared/base/base-form';
@@ -46,7 +47,7 @@ export class VoiceOptionForm extends BaseForm<VoiceOption> implements OnInit {
   ngOnInit(): void {
     this.instrumentsApi.find({ size: FETCH_ALL_SIZE }).subscribe((res) => {
       this.instrumentOptions.set(
-        (res.data ?? []).map((i: Instrument) => ({ label: i.name, value: i.id! })),
+        (res.data ?? []).map((i: Instrument) => ({ label: instrumentLabel(i), value: i.id! })),
       );
     });
   }

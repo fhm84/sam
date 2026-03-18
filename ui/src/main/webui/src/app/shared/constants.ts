@@ -1,4 +1,4 @@
-import { AttachmentType, Genre, Style } from '../model/datamodels';
+import { AttachmentType, Clef, Genre, NotationType, Style } from '../model/datamodels';
 
 /** DifficultyLevel enum values in grade order (grade = index + 1). */
 export const DIFFICULTY_LEVELS = [
@@ -23,6 +23,14 @@ export const STYLES = [
   'POP', 'ROCK', 'FUNK', 'SWING', 'LATIN',
   'TRADITIONAL', 'FOLKLORISTIC', 'EXPERIMENTAL',
 ] as const satisfies readonly Style[];
+
+/** All possible Clef enum values. */
+export const CLEFS = ['TREBLE', 'ALTO', 'TENOR', 'BASS'] as const satisfies readonly Clef[];
+
+/** All possible NotationType enum values. */
+export const NOTATION_TYPES = [
+  'STANDARD', 'TABLATURE', 'PERCUSSION', 'LEAD_SHEET', 'GRAPHIC',
+] as const satisfies readonly NotationType[];
 
 /**
  * Selectable attachment types for file uploads.

@@ -226,6 +226,8 @@ export interface InstrumentFilterRequest extends PaginationRequest {
 export interface InstrumentMatch {
     id?: string;
     name?: string;
+    displayName?: string;
+    transposition?: string;
     score?: number;
 }
 

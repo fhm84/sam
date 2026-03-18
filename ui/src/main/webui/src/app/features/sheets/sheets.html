@@ -166,6 +166,8 @@
               [rounded]="true"
               [text]="true"
               size="small"
+              [pTooltip]="(sheet.favorite ? 'common.removeFromFavorites' : 'common.addToFavorites') | translate"
+              tooltipPosition="top"
               (onClick)="toggleFavorite(sheet, $event)"
             />
           </td>
@@ -224,6 +226,8 @@
               icon="pi pi-pencil"
               [rounded]="true"
               [text]="true"
+              [pTooltip]="'sheets.edit' | translate"
+              tooltipPosition="top"
               (onClick)="openEdit(sheet); $event.stopPropagation()"
             />
             <p-button
@@ -231,6 +235,8 @@
               [rounded]="true"
               [text]="true"
               severity="danger"
+              [pTooltip]="'common.delete' | translate"
+              tooltipPosition="top"
               (onClick)="confirmDelete(sheet); $event.stopPropagation()"
             />
           </td>
@@ -260,6 +266,8 @@
                 [rounded]="true"
                 [text]="true"
                 size="small"
+                [pTooltip]="'sheets.edit' | translate"
+                tooltipPosition="top"
                 (onClick)="openEdit(sheet); $event.stopPropagation()"
               />
               <p-button
@@ -268,6 +276,8 @@
                 [text]="true"
                 severity="danger"
                 size="small"
+                [pTooltip]="'common.delete' | translate"
+                tooltipPosition="top"
                 (onClick)="confirmDelete(sheet); $event.stopPropagation()"
               />
             </div>
@@ -278,6 +288,8 @@
                 [rounded]="true"
                 [text]="true"
                 size="small"
+                [pTooltip]="(sheet.favorite ? 'common.removeFromFavorites' : 'common.addToFavorites') | translate"
+                tooltipPosition="top"
                 (onClick)="toggleFavorite(sheet, $event)"
               />
               <div class="card-title-text">

@@ -5,6 +5,7 @@ import { Toolbar } from 'primeng/toolbar';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { Button } from 'primeng/button';
+import { Tooltip } from 'primeng/tooltip';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { SheetsApiService } from '../../core/api';
 import { SheetMusic } from '../../model/datamodels';
@@ -13,7 +14,7 @@ import { SheetForm } from './sheet-form';
 
 @Component({
   selector: 'app-sheet-form-page',
-  imports: [SheetForm, Button, Panel, ConfirmDialog, TranslatePipe, Toolbar],
+  imports: [SheetForm, Button, Tooltip, Panel, ConfirmDialog, TranslatePipe, Toolbar],
   providers: [ConfirmationService],
   templateUrl: './sheet-form-page.html',
   styleUrl: './sheet-form-page.scss',

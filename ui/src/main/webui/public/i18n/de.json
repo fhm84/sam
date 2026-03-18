@@ -166,6 +166,15 @@
         "cancel": "Abbrechen",
         "success": "Dokumentverknüpfung aktualisiert"
       },
+      "alsoLinkDocument": {
+        "tooltip": "Auch verknüpfen mit…",
+        "header": "Auch verknüpfen mit",
+        "sheetLevel": "Notenblatt (allgemein)",
+        "empty": "Keine weiteren Instrumentierungen vorhanden",
+        "apply": "Verknüpfen",
+        "cancel": "Abbrechen",
+        "success": "Dokument mit weiteren Zielen verknüpft"
+      },
       "uploadComplete": "Upload abgeschlossen",
       "dropFiles": "Dateien hierher ziehen oder klicken zum Durchsuchen",
       "documentsAfterSave": "Speichern Sie das Notenblatt, um Dokumente anzuhängen.",
@@ -378,7 +387,10 @@
       "noResults": "Keine Notenblätter gefunden",
       "instrumentation": "Instrumentierung (optional)",
       "type": "Dokumenttyp (optional)",
-      "cancel": "Abbrechen"
+      "cancel": "Abbrechen",
+      "sheetLevel": "Notenblatt (allgemein)",
+      "selectAll": "Alle auswählen",
+      "targets": "Ziele verknüpft"
     },
     "attachmentTypes": {
       "FULL_SCORE": "Partitur",
@@ -606,7 +618,30 @@
       "clear": "Filter zurücksetzen"
     },
     "search": "Nach Name suchen",
-    "empty": "Keine Instrumente gefunden"
+    "empty": "Keine Instrumente gefunden",
+    "clef": {
+      "TREBLE": "Violinschlüssel",
+      "ALTO": "Altschlüssel",
+      "TENOR": "Tenorschlüssel",
+      "BASS": "Bassschlüssel"
+    },
+    "notationType": {
+      "STANDARD": "Standard",
+      "TABLATURE": "Tabulatur",
+      "PERCUSSION": "Schlagzeugnotation",
+      "LEAD_SHEET": "Lead Sheet",
+      "GRAPHIC": "Grafisch"
+    }
+  },
+  "common": {
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "download": "Herunterladen",
+    "addToFavorites": "Zu Favoriten hinzufügen",
+    "removeFromFavorites": "Aus Favoriten entfernen",
+    "openInNewTab": "In neuem Tab öffnen",
+    "expandRow": "Ausklappen",
+    "collapseRow": "Einklappen"
   },
   "errors": {
     "requestFailed": "Anfrage fehlgeschlagen"
@@ -822,6 +857,11 @@
       "applyError": "Klassifizierung konnte nicht angewendet werden."
     },
     "loadingPreview": "Dokument wird geladen…",
-    "previewUnavailable": "Vorschau nicht verfügbar"
+    "previewUnavailable": "Vorschau nicht verfügbar",
+    "additionalLinks": {
+      "title": "Auch verknüpfen mit",
+      "loading": "Instrumentierungen werden geladen…",
+      "empty": "Noch keine Instrumentierungen für dieses Notenblatt."
+    }
   }
 }
