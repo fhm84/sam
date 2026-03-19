@@ -5,11 +5,13 @@ import de.halbmann.sam.api.boundary.SheetCollectionsResource;
 import de.halbmann.sam.api.entity.PaginatedResponse;
 import de.halbmann.sam.api.entity.SheetCollection;
 import de.halbmann.sam.api.entity.SheetCollectionFilterRequest;
+import de.halbmann.sam.business.controller.CollectionTocService;
 import de.halbmann.sam.business.controller.SheetCollectionService;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.container.ResourceContext;
 import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.Response;
 
 @RequestScoped
 public class SheetCollectionsResourceImpl implements SheetCollectionsResource {
@@ -19,6 +21,9 @@ public class SheetCollectionsResourceImpl implements SheetCollectionsResource {
 
     @Inject
     SheetCollectionService service;
+
+    @Inject
+    CollectionTocService tocService;
 
     @Override
     public PaginatedResponse<SheetCollection> findSheetCollections(final SheetCollectionFilterRequest filterRequest) {
@@ -43,6 +48,16 @@ public class SheetCollectionsResourceImpl implements SheetCollectionsResource {
     @Override
     public void delete(final String collectionId) {
         service.delete(collectionId);
+    }
+
+    @Override
+    public Response generateToc(final String collectionId) {
+        byte[] pdf = tocService.generateToc(collectionId);
+        String filename = "toc-" + collectionId + ".pdf";
+        return Response.ok(pdf)
+                .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")
+                .header("Content-Length", pdf.length)
+                .build();
     }
 
     @Override

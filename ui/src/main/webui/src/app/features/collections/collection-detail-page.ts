@@ -54,7 +54,25 @@ export class CollectionDetailPage implements OnInit {
   }
 
   protected generateToc(): void {
-    // TODO: generate and download a table-of-contents file for this collection
+    this.api.downloadToc(this.collectionId()).subscribe({
+      next: (response) => {
+        const disposition = response.headers.get('Content-Disposition');
+        const serverFilename = disposition?.match(/filename="?([^";]+)"?/i)?.[1];
+        const filename = serverFilename ?? `toc-${this.collectionId()}.pdf`;
+        const url = URL.createObjectURL(response.body!);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+      },
+      error: () => {
+        this.messageService.add({
+          severity: 'error',
+          summary: this.t.t('collections.toc.error'),
+        });
+      },
+    });
   }
 
   protected formatDate(date?: Date): string {

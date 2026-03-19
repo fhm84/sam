@@ -5,6 +5,7 @@ import de.halbmann.sam.api.entity.SheetCollection;
 import de.halbmann.sam.api.entity.SheetCollectionFilterRequest;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 @Path("sheet-collections")
 @Produces(MediaType.APPLICATION_JSON)
@@ -29,6 +30,11 @@ public interface SheetCollectionsResource {
     @DELETE
     @Path("{collectionId}")
     void delete(final @PathParam("collectionId") String collectionId);
+
+    @GET
+    @Path("{collectionId}/toc")
+    @Produces("application/pdf")
+    Response generateToc(final @PathParam("collectionId") String collectionId);
 
     @Path("{collectionId}/sheets")
     CollectionSheetsResource sheets(final @PathParam("collectionId") String collectionId);
