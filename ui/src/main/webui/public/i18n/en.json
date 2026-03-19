@@ -278,6 +278,18 @@
       "genrePlaceholder": "All genres",
       "clear": "Clear filters"
     },
+    "collections": {
+      "title": "Collections",
+      "add": "Add to collection",
+      "empty": "Not in any collection yet",
+      "columnCollection": "Collection",
+      "searchPlaceholder": "Search collections…",
+      "noResults": "No collections found",
+      "remove": {
+        "header": "Confirm removal",
+        "confirm": "Remove this sheet from \"{name}\"?"
+      }
+    },
     "search": "Search sheets",
     "empty": "No sheets found",
     "save": "Save",
@@ -636,9 +648,11 @@
   "common": {
     "edit": "Edit",
     "delete": "Delete",
+    "remove": "Remove",
     "download": "Download",
     "addToFavorites": "Add to favourites",
     "removeFromFavorites": "Remove from favourites",
+    "addToCollection": "Manage collections",
     "openInNewTab": "Open in new tab",
     "expandRow": "Expand",
     "collapseRow": "Collapse"

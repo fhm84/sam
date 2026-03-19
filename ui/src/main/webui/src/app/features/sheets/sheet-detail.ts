@@ -21,6 +21,7 @@ import { DocumentHandler } from '../../shared/base/document-handler';
 import { InstrumentationForm } from './instrumentation-form';
 import { InstrumentationDocuments, DocToggleEvent, DocsLoadedEvent } from './instrumentation-documents';
 import { EnrichmentDialog } from './enrichment-dialog/enrichment-dialog';
+import { SheetCollections } from './sheet-collections';
 
 @Component({
   selector: 'app-sheet-detail',
@@ -45,6 +46,7 @@ import { EnrichmentDialog } from './enrichment-dialog/enrichment-dialog';
     Tag,
     InstrumentationDocuments,
     EnrichmentDialog,
+    SheetCollections,
   ],
   providers: [ConfirmationService],
   templateUrl: './sheet-detail.html',

@@ -8,7 +8,6 @@ import de.halbmann.sam.business.entity.MusicianEntity;
 import de.halbmann.sam.business.entity.PaginatedEntities;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
-import io.quarkus.panache.common.Parameters;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.NoResultException;
@@ -47,7 +46,7 @@ public class MusicianRepository implements PanacheRepositoryBase<MusicianEntity,
     public Optional<MusicianEntity> findMusicianByName(final String name) {
         try {
             return Optional.ofNullable(
-                    find("name = :name", Parameters.with("name", name)).singleResult());
+                    find("name = :name", Map.of("name", name)).singleResult());
         } catch (final NoResultException e) {
             return Optional.empty();
         }

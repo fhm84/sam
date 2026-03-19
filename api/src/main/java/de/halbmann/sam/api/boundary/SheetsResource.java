@@ -114,6 +114,18 @@ public interface SheetsResource {
     List<String> getAvailableLetters(@QueryParam("genre") String genre);
 
     /**
+     * Returns all collections that contain the given sheet music.
+     *
+     * @param sheetId the ID of the sheet music
+     * @param paginationRequest pagination parameters
+     * @return paginated list of collections containing this sheet
+     */
+    @GET
+    @Path("{sheetId}/collections")
+    PaginatedResponse<SheetCollection> getCollections(
+            final @PathParam("sheetId") String sheetId, final @BeanParam PaginationRequest paginationRequest);
+
+    /**
      * Provides access to the instrumentations resource for a specific sheet music.
      *
      * @param sheetId the ID of the sheet music

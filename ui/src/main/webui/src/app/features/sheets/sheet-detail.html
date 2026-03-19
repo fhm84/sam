@@ -82,6 +82,7 @@
       <p-tablist>
         <p-tab [value]="0">{{ 'sheets.detail.tabs.details' | translate }}</p-tab>
         <p-tab [value]="1">{{ 'sheets.instrumentations.title' | translate }}</p-tab>
+        <p-tab [value]="3">{{ 'sheets.collections.title' | translate }}</p-tab>
         @if (coverage) {
           <p-tab [value]="2">{{ 'sheets.detail.tabs.coverage' | translate }}</p-tab>
         }
@@ -436,7 +437,14 @@
           </div>
         </p-tabpanel>
 
-        <!-- Tab 3: Coverage -->
+        <!-- Tab 3: Collections -->
+        <p-tabpanel [value]="3">
+          <div class="tab-panels">
+            <app-sheet-collections [sheetId]="sheetId" />
+          </div>
+        </p-tabpanel>
+
+        <!-- Tab 4: Coverage -->
         @if (coverage) {
           <p-tabpanel [value]="2">
             <div class="tab-panels">
@@ -778,6 +786,20 @@
             }
           </div>
         }
+      </p-panel>
+
+      <!-- Collections -->
+      <p-panel [header]="t.t('sheets.collections.title')" [toggleable]="true" [collapsed]="true">
+        <ng-template pTemplate="headeractions">
+          <p-button
+            icon="pi pi-folder-plus"
+            [label]="t.t('sheets.collections.add')"
+            size="small"
+            [outlined]="true"
+            (onClick)="collectionsPanel.openAdd()"
+          />
+        </ng-template>
+        <app-sheet-collections #collectionsPanel [sheetId]="sheetId" />
       </p-panel>
 
       <!-- Coverage -->

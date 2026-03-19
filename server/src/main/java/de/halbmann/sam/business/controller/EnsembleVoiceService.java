@@ -7,12 +7,12 @@ import de.halbmann.sam.business.boundary.EnsembleVoiceRepository;
 import de.halbmann.sam.business.entity.EnsembleEntity;
 import de.halbmann.sam.business.entity.EnsembleVoiceEntity;
 import de.halbmann.sam.business.exception.EntityNotFoundException;
-import io.quarkus.panache.common.Parameters;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @ApplicationScoped
@@ -31,7 +31,7 @@ public class EnsembleVoiceService {
     public List<EnsembleVoice> getVoices(final String ensembleId) {
         Sort sort = Sort.ascending("label");
         return ensembleVoiceRepository
-                .find("ensemble.id = :ensembleId", sort, Parameters.with("ensembleId", UUID.fromString(ensembleId)))
+                .find("ensemble.id = :ensembleId", sort, Map.of("ensembleId", UUID.fromString(ensembleId)))
                 .list()
                 .stream()
                 .map(ensembleVoiceMapper::toDto)

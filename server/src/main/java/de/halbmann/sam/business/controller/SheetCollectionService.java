@@ -109,6 +109,27 @@ public class SheetCollectionService {
         collectionSheetMapper.update(csEntity, dto);
     }
 
+    public PaginatedResponse<SheetCollection> findCollectionsForSheet(
+            final String sheetId, final PaginationRequest pagination) {
+        UUID sheetUuid = UUID.fromString(sheetId);
+        PaginatedEntities<SheetCollectionEntity> result = repository.findBySheetId(sheetUuid, pagination);
+        PaginatedResponse<SheetCollection> response = new PaginatedResponse<>();
+        response.setData(result.data().stream()
+                .map(entity -> {
+                    SheetCollection dto = mapper.toDto(entity);
+                    // retain only the CollectionSheet entry for this specific sheet
+                    dto.setSheets(dto.getSheets().stream()
+                            .filter(cs -> sheetUuid.equals(cs.getSheetId()))
+                            .toList());
+                    return dto;
+                })
+                .toList());
+        response.setPage(pagination.getPage());
+        response.setSize(response.getData().size());
+        response.setTotalCount(result.totalCount());
+        return response;
+    }
+
     public void removeSheet(final String collectionId, final String sheetId) {
         SheetCollectionEntity collection = repository
                 .findByIdOptional(UUID.fromString(collectionId))

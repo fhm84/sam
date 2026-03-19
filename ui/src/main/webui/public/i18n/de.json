@@ -278,6 +278,18 @@
       "genrePlaceholder": "Alle Genres",
       "clear": "Filter zurücksetzen"
     },
+    "collections": {
+      "title": "Sammlungen",
+      "add": "Zu Sammlung hinzufügen",
+      "empty": "Noch in keiner Sammlung enthalten",
+      "columnCollection": "Sammlung",
+      "searchPlaceholder": "Sammlungen suchen…",
+      "noResults": "Keine Sammlungen gefunden",
+      "remove": {
+        "header": "Entfernen bestätigen",
+        "confirm": "Dieses Notenblatt aus \"{name}\" entfernen?"
+      }
+    },
     "search": "Noten suchen",
     "empty": "Keine Noten gefunden",
     "save": "Speichern",
@@ -636,9 +648,11 @@
   "common": {
     "edit": "Bearbeiten",
     "delete": "Löschen",
+    "remove": "Entfernen",
     "download": "Herunterladen",
     "addToFavorites": "Zu Favoriten hinzufügen",
     "removeFromFavorites": "Aus Favoriten entfernen",
+    "addToCollection": "Sammlungen verwalten",
     "openInNewTab": "In neuem Tab öffnen",
     "expandRow": "Ausklappen",
     "collapseRow": "Einklappen"

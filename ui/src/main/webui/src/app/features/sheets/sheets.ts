@@ -32,7 +32,9 @@ import {
   SheetMusicSearchResult,
 } from '../../model/datamodels';
 import { GENRES, STYLES } from '../../shared/constants';
+import { Dialog } from 'primeng/dialog';
 import { SheetDetail } from './sheet-detail';
+import { SheetCollections } from './sheet-collections';
 
 @Component({
   selector: 'app-sheets',
@@ -50,7 +52,9 @@ Button,
     FormsModule,
     TranslatePipe,
     SheetDetail,
+    SheetCollections,
     Drawer,
+    Dialog,
     Toolbar,
     Tag,
     Tooltip,
@@ -105,6 +109,8 @@ export class Sheets implements OnInit {
 
   protected detailDrawerVisible = false;
   protected selectedSheetId: string | null = null;
+  protected collectionsDialogVisible = false;
+  protected collectionsDialogSheetId: string | null = null;
   protected selectedSheetCoverage = signal<CoverageSnapshotSummary | null>(null);
 
   protected readonly viewOptions = [
@@ -112,7 +118,7 @@ export class Sheets implements OnInit {
     { icon: 'pi pi-list', value: 'list' },
   ];
 
-  private currentPage = 0;
+  protected currentPage = 0;
   private searchFilter = '';
   private readonly filterSubject = new Subject<string>();
 
@@ -253,6 +259,12 @@ export class Sheets implements OnInit {
 
   protected openEdit(sheet: SheetMusic): void {
     this.router.navigate(['/sheets', sheet.id, 'edit']);
+  }
+
+  protected openCollectionsDialog(sheet: SheetMusicSearchResult, event: MouseEvent): void {
+    event.stopPropagation();
+    this.collectionsDialogSheetId = sheet.id ?? null;
+    this.collectionsDialogVisible = true;
   }
 
   protected confirmDelete(sheet: SheetMusic): void {

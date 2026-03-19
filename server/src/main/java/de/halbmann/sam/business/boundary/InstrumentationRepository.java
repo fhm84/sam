@@ -3,9 +3,9 @@ package de.halbmann.sam.business.boundary;
 import de.halbmann.sam.business.entity.AttachmentEntity;
 import de.halbmann.sam.business.entity.InstrumentationEntity;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
-import io.quarkus.panache.common.Parameters;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
+import java.util.Map;
 import java.util.UUID;
 
 @ApplicationScoped
@@ -15,7 +15,7 @@ public class InstrumentationRepository implements PanacheRepositoryBase<Instrume
     public void removeAttachment(AttachmentEntity attachment) {
         find(
                         "SELECT i FROM InstrumentationEntity i JOIN i.attachments a WHERE a.id = :id",
-                        Parameters.with("id", attachment.getId()))
+                        Map.of("id", attachment.getId()))
                 .list()
                 .forEach(i -> i.getAttachments().remove(attachment));
     }

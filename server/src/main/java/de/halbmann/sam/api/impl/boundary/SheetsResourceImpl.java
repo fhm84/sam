@@ -5,6 +5,7 @@ import de.halbmann.sam.api.boundary.InstrumentationsResource;
 import de.halbmann.sam.api.boundary.SheetsResource;
 import de.halbmann.sam.api.entity.*;
 import de.halbmann.sam.business.controller.CoverageEvaluationService;
+import de.halbmann.sam.business.controller.SheetCollectionService;
 import de.halbmann.sam.business.controller.SheetService;
 import de.halbmann.sam.enrichment.controller.SheetEnrichmentService;
 import jakarta.enterprise.context.RequestScoped;
@@ -28,6 +29,9 @@ public class SheetsResourceImpl implements SheetsResource {
 
     @Inject
     SheetEnrichmentService sheetEnrichmentService;
+
+    @Inject
+    SheetCollectionService sheetCollectionService;
 
     @Override
     public PaginatedResponse<SheetMusicSearchResult> findSheets(final SheetFilterRequest filterRequest) {
@@ -102,5 +106,11 @@ public class SheetsResourceImpl implements SheetsResource {
     @Override
     public SheetEnrichment enrich(final String sheetId) {
         return sheetEnrichmentService.enrich(sheetId);
+    }
+
+    @Override
+    public PaginatedResponse<SheetCollection> getCollections(
+            final String sheetId, final PaginationRequest paginationRequest) {
+        return sheetCollectionService.findCollectionsForSheet(sheetId, paginationRequest);
     }
 }

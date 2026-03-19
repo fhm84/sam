@@ -8,7 +8,6 @@ import de.halbmann.sam.business.entity.PaginatedEntities;
 import de.halbmann.sam.business.entity.SheetMusicEntity;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
-import io.quarkus.panache.common.Parameters;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
@@ -72,8 +71,7 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
     }
 
     public Optional<SheetMusicEntity> findByTitle(String title) {
-        return find("lower(title) = lower(:title)", Parameters.with("title", title))
-                .firstResultOptional();
+        return find("lower(title) = lower(:title)", Map.of("title", title)).firstResultOptional();
     }
 
     /**
@@ -156,9 +154,7 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
     }
 
     public void removeAttachment(AttachmentEntity attachment) {
-        find(
-                        "SELECT s FROM SheetMusicEntity s JOIN s.attachments a WHERE a.id = :id",
-                        Parameters.with("id", attachment.getId()))
+        find("SELECT s FROM SheetMusicEntity s JOIN s.attachments a WHERE a.id = :id", Map.of("id", attachment.getId()))
                 .list()
                 .forEach(s -> s.getAttachments().remove(attachment));
     }

@@ -9,12 +9,12 @@ import de.halbmann.sam.business.entity.EnsembleVoiceEntity;
 import de.halbmann.sam.business.entity.InstrumentEntity;
 import de.halbmann.sam.business.entity.VoiceOptionEntity;
 import de.halbmann.sam.business.exception.EntityNotFoundException;
-import io.quarkus.panache.common.Parameters;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @ApplicationScoped
@@ -36,7 +36,7 @@ public class VoiceOptionService {
     public List<VoiceOption> getOptions(final String voiceId) {
         Sort sort = Sort.ascending("instrument.name");
         return voiceOptionRepository
-                .find("voice.id = :voiceId", sort, Parameters.with("voiceId", UUID.fromString(voiceId)))
+                .find("voice.id = :voiceId", sort, Map.of("voiceId", UUID.fromString(voiceId)))
                 .list()
                 .stream()
                 .map(voiceOptionMapper::toDto)

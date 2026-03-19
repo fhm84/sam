@@ -70,4 +70,18 @@ export class CollectionsApiService {
   removeSheet(collectionId: string, sheetId: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${collectionId}/sheets/${sheetId}`);
   }
+
+  // ── Reverse lookup ────────────────────────────────────
+  getCollectionsForSheet(
+    sheetId: string,
+    pagination: PaginationRequest = {},
+  ): Observable<PaginatedResponse<SheetCollection>> {
+    let params = new HttpParams();
+    if (pagination.page !== undefined) params = params.set('page', pagination.page);
+    if (pagination.size !== undefined) params = params.set('size', pagination.size);
+    return this.http.get<PaginatedResponse<SheetCollection>>(
+      `/api/sheets/${sheetId}/collections`,
+      { params },
+    );
+  }
 }

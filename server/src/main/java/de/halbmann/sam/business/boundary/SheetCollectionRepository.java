@@ -50,4 +50,22 @@ public class SheetCollectionRepository implements PanacheRepositoryBase<SheetCol
         }
         return new PaginatedEntities<>(entities, totalItems);
     }
+
+    public PaginatedEntities<SheetCollectionEntity> findBySheetId(UUID sheetId, PaginationRequest pagination) {
+        long total = getEntityManager()
+                .createQuery(
+                        "SELECT COUNT(DISTINCT sc) FROM SheetCollectionEntity sc JOIN sc.sheets cs WHERE cs.sheet.id = :sheetId",
+                        Long.class)
+                .setParameter("sheetId", sheetId)
+                .getSingleResult();
+        List<SheetCollectionEntity> page = getEntityManager()
+                .createQuery(
+                        "SELECT DISTINCT sc FROM SheetCollectionEntity sc JOIN sc.sheets cs WHERE cs.sheet.id = :sheetId ORDER BY sc.name ASC",
+                        SheetCollectionEntity.class)
+                .setParameter("sheetId", sheetId)
+                .setFirstResult(pagination.getPage() * pagination.getSize())
+                .setMaxResults(pagination.getSize())
+                .getResultList();
+        return new PaginatedEntities<>(page, total);
+    }
 }

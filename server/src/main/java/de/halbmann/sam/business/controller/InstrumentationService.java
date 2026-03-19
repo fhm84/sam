@@ -9,13 +9,13 @@ import de.halbmann.sam.business.entity.InstrumentEntity;
 import de.halbmann.sam.business.entity.InstrumentationEntity;
 import de.halbmann.sam.business.entity.SheetMusicEntity;
 import de.halbmann.sam.business.exception.EntityNotFoundException;
-import io.quarkus.panache.common.Parameters;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @ApplicationScoped
@@ -40,7 +40,7 @@ public class InstrumentationService {
     public List<Instrumentation> getInstrumentations(final String sheetId) {
         Sort sort = Sort.ascending("instrument.name", "partLabel");
         return instrumentationRepository
-                .find("sheet.id = :sheet_id", sort, Parameters.with("sheet_id", UUID.fromString(sheetId)))
+                .find("sheet.id = :sheet_id", sort, Map.of("sheet_id", UUID.fromString(sheetId)))
                 .list()
                 .stream()
                 .map(instrumentationMapper::toDto)

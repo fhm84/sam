@@ -7,7 +7,6 @@ import de.halbmann.sam.business.entity.InstrumentEntity;
 import de.halbmann.sam.business.entity.PaginatedEntities;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
-import io.quarkus.panache.common.Parameters;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.NoResultException;
@@ -47,8 +46,8 @@ public class InstrumentRepository implements PanacheRepositoryBase<InstrumentEnt
 
     public Optional<InstrumentEntity> findByName(String name) {
         try {
-            return Optional.ofNullable(find("lower(name) = lower(:name)", Parameters.with("name", name))
-                    .firstResult());
+            return Optional.ofNullable(
+                    find("lower(name) = lower(:name)", Map.of("name", name)).firstResult());
         } catch (NoResultException e) {
             return Optional.empty();
         }

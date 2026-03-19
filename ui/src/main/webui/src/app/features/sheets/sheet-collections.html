@@ -1,0 +1,182 @@
+<!-- ── Membership table ──────────────────────────────────── -->
+<div class="sheet-collections-panel">
+  <p-table
+    [value]="collections()"
+    [loading]="loading()"
+  >
+    <ng-template #header>
+      <tr>
+        <th class="col-identifier">{{ 'collections.sheets.columns.identifier' | translate }}</th>
+        <th>{{ 'sheets.collections.columnCollection' | translate }}</th>
+        <th class="col-type">{{ 'collections.columns.type' | translate }}</th>
+        <th class="col-actions">{{ 'collections.columns.actions' | translate }}</th>
+      </tr>
+    </ng-template>
+
+    <ng-template #body let-col>
+      <tr>
+        <td class="identifier-cell">{{ col.sheets?.[0]?.identifier }}</td>
+        <td>
+          <a class="collection-link" [routerLink]="['/collections', col.id]">{{ col.name }}</a>
+          @if (col.description) {
+            <span class="collection-description">{{ col.description }}</span>
+          }
+        </td>
+        <td>
+          <p-tag [value]="'collections.types.' + col.type | translate" severity="secondary" />
+        </td>
+        <td>
+          <div class="actions-cell">
+            <p-button
+              icon="pi pi-times"
+              [rounded]="true"
+              [text]="true"
+              size="small"
+              severity="danger"
+              [pTooltip]="'common.remove' | translate"
+              tooltipPosition="top"
+              (onClick)="confirmRemove(col)"
+            />
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="4" class="empty-message">{{ 'sheets.collections.empty' | translate }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <div class="membership-toolbar">
+    <p-button
+      icon="pi pi-folder-plus"
+      [label]="t.t('sheets.collections.add')"
+      size="small"
+      [outlined]="true"
+      (onClick)="openAdd()"
+    />
+  </div>
+</div>
+
+<!-- ── Add dialog ──────────────────────────────────────── -->
+<p-dialog
+  [header]="t.t('sheets.collections.add')"
+  [(visible)]="addDialogVisible"
+  [modal]="true"
+  [style]="{ width: '52rem', height: '46rem' }"
+  [breakpoints]="{ '768px': '95vw' }"
+>
+  @if (addDialogVisible) {
+    <div class="add-to-collection-dialog">
+
+      <!-- Selected collection + identifier (shown when a collection is selected) -->
+      @if (selectedCollection) {
+        <div class="selected-block">
+          <div class="selected-indicator">
+            <i class="pi pi-check-circle"></i>
+            <span>{{ selectedCollection.name }}</span>
+            <p-tag
+              [value]="'collections.types.' + selectedCollection.type | translate"
+              severity="secondary"
+            />
+          </div>
+          <form [formGroup]="identifierForm" (ngSubmit)="onAdd()" class="identifier-form">
+            <p-floatlabel variant="on">
+              <input
+                pInputText
+                id="add-identifier"
+                formControlName="identifier"
+                [pTooltip]="t.t('collections.sheets.form.identifierTooltip')"
+                tooltipPosition="right"
+              />
+              <label for="add-identifier">{{ 'collections.sheets.form.identifier' | translate }}</label>
+            </p-floatlabel>
+          </form>
+        </div>
+      }
+
+      <!-- Search -->
+      <div class="search-bar">
+        <p-iconfield class="search-field">
+          <p-inputicon styleClass="pi pi-search" />
+          <input
+            pInputText
+            type="text"
+            [placeholder]="t.t('sheets.collections.searchPlaceholder')"
+            (input)="onSearchInput($event)"
+          />
+        </p-iconfield>
+      </div>
+
+      <!-- Results table -->
+      <p-table
+        [value]="searchResults()"
+        [lazy]="true"
+        [paginator]="true"
+        [rows]="searchRows"
+        [totalRecords]="searchTotal()"
+        [loading]="searchLoading()"
+        [rowsPerPageOptions]="[10, 25]"
+        [rowHover]="true"
+        styleClass="search-results-table"
+        (onLazyLoad)="onSearchLazyLoad($event)"
+      >
+        <ng-template #header>
+          <tr>
+            <th>{{ 'collections.columns.name' | translate }}</th>
+            <th class="col-type">{{ 'collections.columns.type' | translate }}</th>
+            <th class="col-date">{{ 'collections.columns.date' | translate }}</th>
+          </tr>
+        </ng-template>
+
+        <ng-template #body let-col>
+          <tr
+            class="search-row"
+            [class.search-row--selected]="isSelected(col)"
+            (click)="selectCollection(col)"
+          >
+            <td>
+              <span class="search-name">{{ col.name }}</span>
+              @if (col.description) {
+                <span class="collection-description">{{ col.description }}</span>
+              }
+            </td>
+            <td>
+              <p-tag [value]="'collections.types.' + col.type | translate" severity="secondary" />
+            </td>
+            <td>{{ col.date ?? '—' }}</td>
+          </tr>
+        </ng-template>
+
+        <ng-template #emptymessage>
+          <tr>
+            <td colspan="3" class="empty-message">
+              {{ 'sheets.collections.noResults' | translate }}
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+
+    </div>
+  }
+
+  <ng-template #footer>
+    <p-button
+      [label]="t.t('collections.sheets.cancel')"
+      severity="secondary"
+      [text]="true"
+      (onClick)="addDialogVisible = false"
+    />
+    <p-button
+      [label]="t.t('collections.sheets.save')"
+      icon="pi pi-folder-plus"
+      [disabled]="!canAdd || saving"
+      [loading]="saving"
+      (onClick)="onAdd()"
+    />
+  </ng-template>
+</p-dialog>
+
+<p-confirmdialog />
