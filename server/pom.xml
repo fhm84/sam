@@ -17,6 +17,7 @@
         <aws-java-nio-spi-s3.version>2.2.1</aws-java-nio-spi-s3.version>
         <quarkus-langchain4j.version>1.7.4</quarkus-langchain4j.version>
         <pdfbox-tools.version>3.0.7</pdfbox-tools.version>
+        <flying-saucer-pdf.version>10.1.0</flying-saucer-pdf.version>
     </properties>
 
     <dependencyManagement>
@@ -140,8 +141,8 @@
         <!-- HTML → PDF rendering (no PDFBox dependency — avoids conflict with pdfbox-tools 3.x) -->
         <dependency>
             <groupId>org.xhtmlrenderer</groupId>
-            <artifactId>flying-saucer-pdf-openpdf</artifactId>
-            <version>9.3.1</version>
+            <artifactId>flying-saucer-pdf</artifactId>
+            <version>${flying-saucer-pdf.version}</version>
         </dependency>
 
         <!-- test dependencies -->

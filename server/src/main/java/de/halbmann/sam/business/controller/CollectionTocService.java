@@ -47,7 +47,7 @@ public class CollectionTocService {
         }
     }
 
-    private TocRow toRow(final CollectionSheet sheet) {
+    TocRow toRow(final CollectionSheet sheet) {
         return new TocRow(
                 sheet.getIdentifier() != null ? sheet.getIdentifier() : "",
                 sheet.getTitle() != null ? sheet.getTitle() : "",
@@ -56,7 +56,7 @@ public class CollectionTocService {
                 formatDuration(sheet.getDuration()));
     }
 
-    private String formatDuration(final Duration d) {
+    String formatDuration(final Duration d) {
         if (d == null) return "";
         long totalSeconds = d.getSeconds();
         long minutes = totalSeconds / 60;
@@ -64,7 +64,7 @@ public class CollectionTocService {
         return String.format("%d:%02d", minutes, seconds);
     }
 
-    private String computeTotalDuration(final List<CollectionSheet> sheets) {
+    String computeTotalDuration(final List<CollectionSheet> sheets) {
         Duration total = sheets.stream()
                 .map(CollectionSheet::getDuration)
                 .filter(d -> d != null)
