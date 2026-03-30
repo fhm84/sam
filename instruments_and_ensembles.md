@@ -182,7 +182,7 @@ Pflichtstimmen fehlen → Stück als nicht spielbar markiert, unabhängig vom Ge
 
 ### Phase 4 – Admin-UI
 
-* [ ] Instrumentenverwaltung
+* [x] Instrumentenverwaltung
 * [x] Ensemble-Stimmen-Konfiguration (Voices + VoiceOptions)
 * [ ] Simulations-/Test-Ansicht
 

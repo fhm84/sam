@@ -22,7 +22,7 @@ SAM (Sheet music Archiving & Management) is a Quarkus-based application for arch
 ./mvnw test -pl server -Dtest=SheetImporterTest
 
 # Run integration tests (skipped by default via skipITs=true)
-./mvnw verify -pl server -DskipITs=false
+./mvnw verify -pl server -am -DskipITs=false
 
 # Format code (Palantir Java Format via Spotless)
 ./mvnw spotless:apply
