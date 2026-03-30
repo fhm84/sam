@@ -5,13 +5,18 @@ import de.halbmann.sam.api.boundary.InstrumentationsResource;
 import de.halbmann.sam.api.boundary.SheetsResource;
 import de.halbmann.sam.api.entity.*;
 import de.halbmann.sam.business.controller.CoverageEvaluationService;
+import de.halbmann.sam.business.controller.ExportResult;
 import de.halbmann.sam.business.controller.SheetCollectionService;
+import de.halbmann.sam.business.controller.SheetExportService;
 import de.halbmann.sam.business.controller.SheetService;
 import de.halbmann.sam.enrichment.controller.SheetEnrichmentService;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.container.ResourceContext;
 import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.StreamingOutput;
+
 import java.util.List;
 import java.util.Set;
 
@@ -26,6 +31,9 @@ public class SheetsResourceImpl implements SheetsResource {
 
     @Inject
     CoverageEvaluationService coverageEvaluationService;
+
+    @Inject
+    SheetExportService sheetExportService;
 
     @Inject
     SheetEnrichmentService sheetEnrichmentService;
@@ -112,5 +120,14 @@ public class SheetsResourceImpl implements SheetsResource {
     public PaginatedResponse<SheetCollection> getCollections(
             final String sheetId, final PaginationRequest paginationRequest) {
         return sheetCollectionService.findCollectionsForSheet(sheetId, paginationRequest);
+    }
+
+    @Override
+    public Response export(final String sheetId, final ExportFormat format) {
+        ExportResult result = sheetExportService.exportSheet(sheetId, format);
+        return Response.ok((StreamingOutput) result.body()::write)
+                .header("Content-Disposition", "attachment; filename=\"" + result.filename() + "\"")
+                .type(result.contentType())
+                .build();
     }
 }

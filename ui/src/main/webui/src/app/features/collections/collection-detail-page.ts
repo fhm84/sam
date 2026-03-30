@@ -1,8 +1,10 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { HttpResponse } from '@angular/common/http';
 import { MessageService } from 'primeng/api';
 import { Button } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
+import { SplitButton } from 'primeng/splitbutton';
 import { Tag } from 'primeng/tag';
 import { Toolbar } from 'primeng/toolbar';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
@@ -14,7 +16,7 @@ import { CollectionSheets } from './collection-sheets';
 
 @Component({
   selector: 'app-collection-detail-page',
-  imports: [TranslatePipe, Button, Dialog, Tag, CollectionForm, CollectionSheets, Toolbar],
+  imports: [TranslatePipe, Button, SplitButton, Dialog, Tag, CollectionForm, CollectionSheets, Toolbar],
   templateUrl: './collection-detail-page.html',
   styleUrl: './collection-detail-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -29,6 +31,19 @@ export class CollectionDetailPage implements OnInit {
   protected readonly collectionId = signal('');
   protected readonly collection = signal<SheetCollection | null>(null);
   protected editDialogVisible = false;
+
+  protected readonly exportMenuItems = [
+    {
+      label: 'JSON',
+      icon: 'pi pi-file',
+      command: () => this.exportCollection('JSON'),
+    },
+    {
+      label: 'CSV',
+      icon: 'pi pi-table',
+      command: () => this.exportCollection('CSV'),
+    },
+  ];
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id')!;
@@ -80,10 +95,33 @@ export class CollectionDetailPage implements OnInit {
     return new Date(date).toLocaleDateString();
   }
 
+  protected exportCollection(format: 'ZIP' | 'JSON' | 'CSV'): void {
+    this.api.export(this.collectionId(), format).subscribe({
+      next: (response) => triggerDownload(response),
+      error: () => {
+        this.messageService.add({
+          severity: 'error',
+          summary: this.t.t('collections.export.error'),
+        });
+      },
+    });
+  }
+
   private loadCollection(id: string): void {
     this.api.load(id).subscribe({
       next: (c) => this.collection.set(c),
       error: () => {},
     });
   }
+}
+
+function triggerDownload(response: HttpResponse<Blob>): void {
+  const disposition = response.headers.get('Content-Disposition');
+  const filename = disposition?.match(/filename="?([^";]+)"?/i)?.[1] ?? 'export';
+  const url = URL.createObjectURL(response.body!);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
 }

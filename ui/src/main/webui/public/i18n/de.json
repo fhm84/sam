@@ -292,6 +292,10 @@
     },
     "search": "Noten suchen",
     "empty": "Keine Noten gefunden",
+    "export": {
+      "zip": "Als ZIP exportieren",
+      "error": "Export fehlgeschlagen"
+    },
     "save": "Speichern",
     "cancel": "Abbrechen"
   },
@@ -343,6 +347,10 @@
         "label": "Aktionen",
         "generateToc": "Inhaltsverzeichnis erstellen"
       }
+    },
+    "export": {
+      "zip": "Als ZIP exportieren",
+      "error": "Export fehlgeschlagen"
     },
     "sheets": {
       "title": "Noten",

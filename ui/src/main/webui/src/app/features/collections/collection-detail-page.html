@@ -48,6 +48,15 @@
         size="small"
         (onClick)="generateToc()"
       />
+      <p-splitButton
+        icon="pi pi-download"
+        [label]="t.t('collections.export.zip')"
+        [model]="exportMenuItems"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        (onClick)="exportCollection('ZIP')"
+      />
     </div>
 
     <app-collection-sheets [collectionId]="collectionId()" />

@@ -3,6 +3,7 @@ package de.halbmann.sam.api.boundary;
 import de.halbmann.sam.api.entity.*;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import java.util.List;
 import java.util.Set;
 
@@ -165,4 +166,24 @@ public interface SheetsResource {
     @POST
     @Path("{sheetId}/enrich")
     SheetEnrichment enrich(final @PathParam("sheetId") String sheetId);
+
+    /**
+     * Exports a sheet music entry as a downloadable file.
+     *
+     * <ul>
+     *   <li>{@code ZIP} (default) — metadata JSON + all attachment files in a ZIP archive</li>
+     *   <li>{@code JSON} — sheet metadata as a JSON download</li>
+     *   <li>{@code CSV} — sheet metadata as a single-row CSV download</li>
+     * </ul>
+     *
+     * @param sheetId the ID of the sheet music to export
+     * @param format  the export format (ZIP, JSON, CSV); defaults to ZIP
+     * @return the exported file as a download response
+     */
+    @GET
+    @Path("{sheetId}/export")
+    @Produces(MediaType.WILDCARD)
+    Response export(
+            final @PathParam("sheetId") String sheetId,
+            final @QueryParam("format") @DefaultValue("ZIP") ExportFormat format);
 }

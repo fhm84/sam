@@ -18,7 +18,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.core.StreamingOutput;
+import de.halbmann.sam.business.controller.StreamWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -399,7 +399,7 @@ public class DocumentsService {
      * EXTERNAL_LINK attachments (no physical file) are silently skipped.
      * Duplicate filenames are disambiguated with a counter suffix.
      */
-    public StreamingOutput buildZip(List<AttachmentEntity> attachments, String zipFilename) {
+    public StreamWriter buildZip(List<AttachmentEntity> attachments, String zipFilename) {
         return outputStream -> {
             try (ZipOutputStream zip = new ZipOutputStream(outputStream)) {
                 Set<String> usedNames = new LinkedHashSet<>();
@@ -422,7 +422,7 @@ public class DocumentsService {
      * Only attachments with mimeType {@code application/pdf} are included; others are skipped.
      * Returns {@code null} if no PDF attachments are present.
      */
-    public StreamingOutput buildMergedPdf(List<AttachmentEntity> attachments) {
+    public StreamWriter buildMergedPdf(List<AttachmentEntity> attachments) {
         List<AttachmentEntity> pdfAtts = attachments.stream()
                 .filter(a -> a.getDocument() != null)
                 .filter(a -> "application/pdf".equals(a.getDocument().getMimeType()))

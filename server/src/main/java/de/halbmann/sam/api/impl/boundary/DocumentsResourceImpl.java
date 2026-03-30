@@ -3,6 +3,7 @@ package de.halbmann.sam.api.impl.boundary;
 import de.halbmann.sam.api.boundary.DocumentsResource;
 import de.halbmann.sam.api.entity.*;
 import de.halbmann.sam.business.controller.DocumentsService;
+import de.halbmann.sam.business.controller.StreamWriter;
 import de.halbmann.sam.business.entity.AttachmentEntity;
 import de.halbmann.sam.business.entity.DocumentEntity;
 import de.halbmann.sam.classification.controller.DocumentClassificationService;
@@ -120,11 +121,11 @@ public class DocumentsResourceImpl implements DocumentsResource {
 
     private Response buildResponse(List<AttachmentEntity> attachments, DownloadFormat format, String baseName) {
         if (format == DownloadFormat.MERGED_PDF) {
-            StreamingOutput pdf = documentsService.buildMergedPdf(attachments);
+            StreamWriter pdf = documentsService.buildMergedPdf(attachments);
             if (pdf != null) {
                 String filename = URLEncoder.encode(baseName + ".pdf", StandardCharsets.UTF_8)
                         .replace("+", "%20");
-                return Response.ok(pdf)
+                return Response.ok((StreamingOutput) pdf::write)
                         .type("application/pdf")
                         .header("Content-Disposition", "attachment; filename*=utf-8''" + filename)
                         .header("Cache-Control", "no-store")
@@ -134,10 +135,10 @@ public class DocumentsResourceImpl implements DocumentsResource {
             log.info("No PDF attachments found for merged-pdf request — falling back to ZIP");
         }
 
-        StreamingOutput zip = documentsService.buildZip(attachments, baseName);
+        StreamWriter zip = documentsService.buildZip(attachments, baseName);
         String filename =
                 URLEncoder.encode(baseName + ".zip", StandardCharsets.UTF_8).replace("+", "%20");
-        return Response.ok(zip)
+        return Response.ok((StreamingOutput) zip::write)
                 .type("application/zip")
                 .header("Content-Disposition", "attachment; filename*=utf-8''" + filename)
                 .header("Cache-Control", "no-store")

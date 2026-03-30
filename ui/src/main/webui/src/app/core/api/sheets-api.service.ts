@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {
   CreateSheetMusic,
@@ -79,5 +79,14 @@ export class SheetsApiService {
 
   enrich(id: string): Observable<SheetEnrichment> {
     return this.http.post<SheetEnrichment>(`${this.baseUrl}/${id}/enrich`, null);
+  }
+
+  export(id: string, format: 'ZIP' | 'JSON' | 'CSV' = 'ZIP'): Observable<HttpResponse<Blob>> {
+    const params = new HttpParams().set('format', format);
+    return this.http.get(`${this.baseUrl}/${id}/export`, {
+      params,
+      responseType: 'blob',
+      observe: 'response',
+    });
   }
 }

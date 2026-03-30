@@ -71,6 +71,16 @@ export class CollectionsApiService {
     return this.http.delete<void>(`${this.baseUrl}/${collectionId}/sheets/${sheetId}`);
   }
 
+  // ── Export ────────────────────────────────────────────
+  export(id: string, format: 'ZIP' | 'JSON' | 'CSV' = 'ZIP'): Observable<HttpResponse<Blob>> {
+    const params = new HttpParams().set('format', format);
+    return this.http.get(`${this.baseUrl}/${id}/export`, {
+      params,
+      responseType: 'blob',
+      observe: 'response',
+    });
+  }
+
   // ── TOC export ────────────────────────────────────────
   downloadToc(collectionId: string): Observable<HttpResponse<Blob>> {
     return this.http.get(`${this.baseUrl}/${collectionId}/toc`, {

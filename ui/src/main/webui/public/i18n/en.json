@@ -292,6 +292,10 @@
     },
     "search": "Search sheets",
     "empty": "No sheets found",
+    "export": {
+      "zip": "Export ZIP",
+      "error": "Export failed"
+    },
     "save": "Save",
     "cancel": "Cancel"
   },
@@ -343,6 +347,10 @@
         "label": "Actions",
         "generateToc": "Generate Table of Contents"
       }
+    },
+    "export": {
+      "zip": "Export ZIP",
+      "error": "Export failed"
     },
     "sheets": {
       "title": "Sheets",

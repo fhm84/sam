@@ -1,5 +1,6 @@
 package de.halbmann.sam.api.boundary;
 
+import de.halbmann.sam.api.entity.ExportFormat;
 import de.halbmann.sam.api.entity.PaginatedResponse;
 import de.halbmann.sam.api.entity.SheetCollection;
 import de.halbmann.sam.api.entity.SheetCollectionFilterRequest;
@@ -35,6 +36,26 @@ public interface SheetCollectionsResource {
     @Path("{collectionId}/toc")
     @Produces("application/pdf")
     Response generateToc(final @PathParam("collectionId") String collectionId);
+
+    /**
+     * Exports a collection as a downloadable file.
+     *
+     * <ul>
+     *   <li>{@code ZIP} (default) — collection.json + per-sheet folders with metadata and attachments</li>
+     *   <li>{@code JSON} — collection metadata (including sheet list) as a JSON download</li>
+     *   <li>{@code CSV} — one row per sheet with metadata fields as a CSV download</li>
+     * </ul>
+     *
+     * @param collectionId the ID of the collection to export
+     * @param format       the export format (ZIP, JSON, CSV); defaults to ZIP
+     * @return the exported file as a download response
+     */
+    @GET
+    @Path("{collectionId}/export")
+    @Produces(MediaType.WILDCARD)
+    Response export(
+            final @PathParam("collectionId") String collectionId,
+            final @QueryParam("format") @DefaultValue("ZIP") ExportFormat format);
 
     @Path("{collectionId}/sheets")
     CollectionSheetsResource sheets(final @PathParam("collectionId") String collectionId);
