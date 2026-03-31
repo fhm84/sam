@@ -8,6 +8,14 @@ import de.halbmann.sam.business.entity.InstrumentationEntity;
 import de.halbmann.sam.business.entity.VoiceOptionEntity;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Unit tests for MatchingService.score() covering instrument matching, clef factor,
+ * and notation type factor branches.
+ *
+ * <p>Option format: {@code {name}_{transposition}_{clef}}
+ * <p>Instrumentation format: {@code {part}_{name}_{transposition}_{clef}}
+ * <p>Instrument ID = {@code name + "_" + transposition}
+ */
 class MatchingServiceTest {
 
     MatchingService service = new MatchingService();
@@ -16,8 +24,9 @@ class MatchingServiceTest {
 
     @Test
     void differentInstrumentReturnsZero() {
-        VoiceOptionEntity opt = option("ALTO_SAX_EB", 1.0);
-        InstrumentationEntity instr = instrumentation("TENOR_SAX_BB_TREBLE");
+        // ALTO_SAX (ID: ALTO_SAX_EB) vs TENOR_SAX (ID: TENOR_SAX_BB)
+        VoiceOptionEntity opt = option("ALTO_SAX_EB_TREBLE", 1.0);
+        InstrumentationEntity instr = instrumentation("1_TENOR_SAX_BB_TREBLE");
 
         assertEquals(0.0, service.score(opt, instr));
     }
@@ -26,7 +35,7 @@ class MatchingServiceTest {
 
     @Test
     void matchingInstrumentNoClefNoNotationReturnsOne() {
-        VoiceOptionEntity opt = option("ALTO_SAX_EB", 1.0);
+        VoiceOptionEntity opt = option("ALTO_SAX_EB_TREBLE", 1.0);
         InstrumentationEntity instr = instrumentation("1_ALTO_SAX_EB_TREBLE");
         instr.setClef(null);
         instr.setNotationType(null);
@@ -38,8 +47,8 @@ class MatchingServiceTest {
 
     @Test
     void transposingInstrumentWithClefReturnsFullClefFactor() {
-        // ALTO_SAX_EB has transposition EB → clefFactor = 1.0
-        VoiceOptionEntity opt = option("ALTO_SAX_EB", 1.0);
+        // Eb transposition is non-null → clefFactor = 1.0
+        VoiceOptionEntity opt = option("ALTO_SAX_EB_TREBLE", 1.0);
         InstrumentationEntity instr = instrumentation("1_ALTO_SAX_EB_TREBLE");
         instr.setNotationType(null); // isolate clef factor
 
@@ -48,23 +57,19 @@ class MatchingServiceTest {
 
     @Test
     void nonTransposingInstrumentWithClefReturnsReducedClefFactor() {
-        // PIANO has no transposition → clefFactor = 0.7
-        VoiceOptionEntity opt = option("PIANO_NULL", 1.0);
-        // Force no transposition on the option instrument
-        opt.getInstrument().setTransposition(null);
-        InstrumentationEntity instr = instrumentation("1_PIANO_NULL_TREBLE");
-        instr.getInstrument().setTransposition(null);
-        instr.setNotationType(null);
+        // "NONE" is not a valid InstrumentTransposing value → fromString returns null → clefFactor = 0.7
+        VoiceOptionEntity opt = option("PIANO_NONE_TREBLE", 1.0);
+        InstrumentationEntity instr = instrumentation("1_PIANO_NONE_TREBLE");
+        instr.setNotationType(null); // isolate clef factor
 
-        double score = service.score(opt, instr);
-        assertEquals(0.7, score, 0.001);
+        assertEquals(0.7, service.score(opt, instr), 0.001);
     }
 
     // ── notationTypeFactor ─────────────────────────────────────────────────
 
     @Test
     void standardNotationReturnsFull() {
-        VoiceOptionEntity opt = option("ALTO_SAX_EB", 1.0);
+        VoiceOptionEntity opt = option("ALTO_SAX_EB_TREBLE", 1.0);
         InstrumentationEntity instr = instrumentation("1_ALTO_SAX_EB_TREBLE");
         instr.setClef(null);
         instr.setNotationType(NotationType.STANDARD);
@@ -74,7 +79,7 @@ class MatchingServiceTest {
 
     @Test
     void leadSheetNotationReturnsFull() {
-        VoiceOptionEntity opt = option("ALTO_SAX_EB", 1.0);
+        VoiceOptionEntity opt = option("ALTO_SAX_EB_TREBLE", 1.0);
         InstrumentationEntity instr = instrumentation("1_ALTO_SAX_EB_TREBLE");
         instr.setClef(null);
         instr.setNotationType(NotationType.LEAD_SHEET);
@@ -84,7 +89,7 @@ class MatchingServiceTest {
 
     @Test
     void tablatureNotationReturnsReduced() {
-        VoiceOptionEntity opt = option("ALTO_SAX_EB", 1.0);
+        VoiceOptionEntity opt = option("ALTO_SAX_EB_TREBLE", 1.0);
         InstrumentationEntity instr = instrumentation("1_ALTO_SAX_EB_TREBLE");
         instr.setClef(null);
         instr.setNotationType(NotationType.TABLATURE);
@@ -94,7 +99,7 @@ class MatchingServiceTest {
 
     @Test
     void graphicNotationReturnsReduced() {
-        VoiceOptionEntity opt = option("ALTO_SAX_EB", 1.0);
+        VoiceOptionEntity opt = option("ALTO_SAX_EB_TREBLE", 1.0);
         InstrumentationEntity instr = instrumentation("1_ALTO_SAX_EB_TREBLE");
         instr.setClef(null);
         instr.setNotationType(NotationType.GRAPHIC);
@@ -104,7 +109,7 @@ class MatchingServiceTest {
 
     @Test
     void percussionNotationReturnsPartialReduction() {
-        VoiceOptionEntity opt = option("ALTO_SAX_EB", 1.0);
+        VoiceOptionEntity opt = option("ALTO_SAX_EB_TREBLE", 1.0);
         InstrumentationEntity instr = instrumentation("1_ALTO_SAX_EB_TREBLE");
         instr.setClef(null);
         instr.setNotationType(NotationType.PERCUSSION);
@@ -112,23 +117,17 @@ class MatchingServiceTest {
         assertEquals(0.8, service.score(opt, instr), 0.001);
     }
 
-    // ── Below threshold → 0.0 ─────────────────────────────────────────────
+    // ── Combined factors still above threshold ─────────────────────────────
 
     @Test
-    void scoreBelowThresholdReturnsZero() {
-        // non-transposing instrument (clefFactor 0.7) × TABLATURE (0.7) = 0.49 → still above 0.3
-        // Use GRAPHIC + non-transposing = 0.7 * 0.7 = 0.49; still above threshold
-        // To go below 0.3, we need clefFactor=0.7 and notationFactor < 0.43 — but no such value exists.
-        // The lowest achievable score is 0.7 * 0.7 = 0.49, which stays above threshold 0.3.
-        // Therefore this test verifies the threshold guard does NOT drop a valid low score to 0.0.
-        VoiceOptionEntity opt = option("PIANO_NULL", 1.0);
-        opt.getInstrument().setTransposition(null);
-        InstrumentationEntity instr = instrumentation("1_PIANO_NULL_TREBLE");
-        instr.getInstrument().setTransposition(null);
-        instr.setNotationType(NotationType.TABLATURE);
+    void nonTransposingWithGraphicNotationStaysAboveThreshold() {
+        // clefFactor = 0.7 (non-transposing, clef present) × notationFactor = 0.7 (GRAPHIC) = 0.49
+        // 0.49 > threshold(0.3) → not zeroed
+        VoiceOptionEntity opt = option("PIANO_NONE_TREBLE", 1.0);
+        InstrumentationEntity instr = instrumentation("1_PIANO_NONE_TREBLE");
+        instr.setNotationType(NotationType.GRAPHIC);
 
         double score = service.score(opt, instr);
-        // 0.7 * 0.7 = 0.49, above threshold — should NOT be zeroed
         assertEquals(0.49, score, 0.001);
     }
 }
