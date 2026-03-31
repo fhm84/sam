@@ -19,6 +19,24 @@
             <artifactId>quarkus-quinoa</artifactId>
             <version>2.7.2</version>
         </dependency>
+
+        <!-- API dependencies - for ts-model generation -->
+        <dependency>
+            <groupId>de.halbmann.sam</groupId>
+            <artifactId>api</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus.resteasy.reactive</groupId>
+            <artifactId>resteasy-reactive-common</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <profiles>
@@ -40,6 +58,41 @@
                                     </includes>
                                 </fileSet>
                             </scanSet>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>generate-ts</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>cz.habarta.typescript-generator</groupId>
+                        <artifactId>typescript-generator-maven-plugin</artifactId>
+                        <version>3.2.1263</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>generate</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <jsonLibrary>jsonb</jsonLibrary>
+                            <classPatterns>
+                                <classPattern>de.halbmann.sam.api.entity.*</classPattern>
+                            </classPatterns>
+                            <customTypeMappings>
+                                <customTypeMapping>java.time.Duration:long</customTypeMapping>
+                                <customTypeMapping>de.halbmann.sam.api.entity.DifficultyLevel:short</customTypeMapping>
+                            </customTypeMappings>
+                            <outputFile>src/main/webui/src/app/model/datamodels.d.ts</outputFile>
+                            <outputKind>module</outputKind>
+                            <requiredAnnotations>
+                                jakarta.validation.constraints.NotBlank,jakarta.validation.constraints.NotEmpty,jakarta.validation.constraints.NotNull
+                            </requiredAnnotations>
                         </configuration>
                     </plugin>
                 </plugins>
