@@ -17,29 +17,26 @@ class ArchitectureTest {
      * plain Java or framework-agnostic abstractions so it stays testable and portable.
      */
     @ArchTest
-    static final ArchRule businessLayerMustNotUseJaxRs =
-            noClasses()
-                    .that()
-                    .resideInAPackage("de.halbmann.sam.business..")
-                    .should()
-                    .dependOnClassesThat()
-                    .resideInAPackage("jakarta.ws.rs..")
-                    .because(
-                            "business logic must not depend on JAX-RS; "
-                                    + "use framework-agnostic abstractions (e.g. StreamWriter) instead");
+    static final ArchRule businessLayerMustNotUseJaxRs = noClasses()
+            .that()
+            .resideInAPackage("de.halbmann.sam.business..")
+            .should()
+            .dependOnClassesThat()
+            .resideInAPackage("jakarta.ws.rs..")
+            .because("business logic must not depend on JAX-RS; "
+                    + "use framework-agnostic abstractions (e.g. StreamWriter) instead");
 
     /**
      * Same constraint for the classification and enrichment sub-systems.
      */
     @ArchTest
-    static final ArchRule classificationLayerMustNotUseJaxRs =
-            noClasses()
-                    .that()
-                    .resideInAPackage("de.halbmann.sam.classification.controller..")
-                    .or()
-                    .resideInAPackage("de.halbmann.sam.enrichment.controller..")
-                    .should()
-                    .dependOnClassesThat()
-                    .resideInAPackage("jakarta.ws.rs..")
-                    .because("service/controller classes must not depend on JAX-RS");
+    static final ArchRule classificationLayerMustNotUseJaxRs = noClasses()
+            .that()
+            .resideInAPackage("de.halbmann.sam.classification.controller..")
+            .or()
+            .resideInAPackage("de.halbmann.sam.enrichment.controller..")
+            .should()
+            .dependOnClassesThat()
+            .resideInAPackage("jakarta.ws.rs..")
+            .because("service/controller classes must not depend on JAX-RS");
 }

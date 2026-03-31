@@ -18,7 +18,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import de.halbmann.sam.business.controller.StreamWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;

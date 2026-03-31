@@ -43,9 +43,7 @@ public class SheetExportService {
         if (format == ExportFormat.JSON) {
             String json = jsonb.toJson(sheet);
             return new ExportResult(
-                    out -> out.write(json.getBytes(StandardCharsets.UTF_8)),
-                    safeName + ".json",
-                    "application/json");
+                    out -> out.write(json.getBytes(StandardCharsets.UTF_8)), safeName + ".json", "application/json");
         }
 
         if (format == ExportFormat.CSV) {
@@ -69,9 +67,7 @@ public class SheetExportService {
         if (format == ExportFormat.JSON) {
             String json = jsonb.toJson(collection);
             return new ExportResult(
-                    out -> out.write(json.getBytes(StandardCharsets.UTF_8)),
-                    safeName + ".json",
-                    "application/json");
+                    out -> out.write(json.getBytes(StandardCharsets.UTF_8)), safeName + ".json", "application/json");
         }
 
         if (format == ExportFormat.CSV) {
@@ -110,11 +106,13 @@ public class SheetExportService {
         int index = 1;
         for (CollectionSheet cs : collection.getSheets()) {
             SheetMusic sheet = sheetService.getSheet(cs.getSheetId().toString());
-            String identifier = cs.getIdentifier() != null && !cs.getIdentifier().isBlank()
-                    ? cs.getIdentifier()
-                    : String.format("%02d", index);
+            String identifier =
+                    cs.getIdentifier() != null && !cs.getIdentifier().isBlank()
+                            ? cs.getIdentifier()
+                            : String.format("%02d", index);
             String folder = sanitizeFilename(identifier + " - " + sheet.getTitle());
-            List<AttachmentEntity> attachments = collectSheetAttachments(cs.getSheetId().toString());
+            List<AttachmentEntity> attachments =
+                    collectSheetAttachments(cs.getSheetId().toString());
             exports.add(new SheetExport(folder, jsonb.toJson(sheet), attachments));
             index++;
         }
@@ -161,20 +159,32 @@ public class SheetExportService {
             sb.append(csvField(s.getId() != null ? s.getId().toString() : "")).append(',');
             sb.append(csvField(s.getTitle())).append(',');
             sb.append(csvField(s.getSubtitle())).append(',');
-            sb.append(csvField(s.getComposer() != null ? s.getComposer().getName() : "")).append(',');
-            sb.append(csvField(s.getArranger() != null ? s.getArranger().getName() : "")).append(',');
+            sb.append(csvField(s.getComposer() != null ? s.getComposer().getName() : ""))
+                    .append(',');
+            sb.append(csvField(s.getArranger() != null ? s.getArranger().getName() : ""))
+                    .append(',');
             sb.append(csvField(s.getOriginalBy())).append(',');
             sb.append(csvField(s.getGenre() != null ? s.getGenre().name() : "")).append(',');
             sb.append(csvField(s.getStyle() != null ? s.getStyle().name() : "")).append(',');
-            sb.append(csvField(s.getDifficultyLevel() != null ? s.getDifficultyLevel().name() : "")).append(',');
-            sb.append(csvField(s.getDuration() != null ? s.getDuration().toString() : "")).append(',');
-            sb.append(csvField(s.getYearOfComposition() != null ? s.getYearOfComposition().toString() : ""))
+            sb.append(csvField(
+                            s.getDifficultyLevel() != null
+                                    ? s.getDifficultyLevel().name()
+                                    : ""))
+                    .append(',');
+            sb.append(csvField(s.getDuration() != null ? s.getDuration().toString() : ""))
+                    .append(',');
+            sb.append(csvField(
+                            s.getYearOfComposition() != null
+                                    ? s.getYearOfComposition().toString()
+                                    : ""))
                     .append(',');
             sb.append(csvField(s.getPublisher())).append(',');
-            sb.append(csvField(s.getRating() != null ? s.getRating().toString() : "")).append(',');
+            sb.append(csvField(s.getRating() != null ? s.getRating().toString() : ""))
+                    .append(',');
             sb.append(csvField(s.getIswc())).append(',');
             sb.append(csvField(s.getGemaWorkNumber())).append(',');
-            sb.append(csvField(s.getTags() != null ? String.join(";", s.getTags()) : "")).append('\n');
+            sb.append(csvField(s.getTags() != null ? String.join(";", s.getTags()) : ""))
+                    .append('\n');
         }
         return sb.toString();
     }
@@ -214,9 +224,7 @@ public class SheetExportService {
         int i = 1;
         while (used.contains(candidate)) {
             int dot = base.lastIndexOf('.');
-            candidate = dot > 0
-                    ? base.substring(0, dot) + " (" + i + ")" + base.substring(dot)
-                    : base + " (" + i + ")";
+            candidate = dot > 0 ? base.substring(0, dot) + " (" + i + ")" + base.substring(dot) : base + " (" + i + ")";
             i++;
         }
         used.add(candidate);
