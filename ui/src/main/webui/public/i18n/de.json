@@ -57,7 +57,8 @@
       "uploads": "Dokumente verwalten, die noch keinem Notenblatt zugeordnet sind",
       "musicians": "Komponisten, Arrangeure und andere Mitwirkende"
     },
-    "adminTitle": "Verwaltung"
+    "adminTitle": "Verwaltung",
+    "disclaimer": "SAM dient ausschließlich der Archivierung und Verwaltung von Noten im Rahmen Ihrer rechtlichen Rahmenbedingungen. Die Vervielfältigung oder Weitergabe urheberrechtlich geschützter Noten ist nur mit den entsprechenden Rechten oder Lizenzen gestattet."
   },
   "sheets": {
     "title": "Noten",

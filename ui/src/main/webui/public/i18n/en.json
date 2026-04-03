@@ -57,7 +57,8 @@
       "uploads": "Manage documents not yet linked to a sheet",
       "musicians": "Composers, arrangers, and other contributors"
     },
-    "adminTitle": "Administration"
+    "adminTitle": "Administration",
+    "disclaimer": "SAM is intended solely for archiving and managing sheet music within your legal environment. Reproducing or distributing copyrighted music is only permitted if you hold the appropriate rights or licenses."
   },
   "sheets": {
     "title": "Sheets",
