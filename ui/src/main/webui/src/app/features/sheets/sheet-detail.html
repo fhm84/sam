@@ -297,6 +297,7 @@
                   <th>{{ 'sheets.instrumentations.columns.instrument' | translate }}</th>
                   <th>{{ 'sheets.instrumentations.columns.partLabel' | translate }}</th>
                   <th>{{ 'sheets.instrumentations.columns.clef' | translate }}</th>
+                  <th>{{ 'sheets.instrumentations.columns.physicalLocation' | translate }}</th>
                   <th class="docs-col">{{ 'sheets.instrumentations.columns.documents' | translate }}</th>
                   <th>{{ 'sheets.instrumentations.columns.actions' | translate }}</th>
                 </tr>
@@ -317,6 +318,7 @@
                   <td>{{ instr.instrument?.name }}</td>
                   <td>{{ instr.partLabel }}</td>
                   <td>{{ instr.clef }}</td>
+                  <td>{{ instr.physicalLocation }}</td>
                   <td class="docs-col">
                     <div class="doc-badges">
                       @for (badge of instrDocBadges(instr.id!); track badge.type) {
@@ -361,7 +363,7 @@
               </ng-template>
               <ng-template #expandedrow let-instr>
                 <tr class="expansion-row">
-                  <td colspan="6" class="expansion-cell">
+                  <td colspan="7" class="expansion-cell">
                     <app-instrumentation-documents
                       [sheetId]="sheetId"
                       [instrumentation]="instr"
@@ -376,7 +378,7 @@
               </ng-template>
               <ng-template #emptymessage>
                 <tr>
-                  <td colspan="6" class="empty-message">{{ 'sheets.instrumentations.empty' | translate }}</td>
+                  <td colspan="7" class="empty-message">{{ 'sheets.instrumentations.empty' | translate }}</td>
                 </tr>
               </ng-template>
             </p-table>
@@ -713,7 +715,7 @@
           </ng-template>
           <ng-template #expandedrow let-instr>
             <tr class="expansion-row">
-              <td colspan="6" class="expansion-cell">
+              <td colspan="7" class="expansion-cell">
                 <app-instrumentation-documents
                   [sheetId]="sheetId"
                   [instrumentation]="instr"
@@ -728,7 +730,7 @@
           </ng-template>
           <ng-template #emptymessage>
             <tr>
-              <td colspan="6" class="empty-message">{{ 'sheets.instrumentations.empty' | translate }}</td>
+              <td colspan="7" class="empty-message">{{ 'sheets.instrumentations.empty' | translate }}</td>
             </tr>
           </ng-template>
         </p-table>

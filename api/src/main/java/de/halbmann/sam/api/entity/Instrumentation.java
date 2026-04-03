@@ -45,6 +45,16 @@ public class Instrumentation {
     String notes;
 
     /**
+     * Physical archive location of the printed copy (e.g. "Cabinet A / Shelf 3 / Folder 12").
+     */
+    String physicalLocation;
+
+    /**
+     * Physical condition of the printed copy in the archive.
+     */
+    PhysicalCondition physicalCondition;
+
+    /**
      * Metadata of the sheet music files (including location, mime-type, fileSize, ...)
      */
     Set<Attachment> attachments;

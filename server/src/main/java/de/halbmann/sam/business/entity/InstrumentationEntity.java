@@ -2,6 +2,7 @@ package de.halbmann.sam.business.entity;
 
 import de.halbmann.sam.api.entity.Clef;
 import de.halbmann.sam.api.entity.NotationType;
+import de.halbmann.sam.api.entity.PhysicalCondition;
 import jakarta.persistence.*;
 import java.util.Set;
 import lombok.Getter;
@@ -59,6 +60,18 @@ public class InstrumentationEntity extends AbstractEntity {
      */
     @Column(columnDefinition = "text")
     String notes;
+
+    /**
+     * Physical archive location of the printed copy (e.g. "Cabinet A / Shelf 3 / Folder 12").
+     */
+    @Column(columnDefinition = "text")
+    String physicalLocation;
+
+    /**
+     * Physical condition of the printed copy in the archive.
+     */
+    @Enumerated(EnumType.STRING)
+    PhysicalCondition physicalCondition;
 
     /**
      * Sheet music entity, the instrumentation belongs to.

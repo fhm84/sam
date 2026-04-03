@@ -120,6 +120,8 @@ export interface CreateInstrumentation {
     notationType?: NotationType;
     notes?: string;
     partLabel?: string;
+    physicalCondition?: PhysicalCondition;
+    physicalLocation?: string;
 }
 
 export interface CreateSheetMusic {
@@ -239,6 +241,8 @@ export interface Instrumentation {
     notationType?: NotationType;
     notes?: string;
     partLabel?: string;
+    physicalCondition?: PhysicalCondition;
+    physicalLocation?: string;
 }
 
 export interface Musician {
@@ -418,6 +422,8 @@ export type Genre = "MARCH" | "MARCHING_SHOW" | "CONCERT_WORK" | "OVERTURE" | "S
 export type InstrumentTransposing = "C" | "D" | "Eb" | "F" | "G" | "A" | "Ab" | "Bb";
 
 export type NotationType = "STANDARD" | "TABLATURE" | "PERCUSSION" | "LEAD_SHEET" | "GRAPHIC";
+
+export type PhysicalCondition = "GOOD" | "WORN" | "DAMAGED" | "LOST";
 
 export type SortOrder = "ASC" | "DESC";
 

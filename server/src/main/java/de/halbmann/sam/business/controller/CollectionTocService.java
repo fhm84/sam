@@ -10,6 +10,8 @@ import java.io.ByteArrayOutputStream;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
+
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
 @ApplicationScoped
@@ -67,7 +69,7 @@ public class CollectionTocService {
     String computeTotalDuration(final List<CollectionSheet> sheets) {
         Duration total = sheets.stream()
                 .map(CollectionSheet::getDuration)
-                .filter(d -> d != null)
+                .filter(Objects::nonNull)
                 .reduce(Duration.ZERO, Duration::plus);
         return total.isZero() ? null : formatDuration(total);
     }

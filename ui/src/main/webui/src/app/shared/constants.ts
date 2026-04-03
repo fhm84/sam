@@ -1,4 +1,4 @@
-import { AttachmentType, Clef, Genre, NotationType, Style } from '../model/datamodels';
+import { AttachmentType, Clef, Genre, NotationType, PhysicalCondition, Style } from '../model/datamodels';
 
 /** DifficultyLevel enum values in grade order (grade = index + 1). */
 export const DIFFICULTY_LEVELS = [
@@ -31,6 +31,11 @@ export const CLEFS = ['TREBLE', 'ALTO', 'TENOR', 'BASS'] as const satisfies read
 export const NOTATION_TYPES = [
   'STANDARD', 'TABLATURE', 'PERCUSSION', 'LEAD_SHEET', 'GRAPHIC',
 ] as const satisfies readonly NotationType[];
+
+/** All possible PhysicalCondition enum values, best-to-worst. */
+export const PHYSICAL_CONDITIONS = [
+  'GOOD', 'WORN', 'DAMAGED', 'LOST',
+] as const satisfies readonly PhysicalCondition[];
 
 /**
  * Selectable attachment types for file uploads.

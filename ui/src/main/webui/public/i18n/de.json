@@ -189,6 +189,7 @@
         "instrument": "Instrument",
         "partLabel": "Stimmenbezeichnung",
         "clef": "Notenschlüssel",
+        "physicalLocation": "Archivort",
         "documents": "Anhänge",
         "actions": "Aktionen"
       },
@@ -202,7 +203,15 @@
         "notationType": "Notationsart",
         "notationTypePlaceholder": "Notationsart auswählen",
         "notationTypeTooltip": "Notationsart: Standard (Notenlinien), Tabulatur (Saiteninstrumente), Schlagzeug, Lead Sheet (Melodie + Akkorde) oder Grafisch.",
-        "notes": "Anmerkungen"
+        "notes": "Anmerkungen",
+        "physicalLocation": "Archivort",
+        "physicalCondition": "Zustand"
+      },
+      "physicalCondition": {
+        "GOOD": "Gut",
+        "WORN": "Abgenutzt",
+        "DAMAGED": "Beschädigt",
+        "LOST": "Verloren"
       },
       "delete": {
         "confirm": "Möchten Sie die Instrumentierung für \"{instrument}\" wirklich löschen?",

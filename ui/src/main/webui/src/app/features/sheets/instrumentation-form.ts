@@ -10,10 +10,10 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { InstrumentationsApiService, InstrumentsApiService } from '../../core/api';
 import { convertEmptyStringsToNull } from '../../shared/utils/object.utils';
 import { instrumentLabel } from '../../shared/utils/format.utils';
-import { Clef, CreateInstrumentation, Instrument, Instrumentation, NotationType } from '../../model/datamodels';
+import { Clef, CreateInstrumentation, Instrument, Instrumentation, NotationType, PhysicalCondition } from '../../model/datamodels';
 import { map, Observable } from 'rxjs';
 import { BaseForm } from '../../shared/base/base-form';
-import { CLEFS, FETCH_ALL_SIZE, NOTATION_TYPES } from '../../shared/constants';
+import { CLEFS, FETCH_ALL_SIZE, NOTATION_TYPES, PHYSICAL_CONDITIONS } from '../../shared/constants';
 
 interface InstrumentOption {
   label: string;
@@ -41,6 +41,9 @@ export class InstrumentationForm extends BaseForm<Instrumentation> implements On
   protected readonly notationTypeOptions = computed(() =>
     NOTATION_TYPES.map((n) => ({ label: this.t.t(`instruments.notationType.${n}`), value: n })),
   );
+  protected readonly physicalConditionOptions = computed(() =>
+    PHYSICAL_CONDITIONS.map((c) => ({ label: this.t.t(`sheets.instrumentations.physicalCondition.${c}`), value: c })),
+  );
 
   readonly form = new FormGroup({
     instrumentId: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
@@ -48,6 +51,8 @@ export class InstrumentationForm extends BaseForm<Instrumentation> implements On
     clef: new FormControl<Clef | null>(null),
     notationType: new FormControl<NotationType | null>(null),
     notes: new FormControl('', { nonNullable: true }),
+    physicalLocation: new FormControl('', { nonNullable: true }),
+    physicalCondition: new FormControl<PhysicalCondition | null>(null),
   });
 
   getEntity = () => this.instrumentation;
@@ -67,6 +72,8 @@ export class InstrumentationForm extends BaseForm<Instrumentation> implements On
       clef: inst.clef ?? null,
       notationType: inst.notationType ?? null,
       notes: inst.notes ?? '',
+      physicalLocation: inst.physicalLocation ?? '',
+      physicalCondition: inst.physicalCondition ?? null,
     });
   }
 
@@ -78,6 +85,8 @@ export class InstrumentationForm extends BaseForm<Instrumentation> implements On
       clef: raw.clef ?? undefined,
       notationType: raw.notationType ?? undefined,
       notes: raw.notes || undefined,
+      physicalLocation: raw.physicalLocation || undefined,
+      physicalCondition: raw.physicalCondition ?? undefined,
     });
 
     return this.isEdit
@@ -88,6 +97,8 @@ export class InstrumentationForm extends BaseForm<Instrumentation> implements On
           clef: payload.clef,
           notationType: payload.notationType,
           notes: payload.notes,
+          physicalLocation: payload.physicalLocation,
+          physicalCondition: payload.physicalCondition,
         })
       : this.api.create(this.sheetId, payload).pipe(map(() => {}));
   }

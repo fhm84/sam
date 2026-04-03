@@ -189,6 +189,7 @@
         "instrument": "Instrument",
         "partLabel": "Part Label",
         "clef": "Clef",
+        "physicalLocation": "Archive Location",
         "documents": "Attachments",
         "actions": "Actions"
       },
@@ -202,7 +203,15 @@
         "notationType": "Notation Type",
         "notationTypePlaceholder": "Select notation type",
         "notationTypeTooltip": "How the music is written: Standard (staff notation), Tablature (strings/fretted), Percussion, Lead Sheet (melody + chords), or Graphic.",
-        "notes": "Notes"
+        "notes": "Notes",
+        "physicalLocation": "Archive Location",
+        "physicalCondition": "Condition"
+      },
+      "physicalCondition": {
+        "GOOD": "Good",
+        "WORN": "Worn",
+        "DAMAGED": "Damaged",
+        "LOST": "Lost"
       },
       "delete": {
         "confirm": "Are you sure you want to delete the instrumentation for \"{instrument}\"?",
