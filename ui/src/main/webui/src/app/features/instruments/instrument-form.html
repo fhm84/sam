@@ -1,59 +1,68 @@
-<form [formGroup]="form" (ngSubmit)="onSave()" class="sam-form">
-  <div class="form-field">
-    <div class="field-with-hint">
-      <p-floatlabel variant="on">
+<form [formGroup]="form" (ngSubmit)="onSave()" class="flex flex-col gap-5">
+  <div class="flex flex-col gap-1.5">
+    <div class="flex items-center gap-2">
+      <p-floatlabel variant="on" class="flex-1 min-w-0 block">
         <input pInputText id="instrument-id" formControlName="id" [placeholder]="t.t('instruments.form.idHint')" />
         <label for="instrument-id">{{ 'instruments.form.id' | translate }}</label>
       </p-floatlabel>
-      <i class="pi pi-info-circle field-hint-icon"
-         [pTooltip]="t.t('instruments.form.idTooltip')"
-         tooltipPosition="right"></i>
+      <i
+        class="pi pi-info-circle text-xs text-[var(--sam-text-muted)] cursor-help shrink-0 transition-colors hover:text-[var(--sam-text-secondary)]"
+        [pTooltip]="t.t('instruments.form.idTooltip')"
+        tooltipPosition="right"
+      ></i>
     </div>
   </div>
 
-  <div class="form-field">
-    <div class="field-with-hint">
-      <p-floatlabel variant="on">
+  <div class="flex flex-col gap-1.5">
+    <div class="flex items-center gap-2">
+      <p-floatlabel variant="on" class="flex-1 min-w-0 block">
         <input pInputText id="instrument-name" formControlName="name" />
         <label for="instrument-name">{{ 'instruments.form.name' | translate }}</label>
       </p-floatlabel>
-      <i class="pi pi-info-circle field-hint-icon"
-         [pTooltip]="t.t('instruments.form.nameTooltip')"
-         tooltipPosition="right"></i>
+      <i
+        class="pi pi-info-circle text-xs text-[var(--sam-text-muted)] cursor-help shrink-0 transition-colors hover:text-[var(--sam-text-secondary)]"
+        [pTooltip]="t.t('instruments.form.nameTooltip')"
+        tooltipPosition="right"
+      ></i>
     </div>
   </div>
 
-  <div class="form-field">
-    <div class="field-with-hint">
-      <p-floatlabel variant="on">
+  <div class="flex flex-col gap-1.5">
+    <div class="flex items-center gap-2">
+      <p-floatlabel variant="on" class="flex-1 min-w-0 block">
         <input pInputText id="instrument-displayName" formControlName="displayName" />
         <label for="instrument-displayName">{{ 'instruments.form.displayName' | translate }}</label>
       </p-floatlabel>
-      <i class="pi pi-info-circle field-hint-icon"
-         [pTooltip]="t.t('instruments.form.displayNameTooltip')"
-         tooltipPosition="right"></i>
+      <i
+        class="pi pi-info-circle text-xs text-[var(--sam-text-muted)] cursor-help shrink-0 transition-colors hover:text-[var(--sam-text-secondary)]"
+        [pTooltip]="t.t('instruments.form.displayNameTooltip')"
+        tooltipPosition="right"
+      ></i>
     </div>
   </div>
 
-  <div class="form-field">
-    <div class="field-with-hint">
-      <p-floatlabel variant="on">
+  <div class="flex flex-col gap-1.5">
+    <div class="flex items-center gap-2">
+      <p-floatlabel variant="on" class="flex-1 min-w-0 block">
         <p-select
           inputId="instrument-transposition"
           formControlName="transposition"
           [options]="transpositionOptions"
           [showClear]="true"
           styleClass="w-full"
+          appendTo="body"
         />
         <label for="instrument-transposition">{{ 'instruments.form.transposition' | translate }}</label>
       </p-floatlabel>
-      <i class="pi pi-info-circle field-hint-icon"
-         [pTooltip]="t.t('instruments.form.transpositionTooltip')"
-         tooltipPosition="right"></i>
+      <i
+        class="pi pi-info-circle text-xs text-[var(--sam-text-muted)] cursor-help shrink-0 transition-colors hover:text-[var(--sam-text-secondary)]"
+        [pTooltip]="t.t('instruments.form.transpositionTooltip')"
+        tooltipPosition="right"
+      ></i>
     </div>
   </div>
 
-  <div class="form-actions">
+  <div class="flex justify-end gap-2 pt-2">
     <p-button
       [label]="t.t('instruments.form.cancel')"
       severity="secondary"

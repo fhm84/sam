@@ -16,7 +16,6 @@ import { BaseForm } from '../../shared/base/base-form';
   selector: 'app-instrument-form',
   imports: [ReactiveFormsModule, FloatLabel, InputText, Select, Button, Tooltip, TranslatePipe],
   templateUrl: './instrument-form.html',
-  styleUrl: './instrument-form.scss',
 })
 export class InstrumentForm extends BaseForm<Instrument> {
   private readonly api = inject(InstrumentsApiService);

@@ -37,7 +37,6 @@ import { InstrumentForm } from './instrument-form';
   ],
   providers: [ConfirmationService],
   templateUrl: './instruments.html',
-  styleUrl: './instruments.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Instruments extends BaseCrudList<Instrument, InstrumentFilterRequest> {

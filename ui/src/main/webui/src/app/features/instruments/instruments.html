@@ -1,9 +1,9 @@
-<div class="instruments-page">
-  <p-toolbar styleClass="page-toolbar">
+<div class="flex flex-col gap-4">
+  <p-toolbar>
     <ng-template #start>
-      <div class="page-title-group">
-        <h1>{{ 'instruments.title' | translate }}</h1>
-        <p class="page-subtitle">{{ 'instruments.subtitle' | translate }}</p>
+      <div class="flex flex-col gap-0.5">
+        <h1 class="m-0 text-2xl font-semibold text-[var(--sam-text)]">{{ 'instruments.title' | translate }}</h1>
+        <p class="m-0 text-sm text-[var(--sam-text-muted)]">{{ 'instruments.subtitle' | translate }}</p>
       </div>
     </ng-template>
     <ng-template #end>
@@ -24,10 +24,12 @@
     </ng-template>
   </p-toolbar>
 
-  <div class="filter-panel">
-    <div class="filter-row">
-      <div class="filter-field">
-        <label>{{ 'instruments.filters.transposition' | translate }}</label>
+  <div class="bg-[var(--sam-surface)] px-5 py-4 rounded border border-[var(--sam-border)]">
+    <div class="flex items-end gap-4 flex-wrap">
+      <div class="flex flex-col gap-1.5">
+        <label class="text-sm font-medium text-[var(--sam-text-secondary)]">
+          {{ 'instruments.filters.transposition' | translate }}
+        </label>
         <p-select
           [options]="transpositionOptions"
           [ngModel]="transpositionFilter()"
@@ -38,7 +40,10 @@
         />
       </div>
       @if (transpositionFilter()) {
-        <span class="clear-filters" (click)="clearFilters()">
+        <span
+          class="text-[var(--p-primary-color)] cursor-pointer text-sm pb-2 hover:underline"
+          (click)="clearFilters()"
+        >
           {{ 'instruments.filters.clear' | translate }}
         </span>
       }
@@ -71,7 +76,7 @@
         <td>{{ instrument.name }}</td>
         <td>{{ instrument.displayName }}</td>
         <td>{{ instrument.transposition }}</td>
-        <td class="actions-cell">
+        <td class="flex gap-1">
           <p-button
             icon="pi pi-pencil"
             [rounded]="true"
@@ -95,7 +100,9 @@
 
     <ng-template #emptymessage>
       <tr>
-        <td colspan="5" class="empty-message">{{ 'instruments.empty' | translate }}</td>
+        <td colspan="5" class="text-center text-[var(--sam-text-muted)] !p-8">
+          {{ 'instruments.empty' | translate }}
+        </td>
       </tr>
     </ng-template>
   </p-table>
