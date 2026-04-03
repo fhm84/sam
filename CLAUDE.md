@@ -91,3 +91,11 @@ docker compose -f docker-compose.monitoring.yml up
 
 - Java 21, Palantir Java Format (via Spotless plugin, version 2.39.0)
 - Run `./mvnw spotless:apply` before committing
+
+## Browser QA policy
+
+For Angular UI verification, prefer /angular-primeng-browser-verify.
+For browser-visible fixes, prefer /browser-fix-and-recheck.
+Use Playwright MCP as the default verification mechanism.
+Do not consider Angular code inspection or passing tests alone as proof that a UI issue is resolved.
+Pay special attention to PrimeNG overlays, dialogs, tables, form validation, and responsive behavior.
