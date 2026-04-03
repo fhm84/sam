@@ -101,6 +101,8 @@ Each sheet can have multiple instrumentations — one per instrument part.
 | Clef | Enum | `TREBLE` · `ALTO` · `TENOR` · `BASS` |
 | Notation type | Enum | `STANDARD` · `TABLATURE` · `PERCUSSION` · `LEAD_SHEET` · `GRAPHIC` |
 | Notes | Free text | Part-specific performance notes |
+| Archive location | String | Physical storage location of the printed copy (e.g. "Cabinet A / Shelf 3 / Folder 12") |
+| Physical condition | Enum | `GOOD` · `WORN` · `DAMAGED` · `LOST` — state of the printed copy |
 
 ### Actions
 
