@@ -18,7 +18,6 @@ import { BaseForm } from '../../shared/base/base-form';
   selector: 'app-collection-form',
   imports: [ReactiveFormsModule, FloatLabel, InputText, Textarea, Select, DatePicker, Button, TranslatePipe],
   templateUrl: './collection-form.html',
-  styleUrl: './collection-form.scss',
 })
 export class CollectionForm extends BaseForm<SheetCollection> implements OnInit {
   private readonly api = inject(CollectionsApiService);

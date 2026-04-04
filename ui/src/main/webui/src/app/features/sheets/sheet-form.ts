@@ -22,7 +22,6 @@ import { MusicianForm } from '../musicians/musician-form';
   selector: 'app-sheet-form',
   imports: [ReactiveFormsModule, FloatLabel, InputText, InputNumber, Textarea, Select, AutoComplete, Button, Dialog, Tooltip, TranslatePipe, MusicianForm],
   templateUrl: './sheet-form.html',
-  styleUrl: './sheet-form.scss',
 })
 export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnInit {
   private readonly api = inject(SheetsApiService);

@@ -43,7 +43,6 @@ import { EnsembleForm } from './ensemble-form';
   ],
   providers: [ConfirmationService],
   templateUrl: './ensembles.html',
-  styleUrl: './ensembles.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Ensembles extends BaseCrudList<Ensemble, EnsembleFilterRequest> {

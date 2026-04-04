@@ -24,7 +24,6 @@ interface InstrumentOption {
   selector: 'app-instrumentation-form',
   imports: [ReactiveFormsModule, FloatLabel, Select, InputText, Textarea, Button, Tooltip, TranslatePipe],
   templateUrl: './instrumentation-form.html',
-  styleUrl: './instrumentation-form.scss',
 })
 export class InstrumentationForm extends BaseForm<Instrumentation> implements OnInit {
   private readonly api = inject(InstrumentationsApiService);

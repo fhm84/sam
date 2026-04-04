@@ -1,50 +1,54 @@
-<form [formGroup]="form" (ngSubmit)="onSave()" class="sam-form">
-  <div class="form-field">
-    <p-floatlabel variant="on">
+<form [formGroup]="form" (ngSubmit)="onSave()" class="flex flex-col gap-5">
+  <div class="flex flex-col gap-1.5">
+    <p-floatlabel variant="on" class="block">
       <input pInputText id="musician-name" formControlName="name" />
       <label for="musician-name">{{ 'musicians.form.name' | translate }}</label>
     </p-floatlabel>
   </div>
 
-  <div class="form-field">
-    <div class="field-with-hint">
-      <p-floatlabel variant="on">
+  <div class="flex flex-col gap-1.5">
+    <div class="flex items-center gap-2">
+      <p-floatlabel variant="on" class="flex-1 min-w-0 block">
         <input pInputText id="musician-ipi" formControlName="ipi" [placeholder]="t.t('musicians.form.ipiHint')" />
         <label for="musician-ipi">{{ 'musicians.form.ipi' | translate }}</label>
       </p-floatlabel>
-      <i class="pi pi-info-circle field-hint-icon"
-         [pTooltip]="t.t('musicians.form.ipiTooltip')"
-         tooltipPosition="right"></i>
+      <i
+        class="pi pi-info-circle text-xs text-[var(--sam-text-muted)] cursor-help shrink-0 transition-colors hover:text-[var(--sam-text-secondary)]"
+        [pTooltip]="t.t('musicians.form.ipiTooltip')"
+        tooltipPosition="right"
+      ></i>
     </div>
   </div>
 
-  <div class="form-row">
-    <div class="form-field flex-1">
-      <p-floatlabel variant="on">
+  <div class="flex gap-4">
+    <div class="flex flex-col gap-1.5 flex-1">
+      <p-floatlabel variant="on" class="block">
         <p-inputnumber
           inputId="musician-birthYear"
           formControlName="birthYear"
           [useGrouping]="false"
           [maxFractionDigits]="0"
+          styleClass="w-full"
         />
         <label for="musician-birthYear">{{ 'musicians.form.birthYear' | translate }}</label>
       </p-floatlabel>
     </div>
 
-    <div class="form-field flex-1">
-      <p-floatlabel variant="on">
+    <div class="flex flex-col gap-1.5 flex-1">
+      <p-floatlabel variant="on" class="block">
         <p-inputnumber
           inputId="musician-deathYear"
           formControlName="deathYear"
           [useGrouping]="false"
           [maxFractionDigits]="0"
+          styleClass="w-full"
         />
         <label for="musician-deathYear">{{ 'musicians.form.deathYear' | translate }}</label>
       </p-floatlabel>
     </div>
   </div>
 
-  <div class="form-actions">
+  <div class="flex justify-end gap-2 pt-2">
     <p-button
       [label]="t.t('musicians.cancel')"
       severity="secondary"

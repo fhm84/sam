@@ -45,7 +45,6 @@ Button,
   ],
   providers: [ConfirmationService],
   templateUrl: './collections.html',
-  styleUrl: './collections.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Collections extends BaseCrudList<SheetCollection, SheetCollectionFilterRequest> {

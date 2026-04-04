@@ -33,7 +33,6 @@ Button,
   ],
   providers: [ConfirmationService],
   templateUrl: './musicians.html',
-  styleUrl: './musicians.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Musicians extends BaseCrudList<Musician, MusicianFilterRequest> {

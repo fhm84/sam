@@ -23,7 +23,6 @@ interface InstrumentOption {
   selector: 'app-voice-option-form',
   imports: [ReactiveFormsModule, FloatLabel, Select, InputNumber, Button, Tooltip, TranslatePipe],
   templateUrl: './voice-option-form.html',
-  styleUrl: './voice-option-form.scss',
 })
 export class VoiceOptionForm extends BaseForm<VoiceOption> implements OnInit {
   private readonly api = inject(EnsemblesApiService);

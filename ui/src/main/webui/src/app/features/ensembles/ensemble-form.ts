@@ -15,7 +15,6 @@ import { BaseForm } from '../../shared/base/base-form';
   selector: 'app-ensemble-form',
   imports: [ReactiveFormsModule, FloatLabel, InputText, Textarea, Button, TranslatePipe],
   templateUrl: './ensemble-form.html',
-  styleUrl: './ensemble-form.scss',
 })
 export class EnsembleForm extends BaseForm<Ensemble> {
   private readonly api = inject(EnsemblesApiService);

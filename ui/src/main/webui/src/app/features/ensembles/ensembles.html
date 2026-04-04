@@ -1,9 +1,9 @@
-<div class="ensembles-page">
-  <p-toolbar styleClass="page-toolbar">
+<div class="flex flex-col gap-4">
+  <p-toolbar>
     <ng-template #start>
-      <div class="page-title-group">
-        <h1>{{ 'ensembles.title' | translate }}</h1>
-        <p class="page-subtitle">{{ 'ensembles.subtitle' | translate }}</p>
+      <div class="flex flex-col gap-0.5">
+        <h1 class="m-0 text-2xl font-semibold text-[var(--sam-text)]">{{ 'ensembles.title' | translate }}</h1>
+        <p class="m-0 text-sm text-[var(--sam-text-muted)]">{{ 'ensembles.subtitle' | translate }}</p>
       </div>
     </ng-template>
     <ng-template #end>
@@ -56,11 +56,11 @@
       </ng-template>
 
       <ng-template #body let-ensemble>
-        <tr class="clickable-row" (click)="openDetail(ensemble)">
+        <tr class="cursor-pointer" (click)="openDetail(ensemble)">
           <td>{{ ensemble.name }}</td>
           <td>{{ ensemble.description }}</td>
           <td>{{ ensemble.voices?.length ?? 0 }}</td>
-          <td class="actions-cell">
+          <td class="flex gap-1">
             <p-button
               icon="pi pi-pencil"
               [rounded]="true"
@@ -84,22 +84,27 @@
 
       <ng-template #emptymessage>
         <tr>
-          <td colspan="4" class="empty-message">{{ 'ensembles.empty' | translate }}</td>
+          <td colspan="4" class="text-center text-[var(--sam-text-muted)] !p-8">
+            {{ 'ensembles.empty' | translate }}
+          </td>
         </tr>
       </ng-template>
     </p-table>
   } @else {
     @if (loading()) {
-      <div class="loading-indicator">
+      <div class="flex justify-center items-center py-8">
         <i class="pi pi-spinner pi-spin"></i>
       </div>
     } @else if (items().length === 0) {
-      <div class="empty-message">{{ 'ensembles.empty' | translate }}</div>
+      <div class="text-center text-[var(--sam-text-muted)] py-8">{{ 'ensembles.empty' | translate }}</div>
     } @else {
-      <div class="ensemble-cards">
+      <div class="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-4">
         @for (ensemble of items(); track ensemble.id) {
-          <div class="ensemble-card clickable-card" (click)="openDetail(ensemble)">
-            <div class="card-actions">
+          <div
+            class="relative flex flex-col p-5 bg-[var(--sam-surface)] border border-[var(--sam-border)] rounded-[var(--p-border-radius)] transition-shadow duration-200 cursor-pointer group hover:shadow-md"
+            (click)="openDetail(ensemble)"
+          >
+            <div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
               <p-button
                 icon="pi pi-pencil"
                 [rounded]="true"
@@ -120,13 +125,13 @@
                 (onClick)="confirmDelete(ensemble); $event.stopPropagation()"
               />
             </div>
-            <div class="card-header">
-              <span class="card-title">{{ ensemble.name }}</span>
+            <div class="flex flex-col gap-0.5 mb-2">
+              <span class="font-semibold text-[1.05rem] text-[var(--sam-text)] leading-tight">{{ ensemble.name }}</span>
             </div>
             @if (ensemble.description) {
-              <p class="card-description">{{ ensemble.description }}</p>
+              <p class="text-sm text-[var(--sam-text-secondary)] m-0 mb-3 line-clamp-2">{{ ensemble.description }}</p>
             }
-            <div class="card-footer">
+            <div class="mt-auto pt-3 flex gap-1.5 flex-wrap">
               <p-tag icon="pi pi-microphone" [value]="(ensemble.voices?.length ?? 0) + ' ' + t.t('ensembles.columns.voices')" severity="secondary" />
             </div>
           </div>

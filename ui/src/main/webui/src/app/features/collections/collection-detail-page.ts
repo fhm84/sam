@@ -18,7 +18,6 @@ import { CollectionSheets } from './collection-sheets';
   selector: 'app-collection-detail-page',
   imports: [TranslatePipe, Button, SplitButton, Dialog, Tag, CollectionForm, CollectionSheets, Toolbar],
   templateUrl: './collection-detail-page.html',
-  styleUrl: './collection-detail-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CollectionDetailPage implements OnInit {

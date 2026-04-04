@@ -17,7 +17,6 @@ import { BaseForm } from '../../shared/base/base-form';
   selector: 'app-voice-form',
   imports: [ReactiveFormsModule, FloatLabel, InputText, InputNumber, Checkbox, Button, Tooltip, TranslatePipe],
   templateUrl: './voice-form.html',
-  styleUrl: './voice-form.scss',
 })
 export class VoiceForm extends BaseForm<EnsembleVoice> {
   private readonly api = inject(EnsemblesApiService);

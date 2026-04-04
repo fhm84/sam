@@ -11,7 +11,6 @@ import { Locale, TranslationService } from '../../core/translation.service';
   selector: 'app-user-preferences',
   imports: [FormsModule, SelectButton, Tooltip, TranslatePipe],
   templateUrl: './user-preferences.html',
-  styleUrl: './user-preferences.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserPreferences {

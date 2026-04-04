@@ -1,15 +1,15 @@
-<form [formGroup]="form" (ngSubmit)="onSave()" class="sam-form">
-  <div class="form-field">
-    <p-floatlabel variant="on">
+<form [formGroup]="form" (ngSubmit)="onSave()" class="flex flex-col gap-5">
+  <div class="flex flex-col gap-1.5">
+    <p-floatlabel variant="on" class="block">
       <input pInputText id="voice-label" formControlName="label" />
       <label for="voice-label">{{ 'ensembles.voices.form.label' | translate }}</label>
     </p-floatlabel>
   </div>
 
-  <div class="form-row">
-    <div class="form-field">
-      <div class="field-with-hint">
-        <p-floatlabel variant="on">
+  <div class="flex gap-4">
+    <div class="flex flex-col gap-1.5 flex-1">
+      <div class="flex items-center gap-2">
+        <p-floatlabel variant="on" class="flex-1 min-w-0 block">
           <p-inputnumber
             inputId="voice-weight"
             formControlName="weight"
@@ -18,28 +18,32 @@
           />
           <label for="voice-weight">{{ 'ensembles.voices.form.weight' | translate }}</label>
         </p-floatlabel>
-        <i class="pi pi-info-circle field-hint-icon"
-           [pTooltip]="t.t('ensembles.voices.form.weightTooltip')"
-           tooltipPosition="right"></i>
+        <i
+          class="pi pi-info-circle text-xs text-[var(--sam-text-muted)] cursor-help shrink-0 transition-colors hover:text-[var(--sam-text-secondary)]"
+          [pTooltip]="t.t('ensembles.voices.form.weightTooltip')"
+          tooltipPosition="right"
+        ></i>
       </div>
     </div>
 
-    <div class="form-field form-field--checkbox">
+    <div class="flex items-center gap-2 flex-1">
       <p-checkbox
         inputId="voice-required"
         formControlName="required"
         [binary]="true"
       />
-      <div class="checkbox-label-row">
+      <div class="flex items-center gap-2">
         <label for="voice-required">{{ 'ensembles.voices.form.required' | translate }}</label>
-        <i class="pi pi-info-circle field-hint-icon"
-           [pTooltip]="t.t('ensembles.voices.form.requiredTooltip')"
-           tooltipPosition="right"></i>
+        <i
+          class="pi pi-info-circle text-xs text-[var(--sam-text-muted)] cursor-help shrink-0 transition-colors hover:text-[var(--sam-text-secondary)]"
+          [pTooltip]="t.t('ensembles.voices.form.requiredTooltip')"
+          tooltipPosition="right"
+        ></i>
       </div>
     </div>
   </div>
 
-  <div class="form-actions">
+  <div class="flex justify-end gap-2 pt-2">
     <p-button
       [label]="t.t('ensembles.voices.cancel')"
       severity="secondary"

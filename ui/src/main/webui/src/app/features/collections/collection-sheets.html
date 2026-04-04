@@ -1,7 +1,7 @@
 <!-- ── Collection sheets table ──────────────────────────── -->
-<div class="collection-sheets-panel">
-  <div class="panel-toolbar">
-    <h2>{{ 'collections.sheets.title' | translate }}</h2>
+<div class="flex flex-col gap-3">
+  <div class="flex items-center justify-between">
+    <h2 class="m-0 text-xl font-semibold text-[var(--sam-text)]">{{ 'collections.sheets.title' | translate }}</h2>
     <p-button
       icon="pi pi-plus"
       [label]="t.t('collections.sheets.add')"
@@ -22,20 +22,20 @@
   >
     <ng-template #header>
       <tr>
-        <th class="col-identifier">{{ 'collections.sheets.columns.identifier' | translate }}</th>
+        <th class="w-20">{{ 'collections.sheets.columns.identifier' | translate }}</th>
         <th>{{ 'collections.sheets.columns.title' | translate }}</th>
         <th>{{ 'collections.sheets.columns.genre' | translate }}</th>
-        <th class="col-actions">{{ 'collections.sheets.columns.actions' | translate }}</th>
+        <th class="w-32">{{ 'collections.sheets.columns.actions' | translate }}</th>
       </tr>
     </ng-template>
 
     <ng-template #body let-sheet>
       <tr>
-        <td class="identifier-cell">{{ sheet.identifier }}</td>
+        <td class="font-semibold text-[var(--sam-text-secondary)] tabular-nums">{{ sheet.identifier }}</td>
         <td>
-          <a class="sheet-link" [routerLink]="['/sheets', sheet.sheetId]">{{ sheet.title }}</a>
+          <a class="text-[var(--p-primary-color)] no-underline font-medium hover:underline" [routerLink]="['/sheets', sheet.sheetId]">{{ sheet.title }}</a>
           @if (sheet.subtitle) {
-            <span class="sheet-subtitle">{{ sheet.subtitle }}</span>
+            <span class="block text-[0.82rem] text-[var(--sam-text-muted)]">{{ sheet.subtitle }}</span>
           }
         </td>
         <td>
@@ -45,7 +45,7 @@
             —
           }
         </td>
-        <td class="actions-cell">
+        <td class="flex gap-1">
           <p-button
             icon="pi pi-pencil"
             [rounded]="true"
@@ -68,7 +68,7 @@
 
     <ng-template #emptymessage>
       <tr>
-        <td colspan="4" class="empty-message">{{ 'collections.sheets.empty' | translate }}</td>
+        <td colspan="4" class="text-center text-[var(--sam-text-muted)] !p-8">{{ 'collections.sheets.empty' | translate }}</td>
       </tr>
     </ng-template>
   </p-table>
@@ -83,7 +83,7 @@
   [breakpoints]="{ '768px': '95vw' }"
 >
   @if (addDialogVisible) {
-    <div class="add-sheet-dialog">
+    <div class="flex flex-col gap-4">
 
       <!-- Selected sheet + identifier (shown when a sheet is selected) -->
       @if (selectedSheet) {
@@ -95,8 +95,8 @@
               <span class="selected-composer">— {{ selectedSheet.composer!.name }}</span>
             }
           </div>
-          <form [formGroup]="identifierForm" (ngSubmit)="onAdd()" class="identifier-form">
-            <p-floatlabel variant="on">
+          <form [formGroup]="identifierForm" (ngSubmit)="onAdd()">
+            <p-floatlabel variant="on" class="w-48 block">
               <input
                 pInputText
                 id="add-identifier"
@@ -111,17 +111,15 @@
       }
 
       <!-- Search -->
-      <div class="search-bar">
-        <p-iconfield class="search-field">
-          <p-inputicon styleClass="pi pi-search" />
-          <input
-            pInputText
-            type="text"
-            [placeholder]="t.t('collections.sheets.form.sheetPlaceholder')"
-            (input)="onSearchInput($event)"
-          />
-        </p-iconfield>
-      </div>
+      <p-iconfield>
+        <p-inputicon styleClass="pi pi-search" />
+        <input
+          pInputText
+          type="text"
+          [placeholder]="t.t('collections.sheets.form.sheetPlaceholder')"
+          (input)="onSearchInput($event)"
+        />
+      </p-iconfield>
 
       <!-- Results table -->
       <p-table
@@ -139,22 +137,22 @@
         <ng-template #header>
           <tr>
             <th>{{ 'sheets.columns.title' | translate }}</th>
-            <th class="col-composer">{{ 'sheets.columns.composer' | translate }}</th>
-            <th class="col-genre">{{ 'sheets.columns.genre' | translate }}</th>
-            <th class="col-preview"></th>
+            <th class="w-56">{{ 'sheets.columns.composer' | translate }}</th>
+            <th class="w-40">{{ 'sheets.columns.genre' | translate }}</th>
+            <th class="w-12"></th>
           </tr>
         </ng-template>
 
         <ng-template #body let-sheet>
           <tr
-            class="search-row"
+            class="cursor-pointer transition-colors duration-150 search-row"
             [class.search-row--selected]="isSelected(sheet)"
             (click)="selectSheet(sheet)"
           >
             <td>
-              <span class="search-title">{{ sheet.title }}</span>
+              <span class="font-medium">{{ sheet.title }}</span>
               @if (sheet.subtitle) {
-                <span class="sheet-subtitle">{{ sheet.subtitle }}</span>
+                <span class="block text-[0.82rem] text-[var(--sam-text-muted)]">{{ sheet.subtitle }}</span>
               }
             </td>
             <td>{{ sheet.composer?.name ?? '—' }}</td>
@@ -165,7 +163,7 @@
                 —
               }
             </td>
-            <td class="preview-action-cell">
+            <td class="text-center">
               <p-button
                 icon="pi pi-eye"
                 [rounded]="true"
@@ -180,7 +178,7 @@
 
         <ng-template #emptymessage>
           <tr>
-            <td colspan="4" class="empty-message">
+            <td colspan="4" class="text-center text-[var(--sam-text-muted)] !p-8">
               {{ 'collections.sheets.form.noResults' | translate }}
             </td>
           </tr>
@@ -213,14 +211,17 @@
   [style]="{ width: '28rem' }"
 >
   @if (editDialogVisible && editingSheet) {
-    <form [formGroup]="identifierForm" (ngSubmit)="onUpdate()" class="sam-form">
-      <div class="editing-sheet-info">
-        <span class="info-label">{{ 'collections.sheets.form.sheet' | translate }}</span>
-        <span class="info-value">{{ editingSheet.title }}</span>
+    <form [formGroup]="identifierForm" (ngSubmit)="onUpdate()" class="flex flex-col gap-5">
+      <div
+        class="flex flex-col gap-1 px-4 py-3 border border-[var(--sam-border)] rounded-[var(--p-border-radius)] mb-1"
+        [style.background]="'var(--sam-surface-raised, var(--sam-surface))'"
+      >
+        <span class="text-[0.8rem] font-medium text-[var(--sam-text-secondary)] uppercase tracking-[0.03em]">{{ 'collections.sheets.form.sheet' | translate }}</span>
+        <span class="font-medium text-[var(--sam-text)]">{{ editingSheet.title }}</span>
       </div>
 
-      <div class="form-field">
-        <p-floatlabel variant="on">
+      <div class="flex flex-col gap-1.5">
+        <p-floatlabel variant="on" class="block">
           <input
             pInputText
             id="edit-identifier"
@@ -231,7 +232,6 @@
           <label for="edit-identifier">{{ 'collections.sheets.form.identifier' | translate }}</label>
         </p-floatlabel>
       </div>
-
     </form>
   }
 
@@ -260,70 +260,70 @@
   [breakpoints]="{ '768px': '95vw' }"
 >
   @if (previewLoading()) {
-    <div class="preview-loading">
+    <div class="flex justify-center p-8 text-2xl text-[var(--sam-text-muted)]">
       <i class="pi pi-spin pi-spinner"></i>
     </div>
   } @else if (previewSheet(); as sheet) {
-    <div class="preview-grid">
+    <div class="grid grid-cols-2 gap-4 gap-x-6">
       @if (sheet.subtitle) {
-        <div class="preview-field preview-field--full">
-          <span class="field-value preview-subtitle">{{ sheet.subtitle }}</span>
+        <div class="col-span-2 flex flex-col gap-0.5">
+          <span class="text-[0.95rem] text-[var(--sam-text-secondary)] italic">{{ sheet.subtitle }}</span>
         </div>
       }
 
-      <div class="preview-field">
-        <span class="field-label">{{ 'sheets.detail.composer' | translate }}</span>
-        <span class="field-value">{{ sheet.composer?.name ?? '—' }}</span>
+      <div class="flex flex-col gap-0.5">
+        <span class="text-[0.75rem] font-semibold uppercase tracking-[0.04em] text-[var(--sam-text-secondary)]">{{ 'sheets.detail.composer' | translate }}</span>
+        <span class="text-[0.9rem] text-[var(--sam-text)]">{{ sheet.composer?.name ?? '—' }}</span>
       </div>
-      <div class="preview-field">
-        <span class="field-label">{{ 'sheets.detail.arranger' | translate }}</span>
-        <span class="field-value">{{ sheet.arranger?.name ?? '—' }}</span>
+      <div class="flex flex-col gap-0.5">
+        <span class="text-[0.75rem] font-semibold uppercase tracking-[0.04em] text-[var(--sam-text-secondary)]">{{ 'sheets.detail.arranger' | translate }}</span>
+        <span class="text-[0.9rem] text-[var(--sam-text)]">{{ sheet.arranger?.name ?? '—' }}</span>
       </div>
 
-      <div class="preview-field">
-        <span class="field-label">{{ 'sheets.detail.genre' | translate }}</span>
-        <span class="field-value">
+      <div class="flex flex-col gap-0.5">
+        <span class="text-[0.75rem] font-semibold uppercase tracking-[0.04em] text-[var(--sam-text-secondary)]">{{ 'sheets.detail.genre' | translate }}</span>
+        <span class="text-[0.9rem] text-[var(--sam-text)]">
           @if (sheet.genre) { {{ 'sheets.genres.' + sheet.genre | translate }} } @else { — }
         </span>
       </div>
-      <div class="preview-field">
-        <span class="field-label">{{ 'sheets.detail.style' | translate }}</span>
-        <span class="field-value">
+      <div class="flex flex-col gap-0.5">
+        <span class="text-[0.75rem] font-semibold uppercase tracking-[0.04em] text-[var(--sam-text-secondary)]">{{ 'sheets.detail.style' | translate }}</span>
+        <span class="text-[0.9rem] text-[var(--sam-text)]">
           @if (sheet.style) { {{ 'sheets.styles.' + sheet.style | translate }} } @else { — }
         </span>
       </div>
 
-      <div class="preview-field">
-        <span class="field-label">{{ 'sheets.detail.year' | translate }}</span>
-        <span class="field-value">{{ sheet.yearOfComposition ?? '—' }}</span>
+      <div class="flex flex-col gap-0.5">
+        <span class="text-[0.75rem] font-semibold uppercase tracking-[0.04em] text-[var(--sam-text-secondary)]">{{ 'sheets.detail.year' | translate }}</span>
+        <span class="text-[0.9rem] text-[var(--sam-text)]">{{ sheet.yearOfComposition ?? '—' }}</span>
       </div>
-      <div class="preview-field">
-        <span class="field-label">{{ 'sheets.detail.difficulty' | translate }}</span>
-        <span class="field-value">{{ sheet.difficultyLevel ? ('sheets.difficultyLevels.' + difficultyLevelKey(sheet.difficultyLevel) | translate) : '—' }}</span>
-      </div>
-
-      <div class="preview-field">
-        <span class="field-label">{{ 'sheets.detail.publisher' | translate }}</span>
-        <span class="field-value">{{ sheet.publisher ?? '—' }}</span>
-      </div>
-      <div class="preview-field">
-        <span class="field-label">{{ 'sheets.detail.edition' | translate }}</span>
-        <span class="field-value">{{ sheet.edition ?? '—' }}</span>
+      <div class="flex flex-col gap-0.5">
+        <span class="text-[0.75rem] font-semibold uppercase tracking-[0.04em] text-[var(--sam-text-secondary)]">{{ 'sheets.detail.difficulty' | translate }}</span>
+        <span class="text-[0.9rem] text-[var(--sam-text)]">{{ sheet.difficultyLevel ? ('sheets.difficultyLevels.' + difficultyLevelKey(sheet.difficultyLevel) | translate) : '—' }}</span>
       </div>
 
-      <div class="preview-field">
-        <span class="field-label">{{ 'sheets.detail.copyright' | translate }}</span>
-        <span class="field-value">{{ sheet.copyright ?? '—' }}</span>
+      <div class="flex flex-col gap-0.5">
+        <span class="text-[0.75rem] font-semibold uppercase tracking-[0.04em] text-[var(--sam-text-secondary)]">{{ 'sheets.detail.publisher' | translate }}</span>
+        <span class="text-[0.9rem] text-[var(--sam-text)]">{{ sheet.publisher ?? '—' }}</span>
       </div>
-      <div class="preview-field">
-        <span class="field-label">{{ 'sheets.detail.originalBy' | translate }}</span>
-        <span class="field-value">{{ sheet.originalBy ?? '—' }}</span>
+      <div class="flex flex-col gap-0.5">
+        <span class="text-[0.75rem] font-semibold uppercase tracking-[0.04em] text-[var(--sam-text-secondary)]">{{ 'sheets.detail.edition' | translate }}</span>
+        <span class="text-[0.9rem] text-[var(--sam-text)]">{{ sheet.edition ?? '—' }}</span>
+      </div>
+
+      <div class="flex flex-col gap-0.5">
+        <span class="text-[0.75rem] font-semibold uppercase tracking-[0.04em] text-[var(--sam-text-secondary)]">{{ 'sheets.detail.copyright' | translate }}</span>
+        <span class="text-[0.9rem] text-[var(--sam-text)]">{{ sheet.copyright ?? '—' }}</span>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <span class="text-[0.75rem] font-semibold uppercase tracking-[0.04em] text-[var(--sam-text-secondary)]">{{ 'sheets.detail.originalBy' | translate }}</span>
+        <span class="text-[0.9rem] text-[var(--sam-text)]">{{ sheet.originalBy ?? '—' }}</span>
       </div>
 
       @if (sheet.tags?.length) {
-        <div class="preview-field preview-field--full">
-          <span class="field-label">{{ 'sheets.detail.tags' | translate }}</span>
-          <div class="preview-tags">
+        <div class="col-span-2 flex flex-col gap-0.5">
+          <span class="text-[0.75rem] font-semibold uppercase tracking-[0.04em] text-[var(--sam-text-secondary)]">{{ 'sheets.detail.tags' | translate }}</span>
+          <div class="flex flex-wrap gap-1.5 mt-0.5">
             @for (tag of sheet.tags; track tag) {
               <span class="tag-chip">{{ tag }}</span>
             }
@@ -332,9 +332,9 @@
       }
 
       @if (sheet.additionalNotes) {
-        <div class="preview-field preview-field--full">
-          <span class="field-label">{{ 'sheets.detail.notes' | translate }}</span>
-          <span class="field-value preview-notes">{{ sheet.additionalNotes }}</span>
+        <div class="col-span-2 flex flex-col gap-0.5">
+          <span class="text-[0.75rem] font-semibold uppercase tracking-[0.04em] text-[var(--sam-text-secondary)]">{{ 'sheets.detail.notes' | translate }}</span>
+          <span class="whitespace-pre-wrap text-[0.88rem] text-[var(--sam-text-secondary)]">{{ sheet.additionalNotes }}</span>
         </div>
       }
     </div>

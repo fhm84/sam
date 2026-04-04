@@ -1,21 +1,26 @@
-@use 'pages';
-@use 'details';
+.drop-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding: 1.5rem;
+  border: 2px dashed var(--p-surface-300);
+  border-radius: 8px;
+  color: var(--sam-text-muted);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
 
-.page-toolbar {
-  margin-bottom: 0.5rem;
-}
+  .pi-cloud-upload {
+    font-size: 1.5rem;
+  }
 
-.detail-header h2 {
-  font-size: 1.5rem;
-}
-
-.detail-top-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-  align-items: start;
-
-  @media (max-width: 960px) {
-    grid-template-columns: 1fr;
+  &:hover,
+  &.drop-zone-active {
+    border-color: var(--p-primary-color);
+    color: var(--p-primary-color);
+    background: var(--p-primary-50);
   }
 }

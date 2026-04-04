@@ -1,5 +1,5 @@
-<div class="ensemble-detail-page">
-  <p-toolbar styleClass="page-toolbar">
+<div class="flex flex-col gap-6">
+  <p-toolbar>
     <ng-template #start>
       <p-button
         icon="pi pi-arrow-left"
@@ -21,10 +21,10 @@
   </p-toolbar>
 
   @if (ensemble(); as ens) {
-    <div class="detail-header">
-      <h1>{{ ens.name }}</h1>
+    <div class="flex flex-col gap-1">
+      <h1 class="m-0 text-2xl font-semibold text-[var(--sam-text)]">{{ ens.name }}</h1>
       @if (ens.description) {
-        <p class="detail-description">{{ ens.description }}</p>
+        <p class="m-0 text-sm text-[var(--sam-text-secondary)]">{{ ens.description }}</p>
       }
     </div>
 

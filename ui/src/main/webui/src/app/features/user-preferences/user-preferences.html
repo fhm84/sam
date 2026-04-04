@@ -1,9 +1,9 @@
-<div class="pref-page">
-  <h1 class="pref-title">{{ 'userPreferences.title' | translate }}</h1>
+<div class="max-w-[40rem] flex flex-col gap-4">
+  <h1 class="font-[var(--sam-font-display)] text-2xl font-bold text-[var(--sam-text)] mt-0 mb-2">{{ 'userPreferences.title' | translate }}</h1>
 
-  <div class="pref-card">
-    <h2 class="pref-card-title">{{ 'userPreferences.themeTitle' | translate }}</h2>
-    <p class="pref-card-desc">{{ 'userPreferences.themeDescription' | translate }}</p>
+  <div class="bg-[var(--sam-surface)] border border-[var(--sam-border)] rounded-[10px] p-6">
+    <h2 class="font-[var(--sam-font-display)] text-base font-semibold text-[var(--sam-text)] mt-0 mb-1.5">{{ 'userPreferences.themeTitle' | translate }}</h2>
+    <p class="text-sm text-[var(--sam-text-muted)] mt-0 mb-5">{{ 'userPreferences.themeDescription' | translate }}</p>
     <p-selectbutton
       [options]="themeOptions"
       [ngModel]="theme.dark() ? 'dark' : 'light'"
@@ -17,9 +17,9 @@
     </p-selectbutton>
   </div>
 
-  <div class="pref-card">
-    <h2 class="pref-card-title">{{ 'userPreferences.languageTitle' | translate }}</h2>
-    <p class="pref-card-desc">{{ 'userPreferences.languageDescription' | translate }}</p>
+  <div class="bg-[var(--sam-surface)] border border-[var(--sam-border)] rounded-[10px] p-6">
+    <h2 class="font-[var(--sam-font-display)] text-base font-semibold text-[var(--sam-text)] mt-0 mb-1.5">{{ 'userPreferences.languageTitle' | translate }}</h2>
+    <p class="text-sm text-[var(--sam-text-muted)] mt-0 mb-5">{{ 'userPreferences.languageDescription' | translate }}</p>
     <p-selectbutton
       [options]="languageOptions"
       [ngModel]="i18n.locale()"
@@ -33,13 +33,13 @@
     </p-selectbutton>
   </div>
 
-  <div class="pref-card">
-    <h2 class="pref-card-title">{{ 'userPreferences.layoutTitle' | translate }}</h2>
-    <p class="pref-card-desc">{{ 'userPreferences.layoutDescription' | translate }}</p>
+  <div class="bg-[var(--sam-surface)] border border-[var(--sam-border)] rounded-[10px] p-6">
+    <h2 class="font-[var(--sam-font-display)] text-base font-semibold text-[var(--sam-text)] mt-0 mb-1.5">{{ 'userPreferences.layoutTitle' | translate }}</h2>
+    <p class="text-sm text-[var(--sam-text-muted)] mt-0 mb-5">{{ 'userPreferences.layoutDescription' | translate }}</p>
 
-    <div class="pref-rows">
-      <div class="pref-row">
-        <span class="pref-label">{{ 'nav.sheets' | translate }}</span>
+    <div class="flex flex-col gap-4">
+      <div class="flex items-center justify-between gap-4">
+        <span class="text-sm font-medium text-[var(--sam-text)]">{{ 'nav.sheets' | translate }}</span>
         <p-selectbutton
           [options]="layoutOptions"
           [(ngModel)]="sheetsLayout"
@@ -52,8 +52,8 @@
           </ng-template>
         </p-selectbutton>
       </div>
-      <div class="pref-row">
-        <span class="pref-label">{{ 'nav.collections' | translate }}</span>
+      <div class="flex items-center justify-between gap-4">
+        <span class="text-sm font-medium text-[var(--sam-text)]">{{ 'nav.collections' | translate }}</span>
         <p-selectbutton
           [options]="layoutOptions"
           [(ngModel)]="collectionsLayout"
@@ -66,8 +66,8 @@
           </ng-template>
         </p-selectbutton>
       </div>
-      <div class="pref-row">
-        <span class="pref-label">{{ 'nav.admin.ensembles' | translate }}</span>
+      <div class="flex items-center justify-between gap-4">
+        <span class="text-sm font-medium text-[var(--sam-text)]">{{ 'nav.admin.ensembles' | translate }}</span>
         <p-selectbutton
           [options]="layoutOptions"
           [(ngModel)]="ensemblesLayout"

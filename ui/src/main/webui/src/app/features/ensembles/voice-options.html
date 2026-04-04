@@ -1,7 +1,7 @@
 <!-- ── Options table ──────────────────────────────────── -->
-<div class="options-section">
-  <div class="options-toolbar">
-    <h4>{{ 'ensembles.voices.options.title' | translate }}</h4>
+<div class="flex flex-col gap-3">
+  <div class="flex items-center justify-between">
+    <h4 class="m-0 text-base font-semibold text-[var(--sam-text)]">{{ 'ensembles.voices.options.title' | translate }}</h4>
     <p-button
       [label]="t.t('ensembles.voices.options.new')"
       icon="pi pi-plus"
@@ -17,7 +17,7 @@
     <ng-template #header>
       <tr>
         <th>{{ 'ensembles.voices.options.columns.instrument' | translate }}</th>
-        <th>{{ 'ensembles.voices.options.columns.transposition' | translate }}</th>
+        <th class="w-28">{{ 'ensembles.voices.options.columns.transposition' | translate }}</th>
         <th>{{ 'ensembles.voices.options.columns.type' | translate }}</th>
         <th>{{ 'ensembles.voices.options.columns.factor' | translate }}</th>
         <th>{{ 'ensembles.voices.options.columns.actions' | translate }}</th>
@@ -27,14 +27,14 @@
     <ng-template #body let-option>
       <tr>
         <td>{{ instrumentName(option.instrumentId) }}</td>
-        <td class="transposition-cell">{{ instrumentTransposition(option.instrumentId) }}</td>
+        <td class="text-[var(--sam-text-secondary)] text-sm w-28">{{ instrumentTransposition(option.instrumentId) }}</td>
         <td>
           @if (option.type) {
             <p-tag [severity]="typeSeverity(option.type)" [value]="option.type" />
           }
         </td>
         <td>{{ option.factor }}</td>
-        <td class="actions-cell">
+        <td class="flex gap-1">
           <p-button
             icon="pi pi-pencil"
             [rounded]="true"
@@ -60,7 +60,7 @@
 
     <ng-template #emptymessage>
       <tr>
-        <td colspan="5" class="empty-message">{{ 'ensembles.voices.options.empty' | translate }}</td>
+        <td colspan="5" class="text-center text-[var(--sam-text-muted)] !p-6">{{ 'ensembles.voices.options.empty' | translate }}</td>
       </tr>
     </ng-template>
   </p-table>
@@ -75,7 +75,7 @@
   [breakpoints]="{ '768px': '95vw' }"
 >
   @if (addDialogVisible) {
-    <form [formGroup]="addForm" (ngSubmit)="onAdd()" class="add-option-dialog">
+    <form [formGroup]="addForm" (ngSubmit)="onAdd()" class="flex flex-col gap-4">
 
       <!-- Selected indicator + type + factor (shown when instrument is selected) -->
       @if (selectedInstrument) {
@@ -87,26 +87,27 @@
               <span class="selected-transposition">— {{ selectedInstrument.transposition }}</span>
             }
           </div>
-          <div class="footer-fields">
-            <div class="field-with-hint">
-              <p-floatlabel variant="on">
+          <div class="flex gap-4 flex-wrap">
+            <div class="flex items-center gap-2">
+              <p-floatlabel variant="on" class="flex-1 min-w-0 block">
                 <p-select
                   inputId="add-type"
                   formControlName="type"
                   [options]="typeOptions"
                   [showClear]="true"
                   styleClass="w-full"
+                  appendTo="body"
                 />
                 <label for="add-type">{{ 'ensembles.voices.options.form.type' | translate }}</label>
               </p-floatlabel>
               <i
-                class="pi pi-info-circle field-hint-icon"
+                class="pi pi-info-circle text-xs text-[var(--sam-text-muted)] cursor-help shrink-0 transition-colors hover:text-[var(--sam-text-secondary)]"
                 [pTooltip]="t.t('ensembles.voices.options.form.typeTooltip')"
                 tooltipPosition="top"
               ></i>
             </div>
-            <div class="field-with-hint">
-              <p-floatlabel variant="on">
+            <div class="flex items-center gap-2">
+              <p-floatlabel variant="on" class="flex-1 min-w-0 block">
                 <p-inputnumber
                   inputId="add-factor"
                   formControlName="factor"
@@ -121,7 +122,7 @@
                 <label for="add-factor">{{ 'ensembles.voices.options.form.factor' | translate }}</label>
               </p-floatlabel>
               <i
-                class="pi pi-info-circle field-hint-icon"
+                class="pi pi-info-circle text-xs text-[var(--sam-text-muted)] cursor-help shrink-0 transition-colors hover:text-[var(--sam-text-secondary)]"
                 [pTooltip]="t.t('ensembles.voices.options.form.factorTooltip')"
                 tooltipPosition="top"
               ></i>
@@ -131,17 +132,15 @@
       }
 
       <!-- Filter -->
-      <div class="filter-bar">
-        <p-iconfield class="filter-field">
-          <p-inputicon styleClass="pi pi-search" />
-          <input
-            pInputText
-            type="text"
-            [placeholder]="t.t('ensembles.voices.options.form.instrumentPlaceholder')"
-            (input)="onFilterInput($event)"
-          />
-        </p-iconfield>
-      </div>
+      <p-iconfield class="w-full">
+        <p-inputicon styleClass="pi pi-search" />
+        <input
+          pInputText
+          type="text"
+          [placeholder]="t.t('ensembles.voices.options.form.instrumentPlaceholder')"
+          (input)="onFilterInput($event)"
+        />
+      </p-iconfield>
 
       <!-- Instrument table -->
       <p-table
@@ -152,24 +151,24 @@
         <ng-template #header>
           <tr>
             <th>{{ 'ensembles.voices.options.columns.instrument' | translate }}</th>
-            <th class="col-transposition">{{ 'ensembles.voices.options.columns.transposition' | translate }}</th>
+            <th class="w-32">{{ 'ensembles.voices.options.columns.transposition' | translate }}</th>
           </tr>
         </ng-template>
 
         <ng-template #body let-instrument>
           <tr
-            class="instrument-row"
+            class="cursor-pointer transition-colors instrument-row"
             [class.instrument-row--selected]="isInstrumentSelected(instrument)"
             (click)="selectInstrument(instrument)"
           >
             <td>{{ instrument.name }}</td>
-            <td class="transposition-cell">{{ instrument.transposition ?? '—' }}</td>
+            <td class="text-[var(--sam-text-secondary)] text-sm w-32">{{ instrument.transposition ?? '—' }}</td>
           </tr>
         </ng-template>
 
         <ng-template #emptymessage>
           <tr>
-            <td colspan="2" class="empty-message">
+            <td colspan="2" class="text-center text-[var(--sam-text-muted)] !p-6">
               {{ 'ensembles.voices.options.form.noResults' | translate }}
             </td>
           </tr>
@@ -203,36 +202,37 @@
   [style]="{ width: '26rem' }"
 >
   @if (editDialogVisible && editingOption) {
-    <form [formGroup]="editForm" (ngSubmit)="onUpdate()" class="sam-form">
+    <form [formGroup]="editForm" (ngSubmit)="onUpdate()" class="flex flex-col gap-5">
       <div class="editing-instrument-info">
         <span class="info-label">{{ 'ensembles.voices.options.form.instrument' | translate }}</span>
         <span class="info-value">{{ instrumentName(editingOption.instrumentId) }}</span>
       </div>
 
-      <div class="form-row">
-        <div class="form-field">
-          <div class="field-with-hint">
-            <p-floatlabel variant="on">
+      <div class="flex gap-4">
+        <div class="flex flex-col gap-1.5 flex-1">
+          <div class="flex items-center gap-2">
+            <p-floatlabel variant="on" class="flex-1 min-w-0 block">
               <p-select
                 inputId="edit-type"
                 formControlName="type"
                 [options]="typeOptions"
                 [showClear]="true"
                 styleClass="w-full"
+                appendTo="body"
               />
               <label for="edit-type">{{ 'ensembles.voices.options.form.type' | translate }}</label>
             </p-floatlabel>
             <i
-              class="pi pi-info-circle field-hint-icon"
+              class="pi pi-info-circle text-xs text-[var(--sam-text-muted)] cursor-help shrink-0 transition-colors hover:text-[var(--sam-text-secondary)]"
               [pTooltip]="t.t('ensembles.voices.options.form.typeTooltip')"
               tooltipPosition="right"
             ></i>
           </div>
         </div>
 
-        <div class="form-field">
-          <div class="field-with-hint">
-            <p-floatlabel variant="on">
+        <div class="flex flex-col gap-1.5 flex-1">
+          <div class="flex items-center gap-2">
+            <p-floatlabel variant="on" class="flex-1 min-w-0 block">
               <p-inputnumber
                 inputId="edit-factor"
                 formControlName="factor"
@@ -247,14 +247,13 @@
               <label for="edit-factor">{{ 'ensembles.voices.options.form.factor' | translate }}</label>
             </p-floatlabel>
             <i
-              class="pi pi-info-circle field-hint-icon"
+              class="pi pi-info-circle text-xs text-[var(--sam-text-muted)] cursor-help shrink-0 transition-colors hover:text-[var(--sam-text-secondary)]"
               [pTooltip]="t.t('ensembles.voices.options.form.factorTooltip')"
               tooltipPosition="right"
             ></i>
           </div>
         </div>
       </div>
-
     </form>
   }
 

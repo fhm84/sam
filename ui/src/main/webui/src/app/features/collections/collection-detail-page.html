@@ -1,5 +1,5 @@
-<div class="collection-detail-page">
-  <p-toolbar styleClass="page-toolbar">
+<div class="flex flex-col gap-6">
+  <p-toolbar>
     <ng-template #start>
       <p-button
         icon="pi pi-arrow-left"
@@ -21,25 +21,30 @@
   </p-toolbar>
 
   @if (collection(); as col) {
-    <div class="detail-header">
-      <div class="detail-title-row">
-        <h1>{{ col.name }}</h1>
+    <div class="flex flex-col gap-2">
+      <div class="flex items-center gap-3 flex-wrap">
+        <h1 class="m-0 text-[1.75rem] font-semibold text-[var(--sam-text)]">{{ col.name }}</h1>
         @if (col.type) {
           <p-tag [value]="'collections.types.' + col.type | translate" severity="secondary" />
         }
       </div>
       @if (col.description) {
-        <p class="detail-description">{{ col.description }}</p>
+        <p class="m-0 text-[var(--sam-text-secondary)] text-[0.95rem]">{{ col.description }}</p>
       }
       @if (col.date) {
-        <span class="collection-date">
-          <i class="pi pi-calendar"></i> {{ formatDate(col.date) }}
+        <span class="flex items-center gap-1.5 text-[0.85rem] text-[var(--sam-text-secondary)]">
+          <i class="pi pi-calendar text-[0.8rem]"></i> {{ formatDate(col.date) }}
         </span>
       }
     </div>
 
-    <div class="collection-actions">
-      <span class="actions-label">{{ 'collections.detail.actions.label' | translate }}</span>
+    <div
+      class="flex items-center gap-3 px-4 py-[0.6rem] border border-[var(--sam-border)] rounded-[var(--p-border-radius)]"
+      [style.background]="'var(--sam-surface-raised, var(--sam-surface))'"
+    >
+      <span class="text-[0.78rem] font-semibold uppercase tracking-[0.05em] text-[var(--sam-text-secondary)] mr-1">
+        {{ 'collections.detail.actions.label' | translate }}
+      </span>
       <p-button
         icon="pi pi-file-export"
         [label]="t.t('collections.detail.actions.generateToc')"

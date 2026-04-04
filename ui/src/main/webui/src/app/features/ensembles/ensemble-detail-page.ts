@@ -14,7 +14,6 @@ import { EnsembleForm } from './ensemble-form';
   selector: 'app-ensemble-detail-page',
   imports: [EnsembleVoices, EnsembleForm, Button, Dialog, Toolbar],
   templateUrl: './ensemble-detail-page.html',
-  styleUrl: './ensemble-detail-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EnsembleDetailPage implements OnInit {

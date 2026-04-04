@@ -1,7 +1,7 @@
 <!-- ── Voices table ────────────────────────────────────── -->
-<div class="voices-section">
-  <div class="voices-toolbar">
-    <h3>{{ 'ensembles.voices.title' | translate }}</h3>
+<div class="flex flex-col gap-3">
+  <div class="flex items-center justify-between">
+    <h3 class="m-0 text-lg font-semibold text-[var(--sam-text)]">{{ 'ensembles.voices.title' | translate }}</h3>
     <p-button
       [label]="t.t('ensembles.voices.new')"
       icon="pi pi-plus"
@@ -34,7 +34,7 @@
             <p-tag severity="secondary" [value]="t.t('ensembles.voices.no')" />
           }
         </td>
-        <td class="actions-cell">
+        <td class="flex gap-1">
           <p-button
             icon="pi pi-cog"
             [rounded]="true"
@@ -68,7 +68,7 @@
 
     <ng-template #emptymessage>
       <tr>
-        <td colspan="4" class="empty-message">{{ 'ensembles.voices.empty' | translate }}</td>
+        <td colspan="4" class="text-center text-[var(--sam-text-muted)] !p-6">{{ 'ensembles.voices.empty' | translate }}</td>
       </tr>
     </ng-template>
   </p-table>
@@ -82,18 +82,18 @@
   [style]="{ width: '26rem', 'min-height': '28rem' }"
 >
   @if (addDialogVisible) {
-    <form [formGroup]="addForm" (ngSubmit)="onAdd()" class="sam-form">
-      <div class="form-field">
-        <p-floatlabel variant="on">
+    <form [formGroup]="addForm" (ngSubmit)="onAdd()" class="flex flex-col gap-5">
+      <div class="flex flex-col gap-1.5">
+        <p-floatlabel variant="on" class="block">
           <input pInputText id="add-voice-label" formControlName="label" />
           <label for="add-voice-label">{{ 'ensembles.voices.form.label' | translate }}</label>
         </p-floatlabel>
       </div>
 
-      <div class="form-row">
-        <div class="form-field">
-          <div class="field-with-hint">
-            <p-floatlabel variant="on">
+      <div class="flex gap-4">
+        <div class="flex flex-col gap-1.5 flex-1">
+          <div class="flex items-center gap-2">
+            <p-floatlabel variant="on" class="flex-1 min-w-0 block">
               <p-inputnumber
                 inputId="add-voice-weight"
                 formControlName="weight"
@@ -103,26 +103,25 @@
               <label for="add-voice-weight">{{ 'ensembles.voices.form.weight' | translate }}</label>
             </p-floatlabel>
             <i
-              class="pi pi-info-circle field-hint-icon"
+              class="pi pi-info-circle text-xs text-[var(--sam-text-muted)] cursor-help shrink-0 transition-colors hover:text-[var(--sam-text-secondary)]"
               [pTooltip]="t.t('ensembles.voices.form.weightTooltip')"
               tooltipPosition="right"
             ></i>
           </div>
         </div>
 
-        <div class="form-field form-field--checkbox">
+        <div class="flex items-center gap-2 flex-1">
           <p-checkbox inputId="add-voice-required" formControlName="required" [binary]="true" />
-          <div class="checkbox-label-row">
+          <div class="flex items-center gap-2">
             <label for="add-voice-required">{{ 'ensembles.voices.form.required' | translate }}</label>
             <i
-              class="pi pi-info-circle field-hint-icon"
+              class="pi pi-info-circle text-xs text-[var(--sam-text-muted)] cursor-help shrink-0 transition-colors hover:text-[var(--sam-text-secondary)]"
               [pTooltip]="t.t('ensembles.voices.form.requiredTooltip')"
               tooltipPosition="right"
             ></i>
           </div>
         </div>
       </div>
-
     </form>
   }
 
@@ -160,16 +159,16 @@
       <p-tabpanels>
         <!-- Details tab -->
         <p-tabpanel [value]="0">
-          <form [formGroup]="editForm" (ngSubmit)="onUpdate()" class="sam-form tab-form">
+          <form [formGroup]="editForm" (ngSubmit)="onUpdate()" class="flex flex-col gap-5 pt-2">
             <div class="editing-voice-info">
               <span class="info-label">{{ 'ensembles.voices.form.label' | translate }}</span>
               <span class="info-value">{{ editingVoice.label }}</span>
             </div>
 
-            <div class="form-row">
-              <div class="form-field">
-                <div class="field-with-hint">
-                  <p-floatlabel variant="on">
+            <div class="flex gap-4">
+              <div class="flex flex-col gap-1.5 flex-1">
+                <div class="flex items-center gap-2">
+                  <p-floatlabel variant="on" class="flex-1 min-w-0 block">
                     <p-inputnumber
                       inputId="edit-voice-weight"
                       formControlName="weight"
@@ -179,26 +178,25 @@
                     <label for="edit-voice-weight">{{ 'ensembles.voices.form.weight' | translate }}</label>
                   </p-floatlabel>
                   <i
-                    class="pi pi-info-circle field-hint-icon"
+                    class="pi pi-info-circle text-xs text-[var(--sam-text-muted)] cursor-help shrink-0 transition-colors hover:text-[var(--sam-text-secondary)]"
                     [pTooltip]="t.t('ensembles.voices.form.weightTooltip')"
                     tooltipPosition="right"
                   ></i>
                 </div>
               </div>
 
-              <div class="form-field form-field--checkbox">
+              <div class="flex items-center gap-2 flex-1">
                 <p-checkbox inputId="edit-voice-required" formControlName="required" [binary]="true" />
-                <div class="checkbox-label-row">
+                <div class="flex items-center gap-2">
                   <label for="edit-voice-required">{{ 'ensembles.voices.form.required' | translate }}</label>
                   <i
-                    class="pi pi-info-circle field-hint-icon"
+                    class="pi pi-info-circle text-xs text-[var(--sam-text-muted)] cursor-help shrink-0 transition-colors hover:text-[var(--sam-text-secondary)]"
                     [pTooltip]="t.t('ensembles.voices.form.requiredTooltip')"
                     tooltipPosition="right"
                   ></i>
                 </div>
               </div>
             </div>
-
           </form>
         </p-tabpanel>
 

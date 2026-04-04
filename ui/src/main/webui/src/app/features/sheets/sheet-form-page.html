@@ -1,5 +1,5 @@
 <div class="sheet-form-page">
-  <p-toolbar styleClass="page-toolbar">
+  <p-toolbar styleClass="mb-2">
     <ng-template #start>
       <p-button
         icon="pi pi-arrow-left"
@@ -11,21 +11,21 @@
   </p-toolbar>
 
   @if (loading()) {
-    <div class="loading-indicator">
+    <div class="flex justify-center p-12 text-[2rem] text-[var(--sam-text-muted)]">
       <i class="pi pi-spinner pi-spin"></i>
     </div>
   } @else {
-    <div class="detail-header">
-      <div class="page-title-group">
-        <h2>{{ (isEdit ? 'sheets.edit' : 'sheets.new') | translate }}</h2>
+    <div class="flex items-start justify-between gap-4 mb-3">
+      <div class="flex flex-col gap-0.5">
+        <h2 class="m-0 text-2xl font-semibold text-[var(--sam-text)]">{{ (isEdit ? 'sheets.edit' : 'sheets.new') | translate }}</h2>
         @if (isEdit && sheet(); as s) {
-          <p class="page-subtitle">{{ s.title }}</p>
+          <p class="m-0 text-sm text-[var(--sam-text-muted)]">{{ s.title }}</p>
         }
       </div>
     </div>
 
-    <div class="detail-panels">
-      <div class="detail-top-row">
+    <div class="flex flex-col gap-3">
+      <div class="grid grid-cols-2 max-[960px]:grid-cols-1 gap-3 items-start">
         <!-- Form -->
         <p-panel [header]="t.t('sheets.detail.baseData')">
           <app-sheet-form
@@ -40,7 +40,7 @@
           @if (isEdit) {
             <input #fileInput type="file" hidden (change)="uploadFile($event)" />
             <ng-template pTemplate="headeractions">
-              <label class="upload-label">
+              <label class="inline-flex">
                 <p-button
                   icon="pi pi-upload"
                   [label]="t.t('sheets.detail.upload')"
@@ -51,20 +51,20 @@
               </label>
             </ng-template>
             @if (documentsLoading()) {
-              <div class="loading-indicator small">
+              <div class="flex justify-center p-4 text-xl text-[var(--sam-text-muted)]">
                 <i class="pi pi-spinner pi-spin"></i>
               </div>
             } @else {
               @if (documents().length === 0) {
-                <span class="empty-block">{{ 'sheets.detail.noDocuments' | translate }}</span>
+                <span class="text-sm text-[var(--sam-text-muted)] italic">{{ 'sheets.detail.noDocuments' | translate }}</span>
               } @else {
-                <div class="document-list">
+                <div class="flex flex-col gap-1">
                   @for (doc of documents(); track doc.id) {
-                    <div class="document-row">
-                      <i class="pi pi-file"></i>
-                      <span class="document-name">{{ doc.displayName }}</span>
-                      <span class="document-size">{{ formatSize(doc.fileSize) }}</span>
-                      <div class="document-actions">
+                    <div class="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-[var(--p-surface-100)]">
+                      <i class="pi pi-file text-[var(--sam-text-muted)]"></i>
+                      <span class="flex-1 text-sm text-[var(--sam-text)] overflow-hidden text-ellipsis whitespace-nowrap">{{ doc.displayName }}</span>
+                      <span class="text-xs text-[var(--sam-text-muted)] whitespace-nowrap">{{ formatSize(doc.fileSize) }}</span>
+                      <div class="flex gap-0.5">
                         <p-button
                           icon="pi pi-download"
                           [rounded]="true"
@@ -102,7 +102,7 @@
               </div>
             }
           } @else {
-            <span class="empty-block">{{ 'sheets.detail.documentsAfterSave' | translate }}</span>
+            <span class="text-sm text-[var(--sam-text-muted)] italic">{{ 'sheets.detail.documentsAfterSave' | translate }}</span>
           }
         </p-panel>
       </div>
