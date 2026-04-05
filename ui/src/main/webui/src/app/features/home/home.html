@@ -1,70 +1,70 @@
-<div class="home-wrapper">
+<div class="flex-1 flex items-center justify-center relative [overflow-x:clip] py-8">
 
   <!-- Background watermark -->
   <div class="home-bg-logo" aria-hidden="true"></div>
 
-  <div class="home-page">
+  <div class="relative z-[1] flex flex-col items-center gap-10 w-full max-w-[50rem]">
 
     <!-- Hero -->
-    <header class="home-hero">
+    <header class="flex flex-col items-center gap-[0.625rem] text-center">
       <span class="home-hero-logo" [attr.aria-label]="'aria.samLogo' | translate"></span>
-      <h1 class="home-title">{{ 'home.greeting' | translate }}</h1>
-      <p class="home-subtitle">{{ 'home.subtitle' | translate }}</p>
+      <h1 class="[font-family:var(--sam-font-display)] text-[2rem] font-bold text-[var(--sam-text)] m-0 leading-[1.15]">{{ 'home.greeting' | translate }}</h1>
+      <p class="text-[0.9375rem] text-[var(--sam-text-secondary)] m-0 max-w-[34rem] leading-[1.6]">{{ 'home.subtitle' | translate }}</p>
     </header>
 
     <!-- Main navigation cards -->
-    <nav class="home-grid">
-      <a class="home-card" routerLink="/sheets">
-        <i class="pi pi-arrow-up-right home-card-arrow" aria-hidden="true"></i>
-        <i class="pi pi-file home-card-ghost" aria-hidden="true"></i>
-        <span class="home-card-icon-bg"><i class="pi pi-file"></i></span>
-        <span class="home-card-title">{{ 'nav.sheets' | translate }}</span>
-        <span class="home-card-desc">{{ 'home.cards.sheets' | translate }}</span>
+    <nav class="grid grid-cols-2 xs:grid-cols-1 gap-[0.875rem] w-full">
+      <a class="group relative overflow-hidden flex flex-col gap-[0.875rem] p-6 bg-[var(--sam-surface)] border border-[var(--sam-border)] rounded-[14px] no-underline text-inherit transition-[border-color,box-shadow,transform] duration-200 hover:border-[var(--sam-accent)] hover:shadow-[0_6px_28px_rgba(0,0,0,0.07)] hover:-translate-y-0.5" routerLink="/sheets">
+        <i class="pi pi-arrow-up-right absolute top-[1.125rem] right-[1.125rem] text-xs text-[var(--sam-accent)] opacity-0 -translate-x-1 translate-y-1 transition-[opacity,transform] duration-200 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0" aria-hidden="true"></i>
+        <i class="pi pi-file absolute -bottom-[0.625rem] -right-[0.375rem] text-[5.5rem] leading-none text-[var(--sam-accent)] opacity-[0.05] pointer-events-none transition-opacity duration-200 group-hover:opacity-[0.085]" aria-hidden="true"></i>
+        <span class="flex items-center justify-center w-10 h-10 rounded-[10px] bg-[var(--sam-active-bg)] shrink-0"><i class="pi pi-file text-[1.125rem] text-[var(--sam-accent)]"></i></span>
+        <span class="block text-[0.9375rem] font-semibold text-[var(--sam-text)]">{{ 'nav.sheets' | translate }}</span>
+        <span class="block text-[0.8125rem] text-[var(--sam-text-muted)] leading-[1.55]">{{ 'home.cards.sheets' | translate }}</span>
       </a>
-      <a class="home-card" routerLink="/collections">
-        <i class="pi pi-arrow-up-right home-card-arrow" aria-hidden="true"></i>
-        <i class="pi pi-folder home-card-ghost" aria-hidden="true"></i>
-        <span class="home-card-icon-bg"><i class="pi pi-folder"></i></span>
-        <span class="home-card-title">{{ 'nav.collections' | translate }}</span>
-        <span class="home-card-desc">{{ 'home.cards.collections' | translate }}</span>
+      <a class="group relative overflow-hidden flex flex-col gap-[0.875rem] p-6 bg-[var(--sam-surface)] border border-[var(--sam-border)] rounded-[14px] no-underline text-inherit transition-[border-color,box-shadow,transform] duration-200 hover:border-[var(--sam-accent)] hover:shadow-[0_6px_28px_rgba(0,0,0,0.07)] hover:-translate-y-0.5" routerLink="/collections">
+        <i class="pi pi-arrow-up-right absolute top-[1.125rem] right-[1.125rem] text-xs text-[var(--sam-accent)] opacity-0 -translate-x-1 translate-y-1 transition-[opacity,transform] duration-200 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0" aria-hidden="true"></i>
+        <i class="pi pi-folder absolute -bottom-[0.625rem] -right-[0.375rem] text-[5.5rem] leading-none text-[var(--sam-accent)] opacity-[0.05] pointer-events-none transition-opacity duration-200 group-hover:opacity-[0.085]" aria-hidden="true"></i>
+        <span class="flex items-center justify-center w-10 h-10 rounded-[10px] bg-[var(--sam-active-bg)] shrink-0"><i class="pi pi-folder text-[1.125rem] text-[var(--sam-accent)]"></i></span>
+        <span class="block text-[0.9375rem] font-semibold text-[var(--sam-text)]">{{ 'nav.collections' | translate }}</span>
+        <span class="block text-[0.8125rem] text-[var(--sam-text-muted)] leading-[1.55]">{{ 'home.cards.collections' | translate }}</span>
       </a>
-      <a class="home-card" routerLink="/uploads">
-        <i class="pi pi-arrow-up-right home-card-arrow" aria-hidden="true"></i>
-        <i class="pi pi-upload home-card-ghost" aria-hidden="true"></i>
-        <span class="home-card-icon-bg"><i class="pi pi-upload"></i></span>
-        <span class="home-card-title">{{ 'nav.uploads' | translate }}</span>
-        <span class="home-card-desc">{{ 'home.cards.uploads' | translate }}</span>
+      <a class="group relative overflow-hidden flex flex-col gap-[0.875rem] p-6 bg-[var(--sam-surface)] border border-[var(--sam-border)] rounded-[14px] no-underline text-inherit transition-[border-color,box-shadow,transform] duration-200 hover:border-[var(--sam-accent)] hover:shadow-[0_6px_28px_rgba(0,0,0,0.07)] hover:-translate-y-0.5" routerLink="/uploads">
+        <i class="pi pi-arrow-up-right absolute top-[1.125rem] right-[1.125rem] text-xs text-[var(--sam-accent)] opacity-0 -translate-x-1 translate-y-1 transition-[opacity,transform] duration-200 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0" aria-hidden="true"></i>
+        <i class="pi pi-upload absolute -bottom-[0.625rem] -right-[0.375rem] text-[5.5rem] leading-none text-[var(--sam-accent)] opacity-[0.05] pointer-events-none transition-opacity duration-200 group-hover:opacity-[0.085]" aria-hidden="true"></i>
+        <span class="flex items-center justify-center w-10 h-10 rounded-[10px] bg-[var(--sam-active-bg)] shrink-0"><i class="pi pi-upload text-[1.125rem] text-[var(--sam-accent)]"></i></span>
+        <span class="block text-[0.9375rem] font-semibold text-[var(--sam-text)]">{{ 'nav.uploads' | translate }}</span>
+        <span class="block text-[0.8125rem] text-[var(--sam-text-muted)] leading-[1.55]">{{ 'home.cards.uploads' | translate }}</span>
       </a>
-      <a class="home-card" routerLink="/musicians">
-        <i class="pi pi-arrow-up-right home-card-arrow" aria-hidden="true"></i>
-        <i class="pi pi-user home-card-ghost" aria-hidden="true"></i>
-        <span class="home-card-icon-bg"><i class="pi pi-user"></i></span>
-        <span class="home-card-title">{{ 'nav.musicians' | translate }}</span>
-        <span class="home-card-desc">{{ 'home.cards.musicians' | translate }}</span>
+      <a class="group relative overflow-hidden flex flex-col gap-[0.875rem] p-6 bg-[var(--sam-surface)] border border-[var(--sam-border)] rounded-[14px] no-underline text-inherit transition-[border-color,box-shadow,transform] duration-200 hover:border-[var(--sam-accent)] hover:shadow-[0_6px_28px_rgba(0,0,0,0.07)] hover:-translate-y-0.5" routerLink="/musicians">
+        <i class="pi pi-arrow-up-right absolute top-[1.125rem] right-[1.125rem] text-xs text-[var(--sam-accent)] opacity-0 -translate-x-1 translate-y-1 transition-[opacity,transform] duration-200 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0" aria-hidden="true"></i>
+        <i class="pi pi-user absolute -bottom-[0.625rem] -right-[0.375rem] text-[5.5rem] leading-none text-[var(--sam-accent)] opacity-[0.05] pointer-events-none transition-opacity duration-200 group-hover:opacity-[0.085]" aria-hidden="true"></i>
+        <span class="flex items-center justify-center w-10 h-10 rounded-[10px] bg-[var(--sam-active-bg)] shrink-0"><i class="pi pi-user text-[1.125rem] text-[var(--sam-accent)]"></i></span>
+        <span class="block text-[0.9375rem] font-semibold text-[var(--sam-text)]">{{ 'nav.musicians' | translate }}</span>
+        <span class="block text-[0.8125rem] text-[var(--sam-text-muted)] leading-[1.55]">{{ 'home.cards.musicians' | translate }}</span>
       </a>
     </nav>
 
     <!-- Admin section -->
-    <section class="home-admin">
-      <h2 class="home-admin-label">{{ 'home.adminTitle' | translate }}</h2>
-      <div class="home-admin-links">
-        <a class="home-admin-link" routerLink="/admin/ensembles">
-          <i class="pi pi-users"></i>
+    <section class="flex flex-col items-center gap-3 w-full">
+      <h2 class="text-[0.6875rem] font-semibold text-[var(--sam-text-muted)] uppercase tracking-[0.1em] m-0">{{ 'home.adminTitle' | translate }}</h2>
+      <div class="flex flex-wrap gap-2 justify-center">
+        <a class="inline-flex items-center gap-2 py-[0.4375rem] px-[0.875rem] bg-[var(--sam-surface)] border border-[var(--sam-border)] rounded-lg no-underline text-[0.8125rem] font-medium text-[var(--sam-text-secondary)] transition-[border-color,color] duration-150 hover:border-[var(--sam-accent)] hover:text-[var(--sam-accent)]" routerLink="/admin/ensembles">
+          <i class="pi pi-users text-[0.8125rem]"></i>
           <span>{{ 'nav.admin.ensembles' | translate }}</span>
         </a>
-        <a class="home-admin-link" routerLink="/admin/instruments">
-          <i class="pi pi-sliders-h"></i>
+        <a class="inline-flex items-center gap-2 py-[0.4375rem] px-[0.875rem] bg-[var(--sam-surface)] border border-[var(--sam-border)] rounded-lg no-underline text-[0.8125rem] font-medium text-[var(--sam-text-secondary)] transition-[border-color,color] duration-150 hover:border-[var(--sam-accent)] hover:text-[var(--sam-accent)]" routerLink="/admin/instruments">
+          <i class="pi pi-sliders-h text-[0.8125rem]"></i>
           <span>{{ 'nav.admin.instruments' | translate }}</span>
         </a>
-        <a class="home-admin-link" routerLink="/admin/configuration">
-          <i class="pi pi-wrench"></i>
+        <a class="inline-flex items-center gap-2 py-[0.4375rem] px-[0.875rem] bg-[var(--sam-surface)] border border-[var(--sam-border)] rounded-lg no-underline text-[0.8125rem] font-medium text-[var(--sam-text-secondary)] transition-[border-color,color] duration-150 hover:border-[var(--sam-accent)] hover:text-[var(--sam-accent)]" routerLink="/admin/configuration">
+          <i class="pi pi-wrench text-[0.8125rem]"></i>
           <span>{{ 'nav.admin.configuration' | translate }}</span>
         </a>
       </div>
     </section>
 
     <!-- Disclaimer -->
-    <p class="home-disclaimer">{{ 'home.disclaimer' | translate }}</p>
+    <p class="text-xs text-[var(--p-text-muted-color)] text-center max-w-[40rem] leading-[1.6] m-0 px-4">{{ 'home.disclaimer' | translate }}</p>
 
   </div>
 </div>

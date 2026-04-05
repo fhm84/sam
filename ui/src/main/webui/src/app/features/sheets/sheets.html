@@ -1,4 +1,4 @@
-<div class="sheets-page">
+<div class="flex flex-col gap-4">
   <p-toolbar styleClass="page-toolbar">
     <ng-template #start>
       <div class="page-title-group">
@@ -89,7 +89,7 @@
   }
 
   @if (!hasTextSearch()) {
-    <div class="alpha-bar">
+    <div class="flex flex-wrap gap-0.5 py-[0.375rem]">
       @for (letter of ALL_LETTERS; track letter) {
         <button
           class="alpha-btn"
@@ -140,18 +140,18 @@
     >
       <ng-template #header>
         <tr>
-          <th class="fav-col"></th>
+          <th class="w-10 !pr-0"></th>
           <th>{{ 'sheets.columns.title' | translate }}</th>
           <th>{{ 'sheets.columns.composer' | translate }}</th>
           <th>{{ 'sheets.columns.genre' | translate }}</th>
           <th>{{ 'sheets.columns.style' | translate }}</th>
           <th>{{ 'sheets.columns.year' | translate }}</th>
-          <th class="attachments-col" [pTooltip]="'sheets.columns.attachments' | translate" tooltipPosition="top"><i class="pi pi-paperclip"></i></th>
+          <th class="w-12 !text-center" [pTooltip]="'sheets.columns.attachments' | translate" tooltipPosition="top"><i class="pi pi-paperclip"></i></th>
           @if (hasTextSearch()) {
-            <th class="score-col">Match</th>
+            <th class="w-20 !text-center">Match</th>
           }
           @if (selectedEnsemble()) {
-            <th class="score-col">{{ 'sheets.columns.coverage' | translate }}</th>
+            <th class="w-20 !text-center">{{ 'sheets.columns.coverage' | translate }}</th>
           }
           <th>{{ 'sheets.columns.actions' | translate }}</th>
         </tr>
@@ -159,7 +159,7 @@
 
       <ng-template #body let-sheet>
         <tr class="clickable-row" (click)="openDetail(sheet)">
-          <td class="fav-col">
+          <td class="w-10 !pr-0">
             <p-button
               [icon]="sheet.favorite ? 'pi pi-star-fill' : 'pi pi-star'"
               [severity]="sheet.favorite ? 'warn' : 'secondary'"
@@ -172,28 +172,28 @@
             />
           </td>
           <td>
-            <span class="sheet-title-cell">{{ sheet.title }}</span>
+            <span class="block font-medium">{{ sheet.title }}</span>
             @if (sheet.subtitle) {
-              <span class="sheet-subtitle-cell">{{ sheet.subtitle }}</span>
+              <span class="block text-[0.85rem] text-[var(--sam-text-muted)]">{{ sheet.subtitle }}</span>
             }
           </td>
           <td>{{ sheet.composer?.name }}</td>
           <td>{{ sheet.genre ? ('sheets.genres.' + sheet.genre | translate) : '' }}</td>
           <td>{{ sheet.style ? ('sheets.styles.' + sheet.style | translate) : '' }}</td>
           <td>{{ sheet.yearOfComposition }}</td>
-          <td class="attachments-col">
+          <td class="w-12 !text-center">
             @if (totalAttachments(sheet) > 0) {
               <span
-                class="attachment-count"
+                class="inline-flex items-center gap-1 text-xs font-semibold text-[var(--p-text-muted-color)] cursor-default"
                 [pTooltip]="attachmentTooltip(sheet)"
                 tooltipPosition="left"
               >{{ totalAttachments(sheet) }}</span>
             } @else {
-              <span class="attachment-count-empty">—</span>
+              <span class="text-[var(--p-text-muted-color)] opacity-40">—</span>
             }
           </td>
           @if (hasTextSearch()) {
-            <td class="score-col">
+            <td class="w-20 !text-center">
               @if (sheet.metrics) {
                 <span
                   class="score-pill"
@@ -206,7 +206,7 @@
             </td>
           }
           @if (selectedEnsemble()) {
-            <td class="score-col">
+            <td class="w-20 !text-center">
               @if (sheet.coverage) {
                 <span
                   class="coverage-badge"
@@ -265,9 +265,12 @@
     } @else if (sheets().length === 0) {
       <div class="empty-message">{{ 'sheets.empty' | translate }}</div>
     } @else {
-      <div class="sheet-cards">
+      <div class="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
         @for (sheet of sheets(); track sheet.id) {
-          <div class="sheet-card clickable-card" (click)="openDetail(sheet)">
+          <div
+            class="sheet-card cursor-pointer relative flex flex-col p-5 bg-[var(--sam-surface)] border border-[var(--sam-border)] rounded-[var(--p-border-radius)] transition-shadow duration-200 hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)]"
+            (click)="openDetail(sheet)"
+          >
             <div class="card-actions">
               <p-button
                 icon="pi pi-folder-plus"
@@ -298,7 +301,7 @@
                 (onClick)="confirmDelete(sheet); $event.stopPropagation()"
               />
             </div>
-            <div class="card-header">
+            <div class="flex flex-row items-start gap-0.5 mb-3">
               <p-button
                 [icon]="sheet.favorite ? 'pi pi-star-fill' : 'pi pi-star'"
                 [severity]="sheet.favorite ? 'warn' : 'secondary'"
@@ -309,34 +312,34 @@
                 tooltipPosition="top"
                 (onClick)="toggleFavorite(sheet, $event)"
               />
-              <div class="card-title-text">
-                <span class="card-title">{{ sheet.title }}</span>
+              <div class="flex flex-col gap-0.5 flex-1 min-w-0">
+                <span class="font-semibold text-[1.05rem] text-[var(--sam-text)] leading-[1.3]">{{ sheet.title }}</span>
                 @if (sheet.subtitle) {
-                  <span class="card-subtitle">{{ sheet.subtitle }}</span>
+                  <span class="text-[0.85rem] text-[var(--sam-text-muted)]">{{ sheet.subtitle }}</span>
                 }
               </div>
             </div>
-            <div class="card-people">
+            <div class="flex flex-col gap-2 mb-3">
               @if (sheet.composer?.name) {
-                <div class="people-item">
-                  <i class="pi pi-user" [pTooltip]="'sheets.detail.composer' | translate" tooltipPosition="right"></i>
-                  <span class="people-name">{{ sheet.composer?.name }}</span>
+                <div class="flex items-center gap-2">
+                  <i class="pi pi-user text-[0.8rem] text-[var(--sam-text-muted)] w-4 text-center shrink-0 cursor-default" [pTooltip]="'sheets.detail.composer' | translate" tooltipPosition="right"></i>
+                  <span class="text-[0.875rem] text-[var(--sam-text)] whitespace-nowrap overflow-hidden text-ellipsis">{{ sheet.composer?.name }}</span>
                 </div>
               }
               @if (sheet.arranger?.name) {
-                <div class="people-item">
-                  <i class="pi pi-users" [pTooltip]="'sheets.detail.arranger' | translate" tooltipPosition="right"></i>
-                  <span class="people-name">{{ sheet.arranger?.name }}</span>
+                <div class="flex items-center gap-2">
+                  <i class="pi pi-users text-[0.8rem] text-[var(--sam-text-muted)] w-4 text-center shrink-0 cursor-default" [pTooltip]="'sheets.detail.arranger' | translate" tooltipPosition="right"></i>
+                  <span class="text-[0.875rem] text-[var(--sam-text)] whitespace-nowrap overflow-hidden text-ellipsis">{{ sheet.arranger?.name }}</span>
                 </div>
               }
               @if (sheet.publisher) {
-                <div class="people-item">
-                  <i class="pi pi-building" [pTooltip]="'sheets.detail.publisher' | translate" tooltipPosition="right"></i>
-                  <span class="people-name">{{ sheet.publisher }}</span>
+                <div class="flex items-center gap-2">
+                  <i class="pi pi-building text-[0.8rem] text-[var(--sam-text-muted)] w-4 text-center shrink-0 cursor-default" [pTooltip]="'sheets.detail.publisher' | translate" tooltipPosition="right"></i>
+                  <span class="text-[0.875rem] text-[var(--sam-text)] whitespace-nowrap overflow-hidden text-ellipsis">{{ sheet.publisher }}</span>
                 </div>
               }
             </div>
-            <div class="card-tags">
+            <div class="flex flex-wrap gap-[0.375rem] mb-2">
               @if (sheet.genre) {
                 <p-tag icon="pi pi-tag" [value]="'sheets.genres.' + sheet.genre | translate" severity="secondary" />
               }
@@ -350,8 +353,7 @@
                 <p-tag [value]="'#' + tag" severity="secondary" />
               }
             </div>
-            <!-- match score & coverage indicators -->
-            <div class="card-indicators">
+            <div class="min-h-0">
               @if (totalAttachments(sheet) > 0) {
                 <span
                   class="attachment-count"

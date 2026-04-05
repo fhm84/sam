@@ -10,17 +10,17 @@
 
   <!-- Loading -->
   @if (phase() === 'loading') {
-    <div class="enrich-loading">
-      <i class="pi pi-spin pi-spinner enrich-spinner"></i>
+    <div class="flex flex-col items-center justify-center py-10 gap-[0.875rem] text-[var(--p-text-muted-color)]">
+      <i class="pi pi-spin pi-spinner text-[2rem] text-[var(--p-primary-color)]"></i>
       <span>{{ 'enrichment.analyzing' | translate }}</span>
-      <span class="enrich-loading-title">{{ sheet().title }}</span>
+      <span class="text-[0.85rem] opacity-60">{{ sheet().title }}</span>
     </div>
   }
 
   <!-- Error -->
   @if (phase() === 'error') {
-    <div class="enrich-error">
-      <i class="pi pi-exclamation-circle"></i>
+    <div class="flex items-center justify-center gap-3 py-8 text-[var(--p-red-500)]">
+      <i class="pi pi-exclamation-circle text-[1.5rem]"></i>
       <span>{{ 'enrichment.analyzeError' | translate }}</span>
     </div>
   }
@@ -28,21 +28,21 @@
   <!-- Review -->
   @if (phase() === 'review') {
     @if (!hasSuggestions()) {
-      <div class="enrich-empty">
-        <i class="pi pi-check-circle"></i>
+      <div class="flex flex-col items-center justify-center gap-3 py-8 text-[var(--p-text-muted-color)]">
+        <i class="pi pi-check-circle text-[1.5rem] text-[var(--p-green-500)] opacity-70"></i>
         <span>{{ 'enrichment.noSuggestions' | translate }}</span>
       </div>
     } @else {
-      <div class="enrich-form">
+      <div class="flex flex-col gap-[0.875rem] py-1">
 
         <!-- Tags -->
         @if ((enrichment()?.suggestedTags?.length ?? 0) > 0) {
           <p-divider align="left">
-            <span class="section-label">{{ 'enrichment.tags.title' | translate }}</span>
+            <span class="text-[0.7rem] font-semibold uppercase tracking-[0.06em] text-[var(--p-text-muted-color)]">{{ 'enrichment.tags.title' | translate }}</span>
           </p-divider>
-          <div class="tag-list">
+          <div class="flex flex-wrap gap-x-3 gap-y-2 px-0.5">
             @for (tag of enrichment()!.suggestedTags; track tag) {
-              <label class="tag-item">
+              <label class="flex items-center gap-2 cursor-pointer select-none">
                 <p-checkbox
                   [ngModel]="isTagAccepted(tag)"
                   [binary]="true"
@@ -57,44 +57,44 @@
         <!-- Style -->
         @if (enrichment()?.suggestedStyle != null) {
           <p-divider align="left">
-            <span class="section-label">{{ 'enrichment.style.title' | translate }}</span>
+            <span class="text-[0.7rem] font-semibold uppercase tracking-[0.06em] text-[var(--p-text-muted-color)]">{{ 'enrichment.style.title' | translate }}</span>
           </p-divider>
-          <label class="suggestion-item">
+          <label class="flex items-start gap-[0.625rem] px-0.5 cursor-pointer select-none">
             <p-checkbox [(ngModel)]="acceptStyle" [binary]="true" />
-            <span class="suggestion-value">{{ styleLabel() }}</span>
+            <span class="text-[0.925rem] leading-[1.4]">{{ styleLabel() }}</span>
           </label>
         }
 
         <!-- Difficulty -->
         @if (enrichment()?.suggestedDifficultyLevel != null) {
           <p-divider align="left">
-            <span class="section-label">{{ 'enrichment.difficulty.title' | translate }}</span>
+            <span class="text-[0.7rem] font-semibold uppercase tracking-[0.06em] text-[var(--p-text-muted-color)]">{{ 'enrichment.difficulty.title' | translate }}</span>
           </p-divider>
-          <label class="suggestion-item">
+          <label class="flex items-start gap-[0.625rem] px-0.5 cursor-pointer select-none">
             <p-checkbox [(ngModel)]="acceptDifficulty" [binary]="true" />
-            <span class="suggestion-value">{{ difficultyLabel() }}</span>
+            <span class="text-[0.925rem] leading-[1.4]">{{ difficultyLabel() }}</span>
           </label>
         }
 
         <!-- Year of Composition -->
         @if (enrichment()?.suggestedYearOfComposition != null) {
           <p-divider align="left">
-            <span class="section-label">{{ 'enrichment.year.title' | translate }}</span>
+            <span class="text-[0.7rem] font-semibold uppercase tracking-[0.06em] text-[var(--p-text-muted-color)]">{{ 'enrichment.year.title' | translate }}</span>
           </p-divider>
-          <label class="suggestion-item">
+          <label class="flex items-start gap-[0.625rem] px-0.5 cursor-pointer select-none">
             <p-checkbox [(ngModel)]="acceptYear" [binary]="true" />
-            <span class="suggestion-value">{{ enrichment()!.suggestedYearOfComposition }}</span>
+            <span class="text-[0.925rem] leading-[1.4]">{{ enrichment()!.suggestedYearOfComposition }}</span>
           </label>
         }
 
         <!-- Additional Notes -->
         @if (enrichment()?.suggestedAdditionalNotes != null) {
           <p-divider align="left">
-            <span class="section-label">{{ 'enrichment.notes.title' | translate }}</span>
+            <span class="text-[0.7rem] font-semibold uppercase tracking-[0.06em] text-[var(--p-text-muted-color)]">{{ 'enrichment.notes.title' | translate }}</span>
           </p-divider>
-          <label class="suggestion-item suggestion-item--notes">
+          <label class="flex items-start gap-[0.625rem] px-0.5 cursor-pointer select-none">
             <p-checkbox [(ngModel)]="acceptNotes" [binary]="true" />
-            <span class="suggestion-value suggestion-value--notes">{{ enrichment()!.suggestedAdditionalNotes }}</span>
+            <span class="text-[0.925rem] leading-[1.4] text-[var(--p-text-secondary-color)] italic">{{ enrichment()!.suggestedAdditionalNotes }}</span>
           </label>
         }
 

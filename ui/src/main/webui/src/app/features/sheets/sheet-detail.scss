@@ -1,6 +1,8 @@
 @use 'pages';
 @use 'details';
 
+// ─── Enrich prompt — color-mix() cannot be Tailwind ──────────────────────────
+
 .enrich-prompt {
   display: flex;
   align-items: center;
@@ -24,37 +26,17 @@
   }
 }
 
-.detail-title-row {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-
-  h2 {
-    flex: 1;
-    min-width: 0;
-  }
-}
-
-.open-fullpage-link {
-  text-decoration: none;
-  line-height: 0;
-}
-
+// ─── detail-top-row — display:contents in compact; overridden to grid in full mode
 .detail-top-row {
   display: contents;
 }
 
-.tab-panels {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  padding-top: 0.75rem;
+// ─── Empty message — override shared partial's 2rem padding for tighter table context
+.empty-message {
+  padding: 1.5rem !important;
 }
 
-.instrumentations-toolbar {
-  display: flex;
-  justify-content: flex-end;
-}
+// ─── Full-page mode — :host(.mode-*) cannot be in template ───────────────────
 
 :host(.mode-full) {
   display: block;
@@ -75,18 +57,7 @@
   }
 }
 
-.empty-message {
-  padding: 1.5rem !important;
-}
-
-.detail-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.375rem;
-  margin-top: 0.125rem;
-}
-
-// ── Instrumentation table: expand & docs columns ────────────────────
+// ─── Table column widths — must be applied to th/td directly ─────────────────
 
 .expand-col {
   width: 2.5rem;
@@ -97,7 +68,14 @@
   width: 8rem;
 }
 
-// ── Row expansion ───────────────────────────────────────────────────
+// ─── Compact instrumentation table — fixed layout so expanded rows never push the table wider ──
+
+:host ::ng-deep .compact-instr-table .p-datatable-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+// ─── Row expansion — !important needed to override PrimeNG table cell padding ─
 
 .expansion-row td {
   padding: 0 !important;
@@ -107,7 +85,7 @@
   padding: 0 !important;
 }
 
-// ── Coverage panel ───────────────────────────────────────────────────
+// ─── Coverage panel ───────────────────────────────────────────────────────────
 
 .coverage-summary {
   display: flex;
@@ -191,7 +169,7 @@
   line-height: 1.4;
 }
 
-// ── Batch toolbar ────────────────────────────────────────────────────
+// ─── Batch toolbar ────────────────────────────────────────────────────────────
 
 .batch-toolbar {
   display: flex;
@@ -237,6 +215,8 @@
   flex: 1;
 }
 
+// ─── Relink dialog form ───────────────────────────────────────────────────────
+
 .relink-form {
   display: flex;
   flex-direction: column;
@@ -269,12 +249,7 @@
   font-size: 0.9rem;
 }
 
-// ── Also-link dialog ─────────────────────────────────────────────────
-
-.also-link-empty {
-  font-size: 0.875rem;
-  color: var(--p-text-muted-color);
-}
+// ─── Also-link dialog — :hover on item requires SCSS ─────────────────────────
 
 .also-link-checklist {
   display: flex;

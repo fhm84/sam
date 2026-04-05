@@ -16,10 +16,10 @@
         (onClick)="toggleFavorite()"
       />
       <div class="detail-title-text">
-        <div class="detail-title-row">
-          <h2>{{ s.title }}</h2>
+        <div class="flex items-center gap-1">
+          <h2 class="flex-1 min-w-0">{{ s.title }}</h2>
           @if (mode === 'compact') {
-            <a [href]="'/sheets/' + sheetId" target="_blank" rel="noopener" class="open-fullpage-link">
+            <a [href]="'/sheets/' + sheetId" target="_blank" rel="noopener" class="no-underline leading-none">
               <p-button
                 icon="pi pi-external-link"
                 [rounded]="true"
@@ -91,7 +91,7 @@
 
         <!-- Tab 1: Details -->
         <p-tabpanel [value]="0">
-          <div class="detail-panels tab-panels">
+          <div class="detail-panels flex flex-col gap-3 pt-3">
             <!-- Base Data -->
             <p-panel [header]="t.t('sheets.detail.baseData')">
               <div class="detail-meta">
@@ -140,7 +140,7 @@
                 @if (s.tags && s.tags.length > 0) {
                   <div class="meta-entry full-width">
                     <span class="detail-label">{{ 'sheets.detail.tags' | translate }}</span>
-                    <div class="detail-tags">
+                    <div class="flex flex-wrap gap-[0.375rem] mt-0.5">
                       @for (tag of s.tags; track tag) {
                         <p-tag [value]="'#' + tag" severity="secondary" />
                       }
@@ -274,8 +274,8 @@
 
         <!-- Tab 2: Instrumentations -->
         <p-tabpanel [value]="1">
-          <div class="tab-panels">
-            <div class="instrumentations-toolbar">
+          <div class="flex flex-col gap-3 pt-3">
+            <div class="flex justify-end">
               <p-button
                 icon="pi pi-plus"
                 [label]="t.t('sheets.instrumentations.new')"
@@ -286,6 +286,7 @@
             </div>
             <p-table
               #dtCompact
+              styleClass="compact-instr-table"
               [value]="instrumentations()"
               [loading]="instrumentationsLoading()"
               dataKey="id"
@@ -296,8 +297,6 @@
                   <th class="expand-col"></th>
                   <th>{{ 'sheets.instrumentations.columns.instrument' | translate }}</th>
                   <th>{{ 'sheets.instrumentations.columns.partLabel' | translate }}</th>
-                  <th>{{ 'sheets.instrumentations.columns.clef' | translate }}</th>
-                  <th>{{ 'sheets.instrumentations.columns.physicalLocation' | translate }}</th>
                   <th class="docs-col">{{ 'sheets.instrumentations.columns.documents' | translate }}</th>
                   <th>{{ 'sheets.instrumentations.columns.actions' | translate }}</th>
                 </tr>
@@ -317,8 +316,6 @@
                   </td>
                   <td>{{ instr.instrument?.name }}</td>
                   <td>{{ instr.partLabel }}</td>
-                  <td>{{ instr.clef }}</td>
-                  <td>{{ instr.physicalLocation }}</td>
                   <td class="docs-col">
                     <div class="doc-badges">
                       @for (badge of instrDocBadges(instr.id!); track badge.type) {
@@ -363,7 +360,7 @@
               </ng-template>
               <ng-template #expandedrow let-instr>
                 <tr class="expansion-row">
-                  <td colspan="7" class="expansion-cell">
+                  <td colspan="5" class="expansion-cell">
                     <app-instrumentation-documents
                       [sheetId]="sheetId"
                       [instrumentation]="instr"
@@ -378,7 +375,7 @@
               </ng-template>
               <ng-template #emptymessage>
                 <tr>
-                  <td colspan="7" class="empty-message">{{ 'sheets.instrumentations.empty' | translate }}</td>
+                  <td colspan="5" class="empty-message">{{ 'sheets.instrumentations.empty' | translate }}</td>
                 </tr>
               </ng-template>
             </p-table>
@@ -441,7 +438,7 @@
 
         <!-- Tab 3: Collections -->
         <p-tabpanel [value]="3">
-          <div class="tab-panels">
+          <div class="flex flex-col gap-3 pt-3">
             <app-sheet-collections [sheetId]="sheetId" />
           </div>
         </p-tabpanel>
@@ -449,7 +446,7 @@
         <!-- Tab 4: Coverage -->
         @if (coverage) {
           <p-tabpanel [value]="2">
-            <div class="tab-panels">
+            <div class="flex flex-col gap-3 pt-3">
               <div class="coverage-summary">
                 <span class="coverage-badge" [class]="coverage.status!.toLowerCase()">
                   <i [class]="'pi ' + (coverage.status === 'COMPLETE' ? 'pi-check-circle' : coverage.status === 'PLAYABLE' ? 'pi-minus-circle' : 'pi-times-circle')"></i>

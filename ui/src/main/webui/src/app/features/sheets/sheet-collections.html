@@ -1,32 +1,35 @@
 <!-- ── Membership table ──────────────────────────────────── -->
-<div class="sheet-collections-panel">
+<div class="flex flex-col gap-3">
   <p-table
     [value]="collections()"
     [loading]="loading()"
   >
     <ng-template #header>
       <tr>
-        <th class="col-identifier">{{ 'collections.sheets.columns.identifier' | translate }}</th>
+        <th class="w-20">{{ 'collections.sheets.columns.identifier' | translate }}</th>
         <th>{{ 'sheets.collections.columnCollection' | translate }}</th>
-        <th class="col-type">{{ 'collections.columns.type' | translate }}</th>
-        <th class="col-actions">{{ 'collections.columns.actions' | translate }}</th>
+        <th class="w-36">{{ 'collections.columns.type' | translate }}</th>
+        <th class="w-20">{{ 'collections.columns.actions' | translate }}</th>
       </tr>
     </ng-template>
 
     <ng-template #body let-col>
       <tr>
-        <td class="identifier-cell">{{ col.sheets?.[0]?.identifier }}</td>
+        <td class="font-semibold text-[var(--sam-text-secondary)] [font-variant-numeric:tabular-nums]">{{ col.sheets?.[0]?.identifier }}</td>
         <td>
-          <a class="collection-link" [routerLink]="['/collections', col.id]">{{ col.name }}</a>
+          <a
+            class="text-[var(--p-primary-color)] no-underline font-medium hover:underline"
+            [routerLink]="['/collections', col.id]"
+          >{{ col.name }}</a>
           @if (col.description) {
-            <span class="collection-description">{{ col.description }}</span>
+            <span class="block text-[0.82rem] text-[var(--sam-text-muted)]">{{ col.description }}</span>
           }
         </td>
         <td>
           <p-tag [value]="'collections.types.' + col.type | translate" severity="secondary" />
         </td>
         <td>
-          <div class="actions-cell">
+          <div class="flex gap-1 items-center">
             <p-button
               icon="pi pi-times"
               [rounded]="true"
@@ -44,12 +47,12 @@
 
     <ng-template #emptymessage>
       <tr>
-        <td colspan="4" class="empty-message">{{ 'sheets.collections.empty' | translate }}</td>
+        <td colspan="4" class="!text-center !p-8 text-[var(--sam-text-muted)] italic">{{ 'sheets.collections.empty' | translate }}</td>
       </tr>
     </ng-template>
   </p-table>
 
-  <div class="membership-toolbar">
+  <div class="flex justify-start">
     <p-button
       icon="pi pi-folder-plus"
       [label]="t.t('sheets.collections.add')"
@@ -69,9 +72,9 @@
   [breakpoints]="{ '768px': '95vw' }"
 >
   @if (addDialogVisible) {
-    <div class="add-to-collection-dialog">
+    <div class="flex flex-col gap-4">
 
-      <!-- Selected collection + identifier (shown when a collection is selected) -->
+      <!-- Selected collection + identifier -->
       @if (selectedCollection) {
         <div class="selected-block">
           <div class="selected-indicator">
@@ -82,7 +85,7 @@
               severity="secondary"
             />
           </div>
-          <form [formGroup]="identifierForm" (ngSubmit)="onAdd()" class="identifier-form">
+          <form [formGroup]="identifierForm" (ngSubmit)="onAdd()" class="[p-floatlabel]:w-48">
             <p-floatlabel variant="on">
               <input
                 pInputText
@@ -98,17 +101,16 @@
       }
 
       <!-- Search -->
-      <div class="search-bar">
-        <p-iconfield class="search-field">
-          <p-inputicon styleClass="pi pi-search" />
-          <input
-            pInputText
-            type="text"
-            [placeholder]="t.t('sheets.collections.searchPlaceholder')"
-            (input)="onSearchInput($event)"
-          />
-        </p-iconfield>
-      </div>
+      <p-iconfield class="w-full">
+        <p-inputicon styleClass="pi pi-search" />
+        <input
+          pInputText
+          type="text"
+          class="w-full"
+          [placeholder]="t.t('sheets.collections.searchPlaceholder')"
+          (input)="onSearchInput($event)"
+        />
+      </p-iconfield>
 
       <!-- Results table -->
       <p-table
@@ -126,21 +128,21 @@
         <ng-template #header>
           <tr>
             <th>{{ 'collections.columns.name' | translate }}</th>
-            <th class="col-type">{{ 'collections.columns.type' | translate }}</th>
-            <th class="col-date">{{ 'collections.columns.date' | translate }}</th>
+            <th class="w-36">{{ 'collections.columns.type' | translate }}</th>
+            <th class="w-36">{{ 'collections.columns.date' | translate }}</th>
           </tr>
         </ng-template>
 
         <ng-template #body let-col>
           <tr
-            class="search-row"
+            class="search-row cursor-pointer transition-colors duration-150"
             [class.search-row--selected]="isSelected(col)"
             (click)="selectCollection(col)"
           >
             <td>
-              <span class="search-name">{{ col.name }}</span>
+              <span class="font-medium">{{ col.name }}</span>
               @if (col.description) {
-                <span class="collection-description">{{ col.description }}</span>
+                <span class="block text-[0.82rem] text-[var(--sam-text-muted)]">{{ col.description }}</span>
               }
             </td>
             <td>
@@ -152,7 +154,7 @@
 
         <ng-template #emptymessage>
           <tr>
-            <td colspan="3" class="empty-message">
+            <td colspan="3" class="!text-center !p-8 text-[var(--sam-text-muted)]">
               {{ 'sheets.collections.noResults' | translate }}
             </td>
           </tr>

@@ -5,7 +5,11 @@ module.exports = {
     preflight: false, // Avoid conflicts with PrimeNG and existing styles
   },
   theme: {
-    extend: {},
+    extend: {
+      screens: {
+        xs: { max: '540px' },
+      },
+    },
   },
   plugins: [],
 };

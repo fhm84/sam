@@ -1,126 +1,7 @@
 @use 'pages';
 
-.uploads-page {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-// ── Upload card ──────────────────────────────────────────────────────
-
-.upload-card {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  padding: 1rem;
-  background: var(--p-surface-card);
-  border: 1px solid var(--p-surface-border);
-  border-radius: var(--p-border-radius);
-}
-
-.upload-target-row {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.upload-target-label {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--sam-text-muted);
-  white-space: nowrap;
-  margin-right: 0.25rem;
-}
-
-.target-chips {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.375rem;
-}
-
-.upload-drop-area {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 2rem;
-  color: var(--sam-text-muted);
-
-  i {
-    font-size: 2rem;
-  }
-}
-
-// Active uploads
-
-.active-uploads {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  padding-top: 0.5rem;
-  border-top: 1px solid var(--p-surface-border);
-}
-
-.active-uploads-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--sam-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.upload-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.upload-filename {
-  min-width: 10rem;
-  font-size: 0.875rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.upload-percent {
-  min-width: 3rem;
-  text-align: right;
-  font-size: 0.875rem;
-  color: var(--sam-text-muted);
-}
-
-// ── Table caption ────────────────────────────────────────────────────
-
-.table-caption {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.table-caption-title {
-  font-weight: 600;
-  font-size: 1rem;
-}
-
-.table-caption-count {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 1.5rem;
-  height: 1.5rem;
-  padding: 0 0.4rem;
-  border-radius: 999px;
-  background: var(--p-surface-200);
-  color: var(--sam-text-muted);
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-// ── Picker split layout (assign mode) ────────────────────────────────
+// ── Picker split layout (assign mode) ────────────────────────────────────────
+// Kept in SCSS: fixed flex proportions + overflow:hidden required for correct PDF/image preview
 
 .picker-split-layout {
   display: flex;
@@ -183,35 +64,7 @@
   padding: 1rem 1.25rem;
 }
 
-// ── Picker dialog ────────────────────────────────────────────────────
-
-.picker-dialog {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.picker-doc-name {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.75rem;
-  background: var(--sam-hover);
-  border-radius: var(--p-border-radius);
-  font-size: 0.9375rem;
-  font-weight: 500;
-  color: var(--sam-text);
-
-  i {
-    color: var(--sam-text-muted);
-  }
-}
-
-.picker-search {
-  width: 100%;
-}
-
-// Results table rows
+// ── Results table — ::ng-deep required for dynamically added PrimeNG row class ─
 
 :host ::ng-deep .picker-results-table {
   .picker-row {
@@ -225,91 +78,7 @@
   }
 }
 
-.picker-title {
-  display: block;
-}
-
-.picker-subtitle {
-  display: block;
-  font-size: 0.8125rem;
-  color: var(--sam-text-muted);
-}
-
-// Selected sheet summary + instrumentation picker
-
-.picker-selection {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-  padding: 0.75rem;
-  background: var(--sam-active-bg);
-  border-radius: var(--p-border-radius);
-  border-left: 3px solid var(--p-primary-color);
-}
-
-.picker-selected-sheet {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex: 1;
-  min-width: 12rem;
-
-  i {
-    color: var(--p-primary-color);
-  }
-}
-
-.picker-selected-title {
-  font-weight: 600;
-}
-
-.picker-selected-meta {
-  color: var(--sam-text-muted);
-  font-size: 0.875rem;
-}
-
-.picker-instrs-loading {
-  color: var(--sam-text-muted);
-}
-
-.picker-instr-field {
-  flex: 1;
-  min-width: 14rem;
-}
-
-// ── Instrumentation checklist (assign context) ───────────────────────
-
-.picker-instr-checklist {
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-  padding: 0.5rem;
-  background: var(--p-surface-0);
-  border: 1px solid var(--p-content-border-color);
-  border-radius: var(--p-border-radius);
-  max-height: 14rem;
-  overflow-y: auto;
-}
-
-.picker-instr-check-all {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  padding: 0.375rem 0.5rem;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--sam-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  cursor: pointer;
-}
-
-.picker-instr-check-divider {
-  height: 1px;
-  background: var(--p-content-border-color);
-  margin: 0.25rem 0;
-}
+// ── Instrumentation checklist — :hover cannot use Tailwind group (dynamic content) ─
 
 .picker-instr-check-item {
   display: flex;
@@ -337,14 +106,4 @@
     font-size: 0.875rem;
     color: var(--sam-text-muted);
   }
-}
-
-// Column widths
-
-.col-composer {
-  width: 14rem;
-}
-
-.col-genre {
-  width: 10rem;
 }

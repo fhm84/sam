@@ -1,23 +1,13 @@
+// ─── Host fills the expanded row panel ───────────────────────────────────────
 :host {
   display: block;
   padding: 0.75rem 1rem 0.75rem 2.5rem;
   background: var(--p-surface-50);
   border-top: 1px solid var(--p-surface-200);
+  overflow: hidden;
 }
 
-.instr-docs-empty {
-  display: block;
-  color: var(--sam-text-muted);
-  font-size: 0.875rem;
-  margin-bottom: 0.75rem;
-}
-
-.instr-doc-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  margin-bottom: 0.75rem;
-}
+// ─── Document row — :hover and .is-selected states ───────────────────────────
 
 .instr-doc-row {
   display: flex;
@@ -36,47 +26,14 @@
   }
 }
 
-.instr-doc-name {
-  flex: 1;
-  min-width: 0;
-  font-size: 0.875rem;
-  color: var(--sam-text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.instr-doc-type-label {
-  font-size: 0.75rem;
-  color: var(--sam-text-muted);
-  background: var(--p-surface-200);
-  border-radius: 4px;
-  padding: 0.1rem 0.4rem;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.instr-doc-size {
-  font-size: 0.75rem;
-  color: var(--sam-text-muted);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.instr-doc-actions {
-  display: flex;
-  gap: 0.125rem;
-  flex-shrink: 0;
-}
-
-.instr-docs-upload {
-  margin-top: 0.25rem;
-}
+// ─── Drop zone — :hover and JS .drop-zone-active state ───────────────────────
 
 .instr-drop-zone {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.25rem;
+  text-align: center;
   padding: 0.5rem 0.75rem;
   border: 1px dashed var(--p-surface-300);
   border-radius: var(--p-border-radius-md, 6px);
