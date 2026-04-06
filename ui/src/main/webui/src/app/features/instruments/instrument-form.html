@@ -1,49 +1,54 @@
-<form [formGroup]="form" (ngSubmit)="onSave()" class="flex flex-col gap-5">
+<form [formGroup]="form" (ngSubmit)="onSave()" class="flex flex-col gap-5 pt-4">
+
+  <!-- ID -->
   <div class="flex flex-col gap-1.5">
-    <div class="flex items-center gap-2">
-      <p-floatlabel variant="on" class="flex-1 min-w-0 block">
-        <input pInputText id="instrument-id" formControlName="id" [placeholder]="t.t('instruments.form.idHint')" />
+    <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+      <p-floatlabel variant="on" class="block">
+        <input pInputText id="instrument-id" formControlName="id" class="w-full" [placeholder]="t.t('instruments.form.idHint')" />
         <label for="instrument-id">{{ 'instruments.form.id' | translate }}</label>
       </p-floatlabel>
       <i
-        class="pi pi-info-circle text-xs text-[var(--sam-text-muted)] cursor-help shrink-0 transition-colors hover:text-[var(--sam-text-secondary)]"
+        class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
         [pTooltip]="t.t('instruments.form.idTooltip')"
         tooltipPosition="right"
       ></i>
     </div>
   </div>
 
+  <!-- Name -->
   <div class="flex flex-col gap-1.5">
-    <div class="flex items-center gap-2">
-      <p-floatlabel variant="on" class="flex-1 min-w-0 block">
-        <input pInputText id="instrument-name" formControlName="name" />
+    <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+      <p-floatlabel variant="on" class="block">
+        <input pInputText id="instrument-name" formControlName="name" class="w-full" />
         <label for="instrument-name">{{ 'instruments.form.name' | translate }}</label>
       </p-floatlabel>
       <i
-        class="pi pi-info-circle text-xs text-[var(--sam-text-muted)] cursor-help shrink-0 transition-colors hover:text-[var(--sam-text-secondary)]"
+        class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
         [pTooltip]="t.t('instruments.form.nameTooltip')"
         tooltipPosition="right"
       ></i>
     </div>
   </div>
 
+  <!-- Display Name -->
   <div class="flex flex-col gap-1.5">
-    <div class="flex items-center gap-2">
-      <p-floatlabel variant="on" class="flex-1 min-w-0 block">
-        <input pInputText id="instrument-displayName" formControlName="displayName" />
+    <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+      <p-floatlabel variant="on" class="block">
+        <input pInputText id="instrument-displayName" formControlName="displayName" class="w-full" />
         <label for="instrument-displayName">{{ 'instruments.form.displayName' | translate }}</label>
       </p-floatlabel>
       <i
-        class="pi pi-info-circle text-xs text-[var(--sam-text-muted)] cursor-help shrink-0 transition-colors hover:text-[var(--sam-text-secondary)]"
+        class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
         [pTooltip]="t.t('instruments.form.displayNameTooltip')"
         tooltipPosition="right"
       ></i>
     </div>
   </div>
 
+  <!-- Transposition -->
   <div class="flex flex-col gap-1.5">
-    <div class="flex items-center gap-2">
-      <p-floatlabel variant="on" class="flex-1 min-w-0 block">
+    <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+      <p-floatlabel variant="on" class="block">
         <p-select
           inputId="instrument-transposition"
           formControlName="transposition"
@@ -55,7 +60,7 @@
         <label for="instrument-transposition">{{ 'instruments.form.transposition' | translate }}</label>
       </p-floatlabel>
       <i
-        class="pi pi-info-circle text-xs text-[var(--sam-text-muted)] cursor-help shrink-0 transition-colors hover:text-[var(--sam-text-secondary)]"
+        class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
         [pTooltip]="t.t('instruments.form.transpositionTooltip')"
         tooltipPosition="right"
       ></i>

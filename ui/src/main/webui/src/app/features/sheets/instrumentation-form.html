@@ -1,52 +1,60 @@
-<form [formGroup]="form" (ngSubmit)="onSave()" class="flex flex-col gap-5">
+<form [formGroup]="form" (ngSubmit)="onSave()" class="flex flex-col gap-5 pt-4">
+
+  <!-- Instrument -->
   <div class="flex flex-col gap-1.5">
-    <p-floatlabel variant="on" class="block">
-      <p-select
-        inputId="instr-instrument"
-        formControlName="instrumentId"
-        [options]="instrumentOptions()"
-        optionLabel="label"
-        optionValue="value"
-        [filter]="true"
-        styleClass="w-full"
-      />
-      <label for="instr-instrument">{{ 'sheets.instrumentations.form.instrument' | translate }}</label>
-    </p-floatlabel>
+    <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+      <p-floatlabel variant="on" class="block">
+        <p-select
+          inputId="instr-instrument"
+          formControlName="instrumentId"
+          [options]="instrumentOptions()"
+          optionLabel="label"
+          optionValue="value"
+          [filter]="true"
+          styleClass="w-full"
+        />
+        <label for="instr-instrument">{{ 'sheets.instrumentations.form.instrument' | translate }}</label>
+      </p-floatlabel>
+    </div>
   </div>
 
+  <!-- Part Label -->
   <div class="flex flex-col gap-1.5">
-    <div class="flex items-center gap-2">
-      <p-floatlabel variant="on" class="flex-1 min-w-0 block">
-        <input pInputText id="instr-partLabel" formControlName="partLabel" />
+    <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+      <p-floatlabel variant="on" class="block">
+        <input pInputText id="instr-partLabel" formControlName="partLabel" class="w-full" />
         <label for="instr-partLabel">{{ 'sheets.instrumentations.form.partLabel' | translate }}</label>
       </p-floatlabel>
       <i
-        class="pi pi-info-circle text-xs text-[var(--sam-text-muted)] cursor-help shrink-0 transition-colors hover:text-[var(--sam-text-secondary)]"
+        class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
         [pTooltip]="t.t('sheets.instrumentations.form.partLabelTooltip')"
         tooltipPosition="right"
       ></i>
     </div>
   </div>
 
+  <!-- Clef / Notation Type -->
   <div class="flex gap-4">
-    <div class="flex flex-col gap-1.5 flex-1">
-      <p-floatlabel variant="on" class="block">
-        <p-select
-          inputId="instr-clef"
-          formControlName="clef"
-          [options]="clefOptions()"
-          optionLabel="label"
-          optionValue="value"
-          [showClear]="true"
-          styleClass="w-full"
-        />
-        <label for="instr-clef">{{ 'sheets.instrumentations.form.clef' | translate }}</label>
-      </p-floatlabel>
+    <div class="flex flex-col gap-1.5 flex-1 min-w-0">
+      <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+        <p-floatlabel variant="on" class="block">
+          <p-select
+            inputId="instr-clef"
+            formControlName="clef"
+            [options]="clefOptions()"
+            optionLabel="label"
+            optionValue="value"
+            [showClear]="true"
+            styleClass="w-full"
+          />
+          <label for="instr-clef">{{ 'sheets.instrumentations.form.clef' | translate }}</label>
+        </p-floatlabel>
+      </div>
     </div>
 
-    <div class="flex flex-col gap-1.5 flex-1">
-      <div class="flex items-center gap-2">
-        <p-floatlabel variant="on" class="flex-1 min-w-0 block">
+    <div class="flex flex-col gap-1.5 flex-1 min-w-0">
+      <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+        <p-floatlabel variant="on" class="block">
           <p-select
             inputId="instr-notationType"
             formControlName="notationType"
@@ -59,7 +67,7 @@
           <label for="instr-notationType">{{ 'sheets.instrumentations.form.notationType' | translate }}</label>
         </p-floatlabel>
         <i
-          class="pi pi-info-circle text-xs text-[var(--sam-text-muted)] cursor-help shrink-0 transition-colors hover:text-[var(--sam-text-secondary)]"
+          class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
           [pTooltip]="t.t('sheets.instrumentations.form.notationTypeTooltip')"
           tooltipPosition="right"
         ></i>
@@ -67,40 +75,49 @@
     </div>
   </div>
 
+  <!-- Notes -->
   <div class="flex flex-col gap-1.5">
-    <p-floatlabel variant="on" class="block">
-      <textarea
-        pTextarea
-        id="instr-notes"
-        formControlName="notes"
-        [rows]="3"
-        [autoResize]="true"
-      ></textarea>
-      <label for="instr-notes">{{ 'sheets.instrumentations.form.notes' | translate }}</label>
-    </p-floatlabel>
-  </div>
-
-  <div class="flex gap-4">
-    <div class="flex flex-col gap-1.5 flex-1">
+    <div class="grid items-start gap-2 [grid-template-columns:1fr_2rem]">
       <p-floatlabel variant="on" class="block">
-        <input pInputText id="instr-physicalLocation" formControlName="physicalLocation" />
-        <label for="instr-physicalLocation">{{ 'sheets.instrumentations.form.physicalLocation' | translate }}</label>
+        <textarea
+          pTextarea
+          id="instr-notes"
+          formControlName="notes"
+          class="w-full"
+          [rows]="3"
+          [autoResize]="true"
+        ></textarea>
+        <label for="instr-notes">{{ 'sheets.instrumentations.form.notes' | translate }}</label>
       </p-floatlabel>
     </div>
+  </div>
 
-    <div class="flex flex-col gap-1.5 flex-1">
-      <p-floatlabel variant="on" class="block">
-        <p-select
-          inputId="instr-physicalCondition"
-          formControlName="physicalCondition"
-          [options]="physicalConditionOptions()"
-          optionLabel="label"
-          optionValue="value"
-          [showClear]="true"
-          styleClass="w-full"
-        />
-        <label for="instr-physicalCondition">{{ 'sheets.instrumentations.form.physicalCondition' | translate }}</label>
-      </p-floatlabel>
+  <!-- Archive Location / Condition -->
+  <div class="flex gap-4">
+    <div class="flex flex-col gap-1.5 flex-1 min-w-0">
+      <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+        <p-floatlabel variant="on" class="block">
+          <input pInputText id="instr-physicalLocation" formControlName="physicalLocation" class="w-full" />
+          <label for="instr-physicalLocation">{{ 'sheets.instrumentations.form.physicalLocation' | translate }}</label>
+        </p-floatlabel>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-1.5 flex-1 min-w-0">
+      <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+        <p-floatlabel variant="on" class="block">
+          <p-select
+            inputId="instr-physicalCondition"
+            formControlName="physicalCondition"
+            [options]="physicalConditionOptions()"
+            optionLabel="label"
+            optionValue="value"
+            [showClear]="true"
+            styleClass="w-full"
+          />
+          <label for="instr-physicalCondition">{{ 'sheets.instrumentations.form.physicalCondition' | translate }}</label>
+        </p-floatlabel>
+      </div>
     </div>
   </div>
 

@@ -1,25 +1,31 @@
-<form [formGroup]="form" (ngSubmit)="onSave()" class="flex flex-col gap-5">
+<form [formGroup]="form" (ngSubmit)="onSave()" class="flex flex-col gap-5 pt-4">
+
+  <!-- Label -->
   <div class="flex flex-col gap-1.5">
-    <p-floatlabel variant="on" class="block">
-      <input pInputText id="voice-label" formControlName="label" />
-      <label for="voice-label">{{ 'ensembles.voices.form.label' | translate }}</label>
-    </p-floatlabel>
+    <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+      <p-floatlabel variant="on" class="block">
+        <input pInputText id="voice-label" formControlName="label" class="w-full" />
+        <label for="voice-label">{{ 'ensembles.voices.form.label' | translate }}</label>
+      </p-floatlabel>
+    </div>
   </div>
 
+  <!-- Weight / Required -->
   <div class="flex gap-4">
-    <div class="flex flex-col gap-1.5 flex-1">
-      <div class="flex items-center gap-2">
-        <p-floatlabel variant="on" class="flex-1 min-w-0 block">
+    <div class="flex flex-col gap-1.5 flex-1 min-w-0">
+      <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+        <p-floatlabel variant="on" class="block">
           <p-inputnumber
             inputId="voice-weight"
             formControlName="weight"
             [useGrouping]="false"
             styleClass="w-full"
+            inputStyleClass="w-full"
           />
           <label for="voice-weight">{{ 'ensembles.voices.form.weight' | translate }}</label>
         </p-floatlabel>
         <i
-          class="pi pi-info-circle text-xs text-[var(--sam-text-muted)] cursor-help shrink-0 transition-colors hover:text-[var(--sam-text-secondary)]"
+          class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
           [pTooltip]="t.t('ensembles.voices.form.weightTooltip')"
           tooltipPosition="right"
         ></i>
@@ -35,7 +41,7 @@
       <div class="flex items-center gap-2">
         <label for="voice-required">{{ 'ensembles.voices.form.required' | translate }}</label>
         <i
-          class="pi pi-info-circle text-xs text-[var(--sam-text-muted)] cursor-help shrink-0 transition-colors hover:text-[var(--sam-text-secondary)]"
+          class="pi pi-info-circle text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
           [pTooltip]="t.t('ensembles.voices.form.requiredTooltip')"
           tooltipPosition="right"
         ></i>

@@ -1,22 +1,30 @@
 <form [formGroup]="form" (ngSubmit)="onSave()" class="flex flex-col gap-5">
+
+  <!-- Title -->
   <div class="flex flex-col gap-1.5">
-    <p-floatlabel variant="on" class="block">
-      <input pInputText id="sheet-title" formControlName="title" />
-      <label for="sheet-title">{{ 'sheets.form.title' | translate }}</label>
-    </p-floatlabel>
+    <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+      <p-floatlabel variant="on" class="block">
+        <input pInputText id="sheet-title" formControlName="title" class="w-full" />
+        <label for="sheet-title">{{ 'sheets.form.title' | translate }}</label>
+      </p-floatlabel>
+    </div>
   </div>
 
+  <!-- Subtitle -->
   <div class="flex flex-col gap-1.5">
-    <p-floatlabel variant="on" class="block">
-      <input pInputText id="sheet-subtitle" formControlName="subtitle" />
-      <label for="sheet-subtitle">{{ 'sheets.form.subtitle' | translate }}</label>
-    </p-floatlabel>
+    <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+      <p-floatlabel variant="on" class="block">
+        <input pInputText id="sheet-subtitle" formControlName="subtitle" class="w-full" />
+        <label for="sheet-subtitle">{{ 'sheets.form.subtitle' | translate }}</label>
+      </p-floatlabel>
+    </div>
   </div>
 
+  <!-- Composer / Arranger -->
   <div class="flex gap-4">
-    <div class="flex flex-col gap-1.5 flex-1">
-      <div class="flex items-center gap-2">
-        <p-floatlabel variant="on" class="flex-1 min-w-0 block">
+    <div class="flex flex-col gap-1.5 flex-1 min-w-0">
+      <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+        <p-floatlabel variant="on" class="block">
           <p-select
             inputId="sheet-composer"
             formControlName="composerId"
@@ -26,6 +34,7 @@
             [filter]="true"
             [showClear]="true"
             styleClass="w-full"
+            inputStyleClass="w-full"
           />
           <label for="sheet-composer">{{ 'sheets.form.composer' | translate }}</label>
         </p-floatlabel>
@@ -33,15 +42,16 @@
           icon="pi pi-plus"
           [rounded]="true"
           [text]="true"
+          size="small"
           [pTooltip]="t.t('musicians.new')"
           tooltipPosition="top"
           (onClick)="openMusicianDialog('composer')"
         />
       </div>
     </div>
-    <div class="flex flex-col gap-1.5 flex-1">
-      <div class="flex items-center gap-2">
-        <p-floatlabel variant="on" class="flex-1 min-w-0 block">
+    <div class="flex flex-col gap-1.5 flex-1 min-w-0">
+      <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+        <p-floatlabel variant="on" class="block">
           <p-select
             inputId="sheet-arranger"
             formControlName="arrangerId"
@@ -51,6 +61,7 @@
             [filter]="true"
             [showClear]="true"
             styleClass="w-full"
+            inputStyleClass="w-full"
           />
           <label for="sheet-arranger">{{ 'sheets.form.arranger' | translate }}</label>
         </p-floatlabel>
@@ -58,6 +69,7 @@
           icon="pi pi-plus"
           [rounded]="true"
           [text]="true"
+          size="small"
           [pTooltip]="t.t('musicians.new')"
           tooltipPosition="top"
           (onClick)="openMusicianDialog('arranger')"
@@ -66,10 +78,11 @@
     </div>
   </div>
 
+  <!-- Genre / Style -->
   <div class="flex gap-4">
-    <div class="flex flex-col gap-1.5 flex-1">
-      <div class="flex items-center gap-2">
-        <p-floatlabel variant="on" class="flex-1 min-w-0 block">
+    <div class="flex flex-col gap-1.5 flex-1 min-w-0">
+      <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+        <p-floatlabel variant="on" class="block">
           <p-select
             inputId="sheet-genre"
             formControlName="genre"
@@ -78,19 +91,20 @@
             optionValue="value"
             [showClear]="true"
             styleClass="w-full"
+            inputStyleClass="w-full"
           />
           <label for="sheet-genre">{{ 'sheets.form.genre' | translate }}</label>
         </p-floatlabel>
         <i
-          class="pi pi-info-circle text-xs text-[var(--sam-text-muted)] cursor-help shrink-0 transition-colors hover:text-[var(--sam-text-secondary)]"
+          class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
           [pTooltip]="t.t('sheets.form.genreTooltip')"
           tooltipPosition="right"
         ></i>
       </div>
     </div>
-    <div class="flex flex-col gap-1.5 flex-1">
-      <div class="flex items-center gap-2">
-        <p-floatlabel variant="on" class="flex-1 min-w-0 block">
+    <div class="flex flex-col gap-1.5 flex-1 min-w-0">
+      <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+        <p-floatlabel variant="on" class="block">
           <p-select
             inputId="sheet-style"
             formControlName="style"
@@ -99,11 +113,12 @@
             optionValue="value"
             [showClear]="true"
             styleClass="w-full"
+            inputStyleClass="w-full"
           />
           <label for="sheet-style">{{ 'sheets.form.style' | translate }}</label>
         </p-floatlabel>
         <i
-          class="pi pi-info-circle text-xs text-[var(--sam-text-muted)] cursor-help shrink-0 transition-colors hover:text-[var(--sam-text-secondary)]"
+          class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
           [pTooltip]="t.t('sheets.form.styleTooltip')"
           tooltipPosition="right"
         ></i>
@@ -111,81 +126,104 @@
     </div>
   </div>
 
+  <!-- Publisher / Year -->
   <div class="flex gap-4">
-    <div class="flex flex-col gap-1.5 flex-1">
-      <p-floatlabel variant="on" class="block">
-        <input pInputText id="sheet-publisher" formControlName="publisher" />
-        <label for="sheet-publisher">{{ 'sheets.form.publisher' | translate }}</label>
-      </p-floatlabel>
+    <div class="flex flex-col gap-1.5 flex-1 min-w-0">
+      <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+        <p-floatlabel variant="on" class="block">
+          <input pInputText id="sheet-publisher" formControlName="publisher" class="w-full" />
+          <label for="sheet-publisher">{{ 'sheets.form.publisher' | translate }}</label>
+        </p-floatlabel>
+      </div>
     </div>
-    <div class="flex flex-col gap-1.5 flex-1">
-      <p-floatlabel variant="on" class="block">
-        <p-inputnumber
-          inputId="sheet-year"
-          formControlName="yearOfComposition"
-          [useGrouping]="false"
-          [maxlength]="4"
-          styleClass="w-full"
-        />
-        <label for="sheet-year">{{ 'sheets.form.yearOfComposition' | translate }}</label>
-      </p-floatlabel>
+    <div class="flex flex-col gap-1.5 flex-1 min-w-0">
+      <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+        <p-floatlabel variant="on" class="block">
+          <p-inputnumber
+            inputId="sheet-year"
+            formControlName="yearOfComposition"
+            [useGrouping]="false"
+            [maxlength]="4"
+            styleClass="w-full"
+            inputStyleClass="w-full"
+          />
+          <label for="sheet-year">{{ 'sheets.form.yearOfComposition' | translate }}</label>
+        </p-floatlabel>
+      </div>
     </div>
   </div>
 
+  <!-- Difficulty / Copyright -->
   <div class="flex gap-4">
-    <div class="flex flex-col gap-1.5 flex-1">
-      <p-floatlabel variant="on" class="block">
-        <p-select
-          inputId="sheet-difficulty"
-          formControlName="difficultyLevel"
-          [options]="difficultyOptions()"
-          optionLabel="label"
-          optionValue="value"
-          [showClear]="true"
-          styleClass="w-full"
-        />
-        <label for="sheet-difficulty">{{ 'sheets.form.difficultyLevel' | translate }}</label>
-      </p-floatlabel>
+    <div class="flex flex-col gap-1.5 flex-1 min-w-0">
+      <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+        <p-floatlabel variant="on" class="block">
+          <p-select
+            inputId="sheet-difficulty"
+            formControlName="difficultyLevel"
+            [options]="difficultyOptions()"
+            optionLabel="label"
+            optionValue="value"
+            [showClear]="true"
+            styleClass="w-full"
+            inputStyleClass="w-full"
+          />
+          <label for="sheet-difficulty">{{ 'sheets.form.difficultyLevel' | translate }}</label>
+        </p-floatlabel>
+        <i
+          class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
+          [pTooltip]="t.t('sheets.form.difficultyLevelTooltip')"
+          tooltipPosition="right"
+        ></i>
+      </div>
     </div>
-    <div class="flex flex-col gap-1.5 flex-1">
-      <p-floatlabel variant="on" class="block">
-        <input pInputText id="sheet-copyright" formControlName="copyright" />
-        <label for="sheet-copyright">{{ 'sheets.form.copyright' | translate }}</label>
-      </p-floatlabel>
-    </div>
-  </div>
-
-  <div class="flex flex-col gap-1.5">
-    <label class="text-sm font-medium text-[var(--sam-text-muted)]">{{ 'sheets.form.duration' | translate }}</label>
-    <div class="flex items-center gap-2">
-      <p-floatlabel variant="on" class="block" style="width: 7rem">
-        <p-inputnumber
-          inputId="sheet-duration-min"
-          formControlName="durationMinutes"
-          [min]="0"
-          [useGrouping]="false"
-          styleClass="w-full"
-        />
-        <label for="sheet-duration-min">{{ 'sheets.form.durationMinutes' | translate }}</label>
-      </p-floatlabel>
-      <span class="text-[var(--sam-text-muted)] font-mono">:</span>
-      <p-floatlabel variant="on" class="block" style="width: 7rem">
-        <p-inputnumber
-          inputId="sheet-duration-sec"
-          formControlName="durationSeconds"
-          [min]="0"
-          [max]="59"
-          [useGrouping]="false"
-          styleClass="w-full"
-        />
-        <label for="sheet-duration-sec">{{ 'sheets.form.durationSeconds' | translate }}</label>
-      </p-floatlabel>
+    <div class="flex flex-col gap-1.5 flex-1 min-w-0">
+      <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+        <p-floatlabel variant="on" class="block">
+          <input pInputText id="sheet-copyright" formControlName="copyright" class="w-full" />
+          <label for="sheet-copyright">{{ 'sheets.form.copyright' | translate }}</label>
+        </p-floatlabel>
+      </div>
     </div>
   </div>
 
+  <!-- Duration (half-width) / empty right -->
+  <div class="flex gap-4">
+    <div class="flex flex-col gap-1.5 flex-1 min-w-0">
+      <div class="grid items-center gap-2 [grid-template-columns:1fr_0.5rem_1fr_2rem]">
+        <p-floatlabel variant="on" class="block">
+          <p-inputnumber
+            inputId="sheet-duration-min"
+            formControlName="durationMinutes"
+            [min]="0"
+            [useGrouping]="false"
+            styleClass="w-full"
+            inputStyleClass="w-full"
+          />
+          <label for="sheet-duration-min">{{ 'sheets.form.durationMinutes' | translate }}</label>
+        </p-floatlabel>
+        <span class="text-center text-[var(--sam-text-muted)] font-mono text-sm">:</span>
+        <p-floatlabel variant="on" class="block">
+          <p-inputnumber
+            inputId="sheet-duration-sec"
+            formControlName="durationSeconds"
+            [min]="0"
+            [max]="59"
+            [useGrouping]="false"
+            styleClass="w-full"
+            inputStyleClass="w-full"
+          />
+          <label for="sheet-duration-sec">{{ 'sheets.form.durationSeconds' | translate }}</label>
+        </p-floatlabel>
+      </div>
+    </div>
+    <div class="flex-1 min-w-0"></div>
+  </div>
+
+  <!-- Tags (full-width) -->
   <div class="flex flex-col gap-1.5">
-    <div class="flex items-center gap-2">
-      <p-floatlabel variant="on" class="flex-1 min-w-0 block">
+    <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+      <p-floatlabel variant="on" class="block">
         <p-autocomplete
           inputId="sheet-tags"
           formControlName="tags"
@@ -194,28 +232,34 @@
           [addOnBlur]="true"
           [addOnTab]="true"
           separator=","
+          styleClass="w-full"
+            inputStyleClass="w-full"
         />
         <label for="sheet-tags">{{ 'sheets.form.tags' | translate }}</label>
       </p-floatlabel>
       <i
-        class="pi pi-info-circle text-xs text-[var(--sam-text-muted)] cursor-help shrink-0 transition-colors hover:text-[var(--sam-text-secondary)]"
+        class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
         [pTooltip]="t.t('sheets.form.tagsTooltip')"
         tooltipPosition="right"
       ></i>
     </div>
   </div>
 
+  <!-- Additional Notes -->
   <div class="flex flex-col gap-1.5">
-    <p-floatlabel variant="on" class="block">
-      <textarea
-        pTextarea
-        id="sheet-notes"
-        formControlName="additionalNotes"
-        [rows]="3"
-        [autoResize]="true"
-      ></textarea>
-      <label for="sheet-notes">{{ 'sheets.form.additionalNotes' | translate }}</label>
-    </p-floatlabel>
+    <div class="grid items-start gap-2 [grid-template-columns:1fr_2rem]">
+      <p-floatlabel variant="on" class="block">
+        <textarea
+          pTextarea
+          id="sheet-notes"
+          formControlName="additionalNotes"
+          class="w-full"
+          [rows]="3"
+          [autoResize]="true"
+        ></textarea>
+        <label for="sheet-notes">{{ 'sheets.form.additionalNotes' | translate }}</label>
+      </p-floatlabel>
+    </div>
   </div>
 
   <div class="flex justify-end gap-2 pt-2">
