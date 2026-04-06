@@ -56,6 +56,8 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
     yearOfComposition: new FormControl<number | null>(null),
     publisher: new FormControl('', { nonNullable: true }),
     difficultyLevel: new FormControl<number | null>(null),
+    durationMinutes: new FormControl<number | null>(null),
+    durationSeconds: new FormControl<number | null>(null),
     edition: new FormControl('', { nonNullable: true }),
     copyright: new FormControl('', { nonNullable: true }),
     additionalNotes: new FormControl('', { nonNullable: true }),
@@ -71,6 +73,7 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
   }
 
   patchFormValues(s: SheetMusic): void {
+    const { minutes, seconds } = parseDuration(s.duration as unknown as string | undefined);
     this.form.patchValue({
       title: s.title,
       subtitle: s.subtitle ?? '',
@@ -81,6 +84,8 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
       yearOfComposition: s.yearOfComposition ?? null,
       publisher: s.publisher ?? '',
       difficultyLevel: s.difficultyLevel ?? null,
+      durationMinutes: minutes,
+      durationSeconds: seconds,
       edition: s.edition ?? '',
       copyright: s.copyright ?? '',
       additionalNotes: s.additionalNotes ?? '',
@@ -124,6 +129,7 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
       yearOfComposition: raw.yearOfComposition ?? undefined,
       publisher: raw.publisher,
       difficultyLevel: raw.difficultyLevel ?? undefined,
+      duration: buildDuration(raw.durationMinutes, raw.durationSeconds) as unknown as never,
       edition: raw.edition,
       copyright: raw.copyright,
       additionalNotes: raw.additionalNotes,
@@ -136,4 +142,22 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
         )
       : this.api.create(payload);
   }
+}
+
+function parseDuration(iso: string | undefined): { minutes: number | null; seconds: number | null } {
+  if (!iso) return { minutes: null, seconds: null };
+  const match = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?/);
+  if (!match) return { minutes: null, seconds: null };
+  const h = parseInt(match[1] ?? '0', 10);
+  const m = parseInt(match[2] ?? '0', 10);
+  const s = Math.round(parseFloat(match[3] ?? '0'));
+  return { minutes: h * 60 + m, seconds: s };
+}
+
+function buildDuration(minutes: number | null, seconds: number | null): string | undefined {
+  const totalSeconds = (minutes ?? 0) * 60 + (seconds ?? 0);
+  if (totalSeconds <= 0) return undefined;
+  const m = Math.floor(totalSeconds / 60);
+  const s = totalSeconds % 60;
+  return s > 0 ? `PT${m}M${s}S` : `PT${m}M`;
 }

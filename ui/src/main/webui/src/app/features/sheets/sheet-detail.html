@@ -137,6 +137,12 @@
                     <span class="detail-value">{{ 'sheets.difficultyLevels.' + difficultyLevelKey(s.difficultyLevel) | translate }}</span>
                   </div>
                 }
+                @if (s.duration) {
+                  <div class="meta-entry">
+                    <span class="detail-label">{{ 'sheets.detail.duration' | translate }}</span>
+                    <span class="detail-value">{{ formatDuration(s.duration) }}</span>
+                  </div>
+                }
                 @if (s.tags && s.tags.length > 0) {
                   <div class="meta-entry full-width">
                     <span class="detail-label">{{ 'sheets.detail.tags' | translate }}</span>
@@ -361,6 +367,38 @@
               <ng-template #expandedrow let-instr>
                 <tr class="expansion-row">
                   <td colspan="5" class="expansion-cell">
+                    <div class="instr-meta-row">
+                      @if (instr.clef) {
+                        <span class="instr-meta-item">
+                          <span class="detail-label">{{ 'sheets.instrumentations.columns.clef' | translate }}:</span>
+                          <span>{{ 'sheets.clef.' + instr.clef | translate }}</span>
+                        </span>
+                      }
+                      @if (instr.notationType) {
+                        <span class="instr-meta-item">
+                          <span class="detail-label">{{ 'sheets.instrumentations.form.notationType' | translate }}:</span>
+                          <span>{{ 'sheets.notationType.' + instr.notationType | translate }}</span>
+                        </span>
+                      }
+                      @if (instr.physicalCondition) {
+                        <span class="instr-meta-item">
+                          <span class="detail-label">{{ 'sheets.instrumentations.form.physicalCondition' | translate }}:</span>
+                          <span>{{ 'sheets.instrumentations.physicalCondition.' + instr.physicalCondition | translate }}</span>
+                        </span>
+                      }
+                      @if (instr.physicalLocation) {
+                        <span class="instr-meta-item">
+                          <span class="detail-label">{{ 'sheets.instrumentations.form.physicalLocation' | translate }}:</span>
+                          <span>{{ instr.physicalLocation }}</span>
+                        </span>
+                      }
+                      @if (instr.notes) {
+                        <span class="instr-meta-item">
+                          <span class="detail-label">{{ 'sheets.instrumentations.form.notes' | translate }}:</span>
+                          <span>{{ instr.notes }}</span>
+                        </span>
+                      }
+                    </div>
                     <app-instrumentation-documents
                       [sheetId]="sheetId"
                       [instrumentation]="instr"
@@ -534,6 +572,12 @@
               <div class="meta-entry">
                 <span class="detail-label">{{ 'sheets.detail.difficulty' | translate }}</span>
                 <span class="detail-value">{{ 'sheets.difficultyLevels.' + difficultyLevelKey(s.difficultyLevel) | translate }}</span>
+              </div>
+            }
+            @if (s.duration) {
+              <div class="meta-entry">
+                <span class="detail-label">{{ 'sheets.detail.duration' | translate }}</span>
+                <span class="detail-value">{{ formatDuration(s.duration) }}</span>
               </div>
             }
             @if (s.tags && s.tags.length > 0) {
@@ -713,6 +757,32 @@
           <ng-template #expandedrow let-instr>
             <tr class="expansion-row">
               <td colspan="7" class="expansion-cell">
+                <div class="instr-meta-row">
+                  @if (instr.notationType) {
+                    <span class="instr-meta-item">
+                      <span class="detail-label">{{ 'sheets.instrumentations.form.notationType' | translate }}:</span>
+                      <span>{{ 'sheets.notationType.' + instr.notationType | translate }}</span>
+                    </span>
+                  }
+                  @if (instr.physicalCondition) {
+                    <span class="instr-meta-item">
+                      <span class="detail-label">{{ 'sheets.instrumentations.form.physicalCondition' | translate }}:</span>
+                      <span>{{ 'sheets.instrumentations.physicalCondition.' + instr.physicalCondition | translate }}</span>
+                    </span>
+                  }
+                  @if (instr.physicalLocation) {
+                    <span class="instr-meta-item">
+                      <span class="detail-label">{{ 'sheets.instrumentations.form.physicalLocation' | translate }}:</span>
+                      <span>{{ instr.physicalLocation }}</span>
+                    </span>
+                  }
+                  @if (instr.notes) {
+                    <span class="instr-meta-item">
+                      <span class="detail-label">{{ 'sheets.instrumentations.form.notes' | translate }}:</span>
+                      <span>{{ instr.notes }}</span>
+                    </span>
+                  }
+                </div>
                 <app-instrumentation-documents
                   [sheetId]="sheetId"
                   [instrumentation]="instr"

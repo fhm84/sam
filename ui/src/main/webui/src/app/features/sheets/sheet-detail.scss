@@ -85,6 +85,28 @@
   padding: 0 !important;
 }
 
+// ─── Instrumentation metadata row ─────────────────────────────────────────────
+
+.instr-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+  padding: 0.5rem 0.75rem 0.25rem;
+  font-size: 0.8125rem;
+}
+
+.instr-meta-item {
+  display: flex;
+  gap: 0.3rem;
+  color: var(--sam-text);
+
+  .detail-label {
+    color: var(--sam-text-muted);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+}
+
 // ─── Coverage panel ───────────────────────────────────────────────────────────
 
 .coverage-summary {

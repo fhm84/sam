@@ -418,6 +418,20 @@ export class SheetDetail extends DocumentHandler implements OnChanges {
     this.triggerBatchDownload('MERGED_PDF');
   }
 
+  protected formatDuration(iso: unknown): string {
+    if (!iso || typeof iso !== 'string') return '';
+    // Parse ISO 8601 duration string like "PT1H3M30S" or "PT3M30S"
+    const match = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?/);
+    if (!match) return iso;
+    const h = parseInt(match[1] ?? '0', 10);
+    const m = parseInt(match[2] ?? '0', 10);
+    const s = Math.round(parseFloat(match[3] ?? '0'));
+    if (h > 0) {
+      return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+    return `${m}:${String(s).padStart(2, '0')}`;
+  }
+
   private sanitizeFilename(title: string): string {
     return title
       .replace(/[/\\:*?"<>|]/g, '')

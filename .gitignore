@@ -48,3 +48,4 @@ nb-configuration.xml
 .claude/
 /server/uploads/
 /migration/src/migration-data/
+/.playwright-mcp/
