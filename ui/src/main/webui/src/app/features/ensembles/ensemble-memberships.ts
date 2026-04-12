@@ -12,11 +12,13 @@ import { Tooltip } from 'primeng/tooltip';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
 import { InputText } from 'primeng/inputtext';
+import { FloatLabel } from 'primeng/floatlabel';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../core/translation.service';
 import { EnsemblesApiService, InstrumentsApiService, MusiciansApiService } from '../../core/api';
 import { CreateEnsembleMembership, EnsembleMembership, EnsembleVoice, Instrument, Musician } from '../../model/datamodels';
 import { FETCH_ALL_SIZE } from '../../shared/constants';
+import { instrumentLabel } from '../../shared/utils/format.utils';
 
 @Component({
   selector: 'app-ensemble-memberships',
@@ -33,6 +35,7 @@ import { FETCH_ALL_SIZE } from '../../shared/constants';
     IconField,
     InputIcon,
     InputText,
+    FloatLabel,
     TranslatePipe,
   ],
   providers: [ConfirmationService],
@@ -56,7 +59,7 @@ export class EnsembleMemberships implements OnChanges, OnInit {
   protected readonly voices = signal<EnsembleVoice[]>([]);
   private readonly allMusicians = signal<Musician[]>([]);
   protected readonly filteredMusicians = signal<Musician[]>([]);
-  protected readonly allInstruments = signal<Instrument[]>([]);
+  protected readonly instrumentOptions = signal<{ label: string; value: string }[]>([]);
 
   // ── Voice options for Select ──────────────────────────
   protected voiceOptions: { label: string; value: string | null }[] = [];
@@ -89,7 +92,9 @@ export class EnsembleMemberships implements OnChanges, OnInit {
       this.filteredMusicians.set(musicians);
     });
     this.instrumentsApi.find({ size: FETCH_ALL_SIZE }).subscribe((res) => {
-      this.allInstruments.set(res.data ?? []);
+      this.instrumentOptions.set(
+        (res.data ?? []).map((i: Instrument) => ({ label: instrumentLabel(i), value: i.id! })),
+      );
     });
   }
 
@@ -246,7 +251,7 @@ export class EnsembleMemberships implements OnChanges, OnInit {
   // ── Helpers ───────────────────────────────────────────
   protected instrumentName(id: string | undefined): string {
     if (!id) return '—';
-    return this.allInstruments().find((i) => i.id === id)?.name ?? id;
+    return this.instrumentOptions().find((o) => o.value === id)?.label ?? id;
   }
 
   private loadMembers(): void {

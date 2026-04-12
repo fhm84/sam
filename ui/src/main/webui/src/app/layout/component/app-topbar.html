@@ -51,11 +51,14 @@
 
     <!-- User menu -->
     <button
-      class="layout-topbar-action"
+      class="layout-topbar-action user-menu-btn"
       (click)="userMenu.toggle($event)"
       [attr.aria-label]="'aria.openUserMenu' | translate"
     >
       <i class="pi pi-user"></i>
+      @if (auth.displayName()) {
+        <span class="user-display-name">{{ auth.displayName() }}</span>
+      }
     </button>
     <p-menu #userMenu [model]="userMenuItems()" [popup]="true" appendTo="body" />
   </div>

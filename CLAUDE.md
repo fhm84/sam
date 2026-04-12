@@ -69,6 +69,7 @@ Six Maven modules under parent `de.halbmann:sam`:
 
 - **OIDC provider**: Keycloak 26 (`docker-compose.keycloak.yml`). Realm export at `keycloak/sam-realm.json`.
 - **Dev Keycloak**: `docker compose -f docker-compose.keycloak.yml up` — runs on port 8180, auto-imports realm.
+- **Angular OIDC config**: `ui/src/main/webui/public/oidc-config.json` — loaded at runtime by the Angular app (not baked into the build). Committed with dev defaults (`localhost:8180`). Override this file per deployment (CI, Docker, etc.) without rebuilding. Fields: `issuerUrl`, `clientId`.
 - **Realm roles**: `admin`, `music_librarian`. Groups use `ensemble:{UUID}` naming for per-ensemble access.
 - **Auth enforcement**: `@Authenticated` at class level on all `*ResourceImpl` classes (all endpoints require a token). Write methods additionally carry `@RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})`. Role constants are in `server/src/main/java/de/halbmann/sam/security/Roles.java`.
 - **Do NOT put `@RolesAllowed` on the `api` module interfaces** — they are also used as REST clients by the `cli` module.

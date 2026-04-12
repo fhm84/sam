@@ -8,6 +8,7 @@ import { LayoutService, MenuMode } from '../service/layout.service';
 import { ThemeService } from '../../core/theme.service';
 import { TranslationService } from '../../core/translation.service';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { AuthService } from '../../core/auth/auth.service';
 
 @Component({
   selector: 'app-topbar',
@@ -19,6 +20,7 @@ export class AppTopbar {
   protected readonly layoutService = inject(LayoutService);
   protected readonly theme = inject(ThemeService);
   protected readonly i18n = inject(TranslationService);
+  protected readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
   private readonly routeMap: Record<string, string[]> = {
@@ -68,7 +70,7 @@ export class AppTopbar {
         command: () => this.router.navigate(['/user/preferences']),
       },
       { separator: true },
-      { label: this.i18n.t('nav.logout'), icon: 'pi pi-sign-out', command: () => {} },
+      { label: this.i18n.t('nav.logout'), icon: 'pi pi-sign-out', command: () => this.auth.logout() },
     ];
   });
 }

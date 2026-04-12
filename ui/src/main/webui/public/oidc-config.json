@@ -1,0 +1,4 @@
+{
+  "issuerUrl": "http://localhost:8180/realms/sam",
+  "clientId": "sam-ui"
+}
