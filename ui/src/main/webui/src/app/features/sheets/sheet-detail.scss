@@ -1,6 +1,3 @@
-@use 'pages';
-@use 'details';
-
 // ─── Enrich prompt — color-mix() cannot be Tailwind ──────────────────────────
 
 .enrich-prompt {
@@ -31,17 +28,12 @@
   display: contents;
 }
 
-// ─── Empty message — override shared partial's 2rem padding for tighter table context
-.empty-message {
-  padding: 1.5rem !important;
-}
-
 // ─── Full-page mode — :host(.mode-*) cannot be in template ───────────────────
 
 :host(.mode-full) {
   display: block;
 
-  .detail-header h2 {
+  h2 {
     font-size: 1.5rem;
   }
 
@@ -303,4 +295,33 @@
   font-size: 0.9375rem;
   cursor: pointer;
   flex: 1;
+}
+
+// ─── Drop zone — :hover and JS .drop-zone-active state ───────────────────────
+
+.drop-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding: 1.5rem;
+  border: 2px dashed var(--p-surface-300);
+  border-radius: 8px;
+  color: var(--sam-text-muted);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+
+  .pi-cloud-upload {
+    font-size: 1.5rem;
+  }
+
+  &:hover,
+  &.drop-zone-active {
+    border-color: var(--p-primary-color);
+    color: var(--p-primary-color);
+    background: var(--p-primary-50);
+  }
 }

@@ -32,10 +32,7 @@
             "styles": [
               "src/tailwind.css",
               "src/styles.scss"
-            ],
-            "stylePreprocessorOptions": {
-              "includePaths": ["src/app/shared/styles"]
-            }
+            ]
           },
           "configurations": {
             "production": {

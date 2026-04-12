@@ -608,6 +608,40 @@
         "save": "Speichern",
         "cancel": "Abbrechen"
       }
+    },
+    "members": {
+      "title": "Mitglieder",
+      "new": "Mitglied hinzufügen",
+      "edit": "Mitglied bearbeiten",
+      "conductorLabel": "Dirigent",
+      "columns": {
+        "musician": "Musiker",
+        "voice": "Stimme",
+        "instrument": "Instrument",
+        "conductor": "Dirigent",
+        "actions": "Aktionen"
+      },
+      "form": {
+        "musician": "Musiker",
+        "musicianPlaceholder": "Musiker suchen…",
+        "noResults": "Keine Musiker gefunden",
+        "voice": "Stimme",
+        "instrument": "Instrument",
+        "conductor": "Dirigent"
+      },
+      "delete": {
+        "confirm": "Möchten Sie \"{name}\" wirklich aus diesem Ensemble entfernen?",
+        "header": "Entfernen bestätigen"
+      },
+      "messages": {
+        "created": "Mitglied erfolgreich hinzugefügt",
+        "updated": "Mitglied erfolgreich aktualisiert",
+        "deleted": "Mitglied erfolgreich entfernt"
+      },
+      "musician": {
+        "createWithName": "Musiker \"{name}\" erstellen"
+      },
+      "empty": "Noch keine Mitglieder"
     }
   },
   "instruments": {
@@ -668,6 +702,8 @@
     }
   },
   "common": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
     "edit": "Bearbeiten",
     "delete": "Löschen",
     "remove": "Entfernen",

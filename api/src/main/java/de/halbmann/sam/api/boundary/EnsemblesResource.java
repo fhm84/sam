@@ -70,6 +70,15 @@ public interface EnsemblesResource {
     EnsembleVoicesResource voices(final @PathParam("ensembleId") String ensembleId);
 
     /**
+     * Provides access to the members sub-resource for a specific ensemble.
+     *
+     * @param ensembleId the ID of the ensemble
+     * @return the members resource
+     */
+    @Path("{ensembleId}/members")
+    EnsembleMembershipsResource members(final @PathParam("ensembleId") String ensembleId);
+
+    /**
      * Precomputes coverage for all sheets against the given ensemble and stores the results as a
      * snapshot. Subsequent calls overwrite the existing snapshot.
      *

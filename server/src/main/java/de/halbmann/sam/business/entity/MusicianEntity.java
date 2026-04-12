@@ -1,6 +1,7 @@
 package de.halbmann.sam.business.entity;
 
 import jakarta.persistence.Cacheable;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -37,4 +38,11 @@ public class MusicianEntity extends AbstractEntity {
      * Interested Party Information (IPI)-Nummer
      */
     String ipi;
+
+    /**
+     * OIDC subject claim linking this musician to an authenticated user account.
+     * Null for external/historical musicians (composers, arrangers) with no system login.
+     */
+    @Column(unique = true)
+    String userId;
 }

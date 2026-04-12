@@ -1,0 +1,90 @@
+{
+  "realm": "sam",
+  "enabled": true,
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+
+  "roles": {
+    "realm": [
+      { "name": "admin",          "description": "Full administrative access" },
+      { "name": "music_librarian","description": "Can manage sheet music, instruments, musicians, ensembles" }
+    ]
+  },
+
+  "clients": [
+    {
+      "clientId": "sam-ui",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "redirectUris": [
+        "http://localhost:4200/*",
+        "http://localhost:8080/*"
+      ],
+      "webOrigins": [
+        "http://localhost:4200",
+        "http://localhost:8080"
+      ],
+      "protocolMappers": [
+        {
+          "name": "groups",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-group-membership-mapper",
+          "consentRequired": false,
+          "config": {
+            "full.path": "false",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "groups",
+            "userinfo.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ],
+
+  "groups": [
+    {
+      "name": "ensemble:00000000-0000-0000-0000-000000000001",
+      "path": "/ensemble:00000000-0000-0000-0000-000000000001"
+    }
+  ],
+
+  "users": [
+    {
+      "username": "admin1",
+      "email": "admin1@sam.local",
+      "firstName": "Admin",
+      "lastName": "One",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [{ "type": "password", "value": "admin1", "temporary": false }],
+      "realmRoles": ["admin"]
+    },
+    {
+      "username": "librarian1",
+      "email": "librarian1@sam.local",
+      "firstName": "Librarian",
+      "lastName": "One",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [{ "type": "password", "value": "librarian1", "temporary": false }],
+      "realmRoles": ["music_librarian"]
+    },
+    {
+      "username": "musician1",
+      "email": "musician1@sam.local",
+      "firstName": "Musician",
+      "lastName": "One",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [{ "type": "password", "value": "musician1", "temporary": false }],
+      "realmRoles": [],
+      "groups": ["/ensemble:00000000-0000-0000-0000-000000000001"]
+    }
+  ]
+}

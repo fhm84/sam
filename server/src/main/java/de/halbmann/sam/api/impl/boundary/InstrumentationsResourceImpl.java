@@ -5,6 +5,8 @@ import de.halbmann.sam.api.boundary.InstrumentationsResource;
 import de.halbmann.sam.api.entity.CreateInstrumentation;
 import de.halbmann.sam.api.entity.Instrumentation;
 import de.halbmann.sam.business.controller.InstrumentationService;
+import io.quarkus.security.Authenticated;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.PathParam;
@@ -12,6 +14,7 @@ import jakarta.ws.rs.container.ResourceContext;
 import jakarta.ws.rs.core.Context;
 import java.util.List;
 
+@Authenticated
 @RequestScoped
 public class InstrumentationsResourceImpl implements InstrumentationsResource {
 
@@ -35,21 +38,25 @@ public class InstrumentationsResourceImpl implements InstrumentationsResource {
     }
 
     @Override
+    @RolesAllowed({"music_librarian", "admin"})
     public void add(final CreateInstrumentation instrumentation) {
         instrumentationService.addInstrumentation(sheetId, instrumentation);
     }
 
     @Override
+    @RolesAllowed({"music_librarian", "admin"})
     public void add(List<CreateInstrumentation> instrumentations) {
         instrumentationService.addInstrumentations(sheetId, instrumentations);
     }
 
     @Override
+    @RolesAllowed({"music_librarian", "admin"})
     public void update(final String instrumentationId, final Instrumentation instrumentation) {
         instrumentationService.updateInstrumentation(instrumentationId, instrumentation);
     }
 
     @Override
+    @RolesAllowed({"music_librarian", "admin"})
     public void delete(final String instrumentationId) {
         instrumentationService.deleteInstrumentation(instrumentationId);
     }

@@ -608,6 +608,40 @@
         "save": "Save",
         "cancel": "Cancel"
       }
+    },
+    "members": {
+      "title": "Members",
+      "new": "Add member",
+      "edit": "Edit member",
+      "conductorLabel": "Conductor",
+      "columns": {
+        "musician": "Musician",
+        "voice": "Voice",
+        "instrument": "Instrument",
+        "conductor": "Conductor",
+        "actions": "Actions"
+      },
+      "form": {
+        "musician": "Musician",
+        "musicianPlaceholder": "Search musicians…",
+        "noResults": "No musicians found",
+        "voice": "Voice",
+        "instrument": "Instrument",
+        "conductor": "Conductor"
+      },
+      "delete": {
+        "confirm": "Are you sure you want to remove \"{name}\" from this ensemble?",
+        "header": "Confirm removal"
+      },
+      "messages": {
+        "created": "Member added successfully",
+        "updated": "Member updated successfully",
+        "deleted": "Member removed successfully"
+      },
+      "musician": {
+        "createWithName": "Create musician \"{name}\""
+      },
+      "empty": "No members yet"
     }
   },
   "instruments": {
@@ -668,6 +702,8 @@
     }
   },
   "common": {
+    "save": "Save",
+    "cancel": "Cancel",
     "edit": "Edit",
     "delete": "Delete",
     "remove": "Remove",

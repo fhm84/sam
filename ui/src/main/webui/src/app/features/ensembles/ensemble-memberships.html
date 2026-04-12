@@ -1,0 +1,262 @@
+<!-- ── Members table ─────────────────────────────────────── -->
+<div class="flex flex-col gap-3">
+  <div class="flex items-center justify-between">
+    <h3 class="m-0 text-lg font-semibold text-[var(--sam-text)]">{{ 'ensembles.members.title' | translate }}</h3>
+    <p-button
+      [label]="t.t('ensembles.members.new')"
+      icon="pi pi-plus"
+      size="small"
+      (onClick)="openAdd()"
+    />
+  </div>
+
+  <p-table [value]="members()" [loading]="loading()">
+    <ng-template #header>
+      <tr>
+        <th>{{ 'ensembles.members.columns.musician' | translate }}</th>
+        <th>{{ 'ensembles.members.columns.voice' | translate }}</th>
+        <th>{{ 'ensembles.members.columns.instrument' | translate }}</th>
+        <th>{{ 'ensembles.members.columns.conductor' | translate }}</th>
+        <th>{{ 'ensembles.members.columns.actions' | translate }}</th>
+      </tr>
+    </ng-template>
+
+    <ng-template #body let-member>
+      <tr>
+        <td class="font-medium">{{ member.musician.name }}</td>
+        <td class="text-[var(--sam-text-secondary)]">{{ member.voiceLabel ?? '—' }}</td>
+        <td class="text-[var(--sam-text-secondary)]">{{ member.instrumentName ?? '—' }}</td>
+        <td>
+          @if (member.conductor) {
+            <p-tag severity="info" [value]="t.t('ensembles.members.conductorLabel')" icon="pi pi-star" />
+          }
+        </td>
+        <td class="flex gap-1">
+          <p-button
+            icon="pi pi-pencil"
+            [rounded]="true"
+            [text]="true"
+            size="small"
+            [pTooltip]="'ensembles.members.edit' | translate"
+            tooltipPosition="top"
+            (onClick)="openEdit(member)"
+          />
+          <p-button
+            icon="pi pi-trash"
+            [rounded]="true"
+            [text]="true"
+            size="small"
+            severity="danger"
+            [pTooltip]="'common.delete' | translate"
+            tooltipPosition="top"
+            (onClick)="confirmDelete(member)"
+          />
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="5" class="text-center text-[var(--sam-text-muted)] !p-6">
+          {{ 'ensembles.members.empty' | translate }}
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<!-- ── Add dialog ──────────────────────────────────────── -->
+<p-dialog
+  [header]="t.t('ensembles.members.new')"
+  [(visible)]="addDialogVisible"
+  [modal]="true"
+  [style]="{ width: '44rem', 'min-height': '28rem' }"
+  [breakpoints]="{ '768px': '95vw' }"
+>
+  @if (addDialogVisible) {
+    <form [formGroup]="addForm" (ngSubmit)="onAdd()" class="flex flex-col gap-4">
+
+      <!-- Selected musician indicator + other fields (shown once musician chosen) -->
+      @if (selectedMusician) {
+        <div class="flex flex-col gap-4 p-3 rounded border border-[var(--sam-border)] bg-[var(--sam-surface-raised,var(--sam-surface))]">
+          <div class="flex flex-col gap-0.5">
+            <span class="text-xs font-medium uppercase tracking-wide text-[var(--sam-text-secondary)]">
+              {{ 'ensembles.members.form.musician' | translate }}
+            </span>
+            <span class="font-medium text-[var(--sam-text)]">{{ selectedMusician.name }}</span>
+          </div>
+
+          <div class="flex flex-wrap gap-4">
+            <p-floatlabel variant="on" class="flex-1 min-w-40 block">
+              <p-select
+                inputId="add-voice"
+                formControlName="voiceId"
+                [options]="voiceOptions"
+                optionLabel="label"
+                optionValue="value"
+                styleClass="w-full"
+                appendTo="body"
+              />
+              <label for="add-voice">{{ 'ensembles.members.form.voice' | translate }}</label>
+            </p-floatlabel>
+
+            <p-floatlabel variant="on" class="flex-1 min-w-40 block">
+              <p-select
+                inputId="add-instrument"
+                formControlName="instrumentId"
+                [options]="allInstruments()"
+                optionLabel="name"
+                optionValue="id"
+                [filter]="true"
+                filterBy="name"
+                [showClear]="true"
+                styleClass="w-full"
+                appendTo="body"
+              />
+              <label for="add-instrument">{{ 'ensembles.members.form.instrument' | translate }}</label>
+            </p-floatlabel>
+
+            <div class="flex items-center gap-2 self-center">
+              <p-checkbox inputId="add-conductor" formControlName="conductor" [binary]="true" />
+              <label for="add-conductor">{{ 'ensembles.members.form.conductor' | translate }}</label>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Musician search + picker -->
+      <p-iconfield class="w-full">
+        <p-inputicon styleClass="pi pi-search" />
+        <input
+          pInputText
+          type="text"
+          [placeholder]="t.t('ensembles.members.form.musicianPlaceholder')"
+          (input)="onMusicianFilterInput($event)"
+        />
+      </p-iconfield>
+
+      <p-table [value]="filteredMusicians()" [rowHover]="true" styleClass="musician-select-table">
+        <ng-template #header>
+          <tr>
+            <th>{{ 'ensembles.members.columns.musician' | translate }}</th>
+          </tr>
+        </ng-template>
+
+        <ng-template #body let-musician>
+          <tr
+            class="cursor-pointer"
+            [class.bg-[var(--p-highlight-background)]]="isMusicianSelected(musician)"
+            (click)="selectMusician(musician)"
+          >
+            <td>{{ musician.name }}</td>
+          </tr>
+        </ng-template>
+
+        <ng-template #emptymessage>
+          <tr>
+            <td class="text-center text-[var(--sam-text-muted)] !p-6">
+              {{ 'ensembles.members.form.noResults' | translate }}
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+
+      @if (musicianFilterQuery().trim()) {
+        <p-button
+          [label]="t.t('ensembles.members.musician.createWithName').replace('{name}', musicianFilterQuery().trim())"
+          icon="pi pi-plus"
+          severity="secondary"
+          [loading]="creatingMusician"
+          [disabled]="creatingMusician"
+          (onClick)="createMusician()"
+          styleClass="w-full"
+        />
+      }
+    </form>
+  }
+
+  <ng-template #footer>
+    <p-button
+      [label]="t.t('common.cancel')"
+      severity="secondary"
+      [text]="true"
+      (onClick)="addDialogVisible = false"
+    />
+    <p-button
+      [label]="t.t('common.save')"
+      [disabled]="!canAdd || saving"
+      [loading]="saving"
+      (onClick)="onAdd()"
+    />
+  </ng-template>
+</p-dialog>
+
+<!-- ── Edit dialog ─────────────────────────────────────── -->
+<p-dialog
+  [header]="t.t('ensembles.members.edit')"
+  [(visible)]="editDialogVisible"
+  [modal]="true"
+  [style]="{ width: '32rem' }"
+>
+  @if (editDialogVisible && editingMember) {
+    <form [formGroup]="editForm" (ngSubmit)="onUpdate()" class="flex flex-col gap-5">
+      <div class="flex flex-col gap-0.5 p-3 rounded border border-[var(--sam-border)] bg-[var(--sam-surface-raised,var(--sam-surface))]">
+        <span class="text-xs font-medium uppercase tracking-wide text-[var(--sam-text-secondary)]">
+          {{ 'ensembles.members.form.musician' | translate }}
+        </span>
+        <span class="font-medium text-[var(--sam-text)]">{{ editingMember.musician.name }}</span>
+      </div>
+
+      <p-floatlabel variant="on" class="block">
+        <p-select
+          inputId="edit-voice"
+          formControlName="voiceId"
+          [options]="voiceOptions"
+          optionLabel="label"
+          optionValue="value"
+          styleClass="w-full"
+          appendTo="body"
+        />
+        <label for="edit-voice">{{ 'ensembles.members.form.voice' | translate }}</label>
+      </p-floatlabel>
+
+      <p-floatlabel variant="on" class="block">
+        <p-select
+          inputId="edit-instrument"
+          formControlName="instrumentId"
+          [options]="allInstruments()"
+          optionLabel="name"
+          optionValue="id"
+          [filter]="true"
+          filterBy="name"
+          [showClear]="true"
+          styleClass="w-full"
+          appendTo="body"
+        />
+        <label for="edit-instrument">{{ 'ensembles.members.form.instrument' | translate }}</label>
+      </p-floatlabel>
+
+      <div class="flex items-center gap-2">
+        <p-checkbox inputId="edit-conductor" formControlName="conductor" [binary]="true" />
+        <label for="edit-conductor">{{ 'ensembles.members.form.conductor' | translate }}</label>
+      </div>
+    </form>
+  }
+
+  <ng-template #footer>
+    <p-button
+      [label]="t.t('common.cancel')"
+      severity="secondary"
+      [text]="true"
+      (onClick)="editDialogVisible = false"
+    />
+    <p-button
+      [label]="t.t('common.save')"
+      [disabled]="saving"
+      [loading]="saving"
+      (onClick)="onUpdate()"
+    />
+  </ng-template>
+</p-dialog>
+
+<p-confirmdialog />

@@ -8,11 +8,12 @@ import { TranslationService } from '../../core/translation.service';
 import { EnsemblesApiService } from '../../core/api';
 import { Ensemble } from '../../model/datamodels';
 import { EnsembleVoices } from './ensemble-voices';
+import { EnsembleMemberships } from './ensemble-memberships';
 import { EnsembleForm } from './ensemble-form';
 
 @Component({
   selector: 'app-ensemble-detail-page',
-  imports: [EnsembleVoices, EnsembleForm, Button, Dialog, Toolbar],
+  imports: [EnsembleVoices, EnsembleMemberships, EnsembleForm, Button, Dialog, Toolbar],
   templateUrl: './ensemble-detail-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

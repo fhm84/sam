@@ -31,7 +31,7 @@ Status values: `idea` · `planned` · `in progress` · `done`
 ### Physical location & condition on instrumentations — `done`
 
 Archive location (free text) and condition (`GOOD` / `WORN` / `DAMAGED` / `LOST`) fields
-on each instrumentation. Allows the Notenwart to record where a printed part lives and
+on each instrumentation. Allows the music librarian to record where a printed part lives and
 whether it is still usable. Visible in the instrumentation table in the sheet detail view.
 
 ---
@@ -48,7 +48,7 @@ Record when a physical part (or a full set) is borrowed and by whom. Cover two s
 When a part is on loan, its status should be visible in the instrumentation table
 alongside the physical condition.
 
-**Stakeholders:** S1 (Notenwart)
+**Stakeholders:** S1 (music librarian)
 **Effort:** Medium
 
 ---
@@ -60,14 +60,14 @@ When a configurable number of instrumentations for the same piece are `DAMAGED` 
 Prevents the Dirigent from scheduling a piece whose physical parts are no longer
 usable.
 
-**Stakeholders:** S1 (Notenwart), S2 (Dirigent)
+**Stakeholders:** S1 (music librarian), S2 (Dirigent)
 **Effort:** Low–Medium
 
 ---
 
 ### QR codes on physical folders — `idea`
 
-Each instrumentation entry gets a dedicated URL. The Notenwart can generate a QR code
+Each instrumentation entry gets a dedicated URL. The music librarian can generate a QR code
 for that URL and print it as a label for the physical folder. A musician scans the
 label → SAM opens the instrumentation detail with archive location, condition, and
 attached documents.
@@ -75,7 +75,7 @@ attached documents.
 No new data model needed — just a QR generation endpoint (e.g.
 `GET /api/instrumentations/{id}/qr`) returning a PNG or SVG.
 
-**Stakeholders:** S1 (Notenwart), S3 (Musiker)
+**Stakeholders:** S1 (music librarian), S3 (Musiker)
 **Effort:** Low
 
 ---
@@ -94,7 +94,7 @@ Unlocks downstream features:
 - Input for GEMA reporting (see Section 6)
 - Basis for archive statistics (pieces never performed)
 
-**Stakeholders:** S1 (Notenwart), S2 (Dirigent)
+**Stakeholders:** S1 (music librarian), S2 (Dirigent)
 **Effort:** Medium
 
 ---
@@ -105,7 +105,7 @@ Generate a print-ready output (PDF or formatted HTML) from a setlist. Each entry
 ordered position, title, composer/arranger, duration, and optional programme notes
 (free text per setlist entry).
 
-The Dirigent writes the programme notes; the Notenwart or admin triggers the export.
+The Dirigent writes the programme notes; the music librarian or admin triggers the export.
 The output is suitable for printing as a concert booklet or sharing as a public PDF.
 
 Depends on: performance history (for date/event context), setlists (already exist).
@@ -118,20 +118,20 @@ Depends on: performance history (for date/event context), setlists (already exis
 ### Acquisition wish list — `idea`
 
 Any authenticated user can submit an acquisition request: piece title, reason, urgency.
-The Notenwart sees a queue and tracks status:
+The music librarian sees a queue and tracks status:
 
 `requested` → `approved` → `ordered` → `received` → `archived`
 
 When a piece transitions to `archived`, it links to the newly created sheet entry.
 
-**Stakeholders:** S2 (Dirigent), S3 (Musiker), S1 (Notenwart)
+**Stakeholders:** S2 (Dirigent), S3 (Musiker), S1 (music librarian)
 **Effort:** Low–Medium
 
 ---
 
 ### Part ordering pipeline — `idea`
 
-When coverage evaluation shows `INCOMPLETE`, the Dirigent or Notenwart can flag a missing
+When coverage evaluation shows `INCOMPLETE`, the Dirigent or music librarian can flag a missing
 voice as "to order." Track: which part, from which publisher, ordered on, expected
 delivery, cost, received on.
 
@@ -139,7 +139,7 @@ Can be implemented as a lightweight status on the voice-level coverage result, o
 separate procurement entity. Closes the loop between coverage gaps and physical
 acquisition.
 
-**Stakeholders:** S1 (Notenwart), S2 (Dirigent)
+**Stakeholders:** S1 (music librarian), S2 (Dirigent)
 **Effort:** Medium
 
 ---
@@ -184,20 +184,24 @@ between a collection/setlist and a sheet), which already exists.
 
 ## 3. Musician-Facing
 
-### Musician–instrument assignment within ensemble — `idea`
+### Musician–instrument assignment within ensemble — `in progress`
 
-Link a `Musician` entity to one or more ensemble voices. This enables:
+Link a `Musician` entity to an ensemble, optionally specifying which voice and instrument
+they play. Enables:
 
-- Automated part distribution lists for the Notenwart before rehearsal
-  ("Hand Trumpet 1 folder to Hans, Trumpet 2 to Maria")
+- Automated part distribution lists ("Hand Trumpet 1 folder to Hans")
 - Personal "my parts" view for an authenticated musician
-- Resolve the open design question of whether a user account links to a `Musician` entity
-  (see `stakeholders.md` Section 6.5)
+- Minimum-viable setlist (see Section 2)
 
-Data model addition: a join between `Musician` (or a future `User` entity) and
-`EnsembleVoice`.
+**Done:** `EnsembleMembership` data model (musician + ensemble + voice + instrument +
+conductor flag), REST API (`/ensembles/{id}/members`), and management UI in the ensemble
+detail page. Musicians are linked to system accounts via `userId` (OIDC subject) on the
+`Musician` entity — no separate `User` entity.
 
-**Stakeholders:** S3 (Musiker), S1 (Notenwart)
+**Remaining:** "My parts" filtered view for authenticated musicians; ensemble access
+scoped to Keycloak group membership (`ensemble:{UUID}` groups).
+
+**Stakeholders:** S3 (Musiker), S1 (music librarian)
 **Effort:** Medium–High (requires auth foundation)
 
 ---
@@ -222,13 +226,13 @@ panels, no coverage, no batch actions — just the essentials readable at arm's 
 
 ### Part distribution list — `idea`
 
-Before a rehearsal, the Notenwart generates a list: for each instrumentation of a
+Before a rehearsal, the music librarian generates a list: for each instrumentation of a
 given piece, which musician should receive which physical folder. Requires
 musician–instrument assignment (see above).
 
 Output: a simple printed checklist or PDF.
 
-**Stakeholders:** S1 (Notenwart)
+**Stakeholders:** S1 (music librarian)
 **Effort:** Low (once musician–instrument assignment exists)
 
 ---
@@ -237,7 +241,7 @@ Output: a simple printed checklist or PDF.
 
 ### Archive dashboard — `idea`
 
-A single overview page for the Notenwart and Dirigent summarising archive health:
+A single overview page for the music librarian and Dirigent summarising archive health:
 
 - Total sheets; % with at least one digital document attached
 - Condition breakdown across all instrumentations (GOOD / WORN / DAMAGED / LOST counts)
@@ -246,7 +250,7 @@ A single overview page for the Notenwart and Dirigent summarising archive health
 - Pieces never performed (candidates for review / disposal)
 - Most recently added and most recently performed pieces
 
-**Stakeholders:** S1 (Notenwart), S2 (Dirigent), S4 (Administrator)
+**Stakeholders:** S1 (music librarian), S2 (Dirigent), S4 (Administrator)
 **Effort:** Medium (aggregation queries + a new dashboard route)
 
 ---
@@ -272,7 +276,7 @@ Depends on: performance history (see Section 2).
 ### Setlist public page (guest access — minimal) — `planned`
 
 Publish a setlist as a read-only, unauthenticated page at a shareable URL. No login, no
-account. The Notenwart or Dirigent marks a collection as "shared" and shares the link
+account. The music librarian or Dirigent marks a collection as "shared" and shares the link
 (e.g. via WhatsApp group before a concert).
 
 The page shows: ordered programme, title, composer, duration. No documents, no archive
@@ -288,32 +292,40 @@ control.
 
 ---
 
-### Full role-based access control (RBAC) — `planned`
+### Full role-based access control (RBAC) — `in progress`
 
-Implement authentication and authorisation across the full application. See
-`stakeholders.md` Section 6 for the detailed role model, content visibility options, and
-authentication mechanism discussion.
+**Done (Phase 1–3):**
+- `EnsembleMembership` data model with `userId` on `Musician` for OIDC identity linking
+- Quarkus OIDC extension configured (`quarkus-oidc`); dev profile points to local Keycloak 26
+- Keycloak realm export (`keycloak/sam-realm.json`) with roles, test users, and groups claim mapper
+- `docker-compose.keycloak.yml` for local development
+- `CurrentUserService` — reads JWT subject, realm roles, and ensemble group membership (`ensemble:{UUID}` flat groups)
+- `@Authenticated` + `@RolesAllowed` enforced on all resource implementation classes; test profile uses `%test.quarkus.oidc.enabled=false` + `@TestSecurity` for auth-specific tests
 
-Planned roles: `ADMIN` · `MANAGER` · `CONDUCTOR` · `MUSICIAN` · `GUEST`
+**Roles implemented:** `admin` · `music_librarian` (Keycloak realm roles)
 
-Recommended approach: hosted OIDC provider (Auth0 or Google OAuth) + Quarkus OIDC
-extension. Content scoping: ensemble-based for musicians, collection-based for guests.
+**Remaining (Phase 4+):**
+- Frontend OIDC integration (Angular + Keycloak JS adapter or PKCE flow)
+- Role-aware UI (hide write actions for read-only users)
+- "My parts" view scoped to ensemble group membership
+- Conductor role for ensemble membership management
+- Guest / public setlist access
 
 **Stakeholders:** All
 **Effort:** High
-**Depends on:** Decision on auth provider and content visibility model
+**Auth provider chosen:** Self-hosted Keycloak 26 (`ensemble:{UUID}` groups for per-ensemble access)
 
 ---
 
 ### Shared document links — `idea`
 
 Allow a specific document (e.g. a scanned part) to be shared via a time-limited or
-permanent public URL, independently of full guest access. The Notenwart generates the
+permanent public URL, independently of full guest access. The music librarian generates the
 link; anyone with it can download the file.
 
 A lightweight alternative to full guest access for ad-hoc file sharing.
 
-**Stakeholders:** S1 (Notenwart), S3b (Guest musician)
+**Stakeholders:** S1 (music librarian), S3b (Guest musician)
 **Effort:** Low–Medium
 
 ---
@@ -331,7 +343,7 @@ distribution of licensed material.
 Implementation: PDF watermarking via Apache PDFBox (already a dependency for text
 extraction).
 
-**Stakeholders:** S1 (Notenwart), S4 (Administrator)
+**Stakeholders:** S1 (music librarian), S4 (Administrator)
 **Effort:** Medium
 **Depends on:** Shared document links or guest access
 
@@ -348,7 +360,7 @@ instrumentation table and in coverage evaluation (a lent part is temporarily una
 Can be implemented as an extension of the checkout/lending feature (Section 1) with an
 "external" flag.
 
-**Stakeholders:** S1 (Notenwart)
+**Stakeholders:** S1 (music librarian)
 **Effort:** Low (once internal lending exists)
 
 ---
@@ -380,9 +392,9 @@ Features:
 - Dry-run mode: preview what would be created without committing
 
 The CLI already supports batch import via REST, but requires technical setup. A
-UI-based importer is accessible to non-technical Notenwarte without server access.
+UI-based importer is accessible to non-technical music librariane without server access.
 
-**Stakeholders:** S1 (Notenwart), S4 (Administrator)
+**Stakeholders:** S1 (music librarian), S4 (Administrator)
 **Effort:** Medium
 
 ---
@@ -401,14 +413,14 @@ stored document files in their original format, organised by sheet / instrumenta
 This is also a trust signal for adoption: ensembles are more willing to commit to SAM
 if they know they can take their data with them.
 
-**Stakeholders:** S4 (Administrator), S1 (Notenwart)
+**Stakeholders:** S4 (Administrator), S1 (music librarian)
 **Effort:** Medium
 
 ---
 
 ### Cost tracking per acquisition — `idea`
 
-Track purchase price and supplier per sheet. Useful for the Notenwart's annual budget
+Track purchase price and supplier per sheet. Useful for the music librarian's annual budget
 report and for the Administrator to understand archive investment over time.
 
 Fields on `Sheet`: `purchasePrice` (decimal), `supplier` (string), `purchasedOn` (date).
@@ -417,7 +429,7 @@ Optionally also on the part ordering pipeline (Section 2) for tracking per-voice
 Simple addition — no new entities required. Surfaced in the archive dashboard (Section 4)
 as total spend per year or per genre.
 
-**Stakeholders:** S1 (Notenwart), S4 (Administrator)
+**Stakeholders:** S1 (music librarian), S4 (Administrator)
 **Effort:** Low
 
 ---
@@ -435,7 +447,7 @@ navigate to the existing entry.
 Prevents the archive from accumulating near-duplicate entries due to slight spelling
 differences or different edition names for the same work.
 
-**Stakeholders:** S1 (Notenwart)
+**Stakeholders:** S1 (music librarian)
 **Effort:** Low (trigram query already exists; add a pre-create check endpoint + UI warning)
 
 ---
@@ -448,7 +460,7 @@ periodic digest. Examples:
 | Event | Audience |
 |-------|----------|
 | New part uploaded for a piece you play | S3 (Musiker) |
-| Borrowed part overdue for return | S1 (Notenwart) |
+| Borrowed part overdue for return | S1 (music librarian) |
 | New sheets added to the archive this week | S2 (Dirigent), S3 |
 | Coverage dropped to INCOMPLETE after a voice change | S2 (Dirigent) |
 | Acquisition request status changed | Requester |
@@ -459,7 +471,7 @@ building a full real-time notification system.
 Requires auth (to know who to notify and how). Email delivery via a configurable SMTP
 provider; in-app notifications as a second phase.
 
-**Stakeholders:** S1 (Notenwart), S2 (Dirigent), S3 (Musiker)
+**Stakeholders:** S1 (music librarian), S2 (Dirigent), S3 (Musiker)
 **Effort:** Medium–High
 **Depends on:** Authentication
 
@@ -468,14 +480,14 @@ provider; in-app notifications as a second phase.
 ### Audit log UI — `idea`
 
 Hibernate Envers already records all changes. Expose a read-only audit log in the UI:
-per entity, show who changed what and when. Useful for the Notenwart to understand
+per entity, show who changed what and when. Useful for the music librarian to understand
 "how did this part end up as LOST?" and for the Administrator to track configuration
 changes.
 
 Note: this covers **data mutations** only. Document access is tracked separately — see
 below.
 
-**Stakeholders:** S1 (Notenwart), S4 (Administrator)
+**Stakeholders:** S1 (music librarian), S4 (Administrator)
 **Effort:** Medium (query Envers revision tables + new UI component)
 
 ---
@@ -502,7 +514,7 @@ different signal from one made by an authenticated ensemble member.
 
 **Practical value per stakeholder:**
 
-- **S1 (Notenwart):** Confirm that musicians downloaded their parts before rehearsal.
+- **S1 (music librarian):** Confirm that musicians downloaded their parts before rehearsal.
 - **S4 (Administrator):** Detect unusual access patterns (e.g. bulk downloads).
 - **Legal / rights:** Evidence of controlled distribution of copyrighted material —
   relevant for GEMA/licensing compliance.
@@ -520,7 +532,7 @@ Once named user accounts exist, this log constitutes personal data. Design requi
 > authentication — not retrofitted afterwards. A retention policy is significantly easier
 > to build in from the start than to add later.
 
-**Stakeholders:** S1 (Notenwart), S4 (Administrator), S2 (Dirigent)
+**Stakeholders:** S1 (music librarian), S4 (Administrator), S2 (Dirigent)
 **Effort:** Medium
 **Depends on:** Authentication (for meaningful `userId`); GDPR/privacy policy decision on IP address handling
 
@@ -554,7 +566,7 @@ Proposed filter dimensions:
 The filter state should be shareable as a URL so a Dirigent can bookmark a recurring
 query (e.g. "playable marches for the summer concert shortlist").
 
-**Stakeholders:** S2 (Dirigent), S1 (Notenwart)
+**Stakeholders:** S2 (Dirigent), S1 (music librarian)
 **Effort:** Medium (backend query builder + UI filter panel)
 
 ---
@@ -562,14 +574,14 @@ query (e.g. "playable marches for the summer concert shortlist").
 ### Thumbnail preview — `idea`
 
 Render the first page of an attached PDF as a thumbnail image. Shown in the sheet list
-(card view) and in the sheet detail header so the Notenwart can visually confirm they
+(card view) and in the sheet detail header so the music librarian can visually confirm they
 are looking at the right score without downloading the full file.
 
 The PDF-to-image rendering infrastructure already exists in `DocumentUtils`
 (used for AI vision classification). Thumbnails could be generated on first access and
 cached alongside the original document in the storage backend.
 
-**Stakeholders:** S1 (Notenwart), S2 (Dirigent)
+**Stakeholders:** S1 (music librarian), S2 (Dirigent)
 **Effort:** Low–Medium (reuses existing rendering; add caching + UI)
 
 ---
@@ -587,7 +599,7 @@ operation. Use cases:
 The edit applies only to fields explicitly changed — a "partial update" that leaves
 unspecified fields untouched on each selected sheet.
 
-**Stakeholders:** S1 (Notenwart), S4 (Administrator)
+**Stakeholders:** S1 (music librarian), S4 (Administrator)
 **Effort:** Medium
 
 ---
@@ -596,12 +608,12 @@ unspecified fields untouched on each selected sheet.
 
 A quick-access list of the last N sheets viewed by the current user, shown in the
 sidebar or as a dedicated widget on the home/dashboard page. Reduces friction for the
-Notenwart working on several sheets in sequence during an archiving session.
+music librarian working on several sheets in sequence during an archiving session.
 
 Can be implemented client-side (localStorage, no backend changes) as a first step, with
 server-side persistence as an optional second step once auth is in place.
 
-**Stakeholders:** S1 (Notenwart), S2 (Dirigent)
+**Stakeholders:** S1 (music librarian), S2 (Dirigent)
 **Effort:** Low
 
 ---
@@ -611,14 +623,14 @@ server-side persistence as an optional second step once auth is in place.
 These are unresolved decisions that will affect multiple features. They should be
 answered before the relevant implementation work begins.
 
-| # | Question | Affects |
-|---|----------|---------|
-| 1 | Should a `Musician` user account link to the existing `Musician` entity, or be a separate `User` entity? | Auth, musician–instrument assignment, "my parts" view |
-| 2 | How is "selected content" for guests scoped — per-sheet flag, collection-based sharing, or ensemble-based? | Guest access, setlist public page |
-| 3 | Should document-level visibility be independently configurable, or always inherited from the sheet/instrumentation? | Shared document links, guest access |
-| 4 | Is anonymous guest access (no link, open public URL) ever desirable? | Guest access scope |
-| 5 | Should coverage snapshots be invalidated automatically, or remain manual? | Coverage accuracy, performance |
-| 6 | Should lending / checkout be tracked per instrumentation or per physical copy? (Relevant if multiple copies per instrumentation are ever supported) | Lending, physical archive |
-| 7 | Which OIDC provider? Self-hosted (Keycloak) or SaaS (Auth0, Google)? | Auth implementation |
-| 8 | Should IP addresses be stored in the document access log, or omitted/anonymised? Requires GDPR/privacy policy decision. | Document access log |
-| 9 | What retention period for the document access log? (e.g. 12 months) | Document access log |
+| # | Question | Affects | Status |
+|---|----------|---------|--------|
+| 1 | Should a `Musician` user account link to the existing `Musician` entity, or be a separate `User` entity? | Auth, musician–instrument assignment, "my parts" view | **Resolved:** `userId` (OIDC subject) added to `Musician` — no separate User entity. External/historical musicians have `userId = null`. |
+| 2 | How is "selected content" for guests scoped — per-sheet flag, collection-based sharing, or ensemble-based? | Guest access, setlist public page | Open |
+| 3 | Should document-level visibility be independently configurable, or always inherited from the sheet/instrumentation? | Shared document links, guest access | Open |
+| 4 | Is anonymous guest access (no link, open public URL) ever desirable? | Guest access scope | Open |
+| 5 | Should coverage snapshots be invalidated automatically, or remain manual? | Coverage accuracy, performance | Open |
+| 6 | Should lending / checkout be tracked per instrumentation or per physical copy? (Relevant if multiple copies per instrumentation are ever supported) | Lending, physical archive | Open |
+| 7 | Which OIDC provider? Self-hosted (Keycloak) or SaaS (Auth0, Google)? | Auth implementation | **Resolved:** Self-hosted Keycloak 26. |
+| 8 | Should IP addresses be stored in the document access log, or omitted/anonymised? Requires GDPR/privacy policy decision. | Document access log | Open |
+| 9 | What retention period for the document access log? (e.g. 12 months) | Document access log | Open |

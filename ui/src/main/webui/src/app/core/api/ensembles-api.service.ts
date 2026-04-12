@@ -3,11 +3,13 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {
   CreateEnsemble,
+  CreateEnsembleMembership,
   CreateEnsembleVoice,
   CreateVoiceOption,
   Ensemble,
   EnsembleCoverageStatus,
   EnsembleFilterRequest,
+  EnsembleMembership,
   EnsembleVoice,
   PaginatedResponse,
   VoiceOption,
@@ -117,5 +119,22 @@ export class EnsemblesApiService {
     return this.http.delete<void>(
       `${this.baseUrl}/${ensembleId}/voices/${voiceId}/options/${optionId}`,
     );
+  }
+
+  // ── Members ───────────────────────────────────────────
+  listMembers(ensembleId: string): Observable<EnsembleMembership[]> {
+    return this.http.get<EnsembleMembership[]>(`${this.baseUrl}/${ensembleId}/members`);
+  }
+
+  addMember(ensembleId: string, data: CreateEnsembleMembership): Observable<EnsembleMembership> {
+    return this.http.post<EnsembleMembership>(`${this.baseUrl}/${ensembleId}/members`, data);
+  }
+
+  updateMember(ensembleId: string, memberId: string, data: EnsembleMembership): Observable<EnsembleMembership> {
+    return this.http.put<EnsembleMembership>(`${this.baseUrl}/${ensembleId}/members/${memberId}`, data);
+  }
+
+  deleteMember(ensembleId: string, memberId: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${ensembleId}/members/${memberId}`);
   }
 }

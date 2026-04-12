@@ -10,6 +10,9 @@ import de.halbmann.sam.business.controller.SheetCollectionService;
 import de.halbmann.sam.business.controller.SheetExportService;
 import de.halbmann.sam.business.controller.SheetService;
 import de.halbmann.sam.enrichment.controller.SheetEnrichmentService;
+import de.halbmann.sam.security.Roles;
+import io.quarkus.security.Authenticated;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.container.ResourceContext;
@@ -19,6 +22,7 @@ import jakarta.ws.rs.core.StreamingOutput;
 import java.util.List;
 import java.util.Set;
 
+@Authenticated
 @RequestScoped
 public class SheetsResourceImpl implements SheetsResource {
 
@@ -46,6 +50,7 @@ public class SheetsResourceImpl implements SheetsResource {
     }
 
     @Override
+    @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public SheetMusic add(final CreateSheetMusic sheetMusic) {
         return sheetService.addSheet(sheetMusic);
     }
@@ -56,21 +61,25 @@ public class SheetsResourceImpl implements SheetsResource {
     }
 
     @Override
+    @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public void update(final String sheetId, final SheetMusic sheetMusic) {
         sheetService.updateSheet(sheetId, sheetMusic);
     }
 
     @Override
+    @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public void delete(final String sheetId) {
         sheetService.deleteSheet(sheetId);
     }
 
     @Override
+    @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public void addTags(String sheetId, Set<String> newTags) {
         sheetService.addTags(sheetId, newTags);
     }
 
     @Override
+    @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public void removeTag(String sheetId, Set<String> tagsToRemove) {
         sheetService.removeTags(sheetId, tagsToRemove);
     }
@@ -111,6 +120,7 @@ public class SheetsResourceImpl implements SheetsResource {
     }
 
     @Override
+    @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public SheetEnrichment enrich(final String sheetId) {
         return sheetEnrichmentService.enrich(sheetId);
     }

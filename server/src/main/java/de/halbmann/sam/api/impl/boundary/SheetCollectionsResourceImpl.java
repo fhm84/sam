@@ -10,6 +10,9 @@ import de.halbmann.sam.business.controller.CollectionTocService;
 import de.halbmann.sam.business.controller.ExportResult;
 import de.halbmann.sam.business.controller.SheetCollectionService;
 import de.halbmann.sam.business.controller.SheetExportService;
+import de.halbmann.sam.security.Roles;
+import io.quarkus.security.Authenticated;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.container.ResourceContext;
@@ -17,6 +20,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
 
+@Authenticated
 @RequestScoped
 public class SheetCollectionsResourceImpl implements SheetCollectionsResource {
 
@@ -38,6 +42,7 @@ public class SheetCollectionsResourceImpl implements SheetCollectionsResource {
     }
 
     @Override
+    @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public SheetCollection add(final SheetCollection sheetCollection) {
         return service.add(sheetCollection);
     }
@@ -48,11 +53,13 @@ public class SheetCollectionsResourceImpl implements SheetCollectionsResource {
     }
 
     @Override
+    @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public void update(final String collectionId, final SheetCollection sheetCollection) {
         service.update(collectionId, sheetCollection);
     }
 
     @Override
+    @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public void delete(final String collectionId) {
         service.delete(collectionId);
     }

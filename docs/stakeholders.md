@@ -45,7 +45,7 @@ look in practice. It complements `architecture.md` (technical structure) and
 
 ### S1 – Archive Manager (Notenwart)
 
-The Notenwart is responsible for maintaining the ensemble's sheet music archive — both
+The Music librarian is responsible for maintaining the ensemble's sheet music archive — both
 physical (folders, cabinets) and digital. This is often a voluntary position, filled by
 someone with a strong sense of order rather than technical expertise.
 
@@ -116,7 +116,7 @@ There are two sub-variants with different access expectations:
 
 **Pain points (before SAM)**
 - Physical parts are unlabelled or misfiled
-- No way to access digital files without asking the Notenwart
+- No way to access digital files without asking the Music librarian
 - Uncertainty whether a digital version even exists
 
 **SAM features most relevant**
@@ -129,7 +129,7 @@ There are two sub-variants with different access expectations:
 ### S4 – Administrator
 
 The Administrator keeps the reference data consistent and ensures the system is correctly
-configured. This is often the same person as the Notenwart or a technically-minded
+configured. This is often the same person as the Music librarian or a technically-minded
 ensemble member.
 
 **Goals**
@@ -161,11 +161,11 @@ a partner ensemble checking what the band plays, or a musician who has not yet r
 
 **Pain points (without guest access)**
 - No way to share repertoire information without giving full system access
-- Notenwart must export PDFs or send files manually when asked
+- Music librarian must export PDFs or send files manually when asked
 
 **Constraints**
 - No write access of any kind
-- Access is limited to what an Admin/Notenwart has explicitly marked as visible
+- Access is limited to what an Admin/Music librarian has explicitly marked as visible
 - May be further restricted to specific collections, sheets, or even individual documents
 
 **SAM features most relevant**
@@ -241,18 +241,18 @@ strings for reference only.
 
 #### UC-N1: Add a new sheet to the archive
 
-**Actor:** Notenwart  
+**Actor:** Music librarian  
 **Goal:** Register a newly acquired piece so it is findable in SAM  
 **Precondition:** Physical score has been received
 
 **Main flow**
-1. Notenwart navigates to *Sheets → New sheet*.
+1. Music librarian navigates to *Sheets → New sheet*.
 2. Enters title, composer, genre, and other known metadata.
 3. Optionally uploads the score or individual parts as digital files.
 4. Saves. SAM creates the sheet and assigns a deduplication fingerprint.
 
 **Alternative — AI-assisted via upload**
-1. Notenwart uploads the PDF to the staging area (*Uploads*).
+1. Music librarian uploads the PDF to the staging area (*Uploads*).
 2. Triggers *Classify*. SAM extracts text or uses vision AI to detect metadata.
 3. Reviews the pre-filled form; adjusts if needed.
 4. Confirms *Apply*. SAM creates sheet, instrumentation, and links the document.
@@ -261,7 +261,7 @@ strings for reference only.
 
 #### UC-N2: Record physical location of a part
 
-**Actor:** Notenwart  
+**Actor:** Music librarian  
 **Goal:** Make a printed part locatable without a manual search  
 **Precondition:** Sheet and instrumentation exist in SAM
 
@@ -276,7 +276,7 @@ strings for reference only.
 
 #### UC-N3: Mark a physical copy as damaged or lost
 
-**Actor:** Notenwart  
+**Actor:** Music librarian  
 **Goal:** Record the actual state of a physical copy so others are not surprised  
 **Precondition:** Instrumentation with a recorded physical location exists
 
@@ -293,7 +293,7 @@ accordingly.
 
 #### UC-N4: Digitise a physical part
 
-**Actor:** Notenwart  
+**Actor:** Music librarian  
 **Goal:** Make a printed part available digitally for download and practice  
 **Precondition:** Physical part exists; scanner is available
 
@@ -307,7 +307,7 @@ accordingly.
 
 #### UC-N5: Find a specific part in the physical archive
 
-**Actor:** Notenwart  
+**Actor:** Music librarian  
 **Goal:** Locate a printed part without searching through all folders  
 **Precondition:** Physical location was previously recorded (UC-N2)
 
@@ -375,7 +375,7 @@ accordingly.
 
 **Actor:** Musiker  
 **Goal:** Know where the physical part is located in the archive  
-**Precondition:** Part location has been recorded by Notenwart
+**Precondition:** Part location has been recorded by Music librarian
 
 **Main flow**
 1. Searches for the piece by title.
@@ -420,7 +420,7 @@ accordingly.
 **Goal:** Download a part received via a shared link before rehearsal
 
 **Main flow** *(planned — not yet implemented)*
-1. Receives a URL from the Notenwart (e.g. via WhatsApp group).
+1. Receives a URL from the Music librarian (e.g. via WhatsApp group).
 2. Opens the link — SAM shows the sheet detail in read-only mode, no login required.
 3. Downloads their part directly.
 
@@ -502,10 +502,10 @@ accordingly.
 
 ### Flow 1 – AI-assisted archival of a new physical score
 
-This is the most complete end-to-end flow and the main workflow for the Notenwart.
+This is the most complete end-to-end flow and the main workflow for the Music librarian.
 
 ```
-Notenwart                     SAM UI                     SAM Server / LLM
+Music librarian                     SAM UI                     SAM Server / LLM
     │                            │                               │
     │── scans score to PDF ─────►│                               │
     │── uploads to staging area ►│── POST /api/documents ───────►│
@@ -601,12 +601,12 @@ deployment on a private server but does not scale to multi-user or internet-faci
 | Role | Maps to | Read access | Write access | Scope |
 |------|---------|-------------|--------------|-------|
 | `ADMIN` | S4 Administrator | Everything | Everything | Global |
-| `MANAGER` | S1 Notenwart | Everything | Sheets, instrumentations, documents | Global |
+| `MANAGER` | S1 Music librarian | Everything | Sheets, instrumentations, documents | Global |
 | `CONDUCTOR` | S2 Dirigent | Everything | Collections / setlists only | Global |
 | `MUSICIAN` | S3a Musician | Ensemble repertoire + own parts | None | Per ensemble |
 | `GUEST` | S5 Guest | Explicitly published content only | None | Per item |
 
-The `MANAGER` and `CONDUCTOR` distinction allows the Notenwart to manage the archive
+The `MANAGER` and `CONDUCTOR` distinction allows the Music librarian to manage the archive
 without accidentally restructuring ensemble definitions, and the Dirigent to plan
 concerts without touching the archive.
 
@@ -623,7 +623,7 @@ Each sheet has a `visibility` field: `PRIVATE` (default) · `INTERNAL` (authenti
 users) · `PUBLIC` (guests and unauthenticated access).
 
 - Simple to implement and understand.
-- Notenwart sets visibility per sheet when archiving.
+- Music librarian sets visibility per sheet when archiving.
 - Downside: coarse-grained — all or nothing per sheet.
 
 **Option B — Collection-based sharing**

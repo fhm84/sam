@@ -212,7 +212,7 @@ Suggests missing or complementary metadata for an **existing** sheet, based on i
 
 ## 6. Musicians
 
-A shared reference catalogue of composers, arrangers, and other creative contributors.
+A shared reference catalogue of composers, arrangers, and ensemble members.
 
 ### Metadata fields
 
@@ -222,12 +222,14 @@ A shared reference catalogue of composers, arrangers, and other creative contrib
 | IPI | String | Interested Party Information code (9-digit rights holder ID) |
 | Birth year | Integer | |
 | Death year | Integer | |
+| User ID | String | OIDC subject claim — links this musician to a system user account. Null for external/historical musicians with no login. |
 
 ### Actions
 
 - **Create / edit / delete** via a dialog.
 - Paginated list with search by name.
 - Referenced from sheets as composer / arranger.
+- Can be assigned to ensembles as members (see Section 9).
 
 ---
 
@@ -343,6 +345,23 @@ The algorithm:
 
 `POST /ensembles/{id}/coverage/compute` precomputes coverage for all sheets and stores the results as **snapshots**. Snapshots are displayed as colour-coded badges in the sheets list without re-evaluating on each page load. Snapshots must be manually recomputed — there is no automatic invalidation on sheet changes.
 
+### Ensemble members
+
+Each ensemble has a **membership roster** — the list of musicians who play in it.
+
+`GET /ensembles/{id}/members` · `POST /ensembles/{id}/members` · `PUT /ensembles/{id}/members/{memberId}` · `DELETE /ensembles/{id}/members/{memberId}`
+
+| Field | Type | Notes |
+|-------|------|-------|
+| Musician | Musician reference | Required |
+| Voice | EnsembleVoice reference | Optional — which voice/part the musician fills |
+| Instrument | Instrument reference | Optional — instrument played in this ensemble |
+| Conductor | Boolean | Marks the ensemble conductor |
+
+A musician may appear multiple times in the same ensemble (once per voice, for players who double on multiple parts). The `voice_id IS NULL` case is unique per musician per ensemble (prevents duplicate conductor entries). Each member can be linked to a Musician entity that has a `userId` (OIDC subject), enabling future musician-facing features like "my parts" views.
+
+When the musician search filter contains text that matches no existing musician, the Add Member dialog shows a **"Create musician '…'"** button. Clicking it calls `POST /musicians` with the typed name, appends the new musician to the local list, auto-selects them, and shows a success toast — no page navigation required.
+
 ---
 
 ## 10. Search & Discovery
@@ -420,3 +439,8 @@ All endpoints are under the `/api` base path.
 | Ensembles | `/api/ensembles` | Including `/coverage/compute`, `/coverage/status` |
 | Ensemble voices | `/api/ensembles/{id}/voices` | Sub-resource |
 | Voice options | `/api/ensembles/{id}/voices/{vid}/options` | Sub-resource |
+| Ensemble members | `/api/ensembles/{id}/members` | Sub-resource |
+
+### Access control
+
+All endpoints require authentication (valid OIDC bearer token). Write operations (POST, PUT, DELETE) additionally require the `music_librarian` or `admin` realm role. Read operations (GET) are accessible to any authenticated user. Role enforcement uses `@RolesAllowed` on the JAX-RS implementation classes; the API interface definitions remain role-free to stay usable as a REST client in the CLI module.

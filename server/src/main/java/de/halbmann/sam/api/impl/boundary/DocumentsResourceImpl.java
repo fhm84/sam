@@ -7,6 +7,9 @@ import de.halbmann.sam.business.controller.StreamWriter;
 import de.halbmann.sam.business.entity.AttachmentEntity;
 import de.halbmann.sam.business.entity.DocumentEntity;
 import de.halbmann.sam.classification.controller.DocumentClassificationService;
+import de.halbmann.sam.security.Roles;
+import io.quarkus.security.Authenticated;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.InternalServerErrorException;
@@ -25,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.event.Level;
 
 @Slf4j
+@Authenticated
 @RequestScoped
 public class DocumentsResourceImpl implements DocumentsResource {
 
@@ -192,6 +196,7 @@ public class DocumentsResourceImpl implements DocumentsResource {
     }
 
     @Override
+    @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public DocumentUpload uploadDocument(FileUploadRequest request) {
         log.atLevel(Level.DEBUG)
                 .log(() -> "File-Upload ... filename: " + request.getFile().fileName());
@@ -227,21 +232,25 @@ public class DocumentsResourceImpl implements DocumentsResource {
     }
 
     @Override
+    @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public Attachment linkDocument(String docIdentifier, DocumentLinkRequest documentLink) {
         return documentsService.linkDocument(UUID.fromString(docIdentifier), documentLink);
     }
 
     @Override
+    @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public SheetClassification classify(String docIdentifier) {
         return classificationService.classify(UUID.fromString(docIdentifier));
     }
 
     @Override
+    @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public ClassificationApplyResult applyClassification(String docIdentifier, ClassificationApplyRequest request) {
         return classificationService.apply(UUID.fromString(docIdentifier), request);
     }
 
     @Override
+    @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public void delete(String docIdentifier) {
         if (sheetId == null && instrumentationId == null) {
             documentsService.deleteIfUnlinked(UUID.fromString(docIdentifier));

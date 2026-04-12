@@ -15,7 +15,7 @@ import { SheetDetail } from './sheet-detail';
   providers: [ConfirmationService],
   template: `
     <div class="sheet-detail-page">
-      <p-toolbar styleClass="page-toolbar">
+      <p-toolbar styleClass="mb-2">
         <ng-template #start>
           <p-button
             icon="pi pi-arrow-left"
@@ -48,10 +48,6 @@ import { SheetDetail } from './sheet-detail';
   styles: `
     .sheet-detail-page {
       max-width: 100%;
-    }
-
-    .page-toolbar {
-      margin-bottom: 0.5rem;
     }
   `,
 })

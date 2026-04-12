@@ -37,4 +37,10 @@ public class Musician {
      * Interested Party Information (IPI)-Number
      */
     String ipi;
+
+    /**
+     * OIDC subject claim linking this musician to an authenticated user account.
+     * Null for external/historical musicians (composers, arrangers) with no system login.
+     */
+    String userId;
 }

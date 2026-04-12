@@ -197,6 +197,23 @@ export interface EnsembleFilterRequest extends PaginationRequest {
     name?: string;
 }
 
+export interface CreateEnsembleMembership {
+    musicianId: string;
+    voiceId?: string;
+    instrumentId?: string;
+    conductor: boolean;
+}
+
+export interface EnsembleMembership {
+    id?: string;
+    musician: Musician;
+    voiceId?: string;
+    voiceLabel?: string;
+    instrumentId?: string;
+    instrumentName?: string;
+    conductor: boolean;
+}
+
 export interface EnsembleVoice {
     id?: string;
     label: string;

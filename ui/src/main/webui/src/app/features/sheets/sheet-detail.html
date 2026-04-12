@@ -1,10 +1,10 @@
 @if (loading()) {
-  <div class="loading-indicator">
+  <div class="flex justify-center p-12 text-[2rem] text-[var(--sam-text-muted)]">
     <i class="pi pi-spinner pi-spin"></i>
   </div>
 } @else if (sheet(); as s) {
-  <div class="detail-header">
-    <div class="detail-title-group">
+  <div class="flex items-start justify-between gap-4">
+    <div class="flex flex-row items-start gap-0.5">
       <p-button
         [icon]="s.favorite ? 'pi pi-star-fill' : 'pi pi-star'"
         [severity]="s.favorite ? 'warn' : 'secondary'"
@@ -15,7 +15,7 @@
         tooltipPosition="top"
         (onClick)="toggleFavorite()"
       />
-      <div class="detail-title-text">
+      <div class="flex flex-col gap-1">
         <div class="flex items-center gap-1">
           <h2 class="flex-1 min-w-0">{{ s.title }}</h2>
           @if (mode === 'compact') {
@@ -50,7 +50,7 @@
           />
         </div>
         @if (s.subtitle) {
-          <p class="detail-subtitle">{{ s.subtitle }}</p>
+          <p class="text-[0.9rem] text-[var(--sam-text-muted)]">{{ s.subtitle }}</p>
         }
       </div>
     </div>
@@ -91,7 +91,7 @@
 
         <!-- Tab 1: Details -->
         <p-tabpanel [value]="0">
-          <div class="detail-panels flex flex-col gap-3 pt-3">
+          <div class="flex flex-col gap-3 pt-3">
             <!-- Base Data -->
             <p-panel [header]="t.t('sheets.detail.baseData')">
               <div class="detail-meta">
@@ -160,7 +160,7 @@
             <p-panel [header]="t.t('sheets.detail.documents')">
               <input #fileInput type="file" hidden (change)="uploadFile($event)" />
               <ng-template pTemplate="headeractions">
-                <label class="upload-label">
+                <label class="inline-flex">
                   <p-button
                     icon="pi pi-upload"
                     [label]="t.t('sheets.detail.upload')"
@@ -171,20 +171,20 @@
                 </label>
               </ng-template>
               @if (documentsLoading()) {
-                <div class="loading-indicator small">
+                <div class="flex justify-center p-4 text-[1.2rem] text-[var(--sam-text-muted)]">
                   <i class="pi pi-spinner pi-spin"></i>
                 </div>
               } @else {
                 @if (documents().length === 0) {
-                  <span class="empty-block">{{ 'sheets.detail.noDocuments' | translate }}</span>
+                  <span class="text-[0.9rem] text-[var(--sam-text-muted)] italic">{{ 'sheets.detail.noDocuments' | translate }}</span>
                 } @else {
-                  <div class="document-list">
+                  <div class="flex flex-col gap-1">
                     @for (doc of documents(); track doc.id) {
-                      <div class="document-row">
-                        <i class="pi pi-file"></i>
-                        <span class="document-name">{{ doc.displayName }}</span>
-                        <span class="document-size">{{ formatSize(doc.fileSize) }}</span>
-                        <div class="document-actions">
+                      <div class="flex items-center gap-2 px-2 py-[0.4rem] rounded-md hover:bg-[var(--p-surface-100)]">
+                        <i class="pi pi-file text-[var(--sam-text-muted)]"></i>
+                        <span class="flex-1 text-[0.9rem] text-[var(--sam-text)] overflow-hidden text-ellipsis whitespace-nowrap">{{ doc.displayName }}</span>
+                        <span class="text-[0.8rem] text-[var(--sam-text-muted)] whitespace-nowrap">{{ formatSize(doc.fileSize) }}</span>
+                        <div class="flex gap-0.5">
                           <p-button
                             icon="pi pi-download"
                             [rounded]="true"
@@ -224,7 +224,7 @@
               @if (s.additionalNotes) {
                 <span class="detail-value">{{ s.additionalNotes }}</span>
               } @else {
-                <span class="empty-block">{{ 'sheets.detail.noNotes' | translate }}</span>
+                <span class="text-[0.9rem] text-[var(--sam-text-muted)] italic">{{ 'sheets.detail.noNotes' | translate }}</span>
               }
             </p-panel>
 
@@ -341,7 +341,7 @@
                       }
                     </div>
                   </td>
-                  <td class="actions-cell">
+                  <td class="flex gap-1">
                     <p-button
                       icon="pi pi-pencil"
                       [rounded]="true"
@@ -413,7 +413,7 @@
               </ng-template>
               <ng-template #emptymessage>
                 <tr>
-                  <td colspan="5" class="empty-message">{{ 'sheets.instrumentations.empty' | translate }}</td>
+                  <td colspan="5" class="!p-6 text-center text-[var(--sam-text-muted)]">{{ 'sheets.instrumentations.empty' | translate }}</td>
                 </tr>
               </ng-template>
             </p-table>
@@ -527,7 +527,7 @@
 
   } @else {
     <!-- ── Full page: flat layout ──────────────────────── -->
-    <div class="detail-panels">
+    <div class="flex flex-col gap-3">
       <div class="detail-top-row">
         <!-- Base Data -->
         <p-panel [header]="t.t('sheets.detail.baseData')">
@@ -597,7 +597,7 @@
         <p-panel [header]="t.t('sheets.detail.documents')">
           <input #fileInputFull type="file" hidden (change)="uploadFile($event)" />
           <ng-template pTemplate="headeractions">
-            <label class="upload-label">
+            <label class="inline-flex">
               <p-button
                 icon="pi pi-upload"
                 [label]="t.t('sheets.detail.upload')"
@@ -608,20 +608,20 @@
             </label>
           </ng-template>
           @if (documentsLoading()) {
-            <div class="loading-indicator small">
+            <div class="flex justify-center p-4 text-[1.2rem] text-[var(--sam-text-muted)]">
               <i class="pi pi-spinner pi-spin"></i>
             </div>
           } @else {
             @if (documents().length === 0) {
-              <span class="empty-block">{{ 'sheets.detail.noDocuments' | translate }}</span>
+              <span class="text-[0.9rem] text-[var(--sam-text-muted)] italic">{{ 'sheets.detail.noDocuments' | translate }}</span>
             } @else {
-              <div class="document-list">
+              <div class="flex flex-col gap-1">
                 @for (doc of documents(); track doc.id) {
-                  <div class="document-row">
-                    <i class="pi pi-file"></i>
-                    <span class="document-name">{{ doc.displayName }}</span>
-                    <span class="document-size">{{ formatSize(doc.fileSize) }}</span>
-                    <div class="document-actions">
+                  <div class="flex items-center gap-2 px-2 py-[0.4rem] rounded-md hover:bg-[var(--p-surface-100)]">
+                    <i class="pi pi-file text-[var(--sam-text-muted)]"></i>
+                    <span class="flex-1 text-[0.9rem] text-[var(--sam-text)] overflow-hidden text-ellipsis whitespace-nowrap">{{ doc.displayName }}</span>
+                    <span class="text-[0.8rem] text-[var(--sam-text-muted)] whitespace-nowrap">{{ formatSize(doc.fileSize) }}</span>
+                    <div class="flex gap-0.5">
                       <p-button
                         icon="pi pi-download"
                         [rounded]="true"
@@ -731,7 +731,7 @@
                   }
                 </div>
               </td>
-              <td class="actions-cell">
+              <td class="flex gap-1">
                 <p-button
                   icon="pi pi-pencil"
                   [rounded]="true"
@@ -797,7 +797,7 @@
           </ng-template>
           <ng-template #emptymessage>
             <tr>
-              <td colspan="7" class="empty-message">{{ 'sheets.instrumentations.empty' | translate }}</td>
+              <td colspan="7" class="!p-6 text-center text-[var(--sam-text-muted)]">{{ 'sheets.instrumentations.empty' | translate }}</td>
             </tr>
           </ng-template>
         </p-table>
@@ -915,7 +915,7 @@
         @if (s.additionalNotes) {
           <span class="detail-value">{{ s.additionalNotes }}</span>
         } @else {
-          <span class="empty-block">{{ 'sheets.detail.noNotes' | translate }}</span>
+          <span class="text-[0.9rem] text-[var(--sam-text-muted)] italic">{{ 'sheets.detail.noNotes' | translate }}</span>
         }
       </p-panel>
 
