@@ -1,7 +1,7 @@
 package de.halbmann.sam.api.boundary;
 
-import de.halbmann.sam.api.entity.CreateEnsembleVoice;
-import de.halbmann.sam.api.entity.EnsembleVoice;
+import de.halbmann.sam.api.entity.ensembles.CreateEnsembleVoice;
+import de.halbmann.sam.api.entity.ensembles.EnsembleVoice;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import java.util.List;

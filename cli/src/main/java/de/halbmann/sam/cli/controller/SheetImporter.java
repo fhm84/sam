@@ -1,9 +1,9 @@
 package de.halbmann.sam.cli.controller;
 
 import de.halbmann.sam.api.boundary.SamResources;
-import de.halbmann.sam.api.entity.CreateInstrumentation;
-import de.halbmann.sam.api.entity.Instrumentation;
-import de.halbmann.sam.api.entity.SheetMusic;
+import de.halbmann.sam.api.entity.sheets.CreateInstrumentation;
+import de.halbmann.sam.api.entity.sheets.Instrumentation;
+import de.halbmann.sam.api.entity.sheets.SheetMusic;
 import de.halbmann.sam.cli.entity.ImportResult;
 import de.halbmann.sam.cli.mapper.DataMapper;
 import jakarta.inject.Inject;

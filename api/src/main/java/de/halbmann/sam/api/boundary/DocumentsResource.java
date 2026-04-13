@@ -1,6 +1,12 @@
 package de.halbmann.sam.api.boundary;
 
-import de.halbmann.sam.api.entity.*;
+import de.halbmann.sam.api.entity.classification.ClassificationApplyRequest;
+import de.halbmann.sam.api.entity.classification.ClassificationApplyResult;
+import de.halbmann.sam.api.entity.classification.SheetClassification;
+import de.halbmann.sam.api.entity.documents.*;
+import de.halbmann.sam.api.entity.shared.PaginatedResponse;
+import de.halbmann.sam.api.entity.sheets.BatchDownloadRequest;
+import de.halbmann.sam.api.entity.sheets.DownloadFormat;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;

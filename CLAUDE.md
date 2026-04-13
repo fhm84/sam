@@ -103,10 +103,44 @@ docker compose -f docker-compose.monitoring.yml up
 - Java 21, Palantir Java Format (via Spotless plugin, version 2.39.0)
 - Run `./mvnw spotless:apply` before committing
 
-## Browser QA policy
+## Verification Policy
 
-For Angular UI verification, prefer /angular-primeng-browser-verify.
-For browser-visible fixes, prefer /browser-fix-and-recheck.
-Use Playwright MCP as the default verification mechanism.
-Do not consider Angular code inspection or passing tests alone as proof that a UI issue is resolved.
-Pay special attention to PrimeNG overlays, dialogs, tables, form validation, and responsive behavior.
+### Backend (Java / Quarkus)
+
+After implementing any backend change:
+
+1. **Write or update tests** — unit tests for new/changed business logic; `@QuarkusTest` integration tests for new endpoints or complex service interactions.
+2. **Run the affected tests** and confirm they pass before marking the task done:
+   ```bash
+   # Single test class (fast)
+   rtk ./mvnw test -pl server -Dtest=<TestClass>
+
+   # All unit tests
+   rtk ./mvnw test
+
+   # Integration tests (requires running PostgreSQL)
+   rtk ./mvnw verify -pl server -am -DskipITs=false
+   ```
+3. **Apply formatting** after any Java edits:
+   ```bash
+   ./mvnw spotless:apply
+   ```
+4. Do not consider code review or compilation alone as proof — tests must actually execute and pass.
+
+### Frontend (Angular)
+
+After implementing any Angular UI change:
+
+1. **Run TypeScript compilation** to catch type errors:
+   ```bash
+   cd ui/src/main/webui && rtk npx tsc --noEmit
+   ```
+2. **Verify the rendered result in a real browser** using the Playwright MCP skill — do not rely on code inspection alone:
+   - New features / pages → use `/angular-primeng-browser-verify`
+   - Bug fixes → use `/browser-fix-and-recheck`
+3. Pay special attention to: PrimeNG overlays, dialogs, tables, form validation, routing transitions, and responsive behavior.
+4. Test both the golden path and relevant edge cases (empty state, validation errors, loading state).
+
+### When tests are not applicable
+
+If a change is purely structural (rename, move, formatting) or documentation-only and no meaningful test can be written, state this explicitly rather than skipping silently.

@@ -6,8 +6,8 @@
  * </p>
  *
  * <ul>
- *   <li>{@link de.halbmann.sam.api.entity.Genre} – what kind of musical form the work is</li>
- *   <li>{@link de.halbmann.sam.api.entity.Style} – how the work sounds stylistically</li>
+ *   <li>{@link de.halbmann.sam.api.entity.sheets.Genre} – what kind of musical form the work is</li>
+ *   <li>{@link de.halbmann.sam.api.entity.sheets.Style} – how the work sounds stylistically</li>
  *   <li>Tags – contextual or situational metadata</li>
  * </ul>
  */

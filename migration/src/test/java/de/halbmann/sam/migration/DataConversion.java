@@ -2,9 +2,9 @@ package de.halbmann.sam.migration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import de.halbmann.sam.api.entity.Instrument;
-import de.halbmann.sam.api.entity.Instrumentation;
-import de.halbmann.sam.api.entity.SheetMusic;
+import de.halbmann.sam.api.entity.instruments.Instrument;
+import de.halbmann.sam.api.entity.sheets.Instrumentation;
+import de.halbmann.sam.api.entity.sheets.SheetMusic;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;

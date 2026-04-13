@@ -2,7 +2,11 @@ package de.halbmann.sam.migration;
 
 import static java.util.function.Predicate.not;
 
-import de.halbmann.sam.api.entity.*;
+import de.halbmann.sam.api.entity.instruments.Clef;
+import de.halbmann.sam.api.entity.instruments.Instrument;
+import de.halbmann.sam.api.entity.instruments.InstrumentTransposing;
+import de.halbmann.sam.api.entity.sheets.Instrumentation;
+import de.halbmann.sam.api.entity.sheets.NotationType;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;

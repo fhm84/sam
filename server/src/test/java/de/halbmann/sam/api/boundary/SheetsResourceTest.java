@@ -5,7 +5,11 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import de.halbmann.sam.api.entity.*;
+import de.halbmann.sam.api.entity.musicians.Musician;
+import de.halbmann.sam.api.entity.sheets.DifficultyLevel;
+import de.halbmann.sam.api.entity.sheets.Genre;
+import de.halbmann.sam.api.entity.sheets.SheetMusic;
+import de.halbmann.sam.api.entity.sheets.Style;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import jakarta.json.bind.Jsonb;

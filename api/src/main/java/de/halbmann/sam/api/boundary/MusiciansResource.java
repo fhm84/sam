@@ -1,8 +1,8 @@
 package de.halbmann.sam.api.boundary;
 
-import de.halbmann.sam.api.entity.Musician;
-import de.halbmann.sam.api.entity.MusicianFilterRequest;
-import de.halbmann.sam.api.entity.PaginatedResponse;
+import de.halbmann.sam.api.entity.musicians.Musician;
+import de.halbmann.sam.api.entity.musicians.MusicianFilterRequest;
+import de.halbmann.sam.api.entity.shared.PaginatedResponse;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 

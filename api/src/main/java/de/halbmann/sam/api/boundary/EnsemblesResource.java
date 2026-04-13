@@ -1,6 +1,10 @@
 package de.halbmann.sam.api.boundary;
 
-import de.halbmann.sam.api.entity.*;
+import de.halbmann.sam.api.entity.ensembles.CreateEnsemble;
+import de.halbmann.sam.api.entity.ensembles.Ensemble;
+import de.halbmann.sam.api.entity.ensembles.EnsembleCoverageStatus;
+import de.halbmann.sam.api.entity.ensembles.EnsembleFilterRequest;
+import de.halbmann.sam.api.entity.shared.PaginatedResponse;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 

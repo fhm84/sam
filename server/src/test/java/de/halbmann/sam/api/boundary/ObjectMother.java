@@ -1,6 +1,10 @@
 package de.halbmann.sam.api.boundary;
 
-import de.halbmann.sam.api.entity.*;
+import de.halbmann.sam.api.entity.instruments.Clef;
+import de.halbmann.sam.api.entity.instruments.CreateInstrument;
+import de.halbmann.sam.api.entity.instruments.InstrumentTransposing;
+import de.halbmann.sam.api.entity.musicians.Musician;
+import de.halbmann.sam.api.entity.sheets.*;
 
 /**
  * Test data builder

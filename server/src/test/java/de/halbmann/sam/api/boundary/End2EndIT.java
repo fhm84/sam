@@ -2,9 +2,9 @@ package de.halbmann.sam.api.boundary;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.halbmann.sam.api.entity.CreateInstrumentation;
-import de.halbmann.sam.api.entity.Instrumentation;
-import de.halbmann.sam.api.entity.SheetMusic;
+import de.halbmann.sam.api.entity.sheets.CreateInstrumentation;
+import de.halbmann.sam.api.entity.sheets.Instrumentation;
+import de.halbmann.sam.api.entity.sheets.SheetMusic;
 import io.quarkus.test.junit.QuarkusIntegrationTest;
 import java.net.URI;
 import java.util.List;

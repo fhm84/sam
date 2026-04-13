@@ -3,7 +3,10 @@ package de.halbmann.sam.api.boundary;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
-import de.halbmann.sam.api.entity.*;
+import de.halbmann.sam.api.entity.ensembles.CreateEnsemble;
+import de.halbmann.sam.api.entity.ensembles.CreateEnsembleMembership;
+import de.halbmann.sam.api.entity.ensembles.EnsembleMembership;
+import de.halbmann.sam.api.entity.musicians.Musician;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.security.TestSecurity;
 import io.restassured.http.ContentType;

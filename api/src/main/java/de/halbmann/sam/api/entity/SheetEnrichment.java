@@ -1,5 +1,6 @@
 package de.halbmann.sam.api.entity;
 
+import de.halbmann.sam.api.entity.sheets.Style;
 import java.util.Set;
 
 /**

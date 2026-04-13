@@ -1,7 +1,7 @@
 package de.halbmann.sam.api.boundary;
 
-import de.halbmann.sam.api.entity.CreateInstrumentation;
-import de.halbmann.sam.api.entity.Instrumentation;
+import de.halbmann.sam.api.entity.sheets.CreateInstrumentation;
+import de.halbmann.sam.api.entity.sheets.Instrumentation;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import java.util.List;

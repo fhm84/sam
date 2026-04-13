@@ -1,7 +1,7 @@
 package de.halbmann.sam.migration;
 
-import de.halbmann.sam.api.entity.Genre;
-import de.halbmann.sam.api.entity.Style;
+import de.halbmann.sam.api.entity.sheets.Genre;
+import de.halbmann.sam.api.entity.sheets.Style;
 import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;

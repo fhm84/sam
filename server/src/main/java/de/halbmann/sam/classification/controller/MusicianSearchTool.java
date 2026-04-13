@@ -1,7 +1,7 @@
 package de.halbmann.sam.classification.controller;
 
-import de.halbmann.sam.api.entity.MusicianMatch;
-import de.halbmann.sam.business.boundary.MusicianRepository;
+import de.halbmann.sam.api.entity.musicians.MusicianMatch;
+import de.halbmann.sam.business.musicians.boundary.MusicianRepository;
 import dev.langchain4j.agent.tool.Tool;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;

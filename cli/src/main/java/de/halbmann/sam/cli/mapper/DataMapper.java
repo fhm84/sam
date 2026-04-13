@@ -1,9 +1,9 @@
 package de.halbmann.sam.cli.mapper;
 
-import de.halbmann.sam.api.entity.CreateInstrumentation;
-import de.halbmann.sam.api.entity.CreateSheetMusic;
-import de.halbmann.sam.api.entity.Instrumentation;
-import de.halbmann.sam.api.entity.SheetMusic;
+import de.halbmann.sam.api.entity.sheets.CreateInstrumentation;
+import de.halbmann.sam.api.entity.sheets.CreateSheetMusic;
+import de.halbmann.sam.api.entity.sheets.Instrumentation;
+import de.halbmann.sam.api.entity.sheets.SheetMusic;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;

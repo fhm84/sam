@@ -1,0 +1,23 @@
+package de.halbmann.sam.api.entity.sheets;
+
+import de.halbmann.sam.api.entity.shared.PaginationRequest;
+import jakarta.ws.rs.QueryParam;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class BookletFilterRequest extends PaginationRequest {
+
+    /**
+     * For "generic" search/query
+     */
+    @QueryParam("q")
+    private String query;
+
+    /**
+     * Search by name
+     */
+    @QueryParam("name")
+    private String name;
+}

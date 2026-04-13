@@ -1,8 +1,8 @@
 package de.halbmann.sam.cli.controller;
 
 import de.halbmann.sam.api.boundary.SamResources;
-import de.halbmann.sam.api.entity.CreateInstrument;
-import de.halbmann.sam.api.entity.Instrument;
+import de.halbmann.sam.api.entity.instruments.CreateInstrument;
+import de.halbmann.sam.api.entity.instruments.Instrument;
 import de.halbmann.sam.cli.entity.ImportResult;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;

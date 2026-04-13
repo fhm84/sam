@@ -1,7 +1,7 @@
 package de.halbmann.sam.api.boundary;
 
-import de.halbmann.sam.api.entity.CreateEnsembleMembership;
-import de.halbmann.sam.api.entity.EnsembleMembership;
+import de.halbmann.sam.api.entity.ensembles.CreateEnsembleMembership;
+import de.halbmann.sam.api.entity.ensembles.EnsembleMembership;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import java.util.List;

@@ -1,9 +1,9 @@
 package de.halbmann.sam.api.boundary;
 
-import de.halbmann.sam.api.entity.CreateInstrument;
-import de.halbmann.sam.api.entity.Instrument;
-import de.halbmann.sam.api.entity.InstrumentFilterRequest;
-import de.halbmann.sam.api.entity.PaginatedResponse;
+import de.halbmann.sam.api.entity.instruments.CreateInstrument;
+import de.halbmann.sam.api.entity.instruments.Instrument;
+import de.halbmann.sam.api.entity.instruments.InstrumentFilterRequest;
+import de.halbmann.sam.api.entity.shared.PaginatedResponse;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 

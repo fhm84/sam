@@ -1,6 +1,11 @@
 package de.halbmann.sam.api.boundary;
 
 import de.halbmann.sam.api.entity.*;
+import de.halbmann.sam.api.entity.collections.SheetCollection;
+import de.halbmann.sam.api.entity.ensembles.CoverageResult;
+import de.halbmann.sam.api.entity.shared.PaginatedResponse;
+import de.halbmann.sam.api.entity.shared.PaginationRequest;
+import de.halbmann.sam.api.entity.sheets.*;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;

@@ -1,8 +1,8 @@
 package de.halbmann.sam.api.boundary;
 
-import de.halbmann.sam.api.entity.Booklet;
-import de.halbmann.sam.api.entity.BookletFilterRequest;
-import de.halbmann.sam.api.entity.PaginatedResponse;
+import de.halbmann.sam.api.entity.shared.PaginatedResponse;
+import de.halbmann.sam.api.entity.sheets.Booklet;
+import de.halbmann.sam.api.entity.sheets.BookletFilterRequest;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 

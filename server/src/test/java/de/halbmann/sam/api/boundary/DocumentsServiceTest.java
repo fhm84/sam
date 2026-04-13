@@ -2,7 +2,7 @@ package de.halbmann.sam.api.boundary;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.halbmann.sam.api.entity.Clef;
+import de.halbmann.sam.api.entity.instruments.Clef;
 import de.halbmann.sam.classification.boundary.ClassificationService;
 import de.halbmann.sam.classification.entity.SheetAnalyzerResult;
 import io.quarkus.test.junit.QuarkusTest;

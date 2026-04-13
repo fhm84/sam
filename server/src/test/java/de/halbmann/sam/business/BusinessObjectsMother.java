@@ -1,9 +1,14 @@
 package de.halbmann.sam.business;
 
-import de.halbmann.sam.api.entity.Clef;
-import de.halbmann.sam.api.entity.InstrumentTransposing;
-import de.halbmann.sam.api.entity.VoiceOptionType;
-import de.halbmann.sam.business.entity.*;
+import de.halbmann.sam.api.entity.instruments.Clef;
+import de.halbmann.sam.api.entity.instruments.InstrumentTransposing;
+import de.halbmann.sam.api.entity.instruments.VoiceOptionType;
+import de.halbmann.sam.business.ensembles.entity.EnsembleEntity;
+import de.halbmann.sam.business.ensembles.entity.EnsembleVoiceEntity;
+import de.halbmann.sam.business.instruments.entity.InstrumentEntity;
+import de.halbmann.sam.business.sheets.entity.InstrumentationEntity;
+import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
+import de.halbmann.sam.business.sheets.entity.VoiceOptionEntity;
 import java.util.UUID;
 
 public class BusinessObjectsMother {

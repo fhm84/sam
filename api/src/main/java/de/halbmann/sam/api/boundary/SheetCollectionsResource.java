@@ -1,9 +1,9 @@
 package de.halbmann.sam.api.boundary;
 
-import de.halbmann.sam.api.entity.ExportFormat;
-import de.halbmann.sam.api.entity.PaginatedResponse;
-import de.halbmann.sam.api.entity.SheetCollection;
-import de.halbmann.sam.api.entity.SheetCollectionFilterRequest;
+import de.halbmann.sam.api.entity.collections.SheetCollection;
+import de.halbmann.sam.api.entity.collections.SheetCollectionFilterRequest;
+import de.halbmann.sam.api.entity.shared.PaginatedResponse;
+import de.halbmann.sam.api.entity.sheets.ExportFormat;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;

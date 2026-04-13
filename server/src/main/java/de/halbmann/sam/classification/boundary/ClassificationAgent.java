@@ -1,6 +1,6 @@
 package de.halbmann.sam.classification.boundary;
 
-import de.halbmann.sam.api.entity.ClassificationApplyRequest;
+import de.halbmann.sam.api.entity.classification.ClassificationApplyRequest;
 import de.halbmann.sam.classification.controller.InstrumentSearchTool;
 import de.halbmann.sam.classification.controller.MusicianSearchTool;
 import de.halbmann.sam.classification.controller.SheetSearchTool;

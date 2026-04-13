@@ -1,7 +1,10 @@
 package de.halbmann.sam.enrichment.controller;
 
 import de.halbmann.sam.api.entity.*;
-import de.halbmann.sam.business.controller.SheetService;
+import de.halbmann.sam.api.entity.sheets.DifficultyLevel;
+import de.halbmann.sam.api.entity.sheets.SheetMusic;
+import de.halbmann.sam.api.entity.sheets.Style;
+import de.halbmann.sam.business.sheets.controller.SheetService;
 import de.halbmann.sam.enrichment.boundary.SheetEnricher;
 import de.halbmann.sam.enrichment.entity.SheetEnrichmentResult;
 import io.micrometer.core.instrument.MeterRegistry;

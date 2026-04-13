@@ -1,8 +1,8 @@
 package de.halbmann.sam.cli.commands;
 
 import de.halbmann.sam.api.boundary.SamResources;
-import de.halbmann.sam.api.entity.SheetFilterRequest;
-import de.halbmann.sam.api.entity.SheetMusic;
+import de.halbmann.sam.api.entity.sheets.SheetFilterRequest;
+import de.halbmann.sam.api.entity.sheets.SheetMusic;
 import io.quarkus.arc.Unremovable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;

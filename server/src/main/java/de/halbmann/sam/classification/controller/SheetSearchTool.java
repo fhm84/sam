@@ -1,7 +1,7 @@
 package de.halbmann.sam.classification.controller;
 
-import de.halbmann.sam.business.boundary.SheetRepository;
-import de.halbmann.sam.business.entity.SheetMusicEntity;
+import de.halbmann.sam.business.sheets.boundary.SheetRepository;
+import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
 import dev.langchain4j.agent.tool.Tool;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;

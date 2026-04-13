@@ -1,7 +1,7 @@
 package de.halbmann.sam.classification.entity;
 
-import de.halbmann.sam.api.entity.Clef;
-import de.halbmann.sam.api.entity.NotationType;
+import de.halbmann.sam.api.entity.instruments.Clef;
+import de.halbmann.sam.api.entity.sheets.NotationType;
 
 /**
  * @param title             The title of the music sheet/piece.
