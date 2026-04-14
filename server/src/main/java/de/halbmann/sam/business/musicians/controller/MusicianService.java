@@ -11,7 +11,6 @@ import de.halbmann.sam.core.exception.EntityNotFoundException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -26,10 +25,15 @@ public class MusicianService {
     MusicianMapper musicianMapper;
 
     public PaginatedResponse<Musician> findMusicians(final MusicianFilterRequest filterRequest) {
-        if (filterRequest.getName() != null && !filterRequest.getName().isEmpty()) {
-            final Map<String, Object> parameters = new HashMap<>();
-            parameters.put("name", filterRequest.getName());
-            return findMusicians(filterRequest, parameters);
+        if (filterRequest.getName() != null && !filterRequest.getName().isBlank()) {
+            PaginatedEntities<MusicianEntity> result = musicianRepository.searchByName(
+                    filterRequest.getName(), filterRequest.getPage(), filterRequest.getSize());
+            PaginatedResponse<Musician> response = new PaginatedResponse<>();
+            response.setData(result.data().stream().map(musicianMapper::toDto).toList());
+            response.setPage(filterRequest.getPage());
+            response.setSize(response.getData().size());
+            response.setTotalCount(result.totalCount());
+            return response;
         } else {
             return findMusicians(filterRequest, Map.of());
         }

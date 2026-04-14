@@ -2,6 +2,7 @@ package de.halbmann.sam.security;
 
 import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.enterprise.context.RequestScoped;
+import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 import java.util.Set;
 import java.util.UUID;
@@ -24,14 +25,14 @@ public class CurrentUserService {
     SecurityIdentity identity;
 
     @Inject
-    JsonWebToken jwt;
+    Instance<JsonWebToken> jwt;
 
     /** Returns the OIDC subject claim (unique user ID), or {@code null} for anonymous requests. */
     public String getUserId() {
-        if (identity.isAnonymous()) {
+        if (identity.isAnonymous() || jwt.isUnsatisfied()) {
             return null;
         }
-        return jwt.getSubject();
+        return jwt.get().getSubject();
     }
 
     /** Returns {@code true} if the current user holds the given realm role. */
@@ -44,7 +45,10 @@ public class CurrentUserService {
      * membership (groups prefixed with {@code ensemble:}).
      */
     public Set<UUID> getAccessibleEnsembleIds() {
-        Set<String> groups = jwt.getClaim("groups");
+        if (jwt.isUnsatisfied()) {
+            return Set.of();
+        }
+        Set<String> groups = jwt.get().getClaim("groups");
         if (groups == null || groups.isEmpty()) {
             return Set.of();
         }

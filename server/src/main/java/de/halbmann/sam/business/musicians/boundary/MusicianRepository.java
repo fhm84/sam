@@ -14,6 +14,7 @@ import jakarta.persistence.NoResultException;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -41,6 +42,64 @@ public class MusicianRepository implements PanacheRepositoryBase<MusicianEntity,
         return rows.stream()
                 .map(r -> new MusicianMatch((UUID) r[0], (String) r[1], ((Number) r[2]).doubleValue()))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Multi-signal name search combining prefix wildcard, trigram word-similarity and phonetic
+     * matching. Results are ordered by a weighted score (prefix match &gt; substring &gt;
+     * word_similarity &gt; phonetic), so the most relevant hits always appear first.
+     *
+     * <p>Requires the {@code pg_trgm} and {@code fuzzystrmatch} extensions (created by migration
+     * V1.0.1).
+     */
+    @SuppressWarnings("unchecked")
+    public PaginatedEntities<MusicianEntity> searchByName(String name, int page, int size) {
+        // NOTE: the WHERE clause is a plain String (not a text block) to avoid Java text-block
+        // trailing-whitespace stripping which would produce invalid SQL like "WHERElower(...)".
+        String whereClause = "lower(name) LIKE '%' || lower(:name) || '%'"
+                + " OR word_similarity(lower(:name), lower(name)) >= 0.2"
+                + " OR (dmetaphone(lower(:name)) != '' AND name_phonetic = dmetaphone(lower(:name)))";
+
+        long total = ((Number) getEntityManager()
+                        .createNativeQuery("SELECT COUNT(*) FROM musicians WHERE " + whereClause)
+                        .setParameter("name", name)
+                        .getSingleResult())
+                .longValue();
+
+        // Score: prefix match → 1.0, substring → 0.85, word_similarity, full similarity, phonetic
+        String scoreSql = "SELECT id,"
+                + " GREATEST("
+                + "   CASE WHEN lower(name) LIKE lower(:name) || '%' THEN 1.0 ELSE 0.0 END,"
+                + "   CASE WHEN lower(name) LIKE '%' || lower(:name) || '%' THEN 0.85 ELSE 0.0 END,"
+                + "   word_similarity(lower(:name), lower(name)),"
+                + "   similarity(lower(:name), lower(name)),"
+                + "   CASE WHEN dmetaphone(lower(:name)) != ''"
+                + "         AND name_phonetic = dmetaphone(lower(:name))"
+                + "        THEN 0.6 ELSE 0.0 END"
+                + " ) AS score"
+                + " FROM musicians"
+                + " WHERE " + whereClause
+                + " ORDER BY score DESC, name ASC"
+                + " LIMIT :limit OFFSET :offset";
+
+        @SuppressWarnings("unchecked")
+        List<Object[]> rows = getEntityManager()
+                .createNativeQuery(scoreSql)
+                .setParameter("name", name)
+                .setParameter("limit", size)
+                .setParameter("offset", page * size)
+                .getResultList();
+
+        List<UUID> ids = rows.stream().map(r -> (UUID) r[0]).toList();
+        if (ids.isEmpty()) {
+            return new PaginatedEntities<>(List.of(), total);
+        }
+
+        Map<UUID, MusicianEntity> byId = find("id IN :ids", Map.of("ids", ids)).stream()
+                .collect(Collectors.toMap(MusicianEntity::getId, e -> e));
+        List<MusicianEntity> ordered =
+                ids.stream().map(byId::get).filter(Objects::nonNull).toList();
+        return new PaginatedEntities<>(ordered, total);
     }
 
     public Optional<MusicianEntity> findMusicianByName(final String name) {

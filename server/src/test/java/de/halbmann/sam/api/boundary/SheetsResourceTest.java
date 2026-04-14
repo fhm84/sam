@@ -11,12 +11,16 @@ import de.halbmann.sam.api.entity.sheets.Genre;
 import de.halbmann.sam.api.entity.sheets.SheetMusic;
 import de.halbmann.sam.api.entity.sheets.Style;
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.security.TestSecurity;
 import io.restassured.http.ContentType;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import org.junit.jupiter.api.Test;
 
 @QuarkusTest
+@TestSecurity(
+        user = "librarian1",
+        roles = {"music_librarian"})
 class SheetsResourceTest {
 
     @Test
