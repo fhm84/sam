@@ -4,7 +4,7 @@
 -- so ensemble members can find printed copies in the archive.
 -- ============================================================
 
-alter table instrumentations add column physicallLocation text;
+alter table instrumentations add column physicalLocation text;
 alter table instrumentations add column physicalCondition varchar(20)
     check (physicalCondition in ('GOOD', 'WORN', 'DAMAGED', 'LOST'));
 
