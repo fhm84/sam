@@ -9,6 +9,7 @@ import de.halbmann.sam.api.entity.shared.PaginatedResponse;
 import de.halbmann.sam.api.entity.sheets.BatchDownloadRequest;
 import de.halbmann.sam.api.entity.sheets.DownloadFormat;
 import de.halbmann.sam.business.documents.controller.DocumentsService;
+import de.halbmann.sam.business.documents.controller.MergedPdfEntry;
 import de.halbmann.sam.business.documents.controller.StreamWriter;
 import de.halbmann.sam.business.documents.entity.AttachmentEntity;
 import de.halbmann.sam.business.documents.entity.DocumentEntity;
@@ -29,7 +30,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.event.Level;
 
@@ -85,32 +85,24 @@ public class DocumentsResourceImpl implements DocumentsResource {
 
     @Override
     public Response downloadBatch(AttachmentType type, boolean includeInstrumentations, DownloadFormat format) {
-        List<AttachmentEntity> attachments;
+        List<MergedPdfEntry> entries;
         String zipName;
 
         if (instrumentationId != null) {
-            attachments = documentsService.loadAttachmentEntitiesByInstrumentation(instrumentationId, type);
+            entries = documentsService.buildMergeEntriesForInstrumentation(instrumentationId, type);
             zipName = "instrumentation-" + instrumentationId;
         } else if (sheetId != null) {
-            List<AttachmentEntity> sheetAtts = documentsService.loadAttachmentEntitiesBySheet(sheetId, type);
-            if (includeInstrumentations) {
-                List<AttachmentEntity> instrAtts =
-                        documentsService.loadAttachmentEntitiesBySheetInstrumentations(sheetId, type);
-                attachments =
-                        Stream.concat(sheetAtts.stream(), instrAtts.stream()).toList();
-            } else {
-                attachments = sheetAtts;
-            }
+            entries = documentsService.buildMergeEntriesForSheet(sheetId, type, includeInstrumentations);
             zipName = "sheet-" + sheetId + (type != null ? "-" + type.name().toLowerCase() : "");
         } else {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
-        if (attachments.isEmpty()) {
+        if (entries.isEmpty()) {
             return Response.noContent().build();
         }
 
-        return buildResponse(attachments, format, zipName);
+        return buildResponse(entries, format, zipName);
     }
 
     @Override
@@ -119,19 +111,19 @@ public class DocumentsResourceImpl implements DocumentsResource {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
-        List<AttachmentEntity> attachments = documentsService.loadAttachmentEntitiesByIds(request.getIds());
-        if (attachments.isEmpty()) {
+        List<MergedPdfEntry> entries = documentsService.buildMergeEntriesById(request.getIds());
+        if (entries.isEmpty()) {
             return Response.noContent().build();
         }
 
         String baseName =
                 request.getBaseName() != null && !request.getBaseName().isBlank() ? request.getBaseName() : "documents";
-        return buildResponse(attachments, request.getFormat(), baseName);
+        return buildResponse(entries, request.getFormat(), baseName);
     }
 
-    private Response buildResponse(List<AttachmentEntity> attachments, DownloadFormat format, String baseName) {
+    private Response buildResponse(List<MergedPdfEntry> entries, DownloadFormat format, String baseName) {
         if (format == DownloadFormat.MERGED_PDF) {
-            StreamWriter pdf = documentsService.buildMergedPdf(attachments);
+            StreamWriter pdf = documentsService.buildMergedPdf(entries);
             if (pdf != null) {
                 String filename = URLEncoder.encode(baseName + ".pdf", StandardCharsets.UTF_8)
                         .replace("+", "%20");
@@ -145,6 +137,8 @@ public class DocumentsResourceImpl implements DocumentsResource {
             log.info("No PDF attachments found for merged-pdf request — falling back to ZIP");
         }
 
+        List<AttachmentEntity> attachments =
+                entries.stream().map(MergedPdfEntry::attachment).toList();
         StreamWriter zip = documentsService.buildZip(attachments, baseName);
         String filename =
                 URLEncoder.encode(baseName + ".zip", StandardCharsets.UTF_8).replace("+", "%20");

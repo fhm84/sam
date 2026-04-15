@@ -30,12 +30,16 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.function.Function;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageFitDestination;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
 import org.apache.tika.Tika;
 
 @Slf4j
@@ -71,6 +75,9 @@ public class DocumentsService {
 
     @Inject
     DocumentMapper documentMapper;
+
+    @Inject
+    PdfMetadataEnricher pdfMetadataEnricher;
 
     /**
      * Save incoming document. This will also directly check the file-/content-type of and
@@ -147,7 +154,12 @@ public class DocumentsService {
                     .filter(id -> id.toString().equals(docId))
                     .findFirst();
 
-            return loadAttachment(attachmentId.map(String::valueOf).orElse(null));
+            DocumentDownload download =
+                    loadAttachment(attachmentId.map(String::valueOf).orElse(null));
+            if (download == null) {
+                return null;
+            }
+            return pdfMetadataEnricher.enrich(download, instrumentation.getSheet(), instrumentation);
         }
         return null;
     }
@@ -178,7 +190,12 @@ public class DocumentsService {
                     .filter(id -> id.toString().equals(docId))
                     .findFirst();
 
-            return loadAttachment(attachmentId.map(String::valueOf).orElse(null));
+            DocumentDownload download =
+                    loadAttachment(attachmentId.map(String::valueOf).orElse(null));
+            if (download == null) {
+                return null;
+            }
+            return pdfMetadataEnricher.enrich(download, sheetMusic, null);
         }
         return null;
     }
@@ -351,7 +368,9 @@ public class DocumentsService {
      */
     public List<AttachmentEntity> loadAttachmentEntitiesBySheet(String sheetId, AttachmentType type) {
         SheetMusicEntity sheet = sheetRepository.findById(UUID.fromString(sheetId));
-        if (sheet == null) return List.of();
+        if (sheet == null) {
+            return List.of();
+        }
         return sheet.getAttachments().stream()
                 .filter(a -> type == null || type == a.getType())
                 .toList();
@@ -363,7 +382,9 @@ public class DocumentsService {
     public List<AttachmentEntity> loadAttachmentEntitiesByInstrumentation(
             String instrumentationId, AttachmentType type) {
         InstrumentationEntity instr = instrumentationRepository.findById(UUID.fromString(instrumentationId));
-        if (instr == null) return List.of();
+        if (instr == null) {
+            return List.of();
+        }
         return instr.getAttachments().stream()
                 .filter(a -> type == null || type == a.getType())
                 .toList();
@@ -375,7 +396,9 @@ public class DocumentsService {
      */
     public List<AttachmentEntity> loadAttachmentEntitiesBySheetInstrumentations(String sheetId, AttachmentType type) {
         SheetMusicEntity sheet = sheetRepository.findById(UUID.fromString(sheetId));
-        if (sheet == null) return List.of();
+        if (sheet == null) {
+            return List.of();
+        }
         return sheet.getInstrumentations().stream()
                 .sorted(Comparator.comparing(
                                 (InstrumentationEntity i) -> i.getInstrument().getName())
@@ -390,11 +413,86 @@ public class DocumentsService {
      * Load attachment entities by explicit IDs.
      */
     public List<AttachmentEntity> loadAttachmentEntitiesByIds(List<UUID> ids) {
-        if (ids == null || ids.isEmpty()) return List.of();
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
         return ids.stream()
                 .map(id -> attachmentRepository.findByIdOptional(id).orElse(null))
                 .filter(Objects::nonNull)
                 .toList();
+    }
+
+    /**
+     * Build labeled merge entries for a sheet, optionally including all its instrumentation parts.
+     * Sheet-level attachments are labeled with their display name. Instrumentation attachments are
+     * labeled with the instrument name (and part label when set), e.g. {@code "Trompete 2"}.
+     */
+    public List<MergedPdfEntry> buildMergeEntriesForSheet(
+            String sheetId, AttachmentType type, boolean includeInstrumentations) {
+        SheetMusicEntity sheet = sheetRepository.findById(UUID.fromString(sheetId));
+        if (sheet == null) {
+            return List.of();
+        }
+
+        List<MergedPdfEntry> entries = new ArrayList<>();
+
+        sheet.getAttachments().stream()
+                .filter(a -> type == null || type == a.getType())
+                .map(a -> new MergedPdfEntry(a, a.getDisplayName()))
+                .forEach(entries::add);
+
+        if (includeInstrumentations) {
+            sheet.getInstrumentations().stream()
+                    .sorted(Comparator.comparing((InstrumentationEntity i) ->
+                                    i.getInstrument().getName())
+                            .thenComparing(
+                                    i -> Optional.ofNullable(i.getPartLabel()).orElse("")))
+                    .forEach(instr -> {
+                        String label = instrumentLabel(instr);
+                        instr.getAttachments().stream()
+                                .filter(a -> type == null || type == a.getType())
+                                .map(a -> new MergedPdfEntry(a, label))
+                                .forEach(entries::add);
+                    });
+        }
+
+        return Collections.unmodifiableList(entries);
+    }
+
+    /**
+     * Build labeled merge entries for a single instrumentation. All entries share the same label
+     * (instrument name + part label), since they all belong to the same instrumentation context.
+     */
+    public List<MergedPdfEntry> buildMergeEntriesForInstrumentation(String instrumentationId, AttachmentType type) {
+        InstrumentationEntity instr = instrumentationRepository.findById(UUID.fromString(instrumentationId));
+        if (instr == null) {
+            return List.of();
+        }
+        String label = instrumentLabel(instr);
+        return instr.getAttachments().stream()
+                .filter(a -> type == null || type == a.getType())
+                .map(a -> new MergedPdfEntry(a, label))
+                .toList();
+    }
+
+    /**
+     * Build labeled merge entries from an explicit list of attachment IDs, labeled by display name.
+     */
+    public List<MergedPdfEntry> buildMergeEntriesById(List<UUID> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        return ids.stream()
+                .map(id -> attachmentRepository.findByIdOptional(id).orElse(null))
+                .filter(Objects::nonNull)
+                .map(a -> new MergedPdfEntry(a, a.getDisplayName()))
+                .toList();
+    }
+
+    private String instrumentLabel(InstrumentationEntity instr) {
+        String name = Optional.ofNullable(instr.getInstrument().getDisplayName())
+                .orElse(instr.getInstrument().getName());
+        return instr.getPartLabel() != null ? name + " " + instr.getPartLabel() : name;
     }
 
     /**
@@ -407,7 +505,9 @@ public class DocumentsService {
             try (ZipOutputStream zip = new ZipOutputStream(outputStream)) {
                 Set<String> usedNames = new LinkedHashSet<>();
                 for (AttachmentEntity att : attachments) {
-                    if (att.getDocument() == null) continue;
+                    if (att.getDocument() == null) {
+                        continue;
+                    }
                     String entryName = uniqueZipName(att.getDisplayName(), usedNames);
                     zip.putNextEntry(new ZipEntry(entryName));
                     try (InputStream in =
@@ -421,16 +521,34 @@ public class DocumentsService {
     }
 
     /**
-     * Build a streaming merged PDF from a list of attachments.
-     * Only attachments with mimeType {@code application/pdf} are included; others are skipped.
-     * Returns {@code null} if no PDF attachments are present.
+     * Build a streaming merged PDF with a PDF outline (bookmarks) from labeled entries.
+     * Only entries with mimeType {@code application/pdf} are included; others are silently skipped.
+     * Returns {@code null} if no PDF entries are present.
      */
-    public StreamWriter buildMergedPdf(List<AttachmentEntity> attachments) {
-        List<AttachmentEntity> pdfAtts = attachments.stream()
-                .filter(a -> a.getDocument() != null)
-                .filter(a -> "application/pdf".equals(a.getDocument().getMimeType()))
+    public StreamWriter buildMergedPdf(List<MergedPdfEntry> entries) {
+        return doMerge(entries, path -> {
+            try {
+                return filesystem.openForRead(path);
+            } catch (IOException e) {
+                throw new StorageException("Failed to open PDF for merge: " + path, e);
+            }
+        });
+    }
+
+    /**
+     * Core merge logic, separated from filesystem access so it can be tested with in-memory content.
+     *
+     * @param entries     labeled attachment entries; non-PDF entries are skipped
+     * @param pathReader  supplies an {@link InputStream} for a given storage path
+     * @return a {@link StreamWriter} that writes the merged PDF, or {@code null} if no PDFs found
+     */
+    static StreamWriter doMerge(List<MergedPdfEntry> entries, Function<String, InputStream> pathReader) {
+        List<MergedPdfEntry> pdfEntries = entries.stream()
+                .filter(e -> e.attachment().getDocument() != null)
+                .filter(e ->
+                        "application/pdf".equals(e.attachment().getDocument().getMimeType()))
                 .toList();
-        if (pdfAtts.isEmpty()) {
+        if (pdfEntries.isEmpty()) {
             return null;
         }
 
@@ -438,12 +556,27 @@ public class DocumentsService {
             PDFMergerUtility merger = new PDFMergerUtility();
             List<PDDocument> sources = new ArrayList<>();
             try (PDDocument target = new PDDocument()) {
-                for (AttachmentEntity att : pdfAtts) {
+                PDDocumentOutline outline = new PDDocumentOutline();
+                target.getDocumentCatalog().setDocumentOutline(outline);
+
+                int pageOffset = 0;
+                for (MergedPdfEntry entry : pdfEntries) {
                     try (InputStream in =
-                            filesystem.openForRead(att.getDocument().getPath())) {
+                            pathReader.apply(entry.attachment().getDocument().getPath())) {
                         PDDocument src = Loader.loadPDF(in.readAllBytes());
                         sources.add(src);
+                        int srcPageCount = src.getNumberOfPages();
                         merger.appendDocument(target, src);
+
+                        PDPageFitDestination dest = new PDPageFitDestination();
+                        dest.setPage(target.getPage(pageOffset));
+
+                        PDOutlineItem item = new PDOutlineItem();
+                        item.setTitle(entry.bookmarkLabel() != null ? entry.bookmarkLabel() : "");
+                        item.setDestination(dest);
+                        outline.addLast(item);
+
+                        pageOffset += srcPageCount;
                     }
                 }
                 target.save(outputStream);
