@@ -7,6 +7,7 @@ import de.halbmann.sam.api.entity.collections.SheetCollectionFilterRequest;
 import de.halbmann.sam.api.entity.shared.PaginatedResponse;
 import de.halbmann.sam.api.entity.sheets.ExportFormat;
 import de.halbmann.sam.business.collections.controller.CollectionTocService;
+import de.halbmann.sam.business.collections.controller.GemaSetlistService;
 import de.halbmann.sam.business.collections.controller.SheetCollectionService;
 import de.halbmann.sam.business.sheets.controller.ExportResult;
 import de.halbmann.sam.business.sheets.controller.SheetExportService;
@@ -32,6 +33,9 @@ public class SheetCollectionsResourceImpl implements SheetCollectionsResource {
 
     @Inject
     CollectionTocService tocService;
+
+    @Inject
+    GemaSetlistService gemaSetlistService;
 
     @Inject
     SheetExportService sheetExportService;
@@ -71,6 +75,15 @@ public class SheetCollectionsResourceImpl implements SheetCollectionsResource {
         return Response.ok(pdf)
                 .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")
                 .header("Content-Length", pdf.length)
+                .build();
+    }
+
+    @Override
+    public Response generateGemaSetlist(final String collectionId) {
+        ExportResult result = gemaSetlistService.generateGemaSetlist(collectionId);
+        return Response.ok((StreamingOutput) result.body()::write)
+                .header("Content-Disposition", "attachment; filename=\"" + result.filename() + "\"")
+                .type(result.contentType())
                 .build();
     }
 

@@ -37,6 +37,11 @@ public interface SheetCollectionsResource {
     @Produces("application/pdf")
     Response generateToc(final @PathParam("collectionId") String collectionId);
 
+    @GET
+    @Path("{collectionId}/gema-setlist")
+    @Produces("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    Response generateGemaSetlist(final @PathParam("collectionId") String collectionId);
+
     /**
      * Exports a collection as a downloadable file.
      *

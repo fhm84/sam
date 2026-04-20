@@ -17,8 +17,8 @@
         <aws-java-nio-spi-s3.version>2.2.1</aws-java-nio-spi-s3.version>
         <quarkus-langchain4j.version>1.7.4</quarkus-langchain4j.version>
         <pdfbox-tools.version>3.0.7</pdfbox-tools.version>
-        <flying-saucer-pdf.version>10.1.0</flying-saucer-pdf.version>
         <flying-saucer-pdf.version>10.2.0</flying-saucer-pdf.version>
+        <poi.version>5.5.1</poi.version>
     </properties>
 
     <dependencyManagement>
@@ -151,10 +151,27 @@
             <version>${flying-saucer-pdf.version}</version>
         </dependency>
 
+        <!-- xlsx generation (GEMA setlist template filling) -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>${poi.version}</version>
+        </dependency>
+
         <!-- test dependencies -->
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
