@@ -359,7 +359,9 @@
       "backToList": "Zurück zu Sammlungen",
       "actions": {
         "label": "Aktionen",
-        "generateToc": "Inhaltsverzeichnis erstellen"
+        "generateToc": "Inhaltsverzeichnis erstellen",
+        "generateGemaSetlist": "GEMA-Setliste",
+        "gemaSetlistError": "GEMA-Setliste konnte nicht erstellt werden"
       }
     },
     "export": {
@@ -396,7 +398,8 @@
       "empty": "Noch keine Noten in dieser Sammlung",
       "preview": "Notendetails anzeigen",
       "save": "Speichern",
-      "cancel": "Abbrechen"
+      "cancel": "Abbrechen",
+      "createAnother": "Weiteres hinzufügen"
     }
   },
   "uploads": {

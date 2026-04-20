@@ -53,6 +53,16 @@
         size="small"
         (onClick)="generateToc()"
       />
+      @if (isSetlist) {
+        <p-button
+          icon="pi pi-file-excel"
+          [label]="t.t('collections.detail.actions.generateGemaSetlist')"
+          severity="secondary"
+          [outlined]="true"
+          size="small"
+          (onClick)="generateGemaSetlist()"
+        />
+      }
       <p-splitButton
         icon="pi pi-download"
         [label]="t.t('collections.export.zip')"

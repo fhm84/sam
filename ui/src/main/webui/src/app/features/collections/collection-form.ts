@@ -62,13 +62,20 @@ export class CollectionForm extends BaseForm<SheetCollection> implements OnInit 
     });
   }
 
+  private toLocalDateString(date: Date): string {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
   buildSaveRequest(): Observable<void> {
     const raw = this.form.getRawValue();
     const payload = convertEmptyStringsToNull({
       name: raw.name,
       description: raw.description,
       type: raw.type ?? undefined,
-      date: raw.date ?? undefined,
+      date: raw.date ? this.toLocalDateString(raw.date) : undefined,
     }) as SheetCollection;
 
     return this.isEdit

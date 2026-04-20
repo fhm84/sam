@@ -359,7 +359,9 @@
       "backToList": "Back to Collections",
       "actions": {
         "label": "Actions",
-        "generateToc": "Generate Table of Contents"
+        "generateToc": "Generate Table of Contents",
+        "generateGemaSetlist": "GEMA Setlist",
+        "gemaSetlistError": "Failed to generate GEMA setlist"
       }
     },
     "export": {
@@ -396,7 +398,8 @@
       "empty": "No sheets in this collection yet",
       "preview": "View sheet details",
       "save": "Save",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "createAnother": "Add another"
     }
   },
   "uploads": {

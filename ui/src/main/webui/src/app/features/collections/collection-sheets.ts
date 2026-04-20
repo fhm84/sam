@@ -1,7 +1,7 @@
 import { Component, DestroyRef, inject, Input, OnChanges, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subject, debounceTime } from 'rxjs';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { Dialog } from 'primeng/dialog';
@@ -13,6 +13,7 @@ import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
 import { FloatLabel } from 'primeng/floatlabel';
 import { Tooltip } from 'primeng/tooltip';
+import { Checkbox } from 'primeng/checkbox';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../core/translation.service';
 import { CollectionsApiService, SheetsApiService } from '../../core/api';
@@ -23,6 +24,7 @@ import { DIFFICULTY_LEVELS } from '../../shared/constants';
   selector: 'app-collection-sheets',
   imports: [
     RouterLink,
+    FormsModule,
     ReactiveFormsModule,
     TableModule,
     Dialog,
@@ -33,6 +35,7 @@ import { DIFFICULTY_LEVELS } from '../../shared/constants';
     InputIcon,
     FloatLabel,
     Tooltip,
+    Checkbox,
     TranslatePipe,
   ],
   providers: [ConfirmationService],
@@ -60,6 +63,7 @@ export class CollectionSheets implements OnInit, OnChanges {
   protected addDialogVisible = false;
   protected selectedSheet: SheetMusicSearchResult | null = null;
   protected saving = false;
+  protected createAnother = false;
 
   protected readonly searchResults = signal<SheetMusicSearchResult[]>([]);
   protected readonly searchTotal = signal(0);
@@ -105,6 +109,7 @@ export class CollectionSheets implements OnInit, OnChanges {
     this.selectedSheet = null;
     this.currentQuery = '';
     this.searchPage = 0;
+    this.createAnother = false;
     this.identifierForm.reset();
     this.searchResults.set([]);
     this.addDialogVisible = true;
@@ -147,12 +152,17 @@ export class CollectionSheets implements OnInit, OnChanges {
     this.collectionsApi.addSheet(this.collectionId, payload).subscribe({
       next: () => {
         this.saving = false;
-        this.addDialogVisible = false;
         this.messageService.add({
           severity: 'success',
           summary: this.t.t('collections.sheets.messages.added'),
         });
         this.loadSheets();
+        if (this.createAnother) {
+          this.selectedSheet = null;
+          this.identifierForm.reset();
+        } else {
+          this.addDialogVisible = false;
+        }
       },
       error: () => {
         this.saving = false;

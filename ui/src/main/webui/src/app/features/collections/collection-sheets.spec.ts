@@ -173,6 +173,49 @@ describe('CollectionSheets', () => {
     expect(collectionsApi.listSheets).toHaveBeenCalled();
   });
 
+  // ── createAnother ──────────────────────────────────────
+
+  it('openAdd resets createAnother to false', () => {
+    (component as any).createAnother = true;
+    (component as any).openAdd();
+    expect((component as any).createAnother).toBe(false);
+  });
+
+  it('onAdd with createAnother=true keeps dialog open and resets selection and identifier', () => {
+    (component as any).addDialogVisible = true;
+    (component as any).selectedSheet = makeSearchResult('s3');
+    (component as any).identifierForm.controls.identifier.setValue('5');
+    (component as any).createAnother = true;
+
+    (component as any).onAdd();
+
+    expect((component as any).addDialogVisible).toBe(true);
+    expect((component as any).selectedSheet).toBeNull();
+    expect((component as any).identifierForm.controls.identifier.value).toBe('');
+  });
+
+  it('onAdd with createAnother=true still calls addSheet and reloads sheets', () => {
+    (component as any).selectedSheet = makeSearchResult('s3');
+    (component as any).identifierForm.controls.identifier.setValue('5');
+    (component as any).createAnother = true;
+    collectionsApi.listSheets.mockClear();
+
+    (component as any).onAdd();
+
+    expect(collectionsApi.addSheet).toHaveBeenCalledWith('col-1', { identifier: '5', sheetId: 's3' });
+    expect(collectionsApi.listSheets).toHaveBeenCalled();
+  });
+
+  it('onAdd with createAnother=false closes dialog as normal', () => {
+    (component as any).selectedSheet = makeSearchResult('s4');
+    (component as any).identifierForm.controls.identifier.setValue('6');
+    (component as any).createAnother = false;
+
+    (component as any).onAdd();
+
+    expect((component as any).addDialogVisible).toBe(false);
+  });
+
   // ── onUpdate ───────────────────────────────────────────
 
   it('onUpdate does nothing when form is invalid', () => {

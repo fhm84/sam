@@ -89,6 +89,14 @@ export class CollectionsApiService {
     });
   }
 
+  // ── GEMA setlist export ───────────────────────────────
+  downloadGemaSetlist(collectionId: string): Observable<HttpResponse<Blob>> {
+    return this.http.get(`${this.baseUrl}/${collectionId}/gema-setlist`, {
+      responseType: 'blob',
+      observe: 'response',
+    });
+  }
+
   // ── Reverse lookup ────────────────────────────────────
   getCollectionsForSheet(
     sheetId: string,

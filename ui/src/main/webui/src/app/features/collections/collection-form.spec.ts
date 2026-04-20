@@ -123,4 +123,41 @@ describe('CollectionForm', () => {
     component.form.controls.type.setValue('SETLIST');
     expect(component.form.controls.date.value).not.toBeNull();
   });
+
+  // ── toLocalDateString ──────────────────────────────────
+
+  it('toLocalDateString formats a date as yyyy-MM-dd', () => {
+    const date = new Date(2026, 3, 29); // April 29, 2026 local time
+    expect((component as any).toLocalDateString(date)).toBe('2026-04-29');
+  });
+
+  it('toLocalDateString zero-pads month and day', () => {
+    const date = new Date(2024, 0, 5); // January 5
+    expect((component as any).toLocalDateString(date)).toBe('2024-01-05');
+  });
+
+  // ── buildSaveRequest — date serialization ──────────────
+
+  it('buildSaveRequest passes date as yyyy-MM-dd string, not a Date object', () => {
+    component.form.patchValue({
+      name: 'My Setlist',
+      type: 'SETLIST',
+      date: new Date(2026, 3, 29),
+    });
+
+    (component as any).buildSaveRequest().subscribe();
+
+    const payload = collectionsApi.create.mock.calls[0][0];
+    expect(typeof payload.date).toBe('string');
+    expect(payload.date).toBe('2026-04-29');
+  });
+
+  it('buildSaveRequest omits date from payload when date is null', () => {
+    component.form.patchValue({ name: 'My Folder', type: 'FOLDER', date: null });
+
+    (component as any).buildSaveRequest().subscribe();
+
+    const payload = collectionsApi.create.mock.calls[0][0];
+    expect(payload.date).toBeUndefined();
+  });
 });

@@ -188,18 +188,26 @@
   }
 
   <ng-template #footer>
-    <p-button
-      [label]="t.t('collections.sheets.cancel')"
-      severity="secondary"
-      [text]="true"
-      (onClick)="addDialogVisible = false"
-    />
-    <p-button
-      [label]="t.t('collections.sheets.save')"
-      [disabled]="!canAdd || saving"
-      [loading]="saving"
-      (onClick)="onAdd()"
-    />
+    <div class="flex items-center justify-between w-full">
+      <label class="flex items-center gap-2 cursor-pointer text-sm text-[var(--sam-text-secondary)] select-none">
+        <p-checkbox [(ngModel)]="createAnother" [binary]="true" inputId="create-another" />
+        {{ 'collections.sheets.createAnother' | translate }}
+      </label>
+      <div class="flex gap-2">
+        <p-button
+          [label]="t.t('collections.sheets.cancel')"
+          severity="secondary"
+          [text]="true"
+          (onClick)="addDialogVisible = false"
+        />
+        <p-button
+          [label]="t.t('collections.sheets.save')"
+          [disabled]="!canAdd || saving"
+          [loading]="saving"
+          (onClick)="onAdd()"
+        />
+      </div>
+    </div>
   </ng-template>
 </p-dialog>
 

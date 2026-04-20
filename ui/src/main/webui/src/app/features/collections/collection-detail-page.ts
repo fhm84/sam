@@ -67,6 +67,22 @@ export class CollectionDetailPage implements OnInit {
     this.loadCollection(this.collectionId());
   }
 
+  protected get isSetlist(): boolean {
+    return this.collection()?.type === 'SETLIST';
+  }
+
+  protected generateGemaSetlist(): void {
+    this.api.downloadGemaSetlist(this.collectionId()).subscribe({
+      next: (response) => triggerDownload(response),
+      error: () => {
+        this.messageService.add({
+          severity: 'error',
+          summary: this.t.t('collections.detail.actions.gemaSetlistError'),
+        });
+      },
+    });
+  }
+
   protected generateToc(): void {
     this.api.downloadToc(this.collectionId()).subscribe({
       next: (response) => {
