@@ -414,7 +414,10 @@ public class DocumentClassificationService {
         }
         if (name != null && !name.isBlank()) {
             return instrumentRepository.findByName(name).orElseGet(() -> {
-                String slug = name.toLowerCase().replaceAll("[^a-z0-9]+", "-").replaceAll("-+$", "");
+                String slug = name.toLowerCase().replaceAll("[^a-z0-9]+", "-");
+                while (slug.endsWith("-")) {
+                    slug = slug.substring(0, slug.length() - 1);
+                }
                 InstrumentEntity inst = new InstrumentEntity();
                 inst.setId(slug);
                 inst.setName(name);

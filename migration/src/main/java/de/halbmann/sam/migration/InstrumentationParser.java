@@ -15,6 +15,13 @@ import java.util.regex.Pattern;
 
 public class InstrumentationParser {
 
+    // Hyphen is only a segment separator (not inside the char class) to prevent ambiguity-driven backtracking (ReDoS).
+    private static final Pattern INSTRUMENTATION_PATTERN = Pattern.compile(
+            "^\\s*(?:(?<partLabel>\\d+\\.\\s*(?:[A-Za-zÄÖÜäöüß]+(?:-[A-Za-zÄÖÜäöüß]+)*)?)\\s+)?"
+                    + "(?<name>[A-Za-zÄÖÜäöüß]+(?:-[A-Za-zÄÖÜäöüß]+)*)"
+                    + "(?:\\s+in\\s+(?<transposition>[a-z]))?\\s*$",
+            Pattern.CASE_INSENSITIVE);
+
     public static List<Instrumentation> parseInstrumentations(String input) {
         return Arrays.stream(input.split(";"))
                 .map(String::trim)
@@ -25,15 +32,7 @@ public class InstrumentationParser {
     }
 
     private static Instrumentation parseInstrument(String part) {
-        // Pattern to match: "1. Instrument in key" or just "Instrument"
-        // Pattern pattern = Pattern.compile("^(?:(\\d+)\\.\\s+Solo-Stimme\\s+)?(.+?)(?:\\s+in\\s+([a-z]+))?$",
-        // Pattern.CASE_INSENSITIVE);
-        String regex = "^\\s*(?:(?<partLabel>\\d+\\.\\s*(?:[A-Za-zÄÖÜäöüß\\-]+(?:-[A-Za-zÄÖÜäöüß\\-]+)*)?)\\s+)?"
-                + "(?<name>[A-Za-zÄÖÜäöüß\\-]+(?:-[A-Za-zÄÖÜäöüß\\-]+)*)"
-                + "(?:\\s+in\\s+(?<transposition>[a-z]))?\\s*$";
-
-        Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(part);
+        Matcher matcher = INSTRUMENTATION_PATTERN.matcher(part);
 
         if (!matcher.matches()) {
             return null;
