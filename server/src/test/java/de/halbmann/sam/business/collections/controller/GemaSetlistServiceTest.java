@@ -222,18 +222,16 @@ class GemaSetlistServiceTest {
 
     @Test
     void templateHasSetlistSheet() throws Exception {
-        try (InputStream in =
-                        GemaSetlistServiceTest.class.getResourceAsStream("/gema/gema-setlist-template.xlsx");
-             XSSFWorkbook workbook = new XSSFWorkbook(in)) {
+        try (InputStream in = GemaSetlistServiceTest.class.getResourceAsStream("/gema/gema-setlist-template.xlsx");
+                XSSFWorkbook workbook = new XSSFWorkbook(in)) {
             assertEquals("Setlist Template", workbook.getSheetAt(0).getSheetName());
         }
     }
 
     @Test
     void templateContainsPlaceholders() throws Exception {
-        try (InputStream in =
-                        GemaSetlistServiceTest.class.getResourceAsStream("/gema/gema-setlist-template.xlsx");
-             XSSFWorkbook workbook = new XSSFWorkbook(in)) {
+        try (InputStream in = GemaSetlistServiceTest.class.getResourceAsStream("/gema/gema-setlist-template.xlsx");
+                XSSFWorkbook workbook = new XSSFWorkbook(in)) {
             XSSFSheet sheet = workbook.getSheetAt(0);
             List<String> values = collectStringValues(sheet);
             assertTrue(

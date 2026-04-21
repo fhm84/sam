@@ -14,33 +14,32 @@ import jakarta.ws.rs.core.Response;
 public interface SheetCollectionsResource {
 
     @GET
-    PaginatedResponse<SheetCollection> findSheetCollections(
-            final @BeanParam SheetCollectionFilterRequest filterRequest);
+    PaginatedResponse<SheetCollection> findSheetCollections(@BeanParam SheetCollectionFilterRequest filterRequest);
 
     @POST
-    SheetCollection add(final SheetCollection sheetCollection);
+    SheetCollection add(SheetCollection sheetCollection);
 
     @GET
     @Path("{collectionId}")
-    SheetCollection load(final @PathParam("collectionId") String collectionId);
+    SheetCollection load(@PathParam("collectionId") String collectionId);
 
     @PUT
     @Path("{collectionId}")
-    void update(final @PathParam("collectionId") String collectionId, final SheetCollection sheetCollection);
+    void update(@PathParam("collectionId") String collectionId, SheetCollection sheetCollection);
 
     @DELETE
     @Path("{collectionId}")
-    void delete(final @PathParam("collectionId") String collectionId);
+    void delete(@PathParam("collectionId") String collectionId);
 
     @GET
     @Path("{collectionId}/toc")
     @Produces("application/pdf")
-    Response generateToc(final @PathParam("collectionId") String collectionId);
+    Response generateToc(@PathParam("collectionId") String collectionId);
 
     @GET
     @Path("{collectionId}/gema-setlist")
     @Produces("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-    Response generateGemaSetlist(final @PathParam("collectionId") String collectionId);
+    Response generateGemaSetlist(@PathParam("collectionId") String collectionId);
 
     /**
      * Exports a collection as a downloadable file.
@@ -59,9 +58,9 @@ public interface SheetCollectionsResource {
     @Path("{collectionId}/export")
     @Produces(MediaType.WILDCARD)
     Response export(
-            final @PathParam("collectionId") String collectionId,
-            final @QueryParam("format") @DefaultValue("ZIP") ExportFormat format);
+            @PathParam("collectionId") String collectionId,
+            @QueryParam("format") @DefaultValue("ZIP") ExportFormat format);
 
     @Path("{collectionId}/sheets")
-    CollectionSheetsResource sheets(final @PathParam("collectionId") String collectionId);
+    CollectionSheetsResource sheets(@PathParam("collectionId") String collectionId);
 }

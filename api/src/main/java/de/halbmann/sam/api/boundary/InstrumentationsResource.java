@@ -15,23 +15,23 @@ public interface InstrumentationsResource {
 
     @GET
     @Path("{instrumentationId}")
-    Instrumentation get(final @PathParam("instrumentationId") String instrumentationId);
+    Instrumentation get(@PathParam("instrumentationId") String instrumentationId);
 
     @POST
-    void add(final CreateInstrumentation instrumentation);
+    void add(CreateInstrumentation instrumentation);
 
     @POST
     @Path("bulk")
-    void add(final List<CreateInstrumentation> instrumentations);
+    void add(List<CreateInstrumentation> instrumentations);
 
     @PUT
     @Path("{instrumentationId}")
-    void update(final @PathParam("instrumentationId") String instrumentationId, final Instrumentation instrumentation);
+    void update(@PathParam("instrumentationId") String instrumentationId, Instrumentation instrumentation);
 
     @DELETE
     @Path("{instrumentationId}")
-    void delete(final @PathParam("instrumentationId") String instrumentationId);
+    void delete(@PathParam("instrumentationId") String instrumentationId);
 
     @Path("{instrumentationId}/documents")
-    DocumentsResource documents(final @PathParam("instrumentationId") String instrumentationId);
+    DocumentsResource documents(@PathParam("instrumentationId") String instrumentationId);
 }

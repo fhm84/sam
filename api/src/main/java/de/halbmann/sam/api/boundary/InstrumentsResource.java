@@ -13,20 +13,20 @@ import jakarta.ws.rs.core.MediaType;
 public interface InstrumentsResource {
 
     @GET
-    PaginatedResponse<Instrument> findInstruments(final @BeanParam InstrumentFilterRequest filterRequest);
+    PaginatedResponse<Instrument> findInstruments(@BeanParam InstrumentFilterRequest filterRequest);
 
     @POST
-    Instrument add(final CreateInstrument instrument);
+    Instrument add(CreateInstrument instrument);
 
     @GET
     @Path("{instrumentId}")
-    Instrument load(final @PathParam("instrumentId") String instrumentId);
+    Instrument load(@PathParam("instrumentId") String instrumentId);
 
     @PUT
     @Path("{instrumentId}")
-    void update(final @PathParam("instrumentId") String instrumentId, final Instrument instrument);
+    void update(@PathParam("instrumentId") String instrumentId, Instrument instrument);
 
     @DELETE
     @Path("{instrumentId}")
-    void delete(final @PathParam("instrumentId") String instrumentId);
+    void delete(@PathParam("instrumentId") String instrumentId);
 }

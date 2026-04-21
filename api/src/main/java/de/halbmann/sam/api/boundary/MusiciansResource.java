@@ -12,20 +12,20 @@ import jakarta.ws.rs.core.MediaType;
 public interface MusiciansResource {
 
     @GET
-    PaginatedResponse<Musician> findMusicians(final @BeanParam MusicianFilterRequest filterRequest);
+    PaginatedResponse<Musician> findMusicians(@BeanParam MusicianFilterRequest filterRequest);
 
     @POST
-    Musician add(final Musician musician);
+    Musician add(Musician musician);
 
     @GET
     @Path("{musicianId}")
-    Musician load(final @PathParam("musicianId") String musicianId);
+    Musician load(@PathParam("musicianId") String musicianId);
 
     @PUT
     @Path("{musicianId}")
-    void update(final @PathParam("musicianId") String musicianId, final Musician musician);
+    void update(@PathParam("musicianId") String musicianId, Musician musician);
 
     @DELETE
     @Path("{musicianId}")
-    void delete(final @PathParam("musicianId") String musicianId);
+    void delete(@PathParam("musicianId") String musicianId);
 }

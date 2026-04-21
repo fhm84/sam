@@ -12,23 +12,23 @@ import jakarta.ws.rs.core.MediaType;
 public interface BookletsResource {
 
     @GET
-    PaginatedResponse<Booklet> findBooklets(final @BeanParam BookletFilterRequest filterRequest);
+    PaginatedResponse<Booklet> findBooklets(@BeanParam BookletFilterRequest filterRequest);
 
     @POST
-    Booklet add(final Booklet booklet);
+    Booklet add(Booklet booklet);
 
     @GET
     @Path("{bookletId}")
-    Booklet load(final @PathParam("bookletId") String bookletId);
+    Booklet load(@PathParam("bookletId") String bookletId);
 
     @PUT
     @Path("{bookletId}")
-    void update(final @PathParam("bookletId") String bookletId, final Booklet booklet);
+    void update(@PathParam("bookletId") String bookletId, Booklet booklet);
 
     @DELETE
     @Path("{bookletId}")
-    void delete(final @PathParam("bookletId") String bookletId);
+    void delete(@PathParam("bookletId") String bookletId);
 
     @Path("{bookletId}/sheets")
-    CollectionSheetsResource sheets(final @PathParam("bookletId") String bookletId);
+    CollectionSheetsResource sheets(@PathParam("bookletId") String bookletId);
 }

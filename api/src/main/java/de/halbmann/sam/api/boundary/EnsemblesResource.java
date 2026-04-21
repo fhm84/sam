@@ -24,7 +24,7 @@ public interface EnsemblesResource {
      * @return a paginated response containing matching ensembles
      */
     @GET
-    PaginatedResponse<Ensemble> findEnsembles(final @BeanParam EnsembleFilterRequest filterRequest);
+    PaginatedResponse<Ensemble> findEnsembles(@BeanParam EnsembleFilterRequest filterRequest);
 
     /**
      * Creates a new ensemble.
@@ -33,7 +33,7 @@ public interface EnsemblesResource {
      * @return the created ensemble with generated ID
      */
     @POST
-    Ensemble add(final CreateEnsemble ensemble);
+    Ensemble add(CreateEnsemble ensemble);
 
     /**
      * Loads a specific ensemble by its ID, including all voices and their options.
@@ -43,7 +43,7 @@ public interface EnsemblesResource {
      */
     @GET
     @Path("{ensembleId}")
-    Ensemble load(final @PathParam("ensembleId") String ensembleId);
+    Ensemble load(@PathParam("ensembleId") String ensembleId);
 
     /**
      * Updates an existing ensemble's name and description.
@@ -53,7 +53,7 @@ public interface EnsemblesResource {
      */
     @PUT
     @Path("{ensembleId}")
-    void update(final @PathParam("ensembleId") String ensembleId, final Ensemble ensemble);
+    void update(@PathParam("ensembleId") String ensembleId, Ensemble ensemble);
 
     /**
      * Deletes an ensemble and all its voices and options.
@@ -62,7 +62,7 @@ public interface EnsemblesResource {
      */
     @DELETE
     @Path("{ensembleId}")
-    void delete(final @PathParam("ensembleId") String ensembleId);
+    void delete(@PathParam("ensembleId") String ensembleId);
 
     /**
      * Provides access to the voices sub-resource for a specific ensemble.
@@ -71,7 +71,7 @@ public interface EnsemblesResource {
      * @return the voices resource
      */
     @Path("{ensembleId}/voices")
-    EnsembleVoicesResource voices(final @PathParam("ensembleId") String ensembleId);
+    EnsembleVoicesResource voices(@PathParam("ensembleId") String ensembleId);
 
     /**
      * Provides access to the members sub-resource for a specific ensemble.
@@ -80,7 +80,7 @@ public interface EnsemblesResource {
      * @return the members resource
      */
     @Path("{ensembleId}/members")
-    EnsembleMembershipsResource members(final @PathParam("ensembleId") String ensembleId);
+    EnsembleMembershipsResource members(@PathParam("ensembleId") String ensembleId);
 
     /**
      * Precomputes coverage for all sheets against the given ensemble and stores the results as a
@@ -91,7 +91,7 @@ public interface EnsemblesResource {
      */
     @POST
     @Path("{ensembleId}/coverage/compute")
-    EnsembleCoverageStatus computeCoverage(final @PathParam("ensembleId") String ensembleId);
+    EnsembleCoverageStatus computeCoverage(@PathParam("ensembleId") String ensembleId);
 
     /**
      * Returns the current coverage snapshot status for the given ensemble, or 404 if no snapshot
@@ -102,5 +102,5 @@ public interface EnsemblesResource {
      */
     @GET
     @Path("{ensembleId}/coverage/status")
-    EnsembleCoverageStatus getCoverageStatus(final @PathParam("ensembleId") String ensembleId);
+    EnsembleCoverageStatus getCoverageStatus(@PathParam("ensembleId") String ensembleId);
 }

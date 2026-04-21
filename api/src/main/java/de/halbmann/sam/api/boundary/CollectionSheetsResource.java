@@ -12,16 +12,16 @@ import jakarta.ws.rs.core.MediaType;
 public interface CollectionSheetsResource {
 
     @GET
-    PaginatedResponse<CollectionSheet> listAll(final @BeanParam PaginationRequest paginationRequest);
+    PaginatedResponse<CollectionSheet> listAll(@BeanParam PaginationRequest paginationRequest);
 
     @POST
-    void addSheet(final CreateCollectionSheet createCollectionSheet);
+    void addSheet(CreateCollectionSheet createCollectionSheet);
 
     @PUT
     @Path("{sheetId}")
-    void updateSheet(final @PathParam("sheetId") String sheetId, final CollectionSheet collectionSheet);
+    void updateSheet(@PathParam("sheetId") String sheetId, CollectionSheet collectionSheet);
 
     @DELETE
     @Path("{sheetId}")
-    void removeSheet(final @PathParam("sheetId") String sheetId);
+    void removeSheet(@PathParam("sheetId") String sheetId);
 }

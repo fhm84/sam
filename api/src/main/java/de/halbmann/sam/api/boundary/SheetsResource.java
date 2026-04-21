@@ -28,7 +28,7 @@ public interface SheetsResource {
      * @return a paginated response containing the list of sheet music
      */
     @GET
-    PaginatedResponse<SheetMusicSearchResult> findSheets(final @BeanParam SheetFilterRequest filterRequest);
+    PaginatedResponse<SheetMusicSearchResult> findSheets(@BeanParam SheetFilterRequest filterRequest);
 
     /**
      * Adds a new sheet music entry.
@@ -37,7 +37,7 @@ public interface SheetsResource {
      * @return the added sheet music
      */
     @POST
-    SheetMusic add(final CreateSheetMusic sheetMusic);
+    SheetMusic add(CreateSheetMusic sheetMusic);
 
     /**
      * Loads a specific sheet music by its ID.
@@ -47,7 +47,7 @@ public interface SheetsResource {
      */
     @GET
     @Path("{sheetId}")
-    SheetMusic load(final @PathParam("sheetId") String sheetId);
+    SheetMusic load(@PathParam("sheetId") String sheetId);
 
     /**
      * Updates an existing sheet music entry.
@@ -57,7 +57,7 @@ public interface SheetsResource {
      */
     @PUT
     @Path("{sheetId}")
-    void update(final @PathParam("sheetId") String sheetId, final SheetMusic sheetMusic);
+    void update(@PathParam("sheetId") String sheetId, SheetMusic sheetMusic);
 
     /**
      * Deletes a specific sheet music by its ID.
@@ -66,21 +66,21 @@ public interface SheetsResource {
      */
     @DELETE
     @Path("{sheetId}")
-    void delete(final @PathParam("sheetId") String sheetId);
+    void delete(@PathParam("sheetId") String sheetId);
 
     /**
      * Add one or more tags to a sheet music entity.
      */
     @POST
     @Path("{sheetId}/tags")
-    void addTags(final @PathParam("sheetId") String sheetId, Set<String> newTags);
+    void addTags(@PathParam("sheetId") String sheetId, Set<String> newTags);
 
     /**
      * Remove one or more tags from a sheet music entity.
      */
     @DELETE
     @Path("{sheetId}/tags")
-    void removeTag(final @PathParam("sheetId") String sheetId, Set<String> tagsToRemove);
+    void removeTag(@PathParam("sheetId") String sheetId, Set<String> tagsToRemove);
 
     /**
      * Favorite the sheet music.
@@ -89,7 +89,7 @@ public interface SheetsResource {
      */
     @POST
     @Path("{sheetId}/favorite")
-    void favorite(final @PathParam("sheetId") String sheetId);
+    void favorite(@PathParam("sheetId") String sheetId);
 
     /**
      * Unfavorite the sheet music.
@@ -98,7 +98,7 @@ public interface SheetsResource {
      */
     @DELETE
     @Path("{sheetId}/favorite")
-    void unfavorite(final @PathParam("sheetId") String sheetId);
+    void unfavorite(@PathParam("sheetId") String sheetId);
 
     /**
      * Returns all distinct genre values used across sheet music.
@@ -129,7 +129,7 @@ public interface SheetsResource {
     @GET
     @Path("{sheetId}/collections")
     PaginatedResponse<SheetCollection> getCollections(
-            final @PathParam("sheetId") String sheetId, final @BeanParam PaginationRequest paginationRequest);
+            @PathParam("sheetId") String sheetId, @BeanParam PaginationRequest paginationRequest);
 
     /**
      * Provides access to the instrumentations resource for a specific sheet music.
@@ -138,7 +138,7 @@ public interface SheetsResource {
      * @return the instrumentations resource
      */
     @Path("{sheetId}/instrumentations")
-    InstrumentationsResource instrumentations(final @PathParam("sheetId") String sheetId);
+    InstrumentationsResource instrumentations(@PathParam("sheetId") String sheetId);
 
     /**
      * Provides access to the documents resource for a speciic sheet music.
@@ -147,7 +147,7 @@ public interface SheetsResource {
      * @return the documents resource
      */
     @Path("{sheetId}/documents")
-    DocumentsResource documents(final @PathParam("sheetId") String sheetId);
+    DocumentsResource documents(@PathParam("sheetId") String sheetId);
 
     /**
      * Evaluates the coverage of a sheet music's instrumentations against an ensemble definition.
@@ -158,8 +158,7 @@ public interface SheetsResource {
      */
     @GET
     @Path("{sheetId}/coverage")
-    CoverageResult coverage(
-            final @PathParam("sheetId") String sheetId, final @QueryParam("ensemble") String ensembleId);
+    CoverageResult coverage(@PathParam("sheetId") String sheetId, @QueryParam("ensemble") String ensembleId);
 
     /**
      * Runs AI-powered data enrichment on an existing sheet music entry and returns suggestions
@@ -170,7 +169,7 @@ public interface SheetsResource {
      */
     @POST
     @Path("{sheetId}/enrich")
-    SheetEnrichment enrich(final @PathParam("sheetId") String sheetId);
+    SheetEnrichment enrich(@PathParam("sheetId") String sheetId);
 
     /**
      * Exports a sheet music entry as a downloadable file.
@@ -189,6 +188,5 @@ public interface SheetsResource {
     @Path("{sheetId}/export")
     @Produces(MediaType.WILDCARD)
     Response export(
-            final @PathParam("sheetId") String sheetId,
-            final @QueryParam("format") @DefaultValue("ZIP") ExportFormat format);
+            @PathParam("sheetId") String sheetId, @QueryParam("format") @DefaultValue("ZIP") ExportFormat format);
 }

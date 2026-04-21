@@ -29,7 +29,7 @@ public interface VoiceOptionsResource {
      * @return the created option with generated ID
      */
     @POST
-    VoiceOption add(final CreateVoiceOption option);
+    VoiceOption add(CreateVoiceOption option);
 
     /**
      * Updates an existing option's type, factor, or instrument reference.
@@ -39,7 +39,7 @@ public interface VoiceOptionsResource {
      */
     @PUT
     @Path("{optionId}")
-    void update(final @PathParam("optionId") String optionId, final VoiceOption option);
+    void update(@PathParam("optionId") String optionId, VoiceOption option);
 
     /**
      * Deletes an instrument option.
@@ -48,5 +48,5 @@ public interface VoiceOptionsResource {
      */
     @DELETE
     @Path("{optionId}")
-    void delete(final @PathParam("optionId") String optionId);
+    void delete(@PathParam("optionId") String optionId);
 }

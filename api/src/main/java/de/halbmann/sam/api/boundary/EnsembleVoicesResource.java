@@ -29,7 +29,7 @@ public interface EnsembleVoicesResource {
      * @return the created voice with generated ID
      */
     @POST
-    EnsembleVoice add(final CreateEnsembleVoice voice);
+    EnsembleVoice add(CreateEnsembleVoice voice);
 
     /**
      * Loads a specific voice by its ID.
@@ -39,7 +39,7 @@ public interface EnsembleVoicesResource {
      */
     @GET
     @Path("{voiceId}")
-    EnsembleVoice get(final @PathParam("voiceId") String voiceId);
+    EnsembleVoice get(@PathParam("voiceId") String voiceId);
 
     /**
      * Updates an existing voice's label, weight, and required flag.
@@ -49,7 +49,7 @@ public interface EnsembleVoicesResource {
      */
     @PUT
     @Path("{voiceId}")
-    void update(final @PathParam("voiceId") String voiceId, final EnsembleVoice voice);
+    void update(@PathParam("voiceId") String voiceId, EnsembleVoice voice);
 
     /**
      * Deletes a voice and all its options.
@@ -58,7 +58,7 @@ public interface EnsembleVoicesResource {
      */
     @DELETE
     @Path("{voiceId}")
-    void delete(final @PathParam("voiceId") String voiceId);
+    void delete(@PathParam("voiceId") String voiceId);
 
     /**
      * Provides access to the options sub-resource for a specific voice.
@@ -67,5 +67,5 @@ public interface EnsembleVoicesResource {
      * @return the voice options resource
      */
     @Path("{voiceId}/options")
-    VoiceOptionsResource options(final @PathParam("voiceId") String voiceId);
+    VoiceOptionsResource options(@PathParam("voiceId") String voiceId);
 }
