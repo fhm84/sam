@@ -11,69 +11,27 @@ import jakarta.transaction.Transactional;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-/**
- * Generates a GEMA setlist by filling the official GEMA Excel upload template
- * with sheet music data from a collection.
- *
- * <p>Template layout (sheet "Setlist Template"):</p>
- * <pre>
- *   Row 19 (idx 18): column headers
- *   Row 20 (idx 19): Vorname/Nachname sub-headers
- *   Row 21+ (idx 20+): data rows
- * </pre>
- *
- * <p>Column mapping (0-based):</p>
- * <ul>
- *   <li>A (0): WERKNUMMER / WERKFASSUNGSNUMMER</li>
- *   <li>B (1): TITEL *</li>
- *   <li>C (2): SATZANGABE / SONSTIGE(R) TITEL</li>
- *   <li>D (3): ANZAHL MUSIKER / SÄNGER (not populated — not available in data model)</li>
- *   <li>E (4): SPIELDAUER (MM:SS)</li>
- *   <li>F (5): INTERPRET / KOMPONIST — Nachname *</li>
- *   <li>G (6): INTERPRET / KOMPONIST — Vorname</li>
- *   <li>H (7): TEXTDICHTER — Nachname (not populated)</li>
- *   <li>I (8): TEXTDICHTER — Vorname (not populated)</li>
- *   <li>J (9): VERLAG</li>
- *   <li>K (10): Art der Musikwiedergabe LIVE/TONTRÄGER (user fills)</li>
- *   <li>L (11): VERÖFFENTLICHTES WERK (user fills)</li>
- *   <li>M (12): GROßES RECHT (user fills)</li>
- *   <li>N (13): POTPOURRI (P) / FRAGMENT (F) (user fills)</li>
- *   <li>O (14): ISWC</li>
- *   <li>P (15): BEARBEITER — Nachname</li>
- *   <li>Q (16): BEARBEITER — Vorname</li>
- * </ul>
- */
 @ApplicationScoped
 @Transactional
 public class GemaSetlistService {
 
-    private static final String TEMPLATE_PATH = "/gema/Excel-Upload-Template_Light_de.xlsx";
+    private static final String TEMPLATE_PATH = "/gema/gema-setlist-template.xlsx";
     private static final String CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-
-    /** 0-based index of the first data row in the template (Excel row 21). */
-    private static final int FIRST_DATA_ROW = 20;
-
-    /** Number of pre-formatted empty rows in the template to use as style source. */
-    private static final int LAST_COL = 16; // Q
-
-    // Column indices (0-based)
-    private static final int COL_WERK_NR = 0;
-    private static final int COL_TITEL = 1;
-    private static final int COL_SATZ = 2;
-    private static final int COL_DAUER = 4;
-    private static final int COL_KOMP_NACH = 5;
-    private static final int COL_KOMP_VOR = 6;
-    private static final int COL_VERLAG = 9;
-    private static final int COL_ISWC = 14;
-    private static final int COL_BEAR_NACH = 15;
-    private static final int COL_BEAR_VOR = 16;
+    private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
     @Inject
     SheetCollectionService collectionService;
@@ -92,17 +50,15 @@ public class GemaSetlistService {
 
             XSSFSheet sheet = workbook.getSheetAt(0);
 
-            // Capture cell styles from the first pre-formatted empty data row
-            Row styleSource = sheet.getRow(FIRST_DATA_ROW);
-            CellStyle[] colStyles = extractStyles(styleSource, LAST_COL);
+            Map<String, String> globalVars = buildGlobalVars(collection);
+            replaceInSheet(sheet, globalVars);
 
-            for (int i = 0; i < sheets.size(); i++) {
-                Row row = sheet.createRow(FIRST_DATA_ROW + i);
-                if (styleSource != null) {
-                    row.setHeight(styleSource.getHeight());
-                }
-                applyStyles(row, colStyles, LAST_COL);
-                fillRow(row, sheets.get(i));
+            int templateRowIdx = findTemplateRow(sheet);
+            expandTemplateRow(sheet, templateRowIdx, sheets);
+
+            // Remove all sheets except the filled one
+            while (workbook.getNumberOfSheets() > 1) {
+                workbook.removeSheetAt(1);
             }
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -116,59 +72,142 @@ public class GemaSetlistService {
         }
     }
 
-    private static void fillRow(final Row row, final SheetMusic s) {
-        setString(row, COL_WERK_NR, s.getGemaWorkNumber());
-        setString(row, COL_TITEL, s.getTitle());
-        setString(row, COL_SATZ, s.getSubtitle());
-        setString(row, COL_DAUER, formatDuration(s.getDuration()));
-        setMusicianName(row, COL_KOMP_NACH, COL_KOMP_VOR, s.getComposer());
-        setString(row, COL_VERLAG, s.getPublisher());
-        setString(row, COL_ISWC, s.getIswc());
-        setMusicianName(row, COL_BEAR_NACH, COL_BEAR_VOR, s.getArranger());
+    Map<String, String> buildGlobalVars(final SheetCollection collection) {
+        Map<String, String> vars = new HashMap<>();
+        vars.put("COLLECTION_NAME", collection.getName());
+        vars.put("DATE", LocalDate.now().format(DATE_FMT));
+        return vars;
     }
 
-    private static CellStyle[] extractStyles(final Row styleSource, final int lastCol) {
-        CellStyle[] styles = new CellStyle[lastCol + 1];
-        if (styleSource == null) return styles;
-        for (int c = 0; c <= lastCol; c++) {
-            Cell cell = styleSource.getCell(c);
-            if (cell != null) {
-                styles[c] = cell.getCellStyle();
+    Map<String, String> buildRowVars(final SheetMusic s) {
+        Map<String, String> vars = new HashMap<>();
+        vars.put("GEMA_WORK_NUMBER", s.getGemaWorkNumber());
+        vars.put("TITLE", s.getTitle());
+        vars.put("SUBTITLE", s.getSubtitle());
+        vars.put("DURATION", formatDuration(s.getDuration()));
+        String[] composer = splitName(s.getComposer());
+        vars.put("COMPOSER_NAME", composer[0]);
+        vars.put("COMPOSER_FIRSTNAME", composer[1]);
+        vars.put("PUBLISHER", s.getPublisher());
+        vars.put("ISWC", s.getIswc());
+        String[] arranger = splitName(s.getArranger());
+        vars.put("ARRANGER_NAME", arranger[0]);
+        vars.put("ARRANGER_FIRSTNAME", arranger[1]);
+        return vars;
+    }
+
+    /** Replaces all {{KEY}} placeholders in all cells of the sheet. */
+    void replaceInSheet(final XSSFSheet sheet, final Map<String, String> vars) {
+        for (Row row : sheet) {
+            for (Cell cell : row) {
+                replacePlaceholders(cell, vars);
             }
         }
-        return styles;
     }
 
-    private static void applyStyles(final Row row, final CellStyle[] styles, final int lastCol) {
-        for (int c = 0; c <= lastCol; c++) {
-            Cell cell = row.createCell(c);
-            if (styles[c] != null) {
-                cell.setCellStyle(styles[c]);
+    /** Returns the index of the first row containing any {{...}} placeholder. */
+    int findTemplateRow(final XSSFSheet sheet) {
+        for (Row row : sheet) {
+            for (Cell cell : row) {
+                if (cell.getCellType() == CellType.STRING
+                        && cell.getStringCellValue().contains("{{")) {
+                    return row.getRowNum();
+                }
             }
         }
-    }
-
-    private static void setString(final Row row, final int col, final String value) {
-        if (value == null || value.isBlank()) return;
-        Cell cell = row.getCell(col);
-        if (cell == null) cell = row.createCell(col);
-        cell.setCellValue(value);
-    }
-
-    private static void setMusicianName(final Row row, final int colLast, final int colFirst, final Musician musician) {
-        if (musician == null || musician.getName() == null) return;
-        String[] parts = splitName(musician.getName().trim());
-        setString(row, colLast, parts[0]);
-        setString(row, colFirst, parts[1]);
+        throw new IllegalStateException("No template row with {{...}} placeholders found in sheet");
     }
 
     /**
-     * Splits a full name into [lastName, firstName] by the last space.
-     * "Darius Milhaud" → ["Milhaud", "Darius"]
-     * "Bach" → ["Bach", ""]
-     * "Johann Sebastian Bach" → ["Bach", "Johann Sebastian"]
+     * Clones the template row for each sheet entry, fills placeholders,
+     * then removes the original template row.
      */
-    static String[] splitName(final String fullName) {
+    void expandTemplateRow(final XSSFSheet sheet, final int templateRowIdx, final List<SheetMusic> sheets) {
+        XSSFRow templateRow = sheet.getRow(templateRowIdx);
+
+        // Snapshot placeholder values before any modification
+        Map<Integer, String> templateCellValues = snapshotCellValues(templateRow);
+
+        // Shift rows below the template row down by (N-1) to make room
+        int lastRow = sheet.getLastRowNum();
+        if (sheets.size() > 1 && templateRowIdx < lastRow) {
+            sheet.shiftRows(templateRowIdx + 1, lastRow, sheets.size() - 1);
+        }
+
+        for (int i = 0; i < sheets.size(); i++) {
+            XSSFRow targetRow;
+            if (i == 0) {
+                targetRow = templateRow;
+            } else {
+                targetRow = sheet.createRow(templateRowIdx + i);
+                copyRow(templateRow, targetRow, templateCellValues);
+            }
+            replacePlaceholders(targetRow, buildRowVars(sheets.get(i)));
+        }
+    }
+
+    Map<Integer, String> snapshotCellValues(final XSSFRow row) {
+        Map<Integer, String> snapshot = new HashMap<>();
+        for (Cell cell : row) {
+            if (cell.getCellType() == CellType.STRING) {
+                snapshot.put(cell.getColumnIndex(), cell.getStringCellValue());
+            }
+        }
+        return snapshot;
+    }
+
+    void copyRow(final XSSFRow src, final XSSFRow dst, final Map<Integer, String> originalValues) {
+        dst.setHeight(src.getHeight());
+        for (Cell srcCell : src) {
+            XSSFCell dstCell = dst.createCell(srcCell.getColumnIndex(), srcCell.getCellType());
+            dstCell.setCellStyle(srcCell.getCellStyle());
+            if (srcCell.getCellType() == CellType.STRING) {
+                // Use original placeholder values, not the already-replaced ones
+                dstCell.setCellValue(originalValues.getOrDefault(srcCell.getColumnIndex(), ""));
+            }
+        }
+        // Copy merged regions that start in the source row
+        XSSFSheet sheet = src.getSheet();
+        for (int i = 0; i < sheet.getNumMergedRegions(); i++) {
+            CellRangeAddress region = sheet.getMergedRegion(i);
+            if (region.getFirstRow() == src.getRowNum()) {
+                int offset = dst.getRowNum() - src.getRowNum();
+                sheet.addMergedRegion(new CellRangeAddress(
+                        region.getFirstRow() + offset,
+                        region.getLastRow() + offset,
+                        region.getFirstColumn(),
+                        region.getLastColumn()));
+            }
+        }
+    }
+
+    void replacePlaceholders(final Row row, final Map<String, String> vars) {
+        for (Cell cell : row) {
+            replacePlaceholders(cell, vars);
+        }
+    }
+
+    void replacePlaceholders(final Cell cell, final Map<String, String> vars) {
+        if (cell.getCellType() != CellType.STRING) return;
+        String value = cell.getStringCellValue();
+        if (!value.contains("{{")) return;
+        for (Map.Entry<String, String> entry : vars.entrySet()) {
+            String replacement = entry.getValue() != null ? entry.getValue() : "";
+            value = value.replace("{{" + entry.getKey() + "}}", replacement);
+        }
+        cell.setCellValue(value);
+    }
+
+    /**
+     * Splits a musician's full name into [lastName, firstName] by the last space.
+     * Returns ["", ""] for null/blank input.
+     */
+    String[] splitName(final Musician musician) {
+        if (musician == null || musician.getName() == null) return new String[] {"", ""};
+        return splitName(musician.getName().trim());
+    }
+
+    String[] splitName(final String fullName) {
         if (fullName == null || fullName.isBlank()) return new String[] {"", ""};
         String name = fullName.trim();
         int lastSpace = name.lastIndexOf(' ');
@@ -178,7 +217,7 @@ public class GemaSetlistService {
         return new String[] {name, ""};
     }
 
-    static String formatDuration(final Duration d) {
+    String formatDuration(final Duration d) {
         if (d == null) return null;
         long totalSeconds = d.getSeconds();
         long minutes = totalSeconds / 60;
@@ -186,7 +225,7 @@ public class GemaSetlistService {
         return String.format("%d:%02d", minutes, seconds);
     }
 
-    static String sanitizeFilename(final String name) {
+    String sanitizeFilename(final String name) {
         if (name == null || name.isBlank()) return "collection";
         String s = name.replace("ä", "ae")
                 .replace("Ä", "Ae")

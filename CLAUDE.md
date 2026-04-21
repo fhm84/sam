@@ -13,13 +13,13 @@ SAM (Sheet music Archiving & Management) is a Quarkus-based application for arch
 ./mvnw package
 
 # Run server in dev mode (live reload, Dev UI at http://localhost:8080/q/dev/)
-./mvnw quarkus:dev -pl server
+./mvnw quarkus:dev -pl server -am
 
 # Run unit tests (all modules)
 ./mvnw test
 
 # Run a single test class
-./mvnw test -pl server -Dtest=SheetImporterTest
+./mvnw test -pl server -am -Dtest=SheetImporterTest
 
 # Run integration tests (skipped by default via skipITs=true)
 ./mvnw verify -pl server -am -DskipITs=false
@@ -115,7 +115,7 @@ After implementing any backend change:
 2. **Run the affected tests** and confirm they pass before marking the task done:
    ```bash
    # Single test class (fast)
-   rtk ./mvnw test -pl server -Dtest=<TestClass>
+   rtk ./mvnw test -pl server -am -Dtest=<TestClass>
 
    # All unit tests
    rtk ./mvnw test

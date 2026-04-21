@@ -13,7 +13,11 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -39,62 +43,69 @@ class GemaSetlistServiceTest {
 
     @Test
     void formatDurationNull() {
-        assertNull(GemaSetlistService.formatDuration(null));
+        assertNull(service.formatDuration(null));
     }
 
     @Test
     void formatDurationZero() {
-        assertEquals("0:00", GemaSetlistService.formatDuration(Duration.ZERO));
+        assertEquals("0:00", service.formatDuration(Duration.ZERO));
     }
 
     @Test
     void formatDurationSecondsOnly() {
-        assertEquals("0:45", GemaSetlistService.formatDuration(Duration.ofSeconds(45)));
+        assertEquals("0:45", service.formatDuration(Duration.ofSeconds(45)));
     }
 
     @Test
     void formatDurationMinutesAndSeconds() {
-        assertEquals("19:30", GemaSetlistService.formatDuration(Duration.ofSeconds(1170)));
+        assertEquals("19:30", service.formatDuration(Duration.ofSeconds(1170)));
     }
 
     @Test
     void formatDurationPadsSecondsWithLeadingZero() {
-        assertEquals("4:07", GemaSetlistService.formatDuration(Duration.ofSeconds(247)));
+        assertEquals("4:07", service.formatDuration(Duration.ofSeconds(247)));
     }
 
     // ── splitName ──────────────────────────────────────────────────────────
 
     @Test
     void splitNameTwoParts() {
-        String[] parts = GemaSetlistService.splitName("Darius Milhaud");
+        String[] parts = service.splitName("Darius Milhaud");
         assertEquals("Milhaud", parts[0]);
         assertEquals("Darius", parts[1]);
     }
 
     @Test
     void splitNameThreeParts() {
-        String[] parts = GemaSetlistService.splitName("Johann Sebastian Bach");
+        String[] parts = service.splitName("Johann Sebastian Bach");
         assertEquals("Bach", parts[0]);
         assertEquals("Johann Sebastian", parts[1]);
     }
 
     @Test
     void splitNameSingleWord() {
-        String[] parts = GemaSetlistService.splitName("Mozart");
+        String[] parts = service.splitName("Mozart");
         assertEquals("Mozart", parts[0]);
         assertEquals("", parts[1]);
     }
 
     @Test
     void splitNameNullReturnsEmpties() {
-        String[] parts = GemaSetlistService.splitName(null);
+        String[] parts = service.splitName((String) null);
         assertEquals("", parts[0]);
         assertEquals("", parts[1]);
     }
 
     @Test
     void splitNameBlankReturnsEmpties() {
-        String[] parts = GemaSetlistService.splitName("   ");
+        String[] parts = service.splitName("   ");
+        assertEquals("", parts[0]);
+        assertEquals("", parts[1]);
+    }
+
+    @Test
+    void splitNameNullMusicianReturnsEmpties() {
+        String[] parts = service.splitName((Musician) null);
         assertEquals("", parts[0]);
         assertEquals("", parts[1]);
     }
@@ -103,17 +114,17 @@ class GemaSetlistServiceTest {
 
     @Test
     void sanitizeFilenameNullReturnsDefault() {
-        assertEquals("collection", GemaSetlistService.sanitizeFilename(null));
+        assertEquals("collection", service.sanitizeFilename(null));
     }
 
     @Test
     void sanitizeFilenameReplacesUmlauts() {
-        assertEquals("Fruehlingsstueck", GemaSetlistService.sanitizeFilename("Frühlingsstück"));
+        assertEquals("Fruehlingsstueck", service.sanitizeFilename("Frühlingsstück"));
     }
 
     @Test
     void sanitizeFilenameReplacesSpecialChars() {
-        assertEquals("Hello_World_", GemaSetlistService.sanitizeFilename("Hello/World!"));
+        assertEquals("Hello_World_", service.sanitizeFilename("Hello/World!"));
     }
 
     // ── generateGemaSetlist round-trip ─────────────────────────────────────
@@ -132,42 +143,35 @@ class GemaSetlistServiceTest {
 
         ExportResult result = service.generateGemaSetlist("test-id");
 
-        // Verify metadata
         assertEquals("Sommerkonzert 2025-gema-setlist.xlsx", result.filename());
         assertEquals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", result.contentType());
 
-        // Deserialize output and inspect cells
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         result.body().write(out);
 
         try (XSSFWorkbook wb = new XSSFWorkbook(new ByteArrayInputStream(out.toByteArray()))) {
+            assertEquals(1, wb.getNumberOfSheets(), "output must have exactly one sheet");
+
             XSSFSheet sheet = wb.getSheetAt(0);
-            assertEquals("Setlist Template", sheet.getSheetName());
+            assertNoUnreplacedPlaceholders(sheet);
 
-            Row r1 = sheet.getRow(20);
-            assertNotNull(r1, "first data row must exist");
-            assertEquals("Le boeuf sur le toit", r1.getCell(1).getStringCellValue()); // B: TITEL
-            assertEquals("19:30", r1.getCell(4).getStringCellValue()); // E: SPIELDAUER
-            assertEquals("Milhaud", r1.getCell(5).getStringCellValue()); // F: KOMP Nachname
-            assertEquals("Darius", r1.getCell(6).getStringCellValue()); // G: KOMP Vorname
-
-            Row r2 = sheet.getRow(21);
-            assertNotNull(r2, "second data row must exist");
-            assertEquals("La mer", r2.getCell(1).getStringCellValue()); // B: TITEL
-            assertEquals("WERK-42", r2.getCell(0).getStringCellValue()); // A: WERKNUMMER
-            assertEquals("T-000.000.001-0", r2.getCell(14).getStringCellValue()); // O: ISWC
-            assertEquals("22:00", r2.getCell(4).getStringCellValue()); // E: SPIELDAUER
-            assertEquals("Debussy", r2.getCell(5).getStringCellValue()); // F: KOMP Nachname
-            assertEquals("Claude", r2.getCell(6).getStringCellValue()); // G: KOMP Vorname
+            List<String> titles = collectStringValues(sheet);
+            assertTrue(titles.contains("Le boeuf sur le toit"), "first title must be present");
+            assertTrue(titles.contains("La mer"), "second title must be present");
+            assertTrue(titles.contains("Milhaud"), "composer last name must be present");
+            assertTrue(titles.contains("Darius"), "composer first name must be present");
+            assertTrue(titles.contains("Debussy"), "second composer last name must be present");
+            assertTrue(titles.contains("19:30"), "duration of first piece must be present");
+            assertTrue(titles.contains("WERK-42"), "GEMA work number must be present");
+            assertTrue(titles.contains("T-000.000.001-0"), "ISWC must be present");
         }
     }
 
     @Test
-    void generateGemaSetlistNullFieldsProduceNoGarbage() throws Exception {
+    void generateGemaSetlistNullFieldsLeaveNoPlaceholders() throws Exception {
         UUID sheetId = UUID.randomUUID();
         SheetCollection collection = collection("Konzert", sheetId);
         when(collectionService.load("c1")).thenReturn(collection);
-        // sheet with only a title — no composer, no duration, no GEMA numbers
         when(sheetService.getSheet(sheetId.toString())).thenReturn(sheet("Unnamed", null, null, null, null));
 
         ExportResult result = service.generateGemaSetlist("c1");
@@ -175,13 +179,35 @@ class GemaSetlistServiceTest {
         result.body().write(out);
 
         try (XSSFWorkbook wb = new XSSFWorkbook(new ByteArrayInputStream(out.toByteArray()))) {
-            Row r1 = wb.getSheetAt(0).getRow(20);
-            assertNotNull(r1);
-            assertEquals("Unnamed", r1.getCell(1).getStringCellValue()); // B: TITEL
-            // cells that had no data must be blank, not null-valued strings
-            assertEquals("", r1.getCell(0).getStringCellValue()); // A: WERKNUMMER — empty
-            assertEquals("", r1.getCell(4).getStringCellValue()); // E: SPIELDAUER — empty
-            assertEquals("", r1.getCell(5).getStringCellValue()); // F: KOMP Nachname — empty
+            assertEquals(1, wb.getNumberOfSheets());
+            XSSFSheet sheet = wb.getSheetAt(0);
+            assertNoUnreplacedPlaceholders(sheet);
+
+            List<String> values = collectStringValues(sheet);
+            assertTrue(values.contains("Unnamed"), "title must be present");
+        }
+    }
+
+    @Test
+    void generateGemaSetlistProducesOneRowPerSheet() throws Exception {
+        UUID id1 = UUID.randomUUID();
+        UUID id2 = UUID.randomUUID();
+        UUID id3 = UUID.randomUUID();
+
+        SheetCollection collection = collection("Test", id1, id2, id3);
+        when(collectionService.load("x")).thenReturn(collection);
+        when(sheetService.getSheet(id1.toString())).thenReturn(sheet("Title A", null, null, null, null));
+        when(sheetService.getSheet(id2.toString())).thenReturn(sheet("Title B", null, null, null, null));
+        when(sheetService.getSheet(id3.toString())).thenReturn(sheet("Title C", null, null, null, null));
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        service.generateGemaSetlist("x").body().write(out);
+
+        try (XSSFWorkbook wb = new XSSFWorkbook(new ByteArrayInputStream(out.toByteArray()))) {
+            List<String> values = collectStringValues(wb.getSheetAt(0));
+            assertTrue(values.contains("Title A"));
+            assertTrue(values.contains("Title B"));
+            assertTrue(values.contains("Title C"));
         }
     }
 
@@ -190,17 +216,57 @@ class GemaSetlistServiceTest {
     @Test
     void templateIsOnClasspath() {
         assertNotNull(
-                GemaSetlistServiceTest.class.getResourceAsStream("/gema/Excel-Upload-Template_Light_de.xlsx"),
+                GemaSetlistServiceTest.class.getResourceAsStream("/gema/gema-setlist-template.xlsx"),
                 "GEMA Excel template must be present on the classpath at /gema/");
     }
 
     @Test
     void templateHasSetlistSheet() throws Exception {
         try (InputStream in =
-                        GemaSetlistServiceTest.class.getResourceAsStream("/gema/Excel-Upload-Template_Light_de.xlsx");
-                XSSFWorkbook workbook = new XSSFWorkbook(in)) {
+                        GemaSetlistServiceTest.class.getResourceAsStream("/gema/gema-setlist-template.xlsx");
+             XSSFWorkbook workbook = new XSSFWorkbook(in)) {
             assertEquals("Setlist Template", workbook.getSheetAt(0).getSheetName());
         }
+    }
+
+    @Test
+    void templateContainsPlaceholders() throws Exception {
+        try (InputStream in =
+                        GemaSetlistServiceTest.class.getResourceAsStream("/gema/gema-setlist-template.xlsx");
+             XSSFWorkbook workbook = new XSSFWorkbook(in)) {
+            XSSFSheet sheet = workbook.getSheetAt(0);
+            List<String> values = collectStringValues(sheet);
+            assertTrue(
+                    values.stream().anyMatch(v -> v.contains("{{")),
+                    "template must contain at least one {{...}} placeholder");
+        }
+    }
+
+    // ── helpers ────────────────────────────────────────────────────────────
+
+    private static void assertNoUnreplacedPlaceholders(final XSSFSheet sheet) {
+        for (Row row : sheet) {
+            for (Cell cell : row) {
+                if (cell.getCellType() == CellType.STRING) {
+                    String val = cell.getStringCellValue();
+                    assertFalse(
+                            val.contains("{{"), "unreplaced placeholder found: " + val + " at row " + row.getRowNum());
+                }
+            }
+        }
+    }
+
+    private static List<String> collectStringValues(final XSSFSheet sheet) {
+        List<String> result = new ArrayList<>();
+        for (Row row : sheet) {
+            for (Cell cell : row) {
+                if (cell.getCellType() == CellType.STRING) {
+                    String v = cell.getStringCellValue();
+                    if (!v.isBlank()) result.add(v);
+                }
+            }
+        }
+        return result;
     }
 
     // ── fixtures ───────────────────────────────────────────────────────────
