@@ -126,7 +126,7 @@
     </div>
   </div>
 
-  <!-- Publisher / Year -->
+  <!-- Publisher / Edition -->
   <div class="flex gap-4">
     <div class="flex flex-col gap-1.5 flex-1 min-w-0">
       <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
@@ -136,6 +136,23 @@
         </p-floatlabel>
       </div>
     </div>
+    <div class="flex flex-col gap-1.5 flex-1 min-w-0">
+      <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+        <p-floatlabel variant="on" class="block">
+          <input pInputText id="sheet-edition" formControlName="edition" class="w-full" />
+          <label for="sheet-edition">{{ 'sheets.form.edition' | translate }}</label>
+        </p-floatlabel>
+        <i
+          class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
+          [pTooltip]="t.t('sheets.form.editionTooltip')"
+          tooltipPosition="right"
+        ></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Year / Difficulty -->
+  <div class="flex gap-4">
     <div class="flex flex-col gap-1.5 flex-1 min-w-0">
       <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
         <p-floatlabel variant="on" class="block">
@@ -151,10 +168,6 @@
         </p-floatlabel>
       </div>
     </div>
-  </div>
-
-  <!-- Difficulty / Copyright -->
-  <div class="flex gap-4">
     <div class="flex flex-col gap-1.5 flex-1 min-w-0">
       <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
         <p-floatlabel variant="on" class="block">
@@ -177,6 +190,10 @@
         ></i>
       </div>
     </div>
+  </div>
+
+  <!-- Copyright (half-width) -->
+  <div class="flex gap-4">
     <div class="flex flex-col gap-1.5 flex-1 min-w-0">
       <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
         <p-floatlabel variant="on" class="block">
@@ -185,6 +202,7 @@
         </p-floatlabel>
       </div>
     </div>
+    <div class="flex-1 min-w-0"></div>
   </div>
 
   <!-- Duration (half-width) / empty right -->
@@ -245,7 +263,72 @@
     </div>
   </div>
 
+  <!-- Rights & Identifiers -->
+  <div class="text-[0.6875rem] font-semibold tracking-[0.07em] uppercase text-[var(--sam-text-muted)] pt-2 border-t border-[var(--sam-border)]">{{ 'sheets.form.rightsSection' | translate }}</div>
+
+  <!-- Original by / Publisher IPI -->
+  <div class="flex gap-4">
+    <div class="flex flex-col gap-1.5 flex-1 min-w-0">
+      <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+        <p-floatlabel variant="on" class="block">
+          <input pInputText id="sheet-original-by" formControlName="originalBy" class="w-full" />
+          <label for="sheet-original-by">{{ 'sheets.form.originalBy' | translate }}</label>
+        </p-floatlabel>
+        <i
+          class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
+          [pTooltip]="t.t('sheets.form.originalByTooltip')"
+          tooltipPosition="right"
+        ></i>
+      </div>
+    </div>
+    <div class="flex flex-col gap-1.5 flex-1 min-w-0">
+      <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+        <p-floatlabel variant="on" class="block">
+          <input pInputText id="sheet-publisher-ipi" formControlName="publisherIpi" class="w-full" />
+          <label for="sheet-publisher-ipi">{{ 'sheets.form.publisherIpi' | translate }}</label>
+        </p-floatlabel>
+        <i
+          class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
+          [pTooltip]="t.t('sheets.form.publisherIpiTooltip')"
+          tooltipPosition="right"
+        ></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- GEMA Work No. / ISWC -->
+  <div class="flex gap-4">
+    <div class="flex flex-col gap-1.5 flex-1 min-w-0">
+      <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+        <p-floatlabel variant="on" class="block">
+          <input pInputText id="sheet-gema" formControlName="gemaWorkNumber" class="w-full" />
+          <label for="sheet-gema">{{ 'sheets.form.gemaWorkNumber' | translate }}</label>
+        </p-floatlabel>
+        <i
+          class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
+          [pTooltip]="t.t('sheets.form.gemaWorkNumberTooltip')"
+          tooltipPosition="right"
+        ></i>
+      </div>
+    </div>
+    <div class="flex flex-col gap-1.5 flex-1 min-w-0">
+      <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+        <p-floatlabel variant="on" class="block">
+          <input pInputText id="sheet-iswc" formControlName="iswc" class="w-full" />
+          <label for="sheet-iswc">{{ 'sheets.form.iswc' | translate }}</label>
+        </p-floatlabel>
+        <i
+          class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
+          [pTooltip]="t.t('sheets.form.iswcTooltip')"
+          tooltipPosition="right"
+        ></i>
+      </div>
+    </div>
+  </div>
+
   <!-- Additional Notes -->
+  <div class="text-[0.6875rem] font-semibold tracking-[0.07em] uppercase text-[var(--sam-text-muted)] pt-2 border-t border-[var(--sam-border)]">{{ 'sheets.detail.notes' | translate }}</div>
+
   <div class="flex flex-col gap-1.5">
     <div class="grid items-start gap-2 [grid-template-columns:1fr_2rem]">
       <p-floatlabel variant="on" class="block">
@@ -262,7 +345,7 @@
     </div>
   </div>
 
-  <div class="flex justify-end gap-2 pt-2">
+  <div class="flex justify-end gap-2 pt-4 mt-2 border-t border-[var(--sam-border)]">
     <p-button
       [label]="t.t('sheets.cancel')"
       severity="secondary"

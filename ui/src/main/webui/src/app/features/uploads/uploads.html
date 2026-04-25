@@ -120,7 +120,7 @@
             icon="pi pi-sparkles"
             [rounded]="true"
             [text]="true"
-            severity="info"
+            styleClass="row-action"
             [pTooltip]="t.t('classification.action')"
             (onClick)="openClassify(doc)"
           />
@@ -128,7 +128,7 @@
             icon="pi pi-link"
             [rounded]="true"
             [text]="true"
-            severity="secondary"
+            styleClass="row-action"
             [pTooltip]="t.t('uploads.assign.action')"
             (onClick)="openAssignPicker(doc)"
           />
@@ -136,6 +136,7 @@
             icon="pi pi-download"
             [rounded]="true"
             [text]="true"
+            styleClass="row-action"
             [pTooltip]="t.t('uploads.download')"
             (onClick)="onDownload(doc)"
           />
@@ -143,7 +144,7 @@
             icon="pi pi-trash"
             [rounded]="true"
             [text]="true"
-            severity="danger"
+            styleClass="row-action row-action-danger"
             [pTooltip]="'common.delete' | translate"
             tooltipPosition="top"
             (onClick)="confirmDelete(doc)"

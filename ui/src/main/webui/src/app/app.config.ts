@@ -5,7 +5,7 @@ import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common
 import { providePrimeNG } from 'primeng/config';
 import { MessageService } from 'primeng/api';
 import Aura from '@primeuix/themes/aura';
-import { authInterceptor, provideAuth, StsConfigLoader, withAppInitializerAuthCheck } from 'angular-auth-oidc-client';
+import { AbstractSecurityStorage, DefaultLocalStorageService, authInterceptor, provideAuth, StsConfigLoader, withAppInitializerAuthCheck } from 'angular-auth-oidc-client';
 
 import { routes } from './app.routes';
 import { TranslationService } from './core/translation.service';
@@ -37,6 +37,7 @@ export const appConfig: ApplicationConfig = {
       },
       withAppInitializerAuthCheck(),
     ),
+    { provide: AbstractSecurityStorage, useClass: DefaultLocalStorageService },
     {
       provide: APP_INITIALIZER,
       useFactory: () => {

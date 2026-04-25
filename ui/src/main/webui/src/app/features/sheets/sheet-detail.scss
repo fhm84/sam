@@ -325,3 +325,37 @@
     background: var(--p-primary-50);
   }
 }
+
+// ─── Title block ───────────────────────────────────────────────────
+.sheet-title-block {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--sam-border);
+  margin-bottom: 0.25rem;
+}
+
+.sheet-title-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.sheet-subtitle {
+  font-size: 0.85rem;
+  color: var(--sam-text-muted);
+  margin: 0;
+}
+
+.sheet-title-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.125rem;
+  flex-shrink: 0;
+  padding-left: 0.5rem;
+  border-left: 1px solid var(--sam-border);
+  margin-left: 0.25rem;
+}

@@ -113,7 +113,16 @@
       "copyright": "Copyright",
       "additionalNotes": "Additional Notes",
       "tags": "Tags",
-      "tagsTooltip": "Free-form labels to help find and group pieces, e.g. 'outdoor', 'christmas', 'easy'. Separate with Enter or comma."
+      "tagsTooltip": "Free-form labels to help find and group pieces, e.g. 'outdoor', 'christmas', 'easy'. Separate with Enter or comma.",
+      "rightsSection": "Rights & Identifiers",
+      "originalBy": "Original by",
+      "originalByTooltip": "Original composer or work this piece is based on or arranged from.",
+      "publisherIpi": "Publisher IPI",
+      "publisherIpiTooltip": "Interested Parties Information number assigned to the publisher.",
+      "gemaWorkNumber": "GEMA Work No.",
+      "gemaWorkNumberTooltip": "The GEMA work number for rights reporting in Germany.",
+      "iswc": "ISWC",
+      "iswcTooltip": "International Standard Musical Work Code, e.g. T-034.524.680-1."
     },
     "delete": {
       "confirm": "Are you sure you want to delete the sheet \"{title}\"?",

@@ -3,56 +3,54 @@
     <i class="pi pi-spinner pi-spin"></i>
   </div>
 } @else if (sheet(); as s) {
-  <div class="flex items-start justify-between gap-4">
-    <div class="flex flex-row items-start gap-0.5">
+  <div class="sheet-title-block">
+    <p-button
+      [icon]="s.favorite ? 'pi pi-star-fill' : 'pi pi-star'"
+      [severity]="s.favorite ? 'warn' : 'secondary'"
+      [rounded]="true"
+      [text]="true"
+      size="small"
+      [pTooltip]="(s.favorite ? 'common.removeFromFavorites' : 'common.addToFavorites') | translate"
+      tooltipPosition="top"
+      (onClick)="toggleFavorite()"
+    />
+    <div class="sheet-title-content">
+      <h2 class="m-0">{{ s.title }}</h2>
+      @if (s.subtitle) {
+        <p class="sheet-subtitle">{{ s.subtitle }}</p>
+      }
+    </div>
+    <div class="sheet-title-actions">
+      @if (mode === 'compact') {
+        <a [href]="'/sheets/' + sheetId" target="_blank" rel="noopener" class="no-underline leading-none">
+          <p-button
+            icon="pi pi-external-link"
+            [rounded]="true"
+            [text]="true"
+            size="small"
+            [pTooltip]="'common.openInNewTab' | translate"
+            tooltipPosition="top"
+          />
+        </a>
+      }
       <p-button
-        [icon]="s.favorite ? 'pi pi-star-fill' : 'pi pi-star'"
-        [severity]="s.favorite ? 'warn' : 'secondary'"
+        icon="pi pi-pencil"
         [rounded]="true"
         [text]="true"
         size="small"
-        [pTooltip]="(s.favorite ? 'common.removeFromFavorites' : 'common.addToFavorites') | translate"
+        [pTooltip]="t.t('sheets.edit')"
         tooltipPosition="top"
-        (onClick)="toggleFavorite()"
+        (onClick)="onEdit()"
       />
-      <div class="flex flex-col gap-1">
-        <div class="flex items-center gap-1">
-          <h2 class="flex-1 min-w-0">{{ s.title }}</h2>
-          @if (mode === 'compact') {
-            <a [href]="'/sheets/' + sheetId" target="_blank" rel="noopener" class="no-underline leading-none">
-              <p-button
-                icon="pi pi-external-link"
-                [rounded]="true"
-                [text]="true"
-                size="small"
-                [pTooltip]="'common.openInNewTab' | translate"
-                tooltipPosition="top"
-              />
-            </a>
-          }
-          <p-button
-            icon="pi pi-pencil"
-            [rounded]="true"
-            [text]="true"
-            size="small"
-            [pTooltip]="t.t('sheets.edit')"
-            tooltipPosition="top"
-            (onClick)="onEdit()"
-          />
-          <p-button
-            icon="pi pi-sparkles"
-            [rounded]="true"
-            [text]="true"
-            size="small"
-            [pTooltip]="t.t('enrichment.action')"
-            tooltipPosition="top"
-            (onClick)="openEnrichDialog()"
-          />
-        </div>
-        @if (s.subtitle) {
-          <p class="text-[0.9rem] text-[var(--sam-text-muted)]">{{ s.subtitle }}</p>
-        }
-      </div>
+      <p-button
+        icon="pi pi-sparkles"
+        [rounded]="true"
+        [text]="true"
+        size="small"
+        [pTooltip]="t.t('enrichment.action')"
+        tooltipPosition="top"
+        (onClick)="openEnrichDialog()"
+      />
     </div>
   </div>
 
@@ -190,6 +188,7 @@
                             [rounded]="true"
                             [text]="true"
                             size="small"
+                            styleClass="row-action"
                             [pTooltip]="'common.download' | translate"
                             tooltipPosition="top"
                             (onClick)="downloadDocument(doc)"
@@ -199,6 +198,7 @@
                             [rounded]="true"
                             [text]="true"
                             size="small"
+                            styleClass="row-action"
                             [pTooltip]="t.t('sheets.detail.relinkDocument.tooltip')"
                             tooltipPosition="top"
                             (onClick)="openRelinkDialog(doc)"
@@ -208,7 +208,7 @@
                             [rounded]="true"
                             [text]="true"
                             size="small"
-                            severity="danger"
+                            styleClass="row-action row-action-danger"
                             (onClick)="confirmDeleteDocument(doc)"
                           />
                         </div>
@@ -347,6 +347,7 @@
                       [rounded]="true"
                       [text]="true"
                       size="small"
+                      styleClass="row-action"
                       [pTooltip]="'sheets.instrumentations.edit' | translate"
                       tooltipPosition="top"
                       (onClick)="openEditInstrumentation(instr)"
@@ -356,7 +357,7 @@
                       [rounded]="true"
                       [text]="true"
                       size="small"
-                      severity="danger"
+                      styleClass="row-action row-action-danger"
                       [pTooltip]="'common.delete' | translate"
                       tooltipPosition="top"
                       (onClick)="confirmDeleteInstrumentation(instr)"
@@ -627,6 +628,7 @@
                         [rounded]="true"
                         [text]="true"
                         size="small"
+                        styleClass="row-action"
                         [pTooltip]="'common.download' | translate"
                         tooltipPosition="top"
                         (onClick)="downloadDocument(doc)"
@@ -636,6 +638,7 @@
                         [rounded]="true"
                         [text]="true"
                         size="small"
+                        styleClass="row-action"
                         [pTooltip]="t.t('sheets.detail.relinkDocument.tooltip')"
                         tooltipPosition="top"
                         (onClick)="openRelinkDialog(doc)"
@@ -645,7 +648,7 @@
                         [rounded]="true"
                         [text]="true"
                         size="small"
-                        severity="danger"
+                        styleClass="row-action row-action-danger"
                         (onClick)="confirmDeleteDocument(doc)"
                       />
                     </div>
@@ -737,6 +740,7 @@
                   [rounded]="true"
                   [text]="true"
                   size="small"
+                  styleClass="row-action"
                   [pTooltip]="'sheets.instrumentations.edit' | translate"
                   tooltipPosition="top"
                   (onClick)="openEditInstrumentation(instr)"
@@ -746,7 +750,7 @@
                   [rounded]="true"
                   [text]="true"
                   size="small"
-                  severity="danger"
+                  styleClass="row-action row-action-danger"
                   [pTooltip]="'common.delete' | translate"
                   tooltipPosition="top"
                   (onClick)="confirmDeleteInstrumentation(instr)"

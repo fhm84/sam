@@ -8,6 +8,7 @@ import { Select } from 'primeng/select';
 import { AutoComplete } from 'primeng/autocomplete';
 import { Button } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
+import { Panel } from 'primeng/panel';
 import { Tooltip } from 'primeng/tooltip';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { SheetsApiService, MusiciansApiService } from '../../core/api';
@@ -20,7 +21,7 @@ import { MusicianForm } from '../musicians/musician-form';
 
 @Component({
   selector: 'app-sheet-form',
-  imports: [ReactiveFormsModule, FloatLabel, InputText, InputNumber, Textarea, Select, AutoComplete, Button, Dialog, Tooltip, TranslatePipe, MusicianForm],
+  imports: [ReactiveFormsModule, FloatLabel, InputText, InputNumber, Textarea, Select, AutoComplete, Button, Dialog, Panel, Tooltip, TranslatePipe, MusicianForm],
   templateUrl: './sheet-form.html',
 })
 export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnInit {
@@ -60,6 +61,10 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
     durationSeconds: new FormControl<number | null>(null),
     edition: new FormControl('', { nonNullable: true }),
     copyright: new FormControl('', { nonNullable: true }),
+    originalBy: new FormControl('', { nonNullable: true }),
+    publisherIpi: new FormControl('', { nonNullable: true }),
+    gemaWorkNumber: new FormControl('', { nonNullable: true }),
+    iswc: new FormControl('', { nonNullable: true }),
     additionalNotes: new FormControl('', { nonNullable: true }),
     tags: new FormControl<string[]>([], { nonNullable: true }),
   });
@@ -88,6 +93,10 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
       durationSeconds: seconds,
       edition: s.edition ?? '',
       copyright: s.copyright ?? '',
+      originalBy: s.originalBy ?? '',
+      publisherIpi: s.publisherIpi ?? '',
+      gemaWorkNumber: s.gemaWorkNumber ?? '',
+      iswc: s.iswc ?? '',
       additionalNotes: s.additionalNotes ?? '',
       tags: s.tags ?? [],
     });
@@ -132,6 +141,10 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
       duration: buildDuration(raw.durationMinutes, raw.durationSeconds) as unknown as never,
       edition: raw.edition,
       copyright: raw.copyright,
+      originalBy: raw.originalBy,
+      publisherIpi: raw.publisherIpi,
+      gemaWorkNumber: raw.gemaWorkNumber,
+      iswc: raw.iswc,
       additionalNotes: raw.additionalNotes,
       tags: raw.tags.length > 0 ? raw.tags : undefined,
     });

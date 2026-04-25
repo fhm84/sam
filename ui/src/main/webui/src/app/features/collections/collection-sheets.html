@@ -51,6 +51,7 @@
             [rounded]="true"
             [text]="true"
             size="small"
+            styleClass="row-action"
             [pTooltip]="t.t('collections.sheets.edit')"
             (onClick)="openEdit(sheet)"
           />
@@ -59,7 +60,7 @@
             [rounded]="true"
             [text]="true"
             size="small"
-            severity="danger"
+            styleClass="row-action row-action-danger"
             (onClick)="confirmRemove(sheet)"
           />
         </td>

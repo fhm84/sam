@@ -113,7 +113,16 @@
       "copyright": "Urheberrecht",
       "additionalNotes": "Zusätzliche Anmerkungen",
       "tags": "Tags",
-      "tagsTooltip": "Frei vergebene Schlagwörter zum schnellen Finden und Gruppieren von Stücken, z.B. 'outdoor', 'weihnachten', 'leicht'. Mit Enter oder Komma trennen."
+      "tagsTooltip": "Frei vergebene Schlagwörter zum schnellen Finden und Gruppieren von Stücken, z.B. 'outdoor', 'weihnachten', 'leicht'. Mit Enter oder Komma trennen.",
+      "rightsSection": "Rechte & Kennzeichnungen",
+      "originalBy": "Original von",
+      "originalByTooltip": "Ursprünglicher Komponist oder Originalwerk, auf dem dieses Stück basiert oder arrangiert wurde.",
+      "publisherIpi": "Verlags-IPI",
+      "publisherIpiTooltip": "IPI-Nummer (Interested Parties Information) des Verlags.",
+      "gemaWorkNumber": "GEMA-Werknummer",
+      "gemaWorkNumberTooltip": "Die GEMA-Werknummer für die Rechteabrechnung in Deutschland.",
+      "iswc": "ISWC",
+      "iswcTooltip": "Internationaler Standard-Musikkenncode, z.B. T-034.524.680-1."
     },
     "delete": {
       "confirm": "Möchten Sie das Notenblatt \"{title}\" wirklich löschen?",
