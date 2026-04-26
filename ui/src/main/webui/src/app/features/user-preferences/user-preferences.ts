@@ -6,6 +6,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { LayoutPreferenceService } from '../../core/layout-preference.service';
 import { ThemeService } from '../../core/theme.service';
 import { Locale, TranslationService } from '../../core/translation.service';
+import { ColorSchemeKey, ColorSchemeService } from '../../core/color-scheme.service';
 
 @Component({
   selector: 'app-user-preferences',
@@ -17,6 +18,7 @@ export class UserPreferences {
   private readonly layoutPrefs = inject(LayoutPreferenceService);
   protected readonly theme = inject(ThemeService);
   protected readonly i18n = inject(TranslationService);
+  protected readonly colorScheme = inject(ColorSchemeService);
 
   protected readonly layoutOptions = [
     { icon: 'pi pi-th-large', value: 'cards', labelKey: 'userPreferences.cards' },
@@ -49,5 +51,9 @@ export class UserPreferences {
 
   protected setLanguage(value: Locale): void {
     this.i18n.setLocale(value);
+  }
+
+  protected applyColorScheme(key: ColorSchemeKey): void {
+    this.colorScheme.apply(key);
   }
 }

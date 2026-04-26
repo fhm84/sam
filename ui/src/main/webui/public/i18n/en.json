@@ -46,7 +46,9 @@
     "languageTitle": "Language",
     "languageDescription": "Choose your preferred display language.",
     "languageEn": "English",
-    "languageDe": "Deutsch"
+    "languageDe": "Deutsch",
+    "colorSchemeTitle": "Colour Palette",
+    "colorSchemeDescription": "Choose an accent colour for the interface."
   },
   "home": {
     "greeting": "Welcome to SAM",

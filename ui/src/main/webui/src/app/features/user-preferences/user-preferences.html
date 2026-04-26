@@ -34,6 +34,29 @@
   </div>
 
   <div class="bg-[var(--sam-surface)] border border-[var(--sam-border)] rounded-[10px] p-6">
+    <h2 class="font-[var(--sam-font-display)] text-base font-semibold text-[var(--sam-text)] mt-0 mb-1.5">{{ 'userPreferences.colorSchemeTitle' | translate }}</h2>
+    <p class="text-sm text-[var(--sam-text-muted)] mt-0 mb-5">{{ 'userPreferences.colorSchemeDescription' | translate }}</p>
+    <div class="flex gap-3 flex-wrap">
+      @for (key of colorScheme.keys; track key) {
+        <button
+          type="button"
+          (click)="applyColorScheme(key)"
+          class="w-9 h-9 rounded-full cursor-pointer transition-all hover:opacity-90 flex items-center justify-center border-0"
+          [style.background-color]="colorScheme.configs[key].swatch"
+          [style.outline]="colorScheme.current() === key ? '2px solid var(--sam-text)' : 'none'"
+          [style.outline-offset]="'3px'"
+          [pTooltip]="colorScheme.configs[key].label"
+          tooltipPosition="top"
+        >
+          @if (colorScheme.current() === key) {
+            <i class="pi pi-check text-white" style="font-size: 0.625rem"></i>
+          }
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="bg-[var(--sam-surface)] border border-[var(--sam-border)] rounded-[10px] p-6">
     <h2 class="font-[var(--sam-font-display)] text-base font-semibold text-[var(--sam-text)] mt-0 mb-1.5">{{ 'userPreferences.layoutTitle' | translate }}</h2>
     <p class="text-sm text-[var(--sam-text-muted)] mt-0 mb-5">{{ 'userPreferences.layoutDescription' | translate }}</p>
 

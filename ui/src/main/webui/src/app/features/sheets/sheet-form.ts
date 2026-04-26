@@ -21,7 +21,7 @@ import { MusicianForm } from '../musicians/musician-form';
 
 @Component({
   selector: 'app-sheet-form',
-  imports: [ReactiveFormsModule, FloatLabel, InputText, InputNumber, Textarea, Select, AutoComplete, Button, Dialog, Panel, Tooltip, TranslatePipe, MusicianForm],
+  imports: [ReactiveFormsModule, FloatLabel, InputText, InputNumber, Textarea, Select, AutoComplete, Button, Dialog, Tooltip, TranslatePipe, MusicianForm],
   templateUrl: './sheet-form.html',
 })
 export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnInit {

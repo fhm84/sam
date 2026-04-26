@@ -5,6 +5,7 @@ import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common
 import { providePrimeNG } from 'primeng/config';
 import { MessageService } from 'primeng/api';
 import Aura from '@primeuix/themes/aura';
+import { ColorSchemeService } from './core/color-scheme.service';
 import { AbstractSecurityStorage, DefaultLocalStorageService, authInterceptor, provideAuth, StsConfigLoader, withAppInitializerAuthCheck } from 'angular-auth-oidc-client';
 
 import { routes } from './app.routes';
@@ -43,6 +44,14 @@ export const appConfig: ApplicationConfig = {
       useFactory: () => {
         const i18n = inject(TranslationService);
         return () => i18n.initialize();
+      },
+      multi: true,
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: () => {
+        const colorScheme = inject(ColorSchemeService);
+        return () => colorScheme.initialize();
       },
       multi: true,
     },
