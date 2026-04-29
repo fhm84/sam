@@ -269,7 +269,7 @@ Every entity is annotated with `@Audited` (Hibernate Envers). Each table has a c
 
 | Concern | Technology | Version |
 |---------|-----------|---------|
-| Runtime | Quarkus | 3.31.3 |
+| Runtime | Quarkus | 3.32.3 |
 | Language | Java | 21 |
 | ORM | Hibernate ORM + Panache | (via Quarkus BOM) |
 | Audit | Hibernate Envers | (via Quarkus BOM) |
@@ -278,9 +278,10 @@ Every entity is annotated with `@Audited` (Hibernate Envers). Each table has a c
 | REST | JAX-RS (RESTEasy) | (via Quarkus BOM) |
 | Serialization | JSON-B | (via Quarkus BOM) |
 | AI | LangChain4j (Quarkus ext.) | 1.7.1 |
-| Frontend | Angular | (via Quarkus Quinoa) |
+| Frontend | Angular | 21.2.8 |
+| Frontend UI | PrimeNG (Aura preset) | 21.1.1 |
 | CLI | PicoCLI (Quarkus ext.) | (via Quarkus BOM) |
-| Code Gen | Lombok, MapStruct | 1.18.42, 1.6.3 |
+| Code Gen | Lombok, MapStruct | 1.18.44, 1.6.3 |
 | TS Gen | typescript-generator-maven-plugin | (in api module) |
-| Formatting | Palantir Java Format (Spotless) | (plugin 3.2.1) |
+| Formatting | Palantir Java Format (Spotless) | (plugin 3.3.0) |
 | Container | Jib | (via Quarkus ext.) |

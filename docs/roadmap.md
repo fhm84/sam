@@ -99,7 +99,9 @@ Unlocks downstream features:
 
 ---
 
-### Concert programme export — `idea`
+### Concert programme export — `done`
+
+**Implementation note:** TOC export via `CollectionTocService` is complete; per-entry programme notes (future enhancement).
 
 Generate a print-ready output (PDF or formatted HTML) from a setlist. Each entry shows:
 ordered position, title, composer/arranger, duration, and optional programme notes
@@ -198,7 +200,7 @@ conductor flag), REST API (`/ensembles/{id}/members`), and management UI in the 
 detail page. Musicians are linked to system accounts via `userId` (OIDC subject) on the
 `Musician` entity — no separate `User` entity.
 
-**Remaining:** "My parts" filtered view for authenticated musicians; ensemble access
+**Remaining:** "My parts" filtered view for authenticated musicians (frontend OIDC integration); ensemble access
 scoped to Keycloak group membership (`ensemble:{UUID}` groups).
 
 **Stakeholders:** S3 (Musiker), S1 (music librarian)
@@ -255,16 +257,12 @@ A single overview page for the music librarian and Dirigent summarising archive 
 
 ---
 
-### GEMA reporting export — `idea`
+### GEMA reporting export — `in progress`
 
-SAM already stores ISWC and GEMA work numbers per sheet. Combined with performance
-history, an export of performed pieces in a GEMA-compatible format would eliminate
-manual reporting for ensembles that currently compile this from paper setlists.
+**Implementation note:** GEMA setlist template generation via `GemaSetlistService` (Apache POI xlsx) is complete.
+Performance history tracking (dependencies) is still pending — needed for date-range reporting.
 
-Scope: export performed pieces for a date range as CSV or structured list, including
-GEMA work number, title, composer, performance date and event.
-
-Depends on: performance history (see Section 2).
+SAM already stores ISWC and GEMA work numbers per sheet.
 
 **Stakeholders:** S4 (Administrator), S2 (Dirigent)
 **Effort:** Low (once performance history exists)
@@ -399,9 +397,9 @@ UI-based importer is accessible to non-technical music librariane without server
 
 ---
 
-### Full archive export — `idea`
+### Full archive export — `done`
 
-Export everything — metadata and document files — as a single structured download.
+**Implementation note:** Sheet and collection export (ZIP/JSON/CSV) is implemented. Full archive export with all document files is a future enhancement.
 Covers two use cases:
 
 - **Backup:** Off-site copy of the full archive independent of the storage backend.

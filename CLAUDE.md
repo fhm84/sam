@@ -102,7 +102,7 @@ docker compose -f docker-compose.monitoring.yml up
 
 ## Code Style
 
-- Java 21, Palantir Java Format (via Spotless plugin, version 2.39.0)
+- Java 21, Palantir Java Format (via Spotless plugin, version 3.3.0)
 - Run `./mvnw spotless:apply` before committing
 
 ## Verification Policy
@@ -146,3 +146,11 @@ After implementing any Angular UI change:
 ### When tests are not applicable
 
 If a change is purely structural (rename, move, formatting) or documentation-only and no meaningful test can be written, state this explicitly rather than skipping silently.
+
+### Documentation
+
+After implementing a feature or bugfix:
+1. Update README.md TODOs if the feature is now complete
+2. If architecture changed, verify docs/architecture.md sections match
+3. If UI patterns changed, check memory files (ui-architecture.md, etc.)
+4. If adding new modules or resources, update the module structure in architecture.md

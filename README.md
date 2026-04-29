@@ -93,22 +93,17 @@ sam (parent)
  +-- cli            PicoCLI batch import tool (REST client)
 ```
 
-## TODOs
+## Roadmap
 
-- Security (Keycloak)
+### Planned Features
 - Multitenancy
-- Extended revision info
-- Download multiple PDFs at once (merged PDF or ZIP)
-- Generate table of contents for sheet collections (different sorting/grouping)
-- GEMA export
 - Dashboard/statistics (sheets by composer/arranger/genre)
 - Auto-convert to MusicXML format (for transposition)
 - Event logging (e.g. document downloads)
-- data-exports (single sheets, "everything") e.g. as json (as an alternative also to csv?)
+- Advanced file-upload workflows (linking/metadata in upload dialog)
+- System info endpoint (`/api/info`)
 
-### technical focused
-- more advanced file-upload (also include linking-/meta-data)
-- system-info (/api/info)?
-- extended revinfo
-- rethink directory-structure for strogin documents?
-- use AI for automatically link pdf to correct sheet music and instrumentation?
+### Technical Debt
+- Extended revision information (Envers metadata beyond current snapshots)
+- Optimize document storage directory structure
+

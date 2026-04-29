@@ -283,6 +283,8 @@ Each entry in a collection links to a sheet and carries:
 - **Create / edit / delete** collections and individual sheet memberships.
 - Paginated sheet list within each collection.
 - Sheet detail preview accessible from within the collection.
+- **Export formats:** JSON, CSV, and ZIP (metadata + attached documents)
+- **Table of contents:** Generate a PDF TOC from a collection/setlist (via `CollectionTocService`)
 
 ---
 
