@@ -224,7 +224,7 @@ class GemaSetlistServiceTest {
     void templateHasSetlistSheet() throws Exception {
         try (InputStream in = GemaSetlistServiceTest.class.getResourceAsStream("/gema/gema-setlist-template.xlsx");
                 XSSFWorkbook workbook = new XSSFWorkbook(in)) {
-            assertEquals("Setlist Template", workbook.getSheetAt(0).getSheetName());
+            assertEquals("Setlist", workbook.getSheetAt(0).getSheetName());
         }
     }
 
