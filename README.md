@@ -72,6 +72,7 @@ A Quarkus-based application for archiving sheet music, managing instrumentations
 ### Audit Trail
 - Full entity history via Hibernate Envers (every table has an `_AUD` mirror)
 - Validity audit strategy with revision start/end tracking
+- Event log for read-side events (downloads, exports, AI classification) not captured by Envers: records `userId`, `username`, `eventType`, `entityType`, `entityId`, and a JSONB `metadata` payload; queryable via `GET /api/event-logs` with filtering by event type (multi-select), user, and entity type; pre-wired for share-link access via `shareTokenId`
 
 ### CLI
 - PicoCLI-based command-line tool for batch importing sheet music data
@@ -99,7 +100,6 @@ sam (parent)
 - Multitenancy
 - Dashboard/statistics (sheets by composer/arranger/genre)
 - Auto-convert to MusicXML format (for transposition)
-- Event logging (e.g. document downloads)
 - Advanced file-upload workflows (linking/metadata in upload dialog)
 - System info endpoint (`/api/info`)
 

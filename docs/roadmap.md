@@ -315,13 +315,18 @@ control.
 
 ---
 
-### Shared document links — `idea`
+### Shared document links — `planned`
 
 Allow a specific document (e.g. a scanned part) to be shared via a time-limited or
 permanent public URL, independently of full guest access. The music librarian generates the
 link; anyone with it can download the file.
 
-A lightweight alternative to full guest access for ad-hoc file sharing.
+A lightweight alternative to full guest access for ad-hoc file sharing. Tokens are
+resource-scoped (one token = one resource), not broad API keys.
+
+**Event log is pre-wired:** the `event_log` table has a `shareTokenId` column and
+`EventLogService` has a dedicated overload for share-token access. When the feature is
+built, the logging call is already there — just pass the token UUID.
 
 **Stakeholders:** S1 (music librarian), S3b (Guest musician)
 **Effort:** Low–Medium
@@ -490,49 +495,54 @@ below.
 
 ---
 
-### Document access log — `idea`
+### Document access log — `partial`
 
 Track who viewed or downloaded which document, and from where. This is a distinct
 concern from the Envers audit trail, which only captures data mutations (create / update
 / delete). Document access is a **read event** and requires a separate mechanism.
 
-**What to log per access event:**
+**Implemented (Phase 1):**
 
-| Field | Notes |
-|-------|-------|
-| `documentId` | Which file was accessed |
-| `action` | `VIEW` (inline preview) · `DOWNLOAD` (explicit file save) |
-| `timestamp` | When |
-| `userId` | Authenticated user ID; `anonymous` before auth is in place |
-| `sourceContext` | Where access originated: sheet detail · instrumentation · uploads pool · shared link |
-| `ipAddress` | Optional — carries GDPR implications, consider anonymising or omitting |
+An `event_log` table and `GET /api/event-logs` endpoint are in place. The following
+events are currently recorded:
 
-`sourceContext` is particularly valuable: a download from a shared public link is a very
-different signal from one made by an authenticated ensemble member.
+| Event type | Trigger |
+|------------|---------|
+| `DOCUMENT_DOWNLOAD` | Single document served via `GET /documents/{id}` |
+| `DOCUMENT_BATCH_DOWNLOAD` | ZIP or merged-PDF batch download |
+| `SHEET_EXPORT` | Sheet exported as JSON, CSV, or ZIP |
+| `COLLECTION_EXPORT` | Collection exported |
+| `COLLECTION_TOC_GENERATED` | Collection table of contents PDF generated |
+| `GEMA_SETLIST_GENERATED` | GEMA setlist xlsx generated |
+| `DOCUMENT_CLASSIFIED` | AI classification run on a document |
+| `DOCUMENT_CLASSIFICATION_APPLIED` | AI classification result applied to create entities |
 
-**Practical value per stakeholder:**
+Each event captures: `occurredAt`, `userId` (OIDC subject), `username` (snapshotted
+`preferred_username` at event time), `eventType`, `entityType`, `entityId`, and a
+`metadata` JSONB payload (e.g. filename, count, format). For share-link access,
+`userId`/`username` are null and `shareTokenId` is set instead (see Shared document
+links below). A read-only UI page is available at `/admin/event-logs` with filtering
+by event type (multi-select), user ID, and entity type.
 
-- **S1 (music librarian):** Confirm that musicians downloaded their parts before rehearsal.
-- **S4 (Administrator):** Detect unusual access patterns (e.g. bulk downloads).
-- **Legal / rights:** Evidence of controlled distribution of copyrighted material —
-  relevant for GEMA/licensing compliance.
-- **Guest access:** Usage telemetry for shared links and public pages.
+IP addresses are deliberately not stored — the `userId`+`username` pair gives
+unambiguous attribution for all authenticated users, and IP logging would add GDPR
+compliance obligations without meaningful benefit for an ensemble-management context.
+
+**Still pending:**
+
+- Richer UI (charts, per-entity history panel, date-range filter)
+- Retention policy (auto-delete entries older than N months)
+- Users viewing their own access history (GDPR right of access)
 
 **Privacy / GDPR:**
 
-Once named user accounts exist, this log constitutes personal data. Design requirements:
+Once named user accounts exist, this log constitutes personal data:
 - Retention policy (e.g. auto-delete entries older than 12 months)
 - Users can view their own access history (right of access)
-- IP addresses either omitted or anonymised
 - Document the log in the ensemble's privacy policy
 
-> **Implementation note:** This feature should be designed and implemented together with
-> authentication — not retrofitted afterwards. A retention policy is significantly easier
-> to build in from the start than to add later.
-
 **Stakeholders:** S1 (music librarian), S4 (Administrator), S2 (Dirigent)
-**Effort:** Medium
-**Depends on:** Authentication (for meaningful `userId`); GDPR/privacy policy decision on IP address handling
+**Depends on:** Authentication (for meaningful `userId`)
 
 ---
 
@@ -624,11 +634,11 @@ answered before the relevant implementation work begins.
 | # | Question | Affects | Status |
 |---|----------|---------|--------|
 | 1 | Should a `Musician` user account link to the existing `Musician` entity, or be a separate `User` entity? | Auth, musician–instrument assignment, "my parts" view | **Resolved:** `userId` (OIDC subject) added to `Musician` — no separate User entity. External/historical musicians have `userId = null`. |
-| 2 | How is "selected content" for guests scoped — per-sheet flag, collection-based sharing, or ensemble-based? | Guest access, setlist public page | Open |
+| 2 | How is "selected content" for guests scoped — per-sheet flag, collection-based sharing, or ensemble-based? | Guest access, setlist public page | **Partially resolved:** Share links are resource-scoped (one token = one resource, not a broad key). Full guest/public access scoping (e.g. public setlist page) still open. |
 | 3 | Should document-level visibility be independently configurable, or always inherited from the sheet/instrumentation? | Shared document links, guest access | Open |
 | 4 | Is anonymous guest access (no link, open public URL) ever desirable? | Guest access scope | Open |
 | 5 | Should coverage snapshots be invalidated automatically, or remain manual? | Coverage accuracy, performance | Open |
 | 6 | Should lending / checkout be tracked per instrumentation or per physical copy? (Relevant if multiple copies per instrumentation are ever supported) | Lending, physical archive | Open |
 | 7 | Which OIDC provider? Self-hosted (Keycloak) or SaaS (Auth0, Google)? | Auth implementation | **Resolved:** Self-hosted Keycloak 26. |
-| 8 | Should IP addresses be stored in the document access log, or omitted/anonymised? Requires GDPR/privacy policy decision. | Document access log | Open |
+| 8 | Should IP addresses be stored in the document access log, or omitted/anonymised? Requires GDPR/privacy policy decision. | Document access log | **Resolved: not stored.** `userId` (OIDC sub) + snapshotted `username` give unambiguous attribution; IP adds GDPR obligations without meaningful benefit in an ensemble context. |
 | 9 | What retention period for the document access log? (e.g. 12 months) | Document access log | Open |

@@ -5,6 +5,7 @@ import de.halbmann.sam.api.entity.classification.ClassificationApplyRequest;
 import de.halbmann.sam.api.entity.classification.ClassificationApplyResult;
 import de.halbmann.sam.api.entity.classification.SheetClassification;
 import de.halbmann.sam.api.entity.documents.*;
+import de.halbmann.sam.api.entity.eventlog.EventType;
 import de.halbmann.sam.api.entity.shared.PaginatedResponse;
 import de.halbmann.sam.api.entity.sheets.BatchDownloadRequest;
 import de.halbmann.sam.api.entity.sheets.DownloadFormat;
@@ -13,6 +14,7 @@ import de.halbmann.sam.business.documents.controller.MergedPdfEntry;
 import de.halbmann.sam.business.documents.controller.StreamWriter;
 import de.halbmann.sam.business.documents.entity.AttachmentEntity;
 import de.halbmann.sam.business.documents.entity.DocumentEntity;
+import de.halbmann.sam.business.eventlog.controller.EventLogService;
 import de.halbmann.sam.classification.controller.DocumentClassificationService;
 import de.halbmann.sam.security.Roles;
 import io.quarkus.security.Authenticated;
@@ -43,6 +45,9 @@ public class DocumentsResourceImpl implements DocumentsResource {
 
     @Inject
     DocumentClassificationService classificationService;
+
+    @Inject
+    EventLogService eventLogService;
 
     @PathParam("instrumentationId")
     String instrumentationId;
@@ -102,6 +107,12 @@ public class DocumentsResourceImpl implements DocumentsResource {
             return Response.noContent().build();
         }
 
+        eventLogService.log(
+                EventType.DOCUMENT_BATCH_DOWNLOAD,
+                instrumentationId != null ? "instrumentation" : "sheet",
+                instrumentationId != null ? UUID.fromString(instrumentationId) : UUID.fromString(sheetId),
+                Map.of("count", entries.size(), "format", format.name()));
+
         return buildResponse(entries, format, zipName);
     }
 
@@ -115,6 +126,16 @@ public class DocumentsResourceImpl implements DocumentsResource {
         if (entries.isEmpty()) {
             return Response.noContent().build();
         }
+
+        eventLogService.log(
+                EventType.DOCUMENT_BATCH_DOWNLOAD,
+                "attachment",
+                null,
+                Map.of(
+                        "count",
+                        entries.size(),
+                        "format",
+                        request.getFormat() != null ? request.getFormat().name() : "ZIP"));
 
         String baseName =
                 request.getBaseName() != null && !request.getBaseName().isBlank() ? request.getBaseName() : "documents";
@@ -171,6 +192,9 @@ public class DocumentsResourceImpl implements DocumentsResource {
         if (etagMatches(ifNoneMatch, etagValue)) {
             return Response.notModified().tag(etagValue).build();
         }
+
+        eventLogService.log(
+                EventType.DOCUMENT_DOWNLOAD, "document", attachment.id(), Map.of("filename", attachment.filename()));
 
         try {
             final StreamingOutput streamingOutput = output -> {
@@ -240,13 +264,29 @@ public class DocumentsResourceImpl implements DocumentsResource {
     @Override
     @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public SheetClassification classify(String docIdentifier) {
-        return classificationService.classify(UUID.fromString(docIdentifier));
+        SheetClassification result = classificationService.classify(UUID.fromString(docIdentifier));
+        eventLogService.log(
+                EventType.DOCUMENT_CLASSIFIED,
+                "document",
+                UUID.fromString(docIdentifier),
+                Map.of(
+                        "title",
+                        result.suggested() != null && result.suggested().getTitle() != null
+                                ? result.suggested().getTitle()
+                                : ""));
+        return result;
     }
 
     @Override
     @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public ClassificationApplyResult applyClassification(String docIdentifier, ClassificationApplyRequest request) {
-        return classificationService.apply(UUID.fromString(docIdentifier), request);
+        ClassificationApplyResult result = classificationService.apply(UUID.fromString(docIdentifier), request);
+        eventLogService.log(
+                EventType.DOCUMENT_CLASSIFICATION_APPLIED,
+                "document",
+                UUID.fromString(docIdentifier),
+                Map.of("sheetId", result.sheetId() != null ? result.sheetId().toString() : ""));
+        return result;
     }
 
     @Override

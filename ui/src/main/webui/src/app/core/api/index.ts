@@ -6,3 +6,4 @@ export { InstrumentsApiService } from './instruments-api.service';
 export { EnsemblesApiService } from './ensembles-api.service';
 export { CollectionsApiService } from './collections-api.service';
 export { BookletsApiService } from './booklets-api.service';
+export { EventLogsApiService } from './event-logs-api.service';

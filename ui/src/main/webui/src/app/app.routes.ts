@@ -46,6 +46,11 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'admin/event-logs',
+        loadChildren: () =>
+          import('./features/event-logs/event-logs.routes').then((m) => m.EVENT_LOGS_ROUTES),
+      },
+      {
         path: 'user/preferences',
         loadChildren: () =>
           import('./features/user-preferences/user-preferences.routes').then(

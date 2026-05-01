@@ -15,7 +15,8 @@
       "title": "Admin",
       "ensembles": "Ensembles",
       "instruments": "Instruments",
-      "configuration": "Configuration"
+      "configuration": "Configuration",
+      "eventLogs": "Event Logs"
     }
   },
   "layout": {
@@ -734,6 +735,36 @@
   },
   "configuration": {
     "title": "Configuration"
+  },
+  "eventLogs": {
+    "title": "Event Logs",
+    "subtitle": "Audit trail of document access, exports, and AI classification events.",
+    "empty": "No events recorded yet.",
+    "viaShareLink": "via share link",
+    "columns": {
+      "occurredAt": "Time",
+      "eventType": "Event",
+      "entityType": "Entity Type",
+      "entityId": "Entity ID",
+      "username": "User",
+      "metadata": "Details"
+    },
+    "filters": {
+      "eventType": "Event Type",
+      "userId": "User ID",
+      "entityType": "Entity Type",
+      "clear": "Clear Filters"
+    },
+    "eventTypes": {
+      "DOCUMENT_DOWNLOAD": "Document Download",
+      "DOCUMENT_BATCH_DOWNLOAD": "Batch Download",
+      "SHEET_EXPORT": "Sheet Export",
+      "COLLECTION_EXPORT": "Collection Export",
+      "COLLECTION_TOC_GENERATED": "TOC Generated",
+      "GEMA_SETLIST_GENERATED": "GEMA Setlist",
+      "DOCUMENT_CLASSIFIED": "AI Classification",
+      "DOCUMENT_CLASSIFICATION_APPLIED": "Classification Applied"
+    }
   },
   "primeng": {
     "accept": "Yes",

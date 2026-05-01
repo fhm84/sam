@@ -447,3 +447,34 @@ export type SortOrder = "ASC" | "DESC";
 export type Style = "CLASSICAL" | "ROMANTIC" | "MODERN" | "CONTEMPORARY" | "POP" | "ROCK" | "FUNK" | "SWING" | "LATIN" | "TRADITIONAL" | "FOLKLORISTIC" | "EXPERIMENTAL";
 
 export type VoiceOptionType = "PRIMARY" | "ALTERNATE" | "FALLBACK";
+
+export type EventType =
+  | "DOCUMENT_DOWNLOAD"
+  | "DOCUMENT_BATCH_DOWNLOAD"
+  | "SHEET_EXPORT"
+  | "COLLECTION_EXPORT"
+  | "COLLECTION_TOC_GENERATED"
+  | "GEMA_SETLIST_GENERATED"
+  | "DOCUMENT_CLASSIFIED"
+  | "DOCUMENT_CLASSIFICATION_APPLIED";
+
+export interface EventLogEntry {
+  id?: string;
+  occurredAt?: string;
+  userId?: string;
+  username?: string;
+  shareTokenId?: string;
+  eventType?: EventType;
+  entityType?: string;
+  entityId?: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface EventLogFilterRequest {
+  page?: number;
+  size?: number;
+  eventTypes?: EventType[];
+  entityType?: string;
+  userId?: string;
+  shareTokenId?: string;
+}

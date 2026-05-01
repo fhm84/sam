@@ -15,7 +15,8 @@
       "title": "Verwaltung",
       "ensembles": "Ensembles",
       "instruments": "Instrumente",
-      "configuration": "Konfiguration"
+      "configuration": "Konfiguration",
+      "eventLogs": "Ereignisprotokoll"
     }
   },
   "layout": {
@@ -734,6 +735,36 @@
   },
   "configuration": {
     "title": "Konfiguration"
+  },
+  "eventLogs": {
+    "title": "Ereignisprotokoll",
+    "subtitle": "Protokoll von Dokumentzugriffen, Exporten und KI-Klassifikationsereignissen.",
+    "empty": "Noch keine Ereignisse aufgezeichnet.",
+    "viaShareLink": "via Freigabelink",
+    "columns": {
+      "occurredAt": "Zeitpunkt",
+      "eventType": "Ereignis",
+      "entityType": "Entitätstyp",
+      "entityId": "Entitäts-ID",
+      "username": "Benutzer",
+      "metadata": "Details"
+    },
+    "filters": {
+      "eventType": "Ereignistyp",
+      "userId": "Benutzer-ID",
+      "entityType": "Entitätstyp",
+      "clear": "Filter zurücksetzen"
+    },
+    "eventTypes": {
+      "DOCUMENT_DOWNLOAD": "Dokumentendownload",
+      "DOCUMENT_BATCH_DOWNLOAD": "Sammeldownload",
+      "SHEET_EXPORT": "Notenexport",
+      "COLLECTION_EXPORT": "Sammlungsexport",
+      "COLLECTION_TOC_GENERATED": "Inhaltsverzeichnis erstellt",
+      "GEMA_SETLIST_GENERATED": "GEMA-Setliste",
+      "DOCUMENT_CLASSIFIED": "KI-Klassifikation",
+      "DOCUMENT_CLASSIFICATION_APPLIED": "Klassifikation übernommen"
+    }
   },
   "primeng": {
     "accept": "Ja",

@@ -27,4 +27,7 @@ public interface SamResources {
 
     @Path("ensembles")
     EnsemblesResource ensembles();
+
+    @Path("event-logs")
+    EventLogResource eventLogs();
 }

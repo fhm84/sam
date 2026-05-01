@@ -6,11 +6,13 @@ import de.halbmann.sam.api.boundary.SheetsResource;
 import de.halbmann.sam.api.entity.*;
 import de.halbmann.sam.api.entity.collections.SheetCollection;
 import de.halbmann.sam.api.entity.ensembles.CoverageResult;
+import de.halbmann.sam.api.entity.eventlog.EventType;
 import de.halbmann.sam.api.entity.shared.PaginatedResponse;
 import de.halbmann.sam.api.entity.shared.PaginationRequest;
 import de.halbmann.sam.api.entity.sheets.*;
 import de.halbmann.sam.business.collections.controller.SheetCollectionService;
 import de.halbmann.sam.business.ensembles.controller.CoverageEvaluationService;
+import de.halbmann.sam.business.eventlog.controller.EventLogService;
 import de.halbmann.sam.business.sheets.controller.ExportResult;
 import de.halbmann.sam.business.sheets.controller.SheetExportService;
 import de.halbmann.sam.business.sheets.controller.SheetService;
@@ -25,7 +27,9 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 @Authenticated
 @RequestScoped
@@ -48,6 +52,9 @@ public class SheetsResourceImpl implements SheetsResource {
 
     @Inject
     SheetCollectionService sheetCollectionService;
+
+    @Inject
+    EventLogService eventLogService;
 
     @Override
     public PaginatedResponse<SheetMusicSearchResult> findSheets(final SheetFilterRequest filterRequest) {
@@ -139,6 +146,11 @@ public class SheetsResourceImpl implements SheetsResource {
     @Override
     public Response export(final String sheetId, final ExportFormat format) {
         ExportResult result = sheetExportService.exportSheet(sheetId, format);
+        eventLogService.log(
+                EventType.SHEET_EXPORT,
+                "sheet",
+                UUID.fromString(sheetId),
+                Map.of("format", format.name(), "filename", result.filename()));
         return Response.ok((StreamingOutput) result.body()::write)
                 .header("Content-Disposition", "attachment; filename=\"" + result.filename() + "\"")
                 .type(result.contentType())

@@ -4,11 +4,13 @@ import de.halbmann.sam.api.boundary.CollectionSheetsResource;
 import de.halbmann.sam.api.boundary.SheetCollectionsResource;
 import de.halbmann.sam.api.entity.collections.SheetCollection;
 import de.halbmann.sam.api.entity.collections.SheetCollectionFilterRequest;
+import de.halbmann.sam.api.entity.eventlog.EventType;
 import de.halbmann.sam.api.entity.shared.PaginatedResponse;
 import de.halbmann.sam.api.entity.sheets.ExportFormat;
 import de.halbmann.sam.business.collections.controller.CollectionTocService;
 import de.halbmann.sam.business.collections.controller.GemaSetlistService;
 import de.halbmann.sam.business.collections.controller.SheetCollectionService;
+import de.halbmann.sam.business.eventlog.controller.EventLogService;
 import de.halbmann.sam.business.sheets.controller.ExportResult;
 import de.halbmann.sam.business.sheets.controller.SheetExportService;
 import de.halbmann.sam.security.Roles;
@@ -20,6 +22,8 @@ import jakarta.ws.rs.container.ResourceContext;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
+import java.util.Map;
+import java.util.UUID;
 
 @Authenticated
 @RequestScoped
@@ -39,6 +43,9 @@ public class SheetCollectionsResourceImpl implements SheetCollectionsResource {
 
     @Inject
     SheetExportService sheetExportService;
+
+    @Inject
+    EventLogService eventLogService;
 
     @Override
     public PaginatedResponse<SheetCollection> findSheetCollections(final SheetCollectionFilterRequest filterRequest) {
@@ -72,6 +79,11 @@ public class SheetCollectionsResourceImpl implements SheetCollectionsResource {
     public Response generateToc(final String collectionId) {
         byte[] pdf = tocService.generateToc(collectionId);
         String filename = "toc-" + collectionId + ".pdf";
+        eventLogService.log(
+                EventType.COLLECTION_TOC_GENERATED,
+                "collection",
+                UUID.fromString(collectionId),
+                Map.of("filename", filename));
         return Response.ok(pdf)
                 .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")
                 .header("Content-Length", pdf.length)
@@ -81,6 +93,11 @@ public class SheetCollectionsResourceImpl implements SheetCollectionsResource {
     @Override
     public Response generateGemaSetlist(final String collectionId) {
         ExportResult result = gemaSetlistService.generateGemaSetlist(collectionId);
+        eventLogService.log(
+                EventType.GEMA_SETLIST_GENERATED,
+                "collection",
+                UUID.fromString(collectionId),
+                Map.of("filename", result.filename()));
         return Response.ok((StreamingOutput) result.body()::write)
                 .header("Content-Disposition", "attachment; filename=\"" + result.filename() + "\"")
                 .type(result.contentType())
@@ -90,6 +107,11 @@ public class SheetCollectionsResourceImpl implements SheetCollectionsResource {
     @Override
     public Response export(final String collectionId, final ExportFormat format) {
         ExportResult result = sheetExportService.exportCollection(collectionId, format);
+        eventLogService.log(
+                EventType.COLLECTION_EXPORT,
+                "collection",
+                UUID.fromString(collectionId),
+                Map.of("format", format.name(), "filename", result.filename()));
         return Response.ok((StreamingOutput) result.body()::write)
                 .header("Content-Disposition", "attachment; filename=\"" + result.filename() + "\"")
                 .type(result.contentType())

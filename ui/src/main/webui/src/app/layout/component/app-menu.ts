@@ -56,6 +56,11 @@ export class AppMenu {
             icon: 'pi pi-wrench',
             routerLink: ['/admin/configuration'],
           },
+          {
+            label: this.i18n.t('nav.admin.eventLogs'),
+            icon: 'pi pi-list',
+            routerLink: ['/admin/event-logs'],
+          },
         ],
       },
     ];

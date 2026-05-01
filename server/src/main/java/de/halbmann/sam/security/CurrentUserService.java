@@ -35,6 +35,14 @@ public class CurrentUserService {
         return jwt.get().getSubject();
     }
 
+    /** Returns the {@code preferred_username} claim, or {@code null} for anonymous requests. */
+    public String getUsername() {
+        if (identity.isAnonymous() || jwt.isUnsatisfied()) {
+            return null;
+        }
+        return jwt.get().getClaim("preferred_username");
+    }
+
     /** Returns {@code true} if the current user holds the given realm role. */
     public boolean hasRole(String role) {
         return identity.hasRole(role);
