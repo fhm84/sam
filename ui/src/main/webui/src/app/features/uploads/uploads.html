@@ -306,6 +306,7 @@
                   styleClass="w-full"
                   (onChange)="onPickerInstrChange($event)"
                   (onClear)="onPickerInstrClear()"
+                  appendTo="body"
                 />
                 <label for="picker-instr">
                   {{ 'uploads.picker.instrumentation' | translate }}
@@ -323,6 +324,7 @@
               optionValue="value"
               [showClear]="true"
               styleClass="w-full"
+              appendTo="body"
             />
             <label for="picker-type">{{ 'uploads.picker.type' | translate }}</label>
           </p-floatlabel>

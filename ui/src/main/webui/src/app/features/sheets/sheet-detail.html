@@ -1,6 +1,54 @@
 @if (loading()) {
-  <div class="flex justify-center p-12 text-[2rem] text-[var(--sam-text-muted)]">
-    <i class="pi pi-spinner pi-spin"></i>
+  <!-- Title block -->
+  <div class="sheet-title-block">
+    <p-skeleton shape="circle" size="2rem" styleClass="shrink-0" />
+    <div class="sheet-title-content">
+      <p-skeleton width="58%" height="1.3rem" />
+      <p-skeleton width="36%" height="0.85rem" />
+    </div>
+    <div class="flex gap-1 shrink-0">
+      <p-skeleton shape="circle" size="2rem" />
+      <p-skeleton shape="circle" size="2rem" />
+      <p-skeleton shape="circle" size="2rem" />
+    </div>
+  </div>
+  <!-- Tab bar -->
+  <div class="flex gap-5 border-b border-[var(--sam-border)] pb-3 pt-2 mb-1">
+    @for (w of ['4rem','6.5rem','5rem','4.5rem']; track w) {
+      <p-skeleton [width]="w" height="0.85rem" />
+    }
+  </div>
+  <!-- Base Data panel -->
+  <div class="flex flex-col gap-3 pt-3">
+    <div class="border border-[var(--p-content-border-color)] rounded-[var(--p-panel-border-radius,6px)]">
+      <div class="px-4 py-3 border-b border-[var(--p-content-border-color)]">
+        <p-skeleton width="5rem" height="0.8rem" />
+      </div>
+      <div class="p-4">
+        <div class="detail-meta">
+          @for (w of ['65%','50%','75%','60%','55%','70%']; track w) {
+            <div class="meta-entry">
+              <p-skeleton width="45%" height="0.65rem" />
+              <p-skeleton [width]="w" height="0.9rem" />
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+    <!-- Documents panel -->
+    <div class="border border-[var(--p-content-border-color)] rounded-[var(--p-panel-border-radius,6px)]">
+      <div class="px-4 py-3 border-b border-[var(--p-content-border-color)]">
+        <p-skeleton width="5.5rem" height="0.8rem" />
+      </div>
+      <div class="p-4 flex flex-col gap-3">
+        @for (w of ['72%','55%']; track w) {
+          <div class="flex items-center gap-3">
+            <p-skeleton shape="circle" size="1.5rem" styleClass="shrink-0" />
+            <p-skeleton [width]="w" height="0.875rem" />
+          </div>
+        }
+      </div>
+    </div>
   </div>
 } @else if (sheet(); as s) {
   <div class="sheet-title-block">
@@ -1026,6 +1074,7 @@
           optionLabel="label"
           optionValue="value"
           [style]="{ width: '100%' }"
+          appendTo="body"
         />
       </div>
       <div class="relink-field">
@@ -1048,6 +1097,7 @@
             optionValue="value"
             [placeholder]="t.t('sheets.detail.relinkDocument.selectInstrumentation')"
             [style]="{ width: '100%', marginTop: '0.5rem' }"
+            appendTo="body"
           />
         }
       </div>

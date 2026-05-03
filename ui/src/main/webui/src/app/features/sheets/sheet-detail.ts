@@ -12,6 +12,7 @@ import { Divider } from 'primeng/divider';
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from 'primeng/tabs';
 import { Tooltip } from 'primeng/tooltip';
 import { Tag } from 'primeng/tag';
+import { Skeleton } from 'primeng/skeleton';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { SheetsApiService, InstrumentationsApiService } from '../../core/api';
@@ -23,6 +24,7 @@ import { InstrumentationDocuments, DocToggleEvent, DocsLoadedEvent } from './ins
 import { EnrichmentDialog } from './enrichment-dialog/enrichment-dialog';
 import { SheetCollections } from './sheet-collections';
 import { ShareDialogComponent } from '../../shared/share-dialog/share-dialog';
+import { instrumentLabel } from '../../shared/utils/format.utils';
 
 @Component({
   selector: 'app-sheet-detail',
@@ -45,6 +47,7 @@ import { ShareDialogComponent } from '../../shared/share-dialog/share-dialog';
     FormsModule,
     InstrumentationForm,
     Tag,
+    Skeleton,
     InstrumentationDocuments,
     EnrichmentDialog,
     SheetCollections,
@@ -107,7 +110,7 @@ export class SheetDetail extends DocumentHandler implements OnChanges {
 
   protected readonly instrumentationOptions = computed(() =>
     this.instrumentations().map((i) => ({
-      label: i.instrument?.name + (i.partLabel ? ` (${i.partLabel})` : ''),
+      label: instrumentLabel(i.instrument!) + (i.partLabel ? ` (${i.partLabel})` : ''),
       value: i.id!,
     }))
   );
@@ -290,7 +293,7 @@ export class SheetDetail extends DocumentHandler implements OnChanges {
       .filter((i) => i.id !== srcId)
       .map((i) => ({
         id: i.id!,
-        label: (i.instrument?.name ?? '') + (i.partLabel ? ` (${i.partLabel})` : ''),
+        label: instrumentLabel(i.instrument!) + (i.partLabel ? ` (${i.partLabel})` : ''),
       }));
   }
 
