@@ -3,6 +3,7 @@ package de.halbmann.sam.business.ensembles.boundary;
 import de.halbmann.sam.api.entity.shared.PaginationRequest;
 import de.halbmann.sam.api.entity.shared.SortOrder;
 import de.halbmann.sam.business.ensembles.entity.EnsembleEntity;
+import de.halbmann.sam.core.controller.SortFieldValidator;
 import de.halbmann.sam.core.entity.PaginatedEntities;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
@@ -11,12 +12,15 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
 @Transactional
 public class EnsembleRepository implements PanacheRepositoryBase<EnsembleEntity, UUID> {
+
+    private static final Set<String> ALLOWED_SORT_FIELDS = Set.of("name", "description");
 
     public PaginatedEntities<EnsembleEntity> findEnsembleEntities(
             final PaginationRequest paginationRequest, final Map<String, Object> parameters) {
@@ -46,6 +50,7 @@ public class EnsembleRepository implements PanacheRepositoryBase<EnsembleEntity,
 
     private Sort prepareSort(PaginationRequest paginationRequest) {
         if (paginationRequest.getSortBy() != null) {
+            SortFieldValidator.validate(paginationRequest.getSortBy(), ALLOWED_SORT_FIELDS);
             if (SortOrder.DESC == paginationRequest.getSortOrder()) {
                 return Sort.descending(paginationRequest.getSortBy());
             } else {

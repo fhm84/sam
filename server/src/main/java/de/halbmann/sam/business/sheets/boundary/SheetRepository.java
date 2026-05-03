@@ -5,6 +5,7 @@ import de.halbmann.sam.api.entity.shared.SortOrder;
 import de.halbmann.sam.api.entity.sheets.Genre;
 import de.halbmann.sam.business.documents.entity.AttachmentEntity;
 import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
+import de.halbmann.sam.core.controller.SortFieldValidator;
 import de.halbmann.sam.core.entity.PaginatedEntities;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
@@ -17,6 +18,25 @@ import java.util.stream.Collectors;
 @ApplicationScoped
 @Transactional
 public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, UUID> {
+
+    private static final Set<String> ALLOWED_SORT_FIELDS = Set.of(
+            "title",
+            "subtitle",
+            "publisher",
+            "publisherIpi",
+            "originalBy",
+            "genre",
+            "style",
+            "difficultyLevel",
+            "duration",
+            "favorite",
+            "yearOfComposition",
+            "edition",
+            "copyright",
+            "rating",
+            "iswc",
+            "gemaWorkNumber",
+            "additionalNotes");
 
     @SuppressWarnings("unchecked")
     public List<Object[]> searchSheets(final String query, final int page, final int size) {
@@ -144,6 +164,7 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
 
     private Sort prepareSort(PaginationRequest paginationRequest) {
         if (paginationRequest.getSortBy() != null) {
+            SortFieldValidator.validate(paginationRequest.getSortBy(), ALLOWED_SORT_FIELDS);
             if (SortOrder.DESC == paginationRequest.getSortOrder()) {
                 return Sort.descending(paginationRequest.getSortBy());
             } else {

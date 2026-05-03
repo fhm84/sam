@@ -5,6 +5,7 @@ import de.halbmann.sam.api.entity.musicians.MusicianMatch;
 import de.halbmann.sam.api.entity.shared.PaginationRequest;
 import de.halbmann.sam.api.entity.shared.SortOrder;
 import de.halbmann.sam.business.musicians.entity.MusicianEntity;
+import de.halbmann.sam.core.controller.SortFieldValidator;
 import de.halbmann.sam.core.entity.PaginatedEntities;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
@@ -16,12 +17,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
 @Transactional
 public class MusicianRepository implements PanacheRepositoryBase<MusicianEntity, UUID> {
+
+    private static final Set<String> ALLOWED_SORT_FIELDS = Set.of("name", "birthYear", "deathYear", "ipi");
 
     /**
      * Returns up to {@code limit} musicians whose name is similar to {@code name},
@@ -152,6 +156,7 @@ public class MusicianRepository implements PanacheRepositoryBase<MusicianEntity,
 
     private Sort prepareSort(PaginationRequest paginationRequest) {
         if (paginationRequest.getSortBy() != null) {
+            SortFieldValidator.validate(paginationRequest.getSortBy(), ALLOWED_SORT_FIELDS);
             if (SortOrder.DESC == paginationRequest.getSortOrder()) {
                 return Sort.descending(paginationRequest.getSortBy());
             } else {

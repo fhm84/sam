@@ -4,6 +4,7 @@ import de.halbmann.sam.api.entity.instruments.InstrumentMatch;
 import de.halbmann.sam.api.entity.shared.PaginationRequest;
 import de.halbmann.sam.api.entity.shared.SortOrder;
 import de.halbmann.sam.business.instruments.entity.InstrumentEntity;
+import de.halbmann.sam.core.controller.SortFieldValidator;
 import de.halbmann.sam.core.entity.PaginatedEntities;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
@@ -14,11 +15,14 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
 @Transactional
 public class InstrumentRepository implements PanacheRepositoryBase<InstrumentEntity, String> {
+
+    private static final Set<String> ALLOWED_SORT_FIELDS = Set.of("id", "name", "displayName", "transposition");
 
     /**
      * Returns up to {@code limit} instruments whose name is similar to {@code name},
@@ -81,6 +85,7 @@ public class InstrumentRepository implements PanacheRepositoryBase<InstrumentEnt
 
     private Sort prepareSort(PaginationRequest paginationRequest) {
         if (paginationRequest.getSortBy() != null) {
+            SortFieldValidator.validate(paginationRequest.getSortBy(), ALLOWED_SORT_FIELDS);
             if (SortOrder.DESC == paginationRequest.getSortOrder()) {
                 return Sort.descending(paginationRequest.getSortBy());
             } else {
