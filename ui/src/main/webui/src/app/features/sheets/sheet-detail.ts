@@ -22,6 +22,7 @@ import { InstrumentationForm } from './instrumentation-form';
 import { InstrumentationDocuments, DocToggleEvent, DocsLoadedEvent } from './instrumentation-documents';
 import { EnrichmentDialog } from './enrichment-dialog/enrichment-dialog';
 import { SheetCollections } from './sheet-collections';
+import { ShareDialogComponent } from '../../shared/share-dialog/share-dialog';
 
 @Component({
   selector: 'app-sheet-detail',
@@ -47,6 +48,7 @@ import { SheetCollections } from './sheet-collections';
     InstrumentationDocuments,
     EnrichmentDialog,
     SheetCollections,
+    ShareDialogComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './sheet-detail.html',
@@ -87,6 +89,10 @@ export class SheetDetail extends DocumentHandler implements OnChanges {
   protected relinkTargetType: 'sheet' | 'instrumentation' = 'sheet';
   protected relinkInstrumentationId: string | null = null;
   protected relinkAttachmentType: AttachmentType | null = null;
+
+  // Share dialog state
+  protected shareDialogVisible = false;
+  protected sharingInstrumentation: Instrumentation | null = null;
 
   // Also-link dialog state
   protected alsoLinkDialogVisible = false;
@@ -185,6 +191,11 @@ export class SheetDetail extends DocumentHandler implements OnChanges {
   protected openEditInstrumentation(instr: Instrumentation): void {
     this.editingInstrumentation = { ...instr };
     this.instrumentationDialogVisible = true;
+  }
+
+  protected openShareDialog(instr: Instrumentation): void {
+    this.sharingInstrumentation = instr;
+    this.shareDialogVisible = true;
   }
 
   protected confirmDeleteInstrumentation(instr: Instrumentation): void {

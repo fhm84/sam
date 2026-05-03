@@ -1,0 +1,92 @@
+<div class="flex flex-col gap-4">
+  <div class="flex items-center justify-between">
+    <h1 class="m-0 text-2xl font-semibold text-[var(--sam-text)]">
+      {{ 'shares.page.title' | translate }}
+    </h1>
+  </div>
+
+  <p-table
+    [value]="shares()"
+    [loading]="loading()"
+    [rowHover]="true"
+    styleClass="p-datatable-sm"
+  >
+    <ng-template #header>
+      <tr>
+        <th>{{ 'shares.page.col.type' | translate }}</th>
+        <th>{{ 'shares.page.col.resource' | translate }}</th>
+        <th>{{ 'shares.page.col.created' | translate }}</th>
+        <th>{{ 'shares.page.col.expires' | translate }}</th>
+        <th>{{ 'shares.page.col.status' | translate }}</th>
+        <th></th>
+      </tr>
+    </ng-template>
+
+    <ng-template #body let-share>
+      <tr>
+        <td>
+          <div class="flex items-center gap-2">
+            <i
+              [class]="share.resourceType === 'COLLECTION' ? 'pi pi-folder text-[var(--sam-text-muted)]' : 'pi pi-file text-[var(--sam-text-muted)]'"
+            ></i>
+            <span class="text-sm text-[var(--sam-text-secondary)]">
+              {{ ('shares.page.type.' + share.resourceType) | translate }}
+            </span>
+          </div>
+        </td>
+        <td>
+          <span class="text-sm text-[var(--sam-text)]">{{ share.resourceLabel || '—' }}</span>
+        </td>
+        <td>
+          <span class="text-sm text-[var(--sam-text-secondary)]">{{ share.createdAt | date: 'dd.MM.yyyy' }}</span>
+        </td>
+        <td>
+          <span class="text-sm text-[var(--sam-text-secondary)]">
+            {{ share.expiresAt ? (share.expiresAt | date: 'dd.MM.yyyy') : ('shares.page.noExpiry' | translate) }}
+          </span>
+        </td>
+        <td>
+          <p-tag
+            [value]="statusLabel(share) | translate"
+            [severity]="statusSeverity(share)"
+          />
+        </td>
+        <td>
+          <div class="flex items-center gap-1 justify-end">
+            @if (shareStatus(share) === 'active') {
+              <p-button
+                icon="pi pi-copy"
+                [text]="true"
+                [rounded]="true"
+                size="small"
+                [pTooltip]="'shares.page.copyLink' | translate"
+                tooltipPosition="top"
+                (onClick)="copyShareUrl(share)"
+              />
+              <p-button
+                icon="pi pi-ban"
+                [text]="true"
+                [rounded]="true"
+                size="small"
+                severity="danger"
+                [pTooltip]="'shares.page.revoke' | translate"
+                tooltipPosition="top"
+                (onClick)="confirmRevoke(share)"
+              />
+            }
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="6" class="text-center text-[var(--sam-text-secondary)] py-8">
+          {{ 'shares.page.empty' | translate }}
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <p-confirmdialog />
+</div>

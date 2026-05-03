@@ -1,0 +1,92 @@
+<p-dialog
+  [header]="'shares.dialog.title' | translate"
+  [visible]="visible()"
+  (visibleChange)="onVisibleChange($event)"
+  [modal]="true"
+  [style]="{ width: 'min(480px, 96vw)' }"
+  [draggable]="false"
+  [closable]="phase() !== 'creating'"
+>
+  @if (phase() === 'setup') {
+    <div class="flex flex-col gap-4 py-1">
+      <p class="m-0 text-sm text-[var(--sam-text-secondary)]">
+        {{ 'shares.dialog.description' | translate }}
+        <strong>{{ resourceLabel() }}</strong>
+      </p>
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-medium text-[var(--sam-text)]">
+          {{ 'shares.dialog.expiry.label' | translate }}
+        </label>
+        <p-select
+          [(ngModel)]="selectedExpiry"
+          [options]="expiryOptionLabels"
+          optionLabel="label"
+          optionValue="value"
+          styleClass="w-full"
+        />
+      </div>
+    </div>
+    <ng-template #footer>
+      <p-button
+        [label]="'common.close' | translate"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="close()"
+      />
+      <p-button
+        icon="pi pi-share-alt"
+        [label]="'shares.dialog.createLink' | translate"
+        (onClick)="createLink()"
+      />
+    </ng-template>
+  } @else if (phase() === 'creating') {
+    <div class="flex items-center gap-3 py-4 text-[var(--sam-text-secondary)]">
+      <i class="pi pi-spinner pi-spin text-lg"></i>
+      <span class="text-sm">{{ 'shares.dialog.creating' | translate }}</span>
+    </div>
+  } @else if (phase() === 'error') {
+    <div class="flex items-center gap-3 py-4 text-[var(--p-red-500)]">
+      <i class="pi pi-times-circle text-lg"></i>
+      <span class="text-sm">{{ 'shares.dialog.error' | translate }}</span>
+    </div>
+    <ng-template #footer>
+      <p-button
+        [label]="'common.close' | translate"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="close()"
+      />
+    </ng-template>
+  } @else {
+    <div class="flex flex-col gap-3 py-1">
+      <p class="m-0 text-sm text-[var(--sam-text-secondary)]">
+        {{ 'shares.dialog.linkReady' | translate }}
+      </p>
+      <div class="flex items-center gap-2">
+        <input
+          pInputText
+          [value]="shareUrl"
+          readonly
+          class="flex-1 text-sm font-mono"
+          (click)="$any($event.target).select()"
+        />
+        <p-button
+          [icon]="copied() ? 'pi pi-check' : 'pi pi-copy'"
+          [label]="(copied() ? 'shares.dialog.copied' : 'shares.dialog.copyLink') | translate"
+          [severity]="copied() ? 'success' : 'secondary'"
+          [outlined]="true"
+          size="small"
+          (onClick)="copyLink()"
+        />
+      </div>
+    </div>
+    <ng-template #footer>
+      <p-button
+        [label]="'common.close' | translate"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="close()"
+      />
+    </ng-template>
+  }
+</p-dialog>

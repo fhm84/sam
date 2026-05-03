@@ -72,6 +72,14 @@
         size="small"
         (onClick)="exportCollection('ZIP')"
       />
+      <p-button
+        icon="pi pi-share-alt"
+        [label]="t.t('shares.tooltip')"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        (onClick)="openShareDialog()"
+      />
     </div>
 
     <app-collection-sheets [collectionId]="collectionId()" />
@@ -92,3 +100,13 @@
     />
   }
 </p-dialog>
+
+@if (collection()) {
+  <app-share-dialog
+    resourceType="COLLECTION"
+    [resourceId]="collectionId()"
+    [resourceLabel]="collection()!.name"
+    [visible]="shareDialogVisible"
+    (visibleChange)="shareDialogVisible = $event"
+  />
+}

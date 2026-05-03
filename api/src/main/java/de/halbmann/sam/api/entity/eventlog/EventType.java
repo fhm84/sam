@@ -29,4 +29,13 @@ public enum EventType {
 
     /** A reviewed AI classification was applied, creating or updating sheet/musician/instrument entities. */
     DOCUMENT_CLASSIFICATION_APPLIED,
+
+    /** A share token was created by an authenticated user to grant external access to a resource. */
+    SHARE_CREATED,
+
+    /** A shared resource was accessed via a share token (e.g. info page loaded or file downloaded). */
+    SHARE_ACCESSED,
+
+    /** A share token was revoked by its creator, preventing future access. */
+    SHARE_REVOKED,
 }

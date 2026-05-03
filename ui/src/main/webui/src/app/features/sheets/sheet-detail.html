@@ -353,6 +353,16 @@
                       (onClick)="openEditInstrumentation(instr)"
                     />
                     <p-button
+                      icon="pi pi-share-alt"
+                      [rounded]="true"
+                      [text]="true"
+                      size="small"
+                      styleClass="row-action"
+                      [pTooltip]="'shares.tooltip' | translate"
+                      tooltipPosition="top"
+                      (onClick)="openShareDialog(instr)"
+                    />
+                    <p-button
                       icon="pi pi-trash"
                       [rounded]="true"
                       [text]="true"
@@ -746,6 +756,16 @@
                   (onClick)="openEditInstrumentation(instr)"
                 />
                 <p-button
+                  icon="pi pi-share-alt"
+                  [rounded]="true"
+                  [text]="true"
+                  size="small"
+                  styleClass="row-action"
+                  [pTooltip]="'shares.tooltip' | translate"
+                  tooltipPosition="top"
+                  (onClick)="openShareDialog(instr)"
+                />
+                <p-button
                   icon="pi pi-trash"
                   [rounded]="true"
                   [text]="true"
@@ -1106,6 +1126,16 @@
     [visible]="enrichDialogVisible"
     (visibleChange)="enrichDialogVisible = $event"
     (enriched)="onEnriched()"
+  />
+}
+
+@if (sharingInstrumentation) {
+  <app-share-dialog
+    resourceType="INSTRUMENTATION"
+    [resourceId]="sharingInstrumentation.id!"
+    [resourceLabel]="sharingInstrumentation.instrument.name + (sharingInstrumentation.partLabel ? ' ' + sharingInstrumentation.partLabel : '')"
+    [visible]="shareDialogVisible"
+    (visibleChange)="shareDialogVisible = $event"
   />
 }
 

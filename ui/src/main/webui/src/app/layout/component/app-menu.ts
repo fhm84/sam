@@ -36,6 +36,7 @@ export class AppMenu {
           },
           { label: this.i18n.t('nav.uploads'), icon: 'pi pi-upload', routerLink: ['/uploads'] },
           { label: this.i18n.t('nav.musicians'), icon: 'pi pi-user', routerLink: ['/musicians'] },
+          { label: this.i18n.t('nav.shares'), icon: 'pi pi-share-alt', routerLink: ['/shares'] },
         ],
       },
       {

@@ -13,10 +13,11 @@ import { CollectionsApiService } from '../../core/api';
 import { SheetCollection } from '../../model/datamodels';
 import { CollectionForm } from './collection-form';
 import { CollectionSheets } from './collection-sheets';
+import { ShareDialogComponent } from '../../shared/share-dialog/share-dialog';
 
 @Component({
   selector: 'app-collection-detail-page',
-  imports: [TranslatePipe, Button, SplitButton, Dialog, Tag, CollectionForm, CollectionSheets, Toolbar],
+  imports: [TranslatePipe, Button, SplitButton, Dialog, Tag, CollectionForm, CollectionSheets, Toolbar, ShareDialogComponent],
   templateUrl: './collection-detail-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -30,6 +31,7 @@ export class CollectionDetailPage implements OnInit {
   protected readonly collectionId = signal('');
   protected readonly collection = signal<SheetCollection | null>(null);
   protected editDialogVisible = false;
+  protected shareDialogVisible = false;
 
   protected readonly exportMenuItems = [
     {
@@ -56,6 +58,10 @@ export class CollectionDetailPage implements OnInit {
 
   protected openEdit(): void {
     this.editDialogVisible = true;
+  }
+
+  protected openShareDialog(): void {
+    this.shareDialogVisible = true;
   }
 
   protected onEditSaved(): void {

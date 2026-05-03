@@ -12,6 +12,7 @@ import { Tag } from 'primeng/tag';
 import { MultiSelect } from 'primeng/multiselect';
 import { InputText } from 'primeng/inputtext';
 import { Button } from 'primeng/button';
+import { Toolbar } from 'primeng/toolbar';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { EventLogsApiService } from '../../core/api';
 import { EventLogEntry, EventLogFilterRequest, EventType } from '../../model/datamodels';
@@ -25,11 +26,14 @@ const ALL_EVENT_TYPES: EventType[] = [
   'GEMA_SETLIST_GENERATED',
   'DOCUMENT_CLASSIFIED',
   'DOCUMENT_CLASSIFICATION_APPLIED',
+  'SHARE_CREATED',
+  'SHARE_ACCESSED',
+  'SHARE_REVOKED',
 ];
 
 @Component({
   selector: 'app-event-logs',
-  imports: [TableModule, Tag, MultiSelect, InputText, Button, FormsModule, TranslatePipe, DatePipe, JsonPipe],
+  imports: [TableModule, Tag, MultiSelect, InputText, Button, Toolbar, FormsModule, TranslatePipe, DatePipe, JsonPipe],
   templateUrl: './event-logs.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -103,6 +107,11 @@ export class EventLogs implements OnInit {
       case 'DOCUMENT_CLASSIFIED':
       case 'DOCUMENT_CLASSIFICATION_APPLIED':
         return 'success';
+      case 'SHARE_CREATED':
+      case 'SHARE_ACCESSED':
+        return 'info';
+      case 'SHARE_REVOKED':
+        return 'warn';
       default:
         return 'info';
     }

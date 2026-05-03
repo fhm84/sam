@@ -8,6 +8,7 @@
     "collections": "Collections",
     "uploads": "Uploads",
     "musicians": "Musicians",
+    "shares": "My Shares",
     "profile": "Profile",
     "userPreferences": "User Preferences",
     "logout": "Logout",
@@ -728,7 +729,8 @@
     "addToCollection": "Manage collections",
     "openInNewTab": "Open in new tab",
     "expandRow": "Expand",
-    "collapseRow": "Collapse"
+    "collapseRow": "Collapse",
+    "close": "Close"
   },
   "errors": {
     "requestFailed": "Request failed"
@@ -763,7 +765,10 @@
       "COLLECTION_TOC_GENERATED": "TOC Generated",
       "GEMA_SETLIST_GENERATED": "GEMA Setlist",
       "DOCUMENT_CLASSIFIED": "AI Classification",
-      "DOCUMENT_CLASSIFICATION_APPLIED": "Classification Applied"
+      "DOCUMENT_CLASSIFICATION_APPLIED": "Classification Applied",
+      "SHARE_CREATED": "Share Created",
+      "SHARE_ACCESSED": "Share Accessed",
+      "SHARE_REVOKED": "Share Revoked"
     }
   },
   "primeng": {
@@ -980,5 +985,62 @@
       "loading": "Loading instrumentations…",
       "empty": "No instrumentations on this sheet yet."
     }
+  },
+  "shares": {
+    "tooltip": "Share link",
+    "dialog": {
+      "title": "Share link",
+      "description": "Create a shareable link for",
+      "createLink": "Create link",
+      "copyLink": "Copy link",
+      "copied": "Copied!",
+      "creating": "Creating share link…",
+      "linkReady": "Your share link is ready. Anyone with this link can download.",
+      "error": "Failed to create share link. Please try again.",
+      "expiry": {
+        "label": "Link expires",
+        "never": "Never",
+        "7days": "After 7 days",
+        "30days": "After 30 days",
+        "1year": "After 1 year"
+      }
+    },
+    "page": {
+      "title": "My Shares",
+      "col": {
+        "type": "Type",
+        "resource": "Resource",
+        "created": "Created",
+        "expires": "Expires",
+        "status": "Status"
+      },
+      "type": {
+        "INSTRUMENTATION": "Part",
+        "COLLECTION": "Collection"
+      },
+      "status": {
+        "active": "Active",
+        "expired": "Expired",
+        "revoked": "Revoked"
+      },
+      "noExpiry": "Never",
+      "copyLink": "Copy link",
+      "copied": "Link copied!",
+      "revoke": "Revoke",
+      "revokeHeader": "Revoke share",
+      "revokeConfirm": "This link will no longer work. Are you sure?",
+      "revokeSuccess": "Share revoked",
+      "empty": "You have not created any share links yet."
+    }
+  },
+  "publicShare": {
+    "loading": "Loading…",
+    "notFound": "Link not found",
+    "notFoundHint": "This share link is invalid or has been removed.",
+    "expired": "Link expired",
+    "expiredHint": "This share link has expired. Please request a new one.",
+    "download": "Download",
+    "downloadToc": "Download programme (PDF)",
+    "by": "by"
   }
 }

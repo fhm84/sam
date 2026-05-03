@@ -4,6 +4,11 @@ import { authGuard } from './core/auth/auth.guard';
 
 export const routes: Routes = [
   {
+    path: 'share/:token',
+    loadComponent: () =>
+      import('./features/public-share/public-share-page').then((m) => m.PublicSharePage),
+  },
+  {
     path: '',
     component: AppLayout,
     canActivate: [authGuard],
@@ -22,6 +27,11 @@ export const routes: Routes = [
         path: 'uploads',
         loadChildren: () =>
           import('./features/uploads/uploads.routes').then((m) => m.UPLOADS_ROUTES),
+      },
+      {
+        path: 'shares',
+        loadChildren: () =>
+          import('./features/shares/shares.routes').then((m) => m.SHARES_ROUTES),
       },
       {
         path: 'musicians',

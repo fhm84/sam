@@ -8,6 +8,7 @@
     "collections": "Sammlungen",
     "uploads": "Uploads",
     "musicians": "Musiker",
+    "shares": "Meine Freigaben",
     "profile": "Profil",
     "userPreferences": "Benutzereinstellungen",
     "logout": "Abmelden",
@@ -728,7 +729,8 @@
     "addToCollection": "Sammlungen verwalten",
     "openInNewTab": "In neuem Tab öffnen",
     "expandRow": "Ausklappen",
-    "collapseRow": "Einklappen"
+    "collapseRow": "Einklappen",
+    "close": "Schließen"
   },
   "errors": {
     "requestFailed": "Anfrage fehlgeschlagen"
@@ -763,7 +765,10 @@
       "COLLECTION_TOC_GENERATED": "Inhaltsverzeichnis erstellt",
       "GEMA_SETLIST_GENERATED": "GEMA-Setliste",
       "DOCUMENT_CLASSIFIED": "KI-Klassifikation",
-      "DOCUMENT_CLASSIFICATION_APPLIED": "Klassifikation übernommen"
+      "DOCUMENT_CLASSIFICATION_APPLIED": "Klassifikation übernommen",
+      "SHARE_CREATED": "Freigabe erstellt",
+      "SHARE_ACCESSED": "Freigabe geöffnet",
+      "SHARE_REVOKED": "Freigabe widerrufen"
     }
   },
   "primeng": {
@@ -980,5 +985,62 @@
       "loading": "Instrumentierungen werden geladen…",
       "empty": "Noch keine Instrumentierungen für dieses Notenblatt."
     }
+  },
+  "shares": {
+    "tooltip": "Link teilen",
+    "dialog": {
+      "title": "Link teilen",
+      "description": "Freigabelink erstellen für",
+      "createLink": "Link erstellen",
+      "copyLink": "Link kopieren",
+      "copied": "Kopiert!",
+      "creating": "Freigabelink wird erstellt…",
+      "linkReady": "Der Freigabelink ist bereit. Jeder mit diesem Link kann herunterladen.",
+      "error": "Freigabelink konnte nicht erstellt werden. Bitte erneut versuchen.",
+      "expiry": {
+        "label": "Link läuft ab",
+        "never": "Nie",
+        "7days": "Nach 7 Tagen",
+        "30days": "Nach 30 Tagen",
+        "1year": "Nach 1 Jahr"
+      }
+    },
+    "page": {
+      "title": "Meine Freigaben",
+      "col": {
+        "type": "Typ",
+        "resource": "Ressource",
+        "created": "Erstellt",
+        "expires": "Läuft ab",
+        "status": "Status"
+      },
+      "type": {
+        "INSTRUMENTATION": "Stimme",
+        "COLLECTION": "Sammlung"
+      },
+      "status": {
+        "active": "Aktiv",
+        "expired": "Abgelaufen",
+        "revoked": "Widerrufen"
+      },
+      "noExpiry": "Nie",
+      "copyLink": "Link kopieren",
+      "copied": "Link kopiert!",
+      "revoke": "Widerrufen",
+      "revokeHeader": "Freigabe widerrufen",
+      "revokeConfirm": "Dieser Link wird nicht mehr funktionieren. Sicher?",
+      "revokeSuccess": "Freigabe widerrufen",
+      "empty": "Noch keine Freigabelinks erstellt."
+    }
+  },
+  "publicShare": {
+    "loading": "Wird geladen…",
+    "notFound": "Link nicht gefunden",
+    "notFoundHint": "Dieser Freigabelink ist ungültig oder wurde entfernt.",
+    "expired": "Link abgelaufen",
+    "expiredHint": "Dieser Freigabelink ist abgelaufen. Bitte einen neuen anfordern.",
+    "download": "Herunterladen",
+    "downloadToc": "Programm herunterladen (PDF)",
+    "by": "von"
   }
 }
