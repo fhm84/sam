@@ -75,7 +75,7 @@
                     <plugin>
                         <groupId>cz.habarta.typescript-generator</groupId>
                         <artifactId>typescript-generator-maven-plugin</artifactId>
-                        <version>3.2.1263</version>
+                        <version>4.0.0</version>
                         <executions>
                             <execution>
                                 <goals>
@@ -86,11 +86,11 @@
                         <configuration>
                             <jsonLibrary>jsonb</jsonLibrary>
                             <classPatterns>
-                                <classPattern>de.halbmann.sam.api.entity.*</classPattern>
+                                <classPattern>de.halbmann.sam.api.entity.**</classPattern>
                             </classPatterns>
                             <customTypeMappings>
                                 <customTypeMapping>java.time.Duration:long</customTypeMapping>
-                                <customTypeMapping>de.halbmann.sam.api.entity.DifficultyLevel:short</customTypeMapping>
+                                <customTypeMapping>de.halbmann.sam.api.entity.sheets.DifficultyLevel:short</customTypeMapping>
                             </customTypeMappings>
                             <outputFile>src/main/webui/src/app/model/datamodels.d.ts</outputFile>
                             <outputKind>module</outputKind>
