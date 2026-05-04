@@ -53,4 +53,12 @@ public class PublicShareInfo {
 
     /** Ordered list of sheet entries in the collection, each with their downloadable parts. */
     private List<PublicShareCollectionItem> sheets;
+
+    // --- SHEET fields ---
+
+    /**
+     * Flat list of all instrumentations for a {@link ShareType#SHEET} share, sorted by instrument
+     * name and part label. Each entry with {@code hasAttachments = true} offers a per-part download.
+     */
+    private List<PublicShareInstrumentationItem> instrumentations;
 }

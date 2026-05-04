@@ -1,6 +1,9 @@
 package de.halbmann.sam.business.documents.controller;
 
 import de.halbmann.sam.api.entity.documents.*;
+import de.halbmann.sam.business.collections.boundary.SheetCollectionRepository;
+import de.halbmann.sam.business.collections.entity.CollectionSheetEntity;
+import de.halbmann.sam.business.collections.entity.SheetCollectionEntity;
 import de.halbmann.sam.business.documents.boundary.AttachmentRepository;
 import de.halbmann.sam.business.documents.boundary.DocumentRepository;
 import de.halbmann.sam.business.documents.entity.AttachmentEntity;
@@ -31,6 +34,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import lombok.extern.slf4j.Slf4j;
@@ -69,6 +73,9 @@ public class DocumentsService {
 
     @Inject
     AttachmentRepository attachmentRepository;
+
+    @Inject
+    SheetCollectionRepository sheetCollectionRepository;
 
     @Inject
     AttachmentMapper attachmentMapper;
@@ -391,22 +398,28 @@ public class DocumentsService {
     }
 
     /**
-     * Load attachment entities from ALL instrumentations of a sheet, optionally filtered by type.
-     * Results are sorted by instrument name then partLabel for natural ordering.
+     * Load attachment entities from a sheet and ALL its instrumentations, optionally filtered by
+     * type. Sheet-level attachments come first, then instrumentation attachments sorted by
+     * instrument name and partLabel.
      */
     public List<AttachmentEntity> loadAttachmentEntitiesBySheetInstrumentations(String sheetId, AttachmentType type) {
         SheetMusicEntity sheet = sheetRepository.findById(UUID.fromString(sheetId));
         if (sheet == null) {
             return List.of();
         }
-        return sheet.getInstrumentations().stream()
+        List<AttachmentEntity> result = new ArrayList<>();
+        sheet.getAttachments().stream()
+                .filter(a -> type == null || type == a.getType())
+                .forEach(result::add);
+        sheet.getInstrumentations().stream()
                 .sorted(Comparator.comparing(
                                 (InstrumentationEntity i) -> i.getInstrument().getName())
                         .thenComparing(
                                 i -> Optional.ofNullable(i.getPartLabel()).orElse("")))
                 .flatMap(i -> i.getAttachments().stream())
                 .filter(a -> type == null || type == a.getType())
-                .toList();
+                .forEach(result::add);
+        return result;
     }
 
     /**
@@ -512,6 +525,102 @@ public class DocumentsService {
                     zip.putNextEntry(new ZipEntry(entryName));
                     try (InputStream in =
                             filesystem.openForRead(att.getDocument().getPath())) {
+                        in.transferTo(zip);
+                    }
+                    zip.closeEntry();
+                }
+            }
+        };
+    }
+
+    /**
+     * Build a streaming ZIP for a sheet, optionally filtered by type. Includes sheet-level
+     * attachments (no prefix) followed by instrumentation attachments prefixed with the instrument
+     * label, e.g. {@code "Trumpet 1_score.pdf"}.
+     * EXTERNAL_LINK attachments (no physical file) are silently skipped.
+     * Duplicate entry names are disambiguated with a counter suffix.
+     */
+    public StreamWriter buildZipForSheetInstrumentations(String sheetId, AttachmentType type) {
+        SheetMusicEntity sheet = sheetRepository.findById(UUID.fromString(sheetId));
+        if (sheet == null) {
+            return outputStream -> {};
+        }
+        record LabeledAttachment(String label, AttachmentEntity attachment) {}
+        List<LabeledAttachment> sheetEntries = sheet.getAttachments().stream()
+                .filter(a -> type == null || type == a.getType())
+                .filter(a -> a.getDocument() != null)
+                .map(a -> new LabeledAttachment(null, a))
+                .toList();
+        List<LabeledAttachment> instrEntries = sheet.getInstrumentations().stream()
+                .sorted(Comparator.comparing(
+                                (InstrumentationEntity i) -> i.getInstrument().getName())
+                        .thenComparing(
+                                i -> Optional.ofNullable(i.getPartLabel()).orElse("")))
+                .flatMap(instr -> {
+                    String label = instrumentLabel(instr);
+                    return instr.getAttachments().stream()
+                            .filter(a -> type == null || type == a.getType())
+                            .filter(a -> a.getDocument() != null)
+                            .map(a -> new LabeledAttachment(label, a));
+                })
+                .toList();
+        List<LabeledAttachment> entries =
+                Stream.concat(sheetEntries.stream(), instrEntries.stream()).toList();
+        return outputStream -> {
+            try (ZipOutputStream zip = new ZipOutputStream(outputStream)) {
+                Set<String> usedNames = new LinkedHashSet<>();
+                for (LabeledAttachment entry : entries) {
+                    String rawName = entry.label() != null
+                            ? entry.label() + "_" + entry.attachment().getDisplayName()
+                            : entry.attachment().getDisplayName();
+                    String entryName = uniqueZipName(rawName, usedNames);
+                    zip.putNextEntry(new ZipEntry(entryName));
+                    try (InputStream in = filesystem.openForRead(
+                            entry.attachment().getDocument().getPath())) {
+                        in.transferTo(zip);
+                    }
+                    zip.closeEntry();
+                }
+            }
+        };
+    }
+
+    /**
+     * Build a streaming ZIP for all instrumentations of every sheet in a collection, filtered by
+     * attachment type. Entry names are prefixed with the sheet title and instrument label, e.g.
+     * {@code "My Sheet - Trumpet 1_score.pdf"}. Returns {@code null} when the collection has no
+     * matching attachments.
+     */
+    public StreamWriter buildZipForCollectionInstrumentations(String collectionId, AttachmentType type) {
+        SheetCollectionEntity collection = sheetCollectionRepository.findById(UUID.fromString(collectionId));
+        if (collection == null) {
+            return null;
+        }
+        record LabeledAttachment(String label, AttachmentEntity attachment) {}
+        List<LabeledAttachment> entries = collection.getSheets().stream()
+                .map(CollectionSheetEntity::getSheet)
+                .flatMap(sheet -> sheet.getInstrumentations().stream()
+                        .sorted(Comparator.comparing((InstrumentationEntity i) ->
+                                        i.getInstrument().getName())
+                                .thenComparing(i ->
+                                        Optional.ofNullable(i.getPartLabel()).orElse("")))
+                        .flatMap(instr -> instr.getAttachments().stream()
+                                .filter(a -> type == null || type == a.getType())
+                                .filter(a -> a.getDocument() != null)
+                                .map(a -> new LabeledAttachment(sheet.getTitle() + " - " + instrumentLabel(instr), a))))
+                .toList();
+        if (entries.isEmpty()) {
+            return null;
+        }
+        return outputStream -> {
+            try (ZipOutputStream zip = new ZipOutputStream(outputStream)) {
+                Set<String> usedNames = new LinkedHashSet<>();
+                for (LabeledAttachment entry : entries) {
+                    String entryName = uniqueZipName(
+                            entry.label() + "_" + entry.attachment().getDisplayName(), usedNames);
+                    zip.putNextEntry(new ZipEntry(entryName));
+                    try (InputStream in = filesystem.openForRead(
+                            entry.attachment().getDocument().getPath())) {
                         in.transferTo(zip);
                     }
                     zip.closeEntry();

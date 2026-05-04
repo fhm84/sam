@@ -8,4 +8,7 @@ public enum ShareType {
 
     /** A full sheet collection / setlist (TOC PDF + all individual parts within it). */
     COLLECTION,
+
+    /** An entire sheet (all instrumentation parts, each individually downloadable + one ZIP download-all). */
+    SHEET,
 }

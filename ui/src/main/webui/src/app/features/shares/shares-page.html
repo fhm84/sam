@@ -27,7 +27,7 @@
         <td>
           <div class="flex items-center gap-2">
             <i
-              [class]="share.resourceType === 'COLLECTION' ? 'pi pi-folder text-[var(--sam-text-muted)]' : 'pi pi-file text-[var(--sam-text-muted)]'"
+              [class]="share.resourceType === 'COLLECTION' ? 'pi pi-folder text-[var(--sam-text-muted)]' : share.resourceType === 'SHEET' ? 'pi pi-book text-[var(--sam-text-muted)]' : 'pi pi-file text-[var(--sam-text-muted)]'"
             ></i>
             <span class="text-sm text-[var(--sam-text-secondary)]">
               {{ ('shares.page.type.' + share.resourceType) | translate }}

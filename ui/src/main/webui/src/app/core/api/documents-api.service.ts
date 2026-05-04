@@ -85,7 +85,7 @@ export class DocumentsApiService {
   ): Observable<void> {
     const body: Record<string, string> = { sheetId };
     if (instrumentationId) body['instrumentationId'] = instrumentationId;
-    if (type) body['type'] = type;
+    if (type) body['attachmentType'] = type;
     return this.http.post<void>(`${this.forTopLevel()}/${documentId}/link`, body);
   }
 

@@ -11,6 +11,7 @@ import de.halbmann.sam.business.eventlog.controller.EventLogService;
 import de.halbmann.sam.business.shares.boundary.ShareRepository;
 import de.halbmann.sam.business.shares.entity.ShareEntity;
 import de.halbmann.sam.business.sheets.boundary.InstrumentationRepository;
+import de.halbmann.sam.business.sheets.boundary.SheetRepository;
 import de.halbmann.sam.business.sheets.entity.InstrumentationEntity;
 import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
 import de.halbmann.sam.core.exception.EntityNotFoundException;
@@ -18,8 +19,10 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import java.time.OffsetDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -39,6 +42,9 @@ public class ShareService {
 
     @Inject
     InstrumentationRepository instrumentationRepository;
+
+    @Inject
+    SheetRepository sheetRepository;
 
     @Inject
     SheetCollectionRepository collectionRepository;
@@ -109,6 +115,9 @@ public class ShareService {
         } else if (entity.getResourceType() == ShareType.COLLECTION) {
             SheetCollectionEntity col = collectionRepository.findById(entity.getResourceId());
             return col != null ? col.getName() : null;
+        } else if (entity.getResourceType() == ShareType.SHEET) {
+            SheetMusicEntity sheet = sheetRepository.findById(entity.getResourceId());
+            return sheet != null ? sheet.getTitle() : null;
         }
         return null;
     }
@@ -134,6 +143,8 @@ public class ShareService {
             buildInstrumentationInfo(share.getResourceId(), info);
         } else if (share.getResourceType() == ShareType.COLLECTION) {
             buildCollectionInfo(share.getResourceId(), info);
+        } else if (share.getResourceType() == ShareType.SHEET) {
+            buildSheetInfo(share.getResourceId(), info);
         }
 
         return info;
@@ -193,10 +204,56 @@ public class ShareService {
         return item;
     }
 
+    private void buildSheetInfo(UUID sheetId, PublicShareInfo info) {
+        SheetMusicEntity sheet = sheetRepository.findById(sheetId);
+        if (sheet == null) {
+            return;
+        }
+        info.setSheetTitle(sheet.getTitle());
+        info.setComposerName(sheet.getComposer() != null ? sheet.getComposer().getName() : null);
+        List<PublicShareInstrumentationItem> items = sheet.getInstrumentations().stream()
+                .sorted(Comparator.comparing(
+                                (InstrumentationEntity i) -> i.getInstrument().getName())
+                        .thenComparing(
+                                i -> Optional.ofNullable(i.getPartLabel()).orElse("")))
+                .map(this::toInstrumentationItem)
+                .toList();
+        info.setInstrumentations(items);
+        info.setAttachments(documentsService.loadAttachmentsBySheet(sheetId.toString()));
+    }
+
+    /**
+     * Returns true if the instrumentation belongs to the sheet, false otherwise.
+     * Throws 404 if the sheet itself does not exist.
+     */
+    @Transactional
+    public boolean isInstrumentationInSheet(UUID sheetId, UUID instrumentationId) {
+        SheetMusicEntity sheet = sheetRepository.findById(sheetId);
+        if (sheet == null) {
+            throw new EntityNotFoundException("sheet", sheetId);
+        }
+        return sheet.getInstrumentations().stream().anyMatch(i -> i.getId().equals(instrumentationId));
+    }
+
+    /**
+     * Returns true if the attachment belongs directly to the sheet (sheet-level, not instrumentation).
+     * Throws 404 if the sheet itself does not exist.
+     */
+    @Transactional
+    public boolean isAttachmentOnSheet(UUID sheetId, UUID attachmentId) {
+        SheetMusicEntity sheet = sheetRepository.findById(sheetId);
+        if (sheet == null) {
+            throw new EntityNotFoundException("sheet", sheetId);
+        }
+        return sheet.getAttachments() != null
+                && sheet.getAttachments().stream().anyMatch(a -> a.getId().equals(attachmentId));
+    }
+
     /**
      * Returns true if the instrumentation belongs to any sheet in the collection, false otherwise.
      * Throws 404 if the collection itself does not exist.
      */
+    @Transactional
     public boolean isInstrumentationInCollection(UUID collectionId, UUID instrumentationId) {
         SheetCollectionEntity collection = collectionRepository.findById(collectionId);
         if (collection == null) {

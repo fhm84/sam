@@ -99,6 +99,15 @@
         tooltipPosition="top"
         (onClick)="openEnrichDialog()"
       />
+      <p-button
+        icon="pi pi-share-alt"
+        [rounded]="true"
+        [text]="true"
+        size="small"
+        [pTooltip]="t.t('sheets.shareSheet')"
+        tooltipPosition="top"
+        (onClick)="openShareSheetDialog()"
+      />
     </div>
   </div>
 
@@ -464,7 +473,7 @@
                       [selectedIds]="getSelectedIdsForInstr(instr.id!)"
                       (docsLoaded)="onDocsLoaded($event)"
                       (docToggle)="onToggleDoc($event)"
-                      (relinkRequested)="openRelinkDialog($event)"
+                      (relinkRequested)="openRelinkDialog($event, instr.id!)"
                       (alsoLinkRequested)="openAlsoLinkDialog($event, instr.id!)"
                     />
                   </td>
@@ -861,7 +870,7 @@
                   [selectedIds]="getSelectedIdsForInstr(instr.id!)"
                   (docsLoaded)="onDocsLoaded($event)"
                   (docToggle)="onToggleDoc($event)"
-                  (relinkRequested)="openRelinkDialog($event)"
+                  (relinkRequested)="openRelinkDialog($event, instr.id!)"
                   (alsoLinkRequested)="openAlsoLinkDialog($event, instr.id!)"
                 />
               </td>
@@ -1186,6 +1195,16 @@
     [resourceLabel]="sharingInstrumentation.instrument.name + (sharingInstrumentation.partLabel ? ' ' + sharingInstrumentation.partLabel : '')"
     [visible]="shareDialogVisible"
     (visibleChange)="shareDialogVisible = $event"
+  />
+}
+
+@if (sheet(); as s) {
+  <app-share-dialog
+    resourceType="SHEET"
+    [resourceId]="sheetId"
+    [resourceLabel]="s.title"
+    [visible]="shareSheetDialogVisible"
+    (visibleChange)="shareSheetDialogVisible = $event"
   />
 }
 

@@ -11,7 +11,7 @@ import {
 @Injectable({ providedIn: 'root' })
 export class SharesApiService {
   private readonly baseUrl = '/api/shares';
-  private readonly publicBase = '/api/public/share';
+  private readonly publicBase = '/api/public/shares';
 
   constructor(private http: HttpClient) {}
 
@@ -41,5 +41,21 @@ export class SharesApiService {
 
   collectionPartUrl(token: string, instrumentationId: string): string {
     return `${this.publicBase}/${token}/download/${instrumentationId}`;
+  }
+
+  sheetDownloadAllUrl(token: string, type = 'PART'): string {
+    return `${this.publicBase}/${token}/download?type=${type}`;
+  }
+
+  collectionDownloadAllUrl(token: string, type = 'PART'): string {
+    return `${this.publicBase}/${token}/download?type=${type}`;
+  }
+
+  sheetPartUrl(token: string, instrumentationId: string): string {
+    return `${this.publicBase}/${token}/download/${instrumentationId}`;
+  }
+
+  sheetAttachmentUrl(token: string, attachmentId: string): string {
+    return `${this.publicBase}/${token}/sheet/${attachmentId}`;
   }
 }

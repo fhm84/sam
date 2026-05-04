@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 4.0.0 on 2026-05-03 14:00:47.
+// Generated using typescript-generator version 4.0.0 on 2026-05-03 22:36:50.
 
 export interface SheetEnrichment {
     suggestedAdditionalNotes?: string;
@@ -344,6 +344,7 @@ export interface PublicShareInfo {
     expired?: boolean;
     expiresAt?: Date;
     instrumentName?: string;
+    instrumentations?: PublicShareInstrumentationItem[];
     partLabel?: string;
     sheetTitle?: string;
     sheets?: PublicShareCollectionItem[];
@@ -506,7 +507,7 @@ export type VoiceOptionType = "PRIMARY" | "ALTERNATE" | "FALLBACK";
 
 export type SortOrder = "ASC" | "DESC";
 
-export type ShareType = "INSTRUMENTATION" | "COLLECTION";
+export type ShareType = "INSTRUMENTATION" | "COLLECTION" | "SHEET";
 
 export type DownloadFormat = "ZIP" | "MERGED_PDF";
 

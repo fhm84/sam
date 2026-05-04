@@ -93,9 +93,12 @@ export class SheetDetail extends DocumentHandler implements OnChanges {
   protected relinkInstrumentationId: string | null = null;
   protected relinkAttachmentType: AttachmentType | null = null;
 
-  // Share dialog state
+  // Share dialog state (per-instrumentation)
   protected shareDialogVisible = false;
   protected sharingInstrumentation: Instrumentation | null = null;
+
+  // Share sheet dialog state (entire sheet)
+  protected shareSheetDialogVisible = false;
 
   // Also-link dialog state
   protected alsoLinkDialogVisible = false;
@@ -201,6 +204,10 @@ export class SheetDetail extends DocumentHandler implements OnChanges {
     this.shareDialogVisible = true;
   }
 
+  protected openShareSheetDialog(): void {
+    this.shareSheetDialogVisible = true;
+  }
+
   protected confirmDeleteInstrumentation(instr: Instrumentation): void {
     const instrumentName = instr.instrument?.name ?? '';
     this.confirmationService.confirm({
@@ -260,11 +267,16 @@ export class SheetDetail extends DocumentHandler implements OnChanges {
 
   // --- Relink document ---
 
-  protected openRelinkDialog(doc: Attachment): void {
+  protected openRelinkDialog(doc: Attachment, instrId?: string): void {
     this.relinkingDoc = doc;
     this.relinkAttachmentType = doc.type ?? null;
-    this.relinkTargetType = 'sheet';
-    this.relinkInstrumentationId = null;
+    if (instrId) {
+      this.relinkTargetType = 'instrumentation';
+      this.relinkInstrumentationId = instrId;
+    } else {
+      this.relinkTargetType = 'sheet';
+      this.relinkInstrumentationId = null;
+    }
     this.relinkDialogVisible = true;
   }
 

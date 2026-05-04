@@ -69,6 +69,7 @@
     "subtitle": "Browse, search, and manage all pieces in your archive.",
     "new": "New sheet",
     "edit": "Edit sheet",
+    "shareSheet": "Share sheet",
     "columns": {
       "title": "Title",
       "composer": "Composer",
@@ -1016,7 +1017,8 @@
       },
       "type": {
         "INSTRUMENTATION": "Part",
-        "COLLECTION": "Collection"
+        "COLLECTION": "Collection",
+        "SHEET": "Sheet"
       },
       "status": {
         "active": "Active",
@@ -1040,7 +1042,10 @@
     "expired": "Link expired",
     "expiredHint": "This share link has expired. Please request a new one.",
     "download": "Download",
+    "downloadAll": "Download all parts (ZIP)",
     "downloadToc": "Download programme (PDF)",
+    "sheetDocuments": "Sheet documents",
+    "parts": "Parts",
     "by": "by"
   }
 }

@@ -15,7 +15,7 @@ import java.util.UUID;
  * are automatically scoped to the calling user — a user can only see and revoke their own shares.
  *
  * <p>The public (unauthenticated) endpoints for accessing a share by token are defined in
- * {@code PublicShareResource} in the server module.
+ * {@link PublicShareResource}.
  */
 @Path("shares")
 @Produces(MediaType.APPLICATION_JSON)

@@ -107,6 +107,15 @@
               class="self-start"
               (onClick)="downloadToc()"
             />
+            <p-button
+              icon="pi pi-download"
+              [label]="'publicShare.downloadAll' | translate"
+              severity="secondary"
+              [outlined]="true"
+              size="small"
+              class="self-start"
+              (onClick)="downloadCollectionAll()"
+            />
           </div>
 
           @if (data.sheets && data.sheets.length > 0) {
@@ -149,6 +158,79 @@
                   }
                 </div>
               }
+            </div>
+          }
+        </div>
+      }
+
+      @if (data.type === 'SHEET') {
+        <div
+          class="rounded-xl border border-[var(--sam-border)] bg-white dark:bg-[var(--p-surface-900)] p-6 flex flex-col gap-5"
+        >
+          <div class="flex flex-col gap-2">
+            <h1 class="m-0 text-[1.4rem] font-semibold text-[var(--sam-text)]">
+              {{ data.sheetTitle }}
+            </h1>
+            @if (data.composerName) {
+              <span class="text-sm text-[var(--sam-text-secondary)]">
+                {{ 'publicShare.by' | translate }} {{ data.composerName }}
+              </span>
+            }
+            <p-button
+              icon="pi pi-download"
+              [label]="'publicShare.downloadAll' | translate"
+              severity="secondary"
+              [outlined]="true"
+              size="small"
+              class="self-start"
+              (onClick)="downloadSheetAll()"
+            />
+          </div>
+
+          @if (data.attachments && data.attachments.length > 0) {
+            <div class="flex flex-col gap-2">
+              <span class="text-xs font-semibold uppercase tracking-wide text-[var(--sam-text-muted)]">
+                {{ 'publicShare.sheetDocuments' | translate }}
+              </span>
+              @for (att of data.attachments; track att.id) {
+                <div class="flex items-center gap-3 rounded-lg border border-[var(--sam-border)] px-4 py-3">
+                  <i class="pi pi-file text-[var(--sam-text-muted)]"></i>
+                  <span class="flex-1 text-sm text-[var(--sam-text)] truncate">{{ att.displayName }}</span>
+                  <p-button
+                    icon="pi pi-download"
+                    [label]="'publicShare.download' | translate"
+                    size="small"
+                    (onClick)="downloadSheetAttachment(att.id!)"
+                  />
+                </div>
+              }
+            </div>
+          }
+
+          @if (data.instrumentations && data.instrumentations.length > 0) {
+            <div class="flex flex-col gap-2">
+              <span class="text-xs font-semibold uppercase tracking-wide text-[var(--sam-text-muted)]">
+                {{ 'publicShare.parts' | translate }}
+              </span>
+              <div class="flex flex-col gap-1">
+                @for (instr of data.instrumentations; track instr.id) {
+                  @if (instr.hasAttachments) {
+                    <div class="flex items-center gap-2">
+                      <span class="text-sm text-[var(--sam-text)] flex-1">
+                        {{ [instr.instrumentName, instr.partLabel].filter((x) => !!x).join(' ') }}
+                      </span>
+                      <p-button
+                        icon="pi pi-download"
+                        size="small"
+                        [text]="true"
+                        [rounded]="true"
+                        [pTooltip]="'publicShare.download' | translate"
+                        (onClick)="downloadSheetPart(instr.id!)"
+                      />
+                    </div>
+                  }
+                }
+              </div>
             </div>
           }
         </div>

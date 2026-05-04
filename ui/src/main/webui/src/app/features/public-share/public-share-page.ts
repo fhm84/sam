@@ -46,7 +46,23 @@ export class PublicSharePage implements OnInit {
     window.open(this.sharesApi.collectionTocUrl(this.token));
   }
 
+  protected downloadCollectionAll(): void {
+    window.open(this.sharesApi.collectionDownloadAllUrl(this.token));
+  }
+
   protected downloadPart(instrumentationId: string): void {
     window.open(this.sharesApi.collectionPartUrl(this.token, instrumentationId));
+  }
+
+  protected downloadSheetAll(): void {
+    window.open(this.sharesApi.sheetDownloadAllUrl(this.token));
+  }
+
+  protected downloadSheetPart(instrumentationId: string): void {
+    window.open(this.sharesApi.sheetPartUrl(this.token, instrumentationId));
+  }
+
+  protected downloadSheetAttachment(attachmentId: string): void {
+    window.open(this.sharesApi.sheetAttachmentUrl(this.token, attachmentId));
   }
 }
