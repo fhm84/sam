@@ -57,7 +57,7 @@
 
       <ng-template #body let-ensemble>
         <tr class="cursor-pointer" (click)="openDetail(ensemble)">
-          <td>{{ ensemble.name }}</td>
+          <td class="font-medium">{{ ensemble.name }}</td>
           <td>{{ ensemble.description }}</td>
           <td>{{ ensemble.voices?.length ?? 0 }}</td>
           <td class="flex gap-1">
