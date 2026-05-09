@@ -53,7 +53,7 @@
   <p-table
     [value]="items()"
     [lazy]="true"
-    [paginator]="true"
+    [paginator]="totalRecords() > rows"
     [rows]="rows"
     [totalRecords]="totalRecords()"
     [loading]="loading()"
@@ -62,7 +62,6 @@
   >
     <ng-template #header>
       <tr>
-        <th>{{ 'instruments.columns.id' | translate }}</th>
         <th>{{ 'instruments.columns.name' | translate }}</th>
         <th>{{ 'instruments.columns.displayName' | translate }}</th>
         <th>{{ 'instruments.columns.transposition' | translate }}</th>
@@ -72,7 +71,6 @@
 
     <ng-template #body let-instrument>
       <tr>
-        <td>{{ instrument.id }}</td>
         <td>{{ instrument.name }}</td>
         <td>{{ instrument.displayName }}</td>
         <td>{{ instrument.transposition }}</td>
@@ -101,7 +99,7 @@
 
     <ng-template #emptymessage>
       <tr>
-        <td colspan="5" class="text-center text-[var(--sam-text-muted)] !p-8">
+        <td colspan="4" class="text-center text-[var(--sam-text-muted)] !p-8">
           {{ 'instruments.empty' | translate }}
         </td>
       </tr>
