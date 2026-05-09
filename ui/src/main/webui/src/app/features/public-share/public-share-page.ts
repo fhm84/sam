@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@ang
 import { ActivatedRoute } from '@angular/router';
 import { Button } from 'primeng/button';
 import { Tag } from 'primeng/tag';
-import { Tooltip } from 'primeng/tooltip';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../core/translation.service';
 import { SharesApiService } from '../../core/api/shares-api.service';
@@ -10,7 +9,7 @@ import { PublicShareInfo } from '../../model/datamodels';
 
 @Component({
   selector: 'app-public-share-page',
-  imports: [Button, Tag, Tooltip, TranslatePipe],
+  imports: [Button, Tag, TranslatePipe],
   templateUrl: './public-share-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
