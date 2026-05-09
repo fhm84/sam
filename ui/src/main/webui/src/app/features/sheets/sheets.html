@@ -62,10 +62,11 @@
       </p-selectbutton>
       <p-button
         data-testid="btn-new-sheet"
-        [label]="t.t('sheets.new')"
         icon="pi pi-plus"
         (onClick)="openNew()"
-      />
+      >
+        <span class="hidden min-[900px]:inline">{{ 'sheets.new' | translate }}</span>
+      </p-button>
     </ng-template>
   </p-toolbar>
 
