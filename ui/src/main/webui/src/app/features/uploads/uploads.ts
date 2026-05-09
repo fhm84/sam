@@ -29,6 +29,7 @@ import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
 import { InputText } from 'primeng/inputtext';
 import { Tag } from 'primeng/tag';
+import { Tooltip } from 'primeng/tooltip';
 import { Menu } from 'primeng/menu';
 import { Checkbox } from 'primeng/checkbox';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
@@ -73,6 +74,7 @@ type PickerContext = 'upload' | 'assign';
     InputIcon,
     InputText,
     Tag,
+    Tooltip,
     Checkbox,
     Menu,
     TranslatePipe,
@@ -508,11 +510,6 @@ export class Uploads implements OnInit, OnDestroy {
     const part = i.partLabel ? `${i.partLabel} ` : '';
     const transposition = i.instrument.transposition ? ` · ${i.instrument.transposition}` : '';
     return `${part}${name}${transposition}`;
-  }
-
-  protected truncateChecksum(checksum?: string): string {
-    if (!checksum) return '';
-    return checksum.substring(0, 12) + '…';
   }
 
   private loadDocuments(): void {

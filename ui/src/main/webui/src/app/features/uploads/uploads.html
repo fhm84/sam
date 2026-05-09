@@ -104,7 +104,6 @@
         <th>{{ 'uploads.columns.filename' | translate }}</th>
         <th>{{ 'uploads.columns.size' | translate }}</th>
         <th>{{ 'uploads.columns.mimeType' | translate }}</th>
-        <th>{{ 'uploads.columns.checksum' | translate }}</th>
         <th>{{ 'uploads.columns.actions' | translate }}</th>
       </tr>
     </ng-template>
@@ -114,22 +113,63 @@
         <td>{{ doc.filename }}</td>
         <td>{{ formatSize(doc.size) }}</td>
         <td>{{ doc.mimeType }}</td>
-        <td [title]="doc.checksumSha256">{{ truncateChecksum(doc.checksumSha256) }}</td>
         <td>
-          <p-button
-            icon="pi pi-ellipsis-v"
-            [rounded]="true"
-            [text]="true"
-            styleClass="row-action"
-            (onClick)="showDocMenu($event, doc)"
-          />
+          <!-- Wide: individual icon buttons -->
+          <div class="hidden min-[640px]:flex gap-0.5">
+            <p-button
+              icon="pi pi-sparkles"
+              [rounded]="true"
+              [text]="true"
+              styleClass="row-action"
+              [pTooltip]="t.t('classification.action')"
+              tooltipPosition="top"
+              (onClick)="openClassify(doc)"
+            />
+            <p-button
+              icon="pi pi-link"
+              [rounded]="true"
+              [text]="true"
+              styleClass="row-action"
+              [pTooltip]="t.t('uploads.assign.action')"
+              tooltipPosition="top"
+              (onClick)="openAssignPicker(doc)"
+            />
+            <p-button
+              icon="pi pi-download"
+              [rounded]="true"
+              [text]="true"
+              styleClass="row-action"
+              [pTooltip]="t.t('uploads.download')"
+              tooltipPosition="top"
+              (onClick)="onDownload(doc)"
+            />
+            <p-button
+              icon="pi pi-trash"
+              [rounded]="true"
+              [text]="true"
+              styleClass="row-action row-action-danger"
+              [pTooltip]="'common.delete' | translate"
+              tooltipPosition="top"
+              (onClick)="confirmDelete(doc)"
+            />
+          </div>
+          <!-- Narrow: single menu button -->
+          <div class="flex min-[640px]:hidden">
+            <p-button
+              icon="pi pi-ellipsis-v"
+              [rounded]="true"
+              [text]="true"
+              styleClass="row-action"
+              (onClick)="showDocMenu($event, doc)"
+            />
+          </div>
         </td>
       </tr>
     </ng-template>
 
     <ng-template #emptymessage>
       <tr>
-        <td colspan="5" class="!p-8 text-center text-[var(--sam-text-muted)]">{{ 'uploads.empty' | translate }}</td>
+        <td colspan="4" class="!p-8 text-center text-[var(--sam-text-muted)]">{{ 'uploads.empty' | translate }}</td>
       </tr>
     </ng-template>
   </p-table>
