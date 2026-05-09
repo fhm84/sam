@@ -95,7 +95,7 @@
                 {{ data.collectionName }}
               </h1>
               @if (data.collectionType) {
-                <p-tag [value]="data.collectionType" severity="secondary" />
+                <p-tag [value]="t.t('collections.types.' + data.collectionType)" severity="secondary" />
               }
             </div>
             <p-button

@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, Input, OnInit } from '@angular/core';
+import { Component, computed, DestroyRef, inject, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FloatLabel } from 'primeng/floatlabel';
 import { InputText } from 'primeng/inputtext';
@@ -13,6 +13,7 @@ import { CollectionType, SheetCollection } from '../../model/datamodels';
 import { map, Observable } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { BaseForm } from '../../shared/base/base-form';
+import { TranslationService } from '../../core/translation.service';
 
 @Component({
   selector: 'app-collection-form',
@@ -22,13 +23,17 @@ import { BaseForm } from '../../shared/base/base-form';
 export class CollectionForm extends BaseForm<SheetCollection> implements OnInit {
   private readonly api = inject(CollectionsApiService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly i18n = inject(TranslationService);
 
   @Input() collection: SheetCollection | null = null;
 
-  protected readonly typeOptions: { label: string; value: CollectionType }[] = [
-    { label: 'Folder', value: 'FOLDER' },
-    { label: 'Setlist', value: 'SETLIST' },
-  ];
+  protected readonly typeOptions = computed<{ label: string; value: CollectionType }[]>(() => {
+    void this.i18n.version();
+    return [
+      { label: this.i18n.t('collections.types.FOLDER'), value: 'FOLDER' },
+      { label: this.i18n.t('collections.types.SETLIST'), value: 'SETLIST' },
+    ];
+  });
 
   readonly form = new FormGroup({
     name: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
