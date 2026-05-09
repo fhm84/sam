@@ -42,6 +42,13 @@
         <span class="block text-[0.9375rem] font-semibold text-[var(--sam-text)]">{{ 'nav.musicians' | translate }}</span>
         <span class="block text-[0.8125rem] text-[var(--sam-text-muted)] leading-[1.55]">{{ 'home.cards.musicians' | translate }}</span>
       </a>
+      <a class="group relative overflow-hidden flex flex-col gap-[0.875rem] p-6 bg-[var(--sam-surface)] border border-[var(--sam-border)] rounded-[14px] no-underline text-inherit transition-[border-color,box-shadow,transform] duration-200 hover:border-[var(--sam-accent)] hover:shadow-[0_6px_28px_rgba(0,0,0,0.07)] hover:-translate-y-0.5" routerLink="/shares">
+        <i class="pi pi-arrow-up-right absolute top-[1.125rem] right-[1.125rem] text-xs text-[var(--sam-accent)] opacity-0 -translate-x-1 translate-y-1 transition-[opacity,transform] duration-200 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0" aria-hidden="true"></i>
+        <i class="pi pi-share-alt absolute -bottom-[0.625rem] -right-[0.375rem] text-[5.5rem] leading-none text-[var(--sam-accent)] opacity-[0.05] pointer-events-none transition-opacity duration-200 group-hover:opacity-[0.085]" aria-hidden="true"></i>
+        <span class="flex items-center justify-center w-10 h-10 rounded-[10px] bg-[var(--sam-active-bg)] shrink-0"><i class="pi pi-share-alt text-[1.125rem] text-[var(--sam-accent)]"></i></span>
+        <span class="block text-[0.9375rem] font-semibold text-[var(--sam-text)]">{{ 'nav.shares' | translate }}</span>
+        <span class="block text-[0.8125rem] text-[var(--sam-text-muted)] leading-[1.55]">{{ 'home.cards.shares' | translate }}</span>
+      </a>
     </nav>
 
     <!-- Admin section -->
@@ -59,6 +66,10 @@
         <a class="inline-flex items-center gap-2 py-[0.4375rem] px-[0.875rem] bg-[var(--sam-surface)] border border-[var(--sam-border)] rounded-lg no-underline text-[0.8125rem] font-medium text-[var(--sam-text-secondary)] transition-[border-color,color] duration-150 hover:border-[var(--sam-accent)] hover:text-[var(--sam-accent)]" routerLink="/admin/configuration">
           <i class="pi pi-wrench text-[0.8125rem]"></i>
           <span>{{ 'nav.admin.configuration' | translate }}</span>
+        </a>
+        <a class="inline-flex items-center gap-2 py-[0.4375rem] px-[0.875rem] bg-[var(--sam-surface)] border border-[var(--sam-border)] rounded-lg no-underline text-[0.8125rem] font-medium text-[var(--sam-text-secondary)] transition-[border-color,color] duration-150 hover:border-[var(--sam-accent)] hover:text-[var(--sam-accent)]" routerLink="/admin/event-logs">
+          <i class="pi pi-list text-[0.8125rem]"></i>
+          <span>{{ 'nav.admin.eventLogs' | translate }}</span>
         </a>
       </div>
     </section>

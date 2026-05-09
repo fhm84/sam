@@ -59,7 +59,8 @@
       "sheets": "Alle Stücke des Archivs durchsuchen und verwalten",
       "collections": "Noten in Ordner und Setlists organisieren",
       "uploads": "Dokumente verwalten, die noch keinem Notenblatt zugeordnet sind",
-      "musicians": "Komponisten, Arrangeure und andere Mitwirkende"
+      "musicians": "Komponisten, Arrangeure und andere Mitwirkende",
+      "shares": "Geteilte Links zu Noten, Stimmen und Sammlungen"
     },
     "adminTitle": "Verwaltung",
     "disclaimer": "SAM dient ausschließlich der Archivierung und Verwaltung von Noten im Rahmen Ihrer rechtlichen Rahmenbedingungen. Die Vervielfältigung oder Weitergabe urheberrechtlich geschützter Noten ist nur mit den entsprechenden Rechten oder Lizenzen gestattet."

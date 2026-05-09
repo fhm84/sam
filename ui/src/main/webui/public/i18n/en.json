@@ -59,7 +59,8 @@
       "sheets": "Browse and manage all pieces in your archive",
       "collections": "Organize sheets into folders and setlists",
       "uploads": "Manage documents not yet linked to a sheet",
-      "musicians": "Composers, arrangers, and other contributors"
+      "musicians": "Composers, arrangers, and other contributors",
+      "shares": "Shared links to sheets, parts, and collections"
     },
     "adminTitle": "Administration",
     "disclaimer": "SAM is intended solely for archiving and managing sheet music within your legal environment. Reproducing or distributing copyrighted music is only permitted if you hold the appropriate rights or licenses."
