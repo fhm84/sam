@@ -145,10 +145,8 @@
                             </span>
                             <p-button
                               icon="pi pi-download"
+                              [label]="'publicShare.download' | translate"
                               size="small"
-                              [text]="true"
-                              [rounded]="true"
-                              [pTooltip]="'publicShare.download' | translate"
                               (onClick)="downloadPart(instr.id!)"
                             />
                           </div>
@@ -221,10 +219,8 @@
                       </span>
                       <p-button
                         icon="pi pi-download"
+                        [label]="'publicShare.download' | translate"
                         size="small"
-                        [text]="true"
-                        [rounded]="true"
-                        [pTooltip]="'publicShare.download' | translate"
                         (onClick)="downloadSheetPart(instr.id!)"
                       />
                     </div>
