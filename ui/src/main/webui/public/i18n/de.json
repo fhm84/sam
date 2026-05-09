@@ -1028,6 +1028,7 @@
     },
     "page": {
       "title": "Meine Freigaben",
+      "subtitle": "Geteilte Links zu Noten, Stimmen und Sammlungen.",
       "col": {
         "type": "Typ",
         "resource": "Ressource",

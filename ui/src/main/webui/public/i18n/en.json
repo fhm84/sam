@@ -1028,6 +1028,7 @@
     },
     "page": {
       "title": "My Shares",
+      "subtitle": "Shared links to sheets, parts, and collections.",
       "col": {
         "type": "Type",
         "resource": "Resource",
