@@ -546,6 +546,17 @@ body.blocked-scroll {
   color: var(--p-red-500) !important;
 }
 
+// ─── Disabled button state ────────────────────────────────────────
+// PrimeNG Aura preset loses the opacity hint; restore it so disabled
+// buttons are visually distinct from active ones.
+
+.p-button:disabled,
+.p-button[data-p-disabled='true'] {
+  opacity: 0.45 !important;
+  cursor: not-allowed !important;
+  pointer-events: auto !important;
+}
+
 // ─── Panel header refinement ──────────────────────────────────────
 
 .p-panel .p-panel-header {
