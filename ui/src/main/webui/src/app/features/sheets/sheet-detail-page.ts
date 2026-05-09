@@ -23,6 +23,15 @@ import { SheetDetail } from './sheet-detail';
             [text]="true"
             (onClick)="goBack()"
           />
+          @if (sheet(); as s) {
+            <div class="h-5 w-px bg-[var(--sam-border)] mx-3"></div>
+            <div class="flex flex-col gap-0">
+              <span class="text-base font-semibold text-[var(--sam-text)] leading-tight">{{ s.title }}</span>
+              @if (s.subtitle) {
+                <span class="text-xs text-[var(--sam-text-muted)] leading-tight">{{ s.subtitle }}</span>
+              }
+            </div>
+          }
         </ng-template>
         <ng-template #end>
           <p-splitButton
@@ -60,6 +69,7 @@ export class SheetDetailPage implements OnInit {
 
   protected readonly sheetId = signal('');
   protected readonly autoEnrich = signal(false);
+  protected readonly sheet = signal<SheetMusic | null>(null);
 
   protected readonly exportMenuItems = [
     {
@@ -75,16 +85,19 @@ export class SheetDetailPage implements OnInit {
   ];
 
   ngOnInit(): void {
-    this.sheetId.set(this.route.snapshot.paramMap.get('id')!);
+    const id = this.route.snapshot.paramMap.get('id')!;
+    this.sheetId.set(id);
     this.autoEnrich.set(this.route.snapshot.queryParamMap.get('enrich') === 'true');
+    this.api.load(id).subscribe({ next: (s) => this.sheet.set(s) });
   }
 
   protected goBack(): void {
     this.router.navigate(['/sheets']);
   }
 
-  protected onEdit(sheet: SheetMusic): void {
-    this.router.navigate(['/sheets', sheet.id, 'edit']);
+  protected onEdit(s: SheetMusic): void {
+    this.sheet.set(s);
+    this.router.navigate(['/sheets', s.id, 'edit']);
   }
 
   protected onDeleted(): void {
