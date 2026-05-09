@@ -29,7 +29,6 @@ import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
 import { InputText } from 'primeng/inputtext';
 import { Tag } from 'primeng/tag';
-import { Tooltip } from 'primeng/tooltip';
 import { Menu } from 'primeng/menu';
 import { Checkbox } from 'primeng/checkbox';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
@@ -74,7 +73,6 @@ type PickerContext = 'upload' | 'assign';
     InputIcon,
     InputText,
     Tag,
-    Tooltip,
     Checkbox,
     Menu,
     TranslatePipe,
