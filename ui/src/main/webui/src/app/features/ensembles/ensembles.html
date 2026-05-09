@@ -39,7 +39,7 @@
     <p-table
       [value]="items()"
       [lazy]="true"
-      [paginator]="true"
+      [paginator]="totalRecords() > rows"
       [rows]="rows"
       [totalRecords]="totalRecords()"
       [loading]="loading()"
@@ -139,12 +139,14 @@
           </div>
         }
       </div>
-      <p-paginator
-        [rows]="rows"
-        [totalRecords]="totalRecords()"
-        [rowsPerPageOptions]="[10, 25, 50]"
-        (onPageChange)="onPageChange($event)"
-      />
+      @if (totalRecords() > rows) {
+        <p-paginator
+          [rows]="rows"
+          [totalRecords]="totalRecords()"
+          [rowsPerPageOptions]="[10, 25, 50]"
+          (onPageChange)="onPageChange($event)"
+        />
+      }
     }
   }
 </div>
