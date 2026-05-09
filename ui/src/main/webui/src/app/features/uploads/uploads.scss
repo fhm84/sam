@@ -76,6 +76,23 @@
   }
 }
 
+// ── Responsive action column ─────────────────────────────────────────────────────────
+
+.actions-wide {
+  display: none;
+  align-items: center;
+}
+
+.actions-narrow {
+  display: flex;
+  align-items: center;
+}
+
+@media (min-width: 480px) {
+  .actions-wide  { display: flex; }
+  .actions-narrow { display: none; }
+}
+
 // ── Instrumentation checklist — :hover cannot use Tailwind group (dynamic content) ─
 
 .picker-instr-check-item {
