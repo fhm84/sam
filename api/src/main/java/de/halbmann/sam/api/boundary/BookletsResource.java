@@ -6,6 +6,11 @@ import de.halbmann.sam.api.entity.sheets.BookletFilterRequest;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 
+/**
+ * REST API for managing booklets. A booklet is a physical binder or printed compilation that
+ * groups sheet music entries by position. Sheet entries within a booklet are managed via the
+ * {@code sheets} sub-resource ({@link CollectionSheetsResource}).
+ */
 @Path("booklets")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)

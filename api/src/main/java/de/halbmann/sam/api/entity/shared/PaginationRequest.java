@@ -5,6 +5,11 @@ import jakarta.ws.rs.QueryParam;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Base JAX-RS {@code @BeanParam} class for paginated query endpoints. Provides {@code page},
+ * {@code size}, {@code sortBy}, and {@code sortOrder} query parameters. Pass {@code size=-1} to
+ * disable pagination and return all records.
+ */
 @Getter
 @Setter
 public class PaginationRequest {

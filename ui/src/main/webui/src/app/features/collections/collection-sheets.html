@@ -1,92 +1,175 @@
-<!-- ── Collection sheets table ──────────────────────────── -->
-<div class="flex flex-col gap-3">
+<!-- ── Collection items table ─────────────────────────────── -->
+<div class="flex flex-col gap-3" data-testid="collection-items">
   <div class="flex items-center justify-between">
-    <h2 class="m-0 text-xl font-semibold text-[var(--sam-text)]">{{ 'collections.sheets.title' | translate }}</h2>
-    <p-button
-      icon="pi pi-plus"
-      [label]="t.t('collections.sheets.add')"
-      size="small"
-      (onClick)="openAdd()"
-    />
+    <h2 class="m-0 text-xl font-semibold text-[var(--sam-text)]">{{ 'collections.items.title' | translate }}</h2>
+    <div class="flex gap-2">
+      <p-button
+        data-testid="btn-add-sheet"
+        icon="pi pi-music"
+        [label]="t.t('collections.items.addSheet')"
+        size="small"
+        (onClick)="openAddSheet()"
+      />
+      <p-button
+        data-testid="btn-add-text-block"
+        icon="pi pi-align-left"
+        [label]="t.t('collections.items.addTextBlock')"
+        size="small"
+        severity="secondary"
+        (onClick)="openAddTextBlock()"
+      />
+    </div>
   </div>
 
   <p-table
-    [value]="sheets()"
-    [lazy]="true"
-    [paginator]="true"
-    [rows]="rows"
-    [totalRecords]="totalRecords()"
+    data-testid="collection-items-table"
+    [value]="items()"
     [loading]="loading()"
-    [rowsPerPageOptions]="[10, 25, 50]"
-    (onLazyLoad)="onLazyLoad($event)"
+    (onRowReorder)="onRowReorder($event)"
   >
     <ng-template #header>
       <tr>
-        <th class="w-20">{{ 'collections.sheets.columns.identifier' | translate }}</th>
-        <th>{{ 'collections.sheets.columns.title' | translate }}</th>
-        <th>{{ 'collections.sheets.columns.genre' | translate }}</th>
-        <th class="w-32">{{ 'collections.sheets.columns.actions' | translate }}</th>
+        <th class="w-8"></th>
+        <th class="w-12 text-right tabular-nums">{{ 'collections.items.columns.nr' | translate }}</th>
+        <th>{{ 'collections.items.columns.title' | translate }}</th>
+        <th class="w-28">{{ 'collections.items.columns.type' | translate }}</th>
+        <th class="w-32">{{ 'collections.items.columns.genre' | translate }}</th>
+        <th class="w-32">{{ 'collections.items.columns.actions' | translate }}</th>
       </tr>
     </ng-template>
 
-    <ng-template #body let-sheet>
-      <tr>
-        <td class="font-semibold text-[var(--sam-text-secondary)] tabular-nums">{{ sheet.identifier }}</td>
+    <ng-template #body let-item let-i="rowIndex">
+      <tr [pReorderableRow]="i" [attr.data-testid]="'collection-item-row-' + item.id">
+        <td class="cursor-grab text-[var(--sam-text-muted)]">
+          <i class="pi pi-bars" pReorderableRowHandle></i>
+        </td>
+        <td class="text-right font-semibold text-[var(--sam-text-secondary)] tabular-nums">{{ i + 1 }}</td>
         <td>
-          <a class="text-[var(--p-primary-color)] no-underline font-medium hover:underline" [routerLink]="['/sheets', sheet.sheetId]">{{ sheet.title }}</a>
-          @if (sheet.subtitle) {
-            <span class="block text-[0.82rem] text-[var(--sam-text-muted)]">{{ sheet.subtitle }}</span>
+          @if (item.type === 'SHEET') {
+            <a class="text-[var(--p-primary-color)] no-underline font-medium hover:underline" [routerLink]="['/sheets', item.sheetId]">{{ item.title }}</a>
+            @if (item.subtitle) {
+              <span class="block text-[0.82rem] text-[var(--sam-text-muted)]">{{ item.subtitle }}</span>
+            }
+            @if (item.identifier) {
+              <span class="block text-[0.75rem] text-[var(--sam-text-muted)] italic">{{ item.identifier }}</span>
+            }
+          } @else {
+            <span class="text-[var(--sam-text-secondary)] italic text-sm leading-snug line-clamp-2">{{ item.textContent }}</span>
+            @if (item.identifier) {
+              <span class="block text-[0.75rem] text-[var(--sam-text-muted)]">{{ item.identifier }}</span>
+            }
+            @if (item.attachment) {
+              <a
+                class="inline-flex items-center gap-1 mt-1 text-[0.75rem] text-[var(--p-primary-color)] no-underline hover:underline"
+                [href]="'/api/documents/' + item.attachment.id"
+                target="_blank"
+                [attr.data-testid]="'attachment-link-' + item.id"
+              >
+                <i class="pi pi-paperclip text-[0.7rem]"></i>
+                {{ item.attachment.displayName }}
+              </a>
+            }
           }
         </td>
         <td>
-          @if (sheet.genre) {
-            {{ 'sheets.genres.' + sheet.genre | translate }}
+          <p-tag
+            [value]="t.t('collections.items.types.' + item.type)"
+            [severity]="item.type === 'SHEET' ? 'info' : 'secondary'"
+            [rounded]="true"
+          />
+        </td>
+        <td>
+          @if (item.type === 'SHEET' && item.genre) {
+            {{ 'sheets.genres.' + item.genre | translate }}
           } @else {
             —
           }
         </td>
-        <td class="flex gap-1">
-          <p-button
-            icon="pi pi-pencil"
-            [rounded]="true"
-            [text]="true"
-            size="small"
-            styleClass="row-action"
-            [pTooltip]="t.t('collections.sheets.edit')"
-            (onClick)="openEdit(sheet)"
-          />
-          <p-button
-            icon="pi pi-trash"
-            [rounded]="true"
-            [text]="true"
-            size="small"
-            styleClass="row-action row-action-danger"
-            (onClick)="confirmRemove(sheet)"
-          />
+        <td>
+          <div class="flex gap-1 items-center">
+            <p-button
+              icon="pi pi-pencil"
+              [rounded]="true"
+              [text]="true"
+              size="small"
+              styleClass="row-action"
+              [attr.data-testid]="'btn-edit-item-' + item.id"
+              [pTooltip]="t.t(item.type === 'SHEET' ? 'collections.items.editSheet' : 'collections.items.editTextBlock')"
+              (onClick)="openEdit(item)"
+            />
+            @if (item.type === 'TEXT') {
+              @if (item.attachment) {
+                <p-button
+                  icon="pi pi-paperclip"
+                  [rounded]="true"
+                  [text]="true"
+                  size="small"
+                  severity="danger"
+                  styleClass="row-action"
+                  [attr.data-testid]="'btn-remove-attachment-' + item.id"
+                  [pTooltip]="t.t('collections.items.attachment.remove')"
+                  tooltipPosition="top"
+                  (onClick)="confirmRemoveAttachment(item)"
+                />
+              } @else {
+                <p-button
+                  icon="pi pi-upload"
+                  [rounded]="true"
+                  [text]="true"
+                  size="small"
+                  severity="secondary"
+                  styleClass="row-action"
+                  [attr.data-testid]="'btn-upload-attachment-' + item.id"
+                  [pTooltip]="t.t('collections.items.attachment.upload')"
+                  tooltipPosition="top"
+                  [loading]="uploadingAttachment && uploadingItem?.id === item.id"
+                  (onClick)="triggerAttachmentUpload(item)"
+                />
+              }
+            }
+            <p-button
+              icon="pi pi-trash"
+              [rounded]="true"
+              [text]="true"
+              size="small"
+              styleClass="row-action row-action-danger"
+              [attr.data-testid]="'btn-delete-item-' + item.id"
+              (onClick)="confirmRemove(item)"
+            />
+          </div>
         </td>
       </tr>
     </ng-template>
 
     <ng-template #emptymessage>
       <tr>
-        <td colspan="4" class="text-center text-[var(--sam-text-muted)] !p-8">{{ 'collections.sheets.empty' | translate }}</td>
+        <td colspan="6" class="text-center text-[var(--sam-text-muted)] !p-8">{{ 'collections.items.empty' | translate }}</td>
       </tr>
     </ng-template>
   </p-table>
 </div>
 
-<!-- ── Add dialog ──────────────────────────────────────── -->
+<!-- Hidden file input for text item attachments -->
+<input
+  #fileInput
+  type="file"
+  class="hidden"
+  (change)="onFileSelected($event)"
+/>
+
+<!-- ── Add sheet dialog ─────────────────────────────────── -->
 <p-dialog
-  [header]="t.t('collections.sheets.add')"
-  [(visible)]="addDialogVisible"
+  data-testid="dialog-add-sheet"
+  [header]="t.t('collections.items.addSheet')"
+  [(visible)]="addSheetDialogVisible"
   [modal]="true"
   [style]="{ width: '56rem' }"
   [breakpoints]="{ '768px': '95vw' }"
 >
-  @if (addDialogVisible) {
+  @if (addSheetDialogVisible) {
     <div class="flex flex-col gap-4">
 
-      <!-- Selected sheet + identifier (shown when a sheet is selected) -->
+      <!-- Selected sheet + identifier -->
       @if (selectedSheet) {
         <div class="selected-block">
           <div class="selected-indicator">
@@ -96,16 +179,17 @@
               <span class="selected-composer">— {{ selectedSheet.composer!.name }}</span>
             }
           </div>
-          <form [formGroup]="identifierForm" (ngSubmit)="onAdd()">
+          <form [formGroup]="identifierForm" (ngSubmit)="onAddSheet()">
             <p-floatlabel variant="on" class="w-48 block">
               <input
                 pInputText
                 id="add-identifier"
+                data-testid="input-identifier"
                 formControlName="identifier"
-                [pTooltip]="t.t('collections.sheets.form.identifierTooltip')"
+                [pTooltip]="t.t('collections.items.form.identifierTooltip')"
                 tooltipPosition="right"
               />
-              <label for="add-identifier">{{ 'collections.sheets.form.identifier' | translate }}</label>
+              <label for="add-identifier">{{ 'collections.items.form.identifier' | translate }}</label>
             </p-floatlabel>
           </form>
         </div>
@@ -117,13 +201,15 @@
         <input
           pInputText
           type="text"
-          [placeholder]="t.t('collections.sheets.form.sheetPlaceholder')"
+          data-testid="input-search-sheet"
+          [placeholder]="t.t('collections.items.form.sheetPlaceholder')"
           (input)="onSearchInput($event)"
         />
       </p-iconfield>
 
       <!-- Results table -->
       <p-table
+        data-testid="sheet-search-results"
         [value]="searchResults()"
         [lazy]="true"
         [paginator]="true"
@@ -148,6 +234,7 @@
           <tr
             class="cursor-pointer transition-colors duration-150 search-row"
             [class.search-row--selected]="isSelected(sheet)"
+            [attr.data-testid]="'sheet-search-row-' + sheet.id"
             (click)="selectSheet(sheet)"
           >
             <td>
@@ -170,7 +257,8 @@
                 [rounded]="true"
                 [text]="true"
                 size="small"
-                [pTooltip]="t.t('collections.sheets.preview')"
+                [attr.data-testid]="'btn-preview-sheet-' + sheet.id"
+                [pTooltip]="t.t('collections.items.preview')"
                 (onClick)="openPreview(sheet, $event)"
               />
             </td>
@@ -180,7 +268,7 @@
         <ng-template #emptymessage>
           <tr>
             <td colspan="4" class="text-center text-[var(--sam-text-muted)] !p-8">
-              {{ 'collections.sheets.form.noResults' | translate }}
+              {{ 'collections.items.form.noResults' | translate }}
             </td>
           </tr>
         </ng-template>
@@ -192,68 +280,153 @@
     <div class="flex items-center justify-between w-full">
       <label class="flex items-center gap-2 cursor-pointer text-sm text-[var(--sam-text-secondary)] select-none">
         <p-checkbox [(ngModel)]="createAnother" [binary]="true" inputId="create-another" />
-        {{ 'collections.sheets.createAnother' | translate }}
+        {{ 'collections.items.createAnother' | translate }}
       </label>
       <div class="flex gap-2">
         <p-button
-          [label]="t.t('collections.sheets.cancel')"
+          data-testid="btn-cancel-add-sheet"
+          [label]="t.t('collections.items.cancel')"
           severity="secondary"
           [text]="true"
-          (onClick)="addDialogVisible = false"
+          (onClick)="addSheetDialogVisible = false"
         />
         <p-button
-          [label]="t.t('collections.sheets.save')"
-          [disabled]="!canAdd || saving"
+          data-testid="btn-save-add-sheet"
+          [label]="t.t('collections.items.save')"
+          [disabled]="!canAddSheet || saving"
           [loading]="saving"
-          (onClick)="onAdd()"
+          (onClick)="onAddSheet()"
         />
       </div>
     </div>
   </ng-template>
 </p-dialog>
 
-<!-- ── Edit dialog ─────────────────────────────────────── -->
+<!-- ── Add text block dialog ────────────────────────────── -->
 <p-dialog
-  [header]="t.t('collections.sheets.edit')"
-  [(visible)]="editDialogVisible"
+  data-testid="dialog-add-text-block"
+  [header]="t.t('collections.items.addTextBlock')"
+  [(visible)]="addTextDialogVisible"
   [modal]="true"
-  [style]="{ width: '28rem' }"
+  [style]="{ width: '36rem' }"
 >
-  @if (editDialogVisible && editingSheet) {
-    <form [formGroup]="identifierForm" (ngSubmit)="onUpdate()" class="flex flex-col gap-5">
-      <div
-        class="flex flex-col gap-1 px-4 py-3 border border-[var(--sam-border)] rounded-[var(--p-border-radius)] mb-1"
-        [style.background]="'var(--sam-surface-raised, var(--sam-surface))'"
-      >
-        <span class="text-[0.8rem] font-medium text-[var(--sam-text-secondary)] uppercase tracking-[0.03em]">{{ 'collections.sheets.form.sheet' | translate }}</span>
-        <span class="font-medium text-[var(--sam-text)]">{{ editingSheet.title }}</span>
-      </div>
+  @if (addTextDialogVisible) {
+    <form [formGroup]="textForm" (ngSubmit)="onAddTextBlock()" class="flex flex-col gap-5 pt-2">
+      <p-floatlabel variant="on" class="w-48 block">
+        <input
+          pInputText
+          id="text-identifier"
+          data-testid="input-identifier"
+          formControlName="identifier"
+          [pTooltip]="t.t('collections.items.form.identifierTooltip')"
+          tooltipPosition="right"
+        />
+        <label for="text-identifier">{{ 'collections.items.form.identifier' | translate }}</label>
+      </p-floatlabel>
 
-      <div class="flex flex-col gap-1.5">
-        <p-floatlabel variant="on" class="block">
-          <input
-            pInputText
-            id="edit-identifier"
-            formControlName="identifier"
-            [pTooltip]="t.t('collections.sheets.form.identifierTooltip')"
-            tooltipPosition="right"
-          />
-          <label for="edit-identifier">{{ 'collections.sheets.form.identifier' | translate }}</label>
-        </p-floatlabel>
-      </div>
+      <p-floatlabel variant="on" class="block">
+        <textarea
+          pTextarea
+          id="text-content"
+          data-testid="input-text-content"
+          formControlName="textContent"
+          rows="5"
+          class="w-full"
+          [placeholder]="t.t('collections.items.form.textContentPlaceholder')"
+        ></textarea>
+        <label for="text-content">{{ 'collections.items.form.textContent' | translate }}</label>
+      </p-floatlabel>
     </form>
   }
 
   <ng-template #footer>
     <p-button
-      [label]="t.t('collections.sheets.cancel')"
+      data-testid="btn-cancel-add-text-block"
+      [label]="t.t('collections.items.cancel')"
+      severity="secondary"
+      [text]="true"
+      (onClick)="addTextDialogVisible = false"
+    />
+    <p-button
+      data-testid="btn-save-add-text-block"
+      [label]="t.t('collections.items.save')"
+      [disabled]="textForm.invalid || saving"
+      [loading]="saving"
+      (onClick)="onAddTextBlock()"
+    />
+  </ng-template>
+</p-dialog>
+
+<!-- ── Edit dialog ──────────────────────────────────────── -->
+<p-dialog
+  data-testid="dialog-edit-item"
+  [header]="t.t(editingItem?.type === 'SHEET' ? 'collections.items.editSheet' : 'collections.items.editTextBlock')"
+  [(visible)]="editDialogVisible"
+  [modal]="true"
+  [style]="{ width: '36rem' }"
+>
+  @if (editDialogVisible && editingItem) {
+    @if (editingItem.type === 'SHEET') {
+      <form [formGroup]="identifierForm" (ngSubmit)="onUpdate()" class="flex flex-col gap-5">
+        <div
+          class="flex flex-col gap-1 px-4 py-3 border border-[var(--sam-border)] rounded-[var(--p-border-radius)] mb-1"
+          [style.background]="'var(--sam-surface-raised, var(--sam-surface))'"
+        >
+          <span class="text-[0.8rem] font-medium text-[var(--sam-text-secondary)] uppercase tracking-[0.03em]">{{ 'collections.items.form.sheet' | translate }}</span>
+          <span class="font-medium text-[var(--sam-text)]">{{ editingItem.title }}</span>
+        </div>
+        <p-floatlabel variant="on" class="block">
+          <input
+            pInputText
+            id="edit-identifier"
+            data-testid="input-identifier"
+            formControlName="identifier"
+            [pTooltip]="t.t('collections.items.form.identifierTooltip')"
+            tooltipPosition="right"
+          />
+          <label for="edit-identifier">{{ 'collections.items.form.identifier' | translate }}</label>
+        </p-floatlabel>
+      </form>
+    } @else {
+      <form [formGroup]="textForm" (ngSubmit)="onUpdate()" class="flex flex-col gap-5 pt-2">
+        <p-floatlabel variant="on" class="w-48 block">
+          <input
+            pInputText
+            id="edit-text-identifier"
+            data-testid="input-identifier"
+            formControlName="identifier"
+            [pTooltip]="t.t('collections.items.form.identifierTooltip')"
+            tooltipPosition="right"
+          />
+          <label for="edit-text-identifier">{{ 'collections.items.form.identifier' | translate }}</label>
+        </p-floatlabel>
+        <p-floatlabel variant="on" class="block">
+          <textarea
+            pTextarea
+            id="edit-text-content"
+            data-testid="input-text-content"
+            formControlName="textContent"
+            rows="5"
+            class="w-full"
+          ></textarea>
+          <label for="edit-text-content">{{ 'collections.items.form.textContent' | translate }}</label>
+        </p-floatlabel>
+      </form>
+    }
+  }
+
+  <ng-template #footer>
+    <p-button
+      data-testid="btn-cancel-edit"
+      [label]="t.t('collections.items.cancel')"
       severity="secondary"
       [text]="true"
       (onClick)="editDialogVisible = false"
     />
     <p-button
-      [label]="t.t('collections.sheets.save')"
-      [disabled]="identifierForm.invalid || saving"
+      data-testid="btn-save-edit"
+      [label]="t.t('collections.items.save')"
+      [disabled]="(editingItem?.type !== 'SHEET' && textForm.invalid) || saving"
       [loading]="saving"
       (onClick)="onUpdate()"
     />
@@ -262,6 +435,7 @@
 
 <!-- ── Preview dialog ───────────────────────────────────── -->
 <p-dialog
+  data-testid="dialog-sheet-preview"
   [header]="previewSheet()?.title ?? ''"
   [(visible)]="previewDialogVisible"
   [modal]="true"

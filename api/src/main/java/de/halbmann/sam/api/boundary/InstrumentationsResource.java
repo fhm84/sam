@@ -6,6 +6,11 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import java.util.List;
 
+/**
+ * Sub-resource for managing the instrument parts (instrumentations) of a sheet music entry. Each
+ * instrumentation links a sheet to a specific instrument and voice, and can carry its own
+ * attachments (e.g. individual part PDFs).
+ */
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public interface InstrumentationsResource {

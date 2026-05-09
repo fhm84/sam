@@ -7,6 +7,10 @@ import de.halbmann.sam.api.entity.shared.PaginatedResponse;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 
+/**
+ * REST API for managing canonical instrument definitions. Instruments are the shared reference
+ * data used by instrumentations and ensemble voices — changes here affect all referencing records.
+ */
 @Path("instruments")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)

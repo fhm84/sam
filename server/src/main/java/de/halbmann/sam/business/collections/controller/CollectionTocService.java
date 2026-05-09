@@ -1,6 +1,7 @@
 package de.halbmann.sam.business.collections.controller;
 
-import de.halbmann.sam.api.entity.collections.CollectionSheet;
+import de.halbmann.sam.api.entity.collections.CollectionItem;
+import de.halbmann.sam.api.entity.collections.CollectionItemType;
 import de.halbmann.sam.api.entity.collections.SheetCollection;
 import io.quarkus.qute.Location;
 import io.quarkus.qute.Template;
@@ -23,12 +24,18 @@ public class CollectionTocService {
     @Location("collection-toc")
     Template tocTemplate;
 
-    public byte[] generateToc(final String collectionId) {
+    public byte[] generateToc(final String collectionId, final boolean includeTextItems) {
         SheetCollection collection = collectionService.load(collectionId);
 
-        List<TocRow> rows = collection.getSheets().stream().map(this::toRow).toList();
+        List<CollectionItem> items = includeTextItems
+                ? collection.getItems()
+                : collection.getItems().stream()
+                        .filter(i -> i.getType() == CollectionItemType.SHEET)
+                        .toList();
 
-        String totalDuration = computeTotalDuration(collection.getSheets());
+        List<TocRow> rows = items.stream().map(this::toRow).toList();
+
+        String totalDuration = computeTotalDuration(items);
 
         String html = tocTemplate
                 .data("collection", collection)
@@ -48,13 +55,21 @@ public class CollectionTocService {
         }
     }
 
-    TocRow toRow(final CollectionSheet sheet) {
+    TocRow toRow(final CollectionItem item) {
+        if (item.getType() == CollectionItemType.TEXT) {
+            return new TocRow(
+                    item.getIdentifier() != null ? item.getIdentifier() : "",
+                    null,
+                    item.getTextContent() != null ? item.getTextContent() : "",
+                    null,
+                    null);
+        }
         return new TocRow(
-                sheet.getIdentifier() != null ? sheet.getIdentifier() : "",
-                sheet.getTitle() != null ? sheet.getTitle() : "",
-                sheet.getSubtitle() != null ? sheet.getSubtitle() : "",
-                sheet.getGenre() != null ? sheet.getGenre().name() : "",
-                formatDuration(sheet.getDuration()));
+                item.getIdentifier() != null ? item.getIdentifier() : "",
+                item.getTitle() != null ? item.getTitle() : "",
+                item.getSubtitle() != null ? item.getSubtitle() : "",
+                item.getGenre() != null ? item.getGenre().name() : "",
+                formatDuration(item.getDuration()));
     }
 
     String formatDuration(final Duration d) {
@@ -65,13 +80,20 @@ public class CollectionTocService {
         return String.format("%d:%02d", minutes, seconds);
     }
 
-    String computeTotalDuration(final List<CollectionSheet> sheets) {
-        Duration total = sheets.stream()
-                .map(CollectionSheet::getDuration)
+    String computeTotalDuration(final List<CollectionItem> items) {
+        Duration total = items.stream()
+                .map(CollectionItem::getDuration)
                 .filter(Objects::nonNull)
                 .reduce(Duration.ZERO, Duration::plus);
         return total.isZero() ? null : formatDuration(total);
     }
 
-    public record TocRow(String identifier, String title, String subtitle, String genre, String duration) {}
+    /**
+     * @param title null signals a TEXT item — rendered full-width in the template
+     */
+    public record TocRow(String identifier, String title, String subtitle, String genre, String duration) {
+        public boolean isTextItem() {
+            return title == null;
+        }
+    }
 }

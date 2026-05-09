@@ -2,8 +2,8 @@ package de.halbmann.sam.business.documents.controller;
 
 import de.halbmann.sam.api.entity.documents.*;
 import de.halbmann.sam.business.collections.boundary.SheetCollectionRepository;
-import de.halbmann.sam.business.collections.entity.CollectionSheetEntity;
 import de.halbmann.sam.business.collections.entity.SheetCollectionEntity;
+import de.halbmann.sam.business.collections.entity.SheetCollectionItemEntity;
 import de.halbmann.sam.business.documents.boundary.AttachmentRepository;
 import de.halbmann.sam.business.documents.boundary.DocumentRepository;
 import de.halbmann.sam.business.documents.entity.AttachmentEntity;
@@ -597,8 +597,10 @@ public class DocumentsService {
             return null;
         }
         record LabeledAttachment(String label, AttachmentEntity attachment) {}
-        List<LabeledAttachment> entries = collection.getSheets().stream()
-                .map(CollectionSheetEntity::getSheet)
+        List<LabeledAttachment> entries = collection.getItems().stream()
+                .filter(SheetCollectionItemEntity.class::isInstance)
+                .map(SheetCollectionItemEntity.class::cast)
+                .map(SheetCollectionItemEntity::getSheet)
                 .flatMap(sheet -> sheet.getInstrumentations().stream()
                         .sorted(Comparator.comparing((InstrumentationEntity i) ->
                                         i.getInstrument().getName())

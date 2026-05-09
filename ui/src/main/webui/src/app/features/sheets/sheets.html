@@ -1,4 +1,4 @@
-<div class="flex flex-col gap-4">
+<div class="flex flex-col gap-4" data-testid="sheets-page">
   <p-toolbar>
     <ng-template #start>
       <div class="flex flex-col gap-0.5">
@@ -12,6 +12,7 @@
         <input
           pInputText
           type="text"
+          data-testid="input-search"
           [placeholder]="t.t('sheets.search')"
           (input)="onFilter($event)"
         />
@@ -36,6 +37,7 @@
         />
       }
       <p-button
+        data-testid="btn-toggle-filters"
         [outlined]="true"
         [severity]="activeFilterCount() > 0 ? 'primary' : 'secondary'"
         (onClick)="toggleFilterPanel()"
@@ -47,6 +49,7 @@
         }
       </p-button>
       <p-selectbutton
+        data-testid="view-mode-toggle"
         [options]="viewOptions"
         [(ngModel)]="viewMode"
         optionLabel="icon"
@@ -58,6 +61,7 @@
         </ng-template>
       </p-selectbutton>
       <p-button
+        data-testid="btn-new-sheet"
         [label]="t.t('sheets.new')"
         icon="pi pi-plus"
         (onClick)="openNew()"
@@ -89,13 +93,14 @@
   }
 
   @if (!hasTextSearch()) {
-    <div class="flex flex-wrap gap-0.5 py-[0.375rem]">
+    <div class="flex flex-wrap gap-0.5 py-[0.375rem]" data-testid="alpha-filter">
       @for (letter of ALL_LETTERS; track letter) {
         <button
           class="alpha-btn"
           [class.active]="selectedLetter() === letter"
           [class.unavailable]="!availableLetters().includes(letter)"
           [disabled]="!availableLetters().includes(letter)"
+          [attr.data-testid]="'alpha-btn-' + letter"
           (click)="onLetterSelect(letter)"
         >{{ letter }}</button>
       }
@@ -103,11 +108,12 @@
   }
 
   @if (filterPanelOpen()) {
-    <div class="bg-[var(--sam-surface)] px-5 py-4 rounded-[var(--p-border-radius)] border border-[var(--sam-border)]">
+    <div class="bg-[var(--sam-surface)] px-5 py-4 rounded-[var(--p-border-radius)] border border-[var(--sam-border)]" data-testid="filter-panel">
       <div class="flex items-end gap-4 flex-wrap">
         <div class="flex flex-col gap-[0.375rem]">
           <label class="text-[0.85rem] font-medium text-[var(--sam-text-secondary)]">{{ 'sheets.filters.genre' | translate }}</label>
           <p-select
+            data-testid="select-filter-genre"
             [options]="genreOptions()"
             optionLabel="label"
             optionValue="value"
@@ -129,6 +135,7 @@
 
   @if (viewMode() === 'list') {
     <p-table
+      data-testid="sheets-table"
       [value]="sheets()"
       [lazy]="true"
       [paginator]="true"
@@ -158,7 +165,7 @@
       </ng-template>
 
       <ng-template #body let-sheet>
-        <tr class="cursor-pointer" (click)="openDetail(sheet)">
+        <tr class="cursor-pointer" [attr.data-testid]="'sheet-row-' + sheet.id" (click)="openDetail(sheet)">
           <td class="w-10 !pr-0">
             <p-button
               [icon]="sheet.favorite ? 'pi pi-star-fill' : 'pi pi-star'"
@@ -166,6 +173,7 @@
               [rounded]="true"
               [text]="true"
               size="small"
+              [attr.data-testid]="'btn-favorite-' + sheet.id"
               [pTooltip]="(sheet.favorite ? 'common.removeFromFavorites' : 'common.addToFavorites') | translate"
               tooltipPosition="top"
               (onClick)="toggleFavorite(sheet, $event)"
@@ -227,6 +235,7 @@
               [rounded]="true"
               [text]="true"
               styleClass="row-action"
+              [attr.data-testid]="'btn-add-to-collection-' + sheet.id"
               [pTooltip]="'common.addToCollection' | translate"
               tooltipPosition="top"
               (onClick)="openCollectionsDialog(sheet, $event)"
@@ -236,6 +245,7 @@
               [rounded]="true"
               [text]="true"
               styleClass="row-action"
+              [attr.data-testid]="'btn-edit-sheet-' + sheet.id"
               [pTooltip]="'sheets.edit' | translate"
               tooltipPosition="top"
               (onClick)="openEdit(sheet); $event.stopPropagation()"
@@ -245,6 +255,7 @@
               [rounded]="true"
               [text]="true"
               styleClass="row-action row-action-danger"
+              [attr.data-testid]="'btn-delete-sheet-' + sheet.id"
               [pTooltip]="'common.delete' | translate"
               tooltipPosition="top"
               (onClick)="confirmDelete(sheet); $event.stopPropagation()"
@@ -267,10 +278,11 @@
     } @else if (sheets().length === 0) {
       <div class="p-8 text-center text-[var(--sam-text-muted)]">{{ 'sheets.empty' | translate }}</div>
     } @else {
-      <div class="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
+      <div class="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4" data-testid="sheets-cards">
         @for (sheet of sheets(); track sheet.id) {
           <div
             class="sheet-card cursor-pointer relative flex flex-col p-5 bg-[var(--sam-surface)] border border-[var(--sam-border)] rounded-[var(--p-border-radius)] transition-shadow duration-200 hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)]"
+            [attr.data-testid]="'sheet-card-' + sheet.id"
             (click)="openDetail(sheet)"
           >
             <div class="card-actions">
@@ -280,6 +292,7 @@
                 [text]="true"
                 size="small"
                 styleClass="row-action"
+                [attr.data-testid]="'btn-add-to-collection-' + sheet.id"
                 [pTooltip]="'common.addToCollection' | translate"
                 tooltipPosition="top"
                 (onClick)="openCollectionsDialog(sheet, $event)"
@@ -290,6 +303,7 @@
                 [text]="true"
                 size="small"
                 styleClass="row-action"
+                [attr.data-testid]="'btn-edit-sheet-' + sheet.id"
                 [pTooltip]="'sheets.edit' | translate"
                 tooltipPosition="top"
                 (onClick)="openEdit(sheet); $event.stopPropagation()"
@@ -300,6 +314,7 @@
                 [text]="true"
                 size="small"
                 styleClass="row-action row-action-danger"
+                [attr.data-testid]="'btn-delete-sheet-' + sheet.id"
                 [pTooltip]="'common.delete' | translate"
                 tooltipPosition="top"
                 (onClick)="confirmDelete(sheet); $event.stopPropagation()"
@@ -312,6 +327,7 @@
                 [rounded]="true"
                 [text]="true"
                 size="small"
+                [attr.data-testid]="'btn-favorite-' + sheet.id"
                 [pTooltip]="(sheet.favorite ? 'common.removeFromFavorites' : 'common.addToFavorites') | translate"
                 tooltipPosition="top"
                 (onClick)="toggleFavorite(sheet, $event)"
@@ -439,6 +455,7 @@
 <p-confirmdialog />
 
 <p-dialog
+  data-testid="dialog-sheet-collections"
   [header]="'sheets.collections.title' | translate"
   [(visible)]="collectionsDialogVisible"
   [modal]="true"
@@ -448,4 +465,14 @@
   @if (collectionsDialogVisible && collectionsDialogSheetId) {
     <app-sheet-collections [sheetId]="collectionsDialogSheetId" />
   }
+  <ng-template #footer>
+    <p-button
+      data-testid="btn-open-add-to-collection"
+      icon="pi pi-folder-plus"
+      [label]="'sheets.collections.add' | translate"
+      size="small"
+      [outlined]="true"
+      (onClick)="collectionsDialogPanel?.openAdd()"
+    />
+  </ng-template>
 </p-dialog>

@@ -43,9 +43,8 @@ public class SheetCollection {
     LocalDate date;
 
     /**
-     * The list of sheets (wrapped in a collection sheet adding an identifier in context of the
-     * collection)
+     * The ordered list of items in the collection (sheet references and/or free-text blocks).
      */
     @Valid
-    List<CollectionSheet> sheets = new ArrayList<>();
+    List<CollectionItem> items = new ArrayList<>();
 }

@@ -8,6 +8,11 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+/**
+ * REST API for managing sheet music collections (setlists, songbooks, etc.). Supports CRUD
+ * operations, PDF table-of-contents generation, GEMA setlist export, and bulk ZIP/JSON/CSV export.
+ * The {@code items} sub-resource manages the ordered entries within each collection.
+ */
 @Path("sheet-collections")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -34,7 +39,9 @@ public interface SheetCollectionsResource {
     @GET
     @Path("{collectionId}/toc")
     @Produces("application/pdf")
-    Response generateToc(@PathParam("collectionId") String collectionId);
+    Response generateToc(
+            @PathParam("collectionId") String collectionId,
+            @QueryParam("includeTextItems") @DefaultValue("true") boolean includeTextItems);
 
     @GET
     @Path("{collectionId}/gema-setlist")
@@ -50,8 +57,11 @@ public interface SheetCollectionsResource {
      *   <li>{@code CSV} — one row per sheet with metadata fields as a CSV download</li>
      * </ul>
      *
-     * @param collectionId the ID of the collection to export
-     * @param format       the export format (ZIP, JSON, CSV); defaults to ZIP
+     * @param collectionId          the ID of the collection to export
+     * @param format                the export format (ZIP, JSON, CSV); defaults to ZIP
+     * @param includeTextItems      whether to include free-text items; defaults to true (ignored for ZIP)
+     * @param includeTextAttachments whether to include programme-note attachments from text blocks in
+     *                              the ZIP {@code Programmnotizen/} folder; defaults to false (ZIP only)
      * @return the exported file as a download response
      */
     @GET
@@ -59,8 +69,10 @@ public interface SheetCollectionsResource {
     @Produces(MediaType.WILDCARD)
     Response export(
             @PathParam("collectionId") String collectionId,
-            @QueryParam("format") @DefaultValue("ZIP") ExportFormat format);
+            @QueryParam("format") @DefaultValue("ZIP") ExportFormat format,
+            @QueryParam("includeTextItems") @DefaultValue("true") boolean includeTextItems,
+            @QueryParam("includeTextAttachments") @DefaultValue("false") boolean includeTextAttachments);
 
-    @Path("{collectionId}/sheets")
-    CollectionSheetsResource sheets(@PathParam("collectionId") String collectionId);
+    @Path("{collectionId}/items")
+    CollectionItemsResource items(@PathParam("collectionId") String collectionId);
 }

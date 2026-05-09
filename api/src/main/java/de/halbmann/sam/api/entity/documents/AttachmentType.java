@@ -54,6 +54,10 @@ public enum AttachmentType {
      */
     MUSIC_XML,
     /**
+     * Programme note, flyer, or other document attached to a setlist text block
+     */
+    PROGRAM_NOTE,
+    /**
      * Any other type of attachment
      */
     OTHER,

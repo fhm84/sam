@@ -5,6 +5,12 @@ import jakarta.ws.rs.QueryParam;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Filter and pagination parameters for the sheet music list endpoint. Extends
+ * {@link PaginationRequest} with full-text search ({@code q}), field-specific filters (title,
+ * composer, genre, first-letter prefix), a favorites flag, and an optional ensemble context for
+ * attaching coverage snapshots to each result.
+ */
 @Getter
 @Setter
 public class SheetFilterRequest extends PaginationRequest {

@@ -380,36 +380,56 @@
     },
     "export": {
       "zip": "Als ZIP exportieren",
+      "zipWithNotes": "Als ZIP (inkl. Programmnotizen)",
       "error": "Export fehlgeschlagen"
     },
-    "sheets": {
-      "title": "Noten",
-      "add": "Note hinzufügen",
-      "edit": "Eintrag bearbeiten",
+    "items": {
+      "title": "Programm",
+      "addSheet": "Notenblatt hinzufügen",
+      "addTextBlock": "Textblock hinzufügen",
+      "editSheet": "Noteneintrag bearbeiten",
+      "editTextBlock": "Textblock bearbeiten",
       "columns": {
-        "identifier": "Nr.",
-        "title": "Titel",
+        "nr": "Nr.",
+        "title": "Titel / Text",
+        "type": "Typ",
         "genre": "Genre",
         "actions": "Aktionen"
+      },
+      "types": {
+        "SHEET": "Notenblatt",
+        "TEXT": "Textblock"
       },
       "form": {
         "sheet": "Notenblatt",
         "sheetPlaceholder": "Notenblatt suchen…",
         "identifier": "Position",
         "identifierTooltip": "Positionsnummer oder Bezeichner innerhalb der Sammlung, z.B. 1, A1 oder Intro.",
-        "noResults": "Keine Noten gefunden"
+        "noResults": "Keine Noten gefunden",
+        "textContent": "Text",
+        "textContentPlaceholder": "Text für diesen Programmeintrag eingeben…"
       },
       "delete": {
         "confirm": "\"{title}\" aus dieser Sammlung entfernen?",
         "header": "Entfernen bestätigen"
       },
       "messages": {
-        "added": "Notenblatt zur Sammlung hinzugefügt",
+        "sheetAdded": "Notenblatt zur Sammlung hinzugefügt",
+        "textBlockAdded": "Textblock hinzugefügt",
         "updated": "Eintrag aktualisiert",
-        "removed": "Notenblatt aus Sammlung entfernt",
+        "removed": "Eintrag aus Sammlung entfernt",
+        "attachmentUploaded": "Datei angehängt",
+        "attachmentRemoved": "Anhang entfernt",
+        "reorderFailed": "Reihenfolge konnte nicht gespeichert werden",
         "error": "Ein Fehler ist aufgetreten"
       },
-      "empty": "Noch keine Noten in dieser Sammlung",
+      "attachment": {
+        "upload": "Datei anhängen",
+        "remove": "Anhang entfernen",
+        "removeConfirm": "Angehängte Datei von diesem Textblock entfernen?",
+        "removeHeader": "Anhang entfernen"
+      },
+      "empty": "Noch keine Einträge in dieser Sammlung",
       "preview": "Notendetails anzeigen",
       "save": "Speichern",
       "cancel": "Abbrechen",

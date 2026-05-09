@@ -10,7 +10,8 @@ import java.util.Set;
 import lombok.*;
 
 /**
- * Represents a piece of music.
+ * DTO for creating a new sheet music entry. Contains all metadata fields; the base class for
+ * {@link SheetMusic} which adds the server-assigned {@code id} and read-only associations.
  */
 @Data
 @EqualsAndHashCode

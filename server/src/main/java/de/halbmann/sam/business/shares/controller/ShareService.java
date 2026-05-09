@@ -4,8 +4,8 @@ import de.halbmann.sam.api.entity.eventlog.EventType;
 import de.halbmann.sam.api.entity.shared.PaginatedResponse;
 import de.halbmann.sam.api.entity.shares.*;
 import de.halbmann.sam.business.collections.boundary.SheetCollectionRepository;
-import de.halbmann.sam.business.collections.entity.CollectionSheetEntity;
 import de.halbmann.sam.business.collections.entity.SheetCollectionEntity;
+import de.halbmann.sam.business.collections.entity.SheetCollectionItemEntity;
 import de.halbmann.sam.business.documents.controller.DocumentsService;
 import de.halbmann.sam.business.eventlog.controller.EventLogService;
 import de.halbmann.sam.business.shares.boundary.ShareRepository;
@@ -174,8 +174,10 @@ public class ShareService {
         }
         info.setCollectionName(collection.getName());
         info.setCollectionType(collection.getType());
-        List<PublicShareCollectionItem> sheetItems = collection.getSheets().stream()
-                .map(CollectionSheetEntity::getSheet)
+        List<PublicShareCollectionItem> sheetItems = collection.getItems().stream()
+                .filter(SheetCollectionItemEntity.class::isInstance)
+                .map(SheetCollectionItemEntity.class::cast)
+                .map(SheetCollectionItemEntity::getSheet)
                 .map(this::toCollectionItem)
                 .toList();
         info.setSheets(sheetItems);
@@ -259,8 +261,10 @@ public class ShareService {
         if (collection == null) {
             throw new EntityNotFoundException("collection", collectionId);
         }
-        return collection.getSheets().stream()
-                .map(CollectionSheetEntity::getSheet)
+        return collection.getItems().stream()
+                .filter(SheetCollectionItemEntity.class::isInstance)
+                .map(SheetCollectionItemEntity.class::cast)
+                .map(SheetCollectionItemEntity::getSheet)
                 .flatMap(s -> s.getInstrumentations().stream())
                 .anyMatch(i -> i.getId().equals(instrumentationId));
     }

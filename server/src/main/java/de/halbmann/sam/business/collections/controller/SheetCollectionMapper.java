@@ -6,7 +6,7 @@ import org.mapstruct.*;
 
 @Mapper(
         componentModel = MappingConstants.ComponentModel.JAKARTA_CDI,
-        uses = {CollectionSheetMapper.class},
+        uses = {CollectionItemMapper.class},
         unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface SheetCollectionMapper {
 
@@ -16,13 +16,13 @@ public interface SheetCollectionMapper {
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "created", ignore = true)
     @Mapping(target = "lastUpdate", ignore = true)
-    @Mapping(target = "sheets", ignore = true)
+    @Mapping(target = "items", ignore = true)
     SheetCollectionEntity fromDto(final SheetCollection dto);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "created", ignore = true)
     @Mapping(target = "lastUpdate", ignore = true)
-    @Mapping(target = "sheets", ignore = true)
+    @Mapping(target = "items", ignore = true)
     void update(@MappingTarget final SheetCollectionEntity entity, final SheetCollection dto);
 }

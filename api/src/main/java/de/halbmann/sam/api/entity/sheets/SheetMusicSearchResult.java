@@ -6,6 +6,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+/**
+ * Search result wrapper around {@link SheetMusic}. Adds optional full-text search metrics (rank,
+ * headline) from PostgreSQL {@code tsvector} and an optional ensemble coverage summary that is
+ * attached when the caller passes an {@code ensemble} query parameter.
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor

@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 4.0.0 on 2026-05-03 22:36:50.
+// Generated using typescript-generator version 4.0.0 on 2026-05-09 16:24:46.
 
 export interface SheetEnrichment {
     suggestedAdditionalNotes?: string;
@@ -62,6 +62,20 @@ export interface SheetClassification {
     yearOfComposition?: number;
 }
 
+export interface CollectionItem {
+    attachment?: Attachment;
+    duration?: long;
+    genre?: Genre;
+    id?: string;
+    identifier: string;
+    sheetId?: string;
+    style?: Style;
+    subtitle?: string;
+    textContent?: string;
+    title?: string;
+    type: CollectionItemType;
+}
+
 export interface CollectionSheet {
     duration?: long;
     genre?: Genre;
@@ -73,6 +87,13 @@ export interface CollectionSheet {
     title?: string;
 }
 
+export interface CreateCollectionItem {
+    identifier?: string;
+    sheetId?: string;
+    textContent?: string;
+    type: CollectionItemType;
+}
+
 export interface CreateCollectionSheet {
     identifier: string;
     sheetId: string;
@@ -82,8 +103,8 @@ export interface SheetCollection {
     date?: Date;
     description?: string;
     id?: string;
+    items?: CollectionItem[];
     name: string;
-    sheets?: CollectionSheet[];
     type?: CollectionType;
 }
 
@@ -491,9 +512,11 @@ export interface JsonbAdapter<Original, Adapted> {
 
 export type ClassificationStatus = "PENDING" | "CLASSIFIED" | "REJECTED";
 
+export type CollectionItemType = "SHEET" | "TEXT";
+
 export type CollectionType = "FOLDER" | "SETLIST";
 
-export type AttachmentType = "FULL_SCORE" | "PART" | "COVER" | "LYRICS" | "MIDI" | "AUDIO" | "ANNOTATIONS" | "IMAGE" | "ANALYSIS" | "TRANSCRIPTION" | "EXTERNAL_LINK" | "MUSIC_XML" | "OTHER" | "UNSPECIFIED";
+export type AttachmentType = "FULL_SCORE" | "PART" | "COVER" | "LYRICS" | "MIDI" | "AUDIO" | "ANNOTATIONS" | "IMAGE" | "ANALYSIS" | "TRANSCRIPTION" | "EXTERNAL_LINK" | "MUSIC_XML" | "PROGRAM_NOTE" | "OTHER" | "UNSPECIFIED";
 
 export type CoverageStatus = "COMPLETE" | "PLAYABLE" | "INCOMPLETE";
 

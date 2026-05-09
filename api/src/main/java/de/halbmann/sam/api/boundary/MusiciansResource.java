@@ -6,6 +6,10 @@ import de.halbmann.sam.api.entity.shared.PaginatedResponse;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 
+/**
+ * REST API for managing musicians. A musician record represents a person referenced as composer,
+ * arranger, or ensemble member — it is a shared canonical entry, not a per-sheet copy.
+ */
 @Path("musicians")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)

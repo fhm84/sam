@@ -3,7 +3,8 @@ package de.halbmann.sam.business.collections.controller;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
-import de.halbmann.sam.api.entity.collections.CollectionSheet;
+import de.halbmann.sam.api.entity.collections.CollectionItem;
+import de.halbmann.sam.api.entity.collections.CollectionItemType;
 import de.halbmann.sam.api.entity.collections.SheetCollection;
 import de.halbmann.sam.api.entity.musicians.Musician;
 import de.halbmann.sam.api.entity.sheets.SheetMusic;
@@ -273,10 +274,11 @@ class GemaSetlistServiceTest {
         SheetCollection c = new SheetCollection();
         c.setName(name);
         for (UUID id : sheetIds) {
-            CollectionSheet cs = new CollectionSheet();
+            CollectionItem cs = new CollectionItem();
+            cs.setType(CollectionItemType.SHEET);
             cs.setSheetId(id);
             cs.setIdentifier("1");
-            c.getSheets().add(cs);
+            c.getItems().add(cs);
         }
         return c;
     }

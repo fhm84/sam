@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -27,11 +28,11 @@ public abstract class AbstractBaseEntity implements Serializable {
 
     @PrePersist
     public void onCreate() {
-        lastUpdate = created = LocalDateTime.now();
+        lastUpdate = created = LocalDateTime.now(ZoneOffset.UTC);
     }
 
     @PreUpdate
     public void onUpdate() {
-        lastUpdate = LocalDateTime.now();
+        lastUpdate = LocalDateTime.now(ZoneOffset.UTC);
     }
 }

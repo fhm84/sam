@@ -1,10 +1,12 @@
 package de.halbmann.sam.business.sheets.controller;
 
-import de.halbmann.sam.api.entity.collections.CollectionSheet;
+import de.halbmann.sam.api.entity.collections.CollectionItem;
+import de.halbmann.sam.api.entity.collections.CollectionItemType;
 import de.halbmann.sam.api.entity.collections.SheetCollection;
 import de.halbmann.sam.api.entity.sheets.ExportFormat;
 import de.halbmann.sam.api.entity.sheets.SheetMusic;
 import de.halbmann.sam.business.collections.controller.SheetCollectionService;
+import de.halbmann.sam.business.collections.controller.SheetCollectionService.TextItemAttachment;
 import de.halbmann.sam.business.documents.controller.DocumentsService;
 import de.halbmann.sam.business.documents.controller.StreamWriter;
 import de.halbmann.sam.business.documents.entity.AttachmentEntity;
@@ -66,18 +68,21 @@ public class SheetExportService {
         return new ExportResult(buildSheetZip(metadataJson, attachments), safeName + ".zip", "application/zip");
     }
 
-    public ExportResult exportCollection(String collectionId, ExportFormat format) {
+    public ExportResult exportCollection(
+            String collectionId, ExportFormat format, boolean includeTextItems, boolean includeTextAttachments) {
         SheetCollection collection = collectionService.load(collectionId);
         String safeName = sanitizeFilename(collection.getName());
 
         if (format == ExportFormat.JSON) {
-            String json = jsonb.toJson(collection);
+            SheetCollection exported = includeTextItems ? collection : withoutTextItems(collection);
+            String json = jsonb.toJson(exported);
             return new ExportResult(
                     out -> out.write(json.getBytes(StandardCharsets.UTF_8)), safeName + ".json", "application/json");
         }
 
         if (format == ExportFormat.CSV) {
-            List<SheetMusic> sheets = collection.getSheets().stream()
+            List<SheetMusic> sheets = collection.getItems().stream()
+                    .filter(i -> i.getType() == CollectionItemType.SHEET)
                     .map(cs -> sheetService.getSheet(cs.getSheetId().toString()))
                     .toList();
             String csv = buildCsv(sheets);
@@ -87,7 +92,22 @@ public class SheetExportService {
                     "text/csv; charset=UTF-8");
         }
 
-        return new ExportResult(buildCollectionZip(collection), safeName + ".zip", "application/zip");
+        List<TextItemAttachment> textAttachments =
+                includeTextAttachments ? collectionService.getTextItemAttachments(collectionId) : List.of();
+        return new ExportResult(buildCollectionZip(collection, textAttachments), safeName + ".zip", "application/zip");
+    }
+
+    private static SheetCollection withoutTextItems(SheetCollection collection) {
+        SheetCollection copy = new SheetCollection();
+        copy.setId(collection.getId());
+        copy.setName(collection.getName());
+        copy.setDescription(collection.getDescription());
+        copy.setType(collection.getType());
+        copy.setDate(collection.getDate());
+        copy.setItems(collection.getItems().stream()
+                .filter(i -> i.getType() == CollectionItemType.SHEET)
+                .toList());
+        return copy;
     }
 
     // ── ZIP builders ─────────────────────────────────────────────────────────
@@ -103,14 +123,14 @@ public class SheetExportService {
         };
     }
 
-    private StreamWriter buildCollectionZip(SheetCollection collection) {
+    private StreamWriter buildCollectionZip(SheetCollection collection, List<TextItemAttachment> textAttachments) {
         record SheetExport(String folder, String metadataJson, List<AttachmentEntity> attachments) {}
 
-        // Pre-load all data within the transaction
         String collectionJson = jsonb.toJson(collection);
         List<SheetExport> exports = new ArrayList<>();
         int index = 1;
-        for (CollectionSheet cs : collection.getSheets()) {
+        for (CollectionItem cs : collection.getItems()) {
+            if (cs.getType() != CollectionItemType.SHEET) continue;
             SheetMusic sheet = sheetService.getSheet(cs.getSheetId().toString());
             String identifier =
                     cs.getIdentifier() != null && !cs.getIdentifier().isBlank()
@@ -136,6 +156,22 @@ public class SheetExportService {
                     zip.write(se.metadataJson().getBytes(StandardCharsets.UTF_8));
                     zip.closeEntry();
                     writeAttachmentsToZip(zip, folder + "documents/", se.attachments());
+                }
+
+                if (!textAttachments.isEmpty()) {
+                    Set<String> usedNames = new LinkedHashSet<>();
+                    for (TextItemAttachment ta : textAttachments) {
+                        if (ta.attachment().getDocument() == null) continue;
+                        String prefix = ta.identifier().isBlank() ? "" : sanitizeFilename(ta.identifier()) + " - ";
+                        String entryName = "Programmnotizen/"
+                                + uniqueZipName(prefix + ta.attachment().getDisplayName(), usedNames);
+                        zip.putNextEntry(new ZipEntry(entryName));
+                        try (InputStream in = filesystem.openForRead(
+                                ta.attachment().getDocument().getPath())) {
+                            in.transferTo(zip);
+                        }
+                        zip.closeEntry();
+                    }
                 }
             }
         };

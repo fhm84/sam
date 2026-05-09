@@ -85,7 +85,7 @@ public class PublicShareResourceImpl implements PublicShareResource {
         }
         shareService.logAccess(share.getId(), "collection", share.getResourceId());
 
-        byte[] pdf = collectionTocService.generateToc(share.getResourceId().toString());
+        byte[] pdf = collectionTocService.generateToc(share.getResourceId().toString(), true);
         return Response.ok(pdf)
                 .type("application/pdf")
                 .header("Content-Disposition", "attachment; filename*=utf-8''collection-toc.pdf")

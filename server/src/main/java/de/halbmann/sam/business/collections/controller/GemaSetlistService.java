@@ -1,5 +1,6 @@
 package de.halbmann.sam.business.collections.controller;
 
+import de.halbmann.sam.api.entity.collections.CollectionItemType;
 import de.halbmann.sam.api.entity.collections.SheetCollection;
 import de.halbmann.sam.api.entity.musicians.Musician;
 import de.halbmann.sam.api.entity.sheets.SheetMusic;
@@ -41,7 +42,8 @@ public class GemaSetlistService {
 
     public ExportResult generateGemaSetlist(final String collectionId) {
         SheetCollection collection = collectionService.load(collectionId);
-        List<SheetMusic> sheets = collection.getSheets().stream()
+        List<SheetMusic> sheets = collection.getItems().stream()
+                .filter(i -> i.getType() == CollectionItemType.SHEET)
                 .map(cs -> sheetService.getSheet(cs.getSheetId().toString()))
                 .toList();
 

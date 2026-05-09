@@ -42,9 +42,13 @@ public class SheetCollectionEntity extends AbstractEntity {
     LocalDate date;
 
     /**
-     * The list of sheets (wrapped in a collection sheet adding an identifier in context of the
-     * collection)
+     * The ordered list of items in this collection (sheet references and/or free-text blocks).
      */
     @OneToMany
-    List<CollectionSheetEntity> sheets = new ArrayList<>();
+    @JoinTable(
+            name = "sheet_collections_items",
+            joinColumns = @JoinColumn(name = "sheet_collections_id"),
+            inverseJoinColumns = @JoinColumn(name = "items_id"))
+    @OrderColumn(name = "items_order")
+    List<CollectionItemEntity> items = new ArrayList<>();
 }

@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import {
   Booklet,
   BookletFilterRequest,
-  CollectionSheet,
+  CollectionItem,
   PaginatedResponse,
   PaginationRequest,
 } from '../../model/datamodels';
@@ -45,21 +45,21 @@ export class BookletsApiService {
   listSheets(
     bookletId: string,
     pagination: PaginationRequest = {},
-  ): Observable<PaginatedResponse<CollectionSheet>> {
+  ): Observable<PaginatedResponse<CollectionItem>> {
     let params = new HttpParams();
     if (pagination.page !== undefined) params = params.set('page', pagination.page);
     if (pagination.size !== undefined) params = params.set('size', pagination.size);
-    return this.http.get<PaginatedResponse<CollectionSheet>>(
+    return this.http.get<PaginatedResponse<CollectionItem>>(
       `${this.baseUrl}/${bookletId}/sheets`,
       { params },
     );
   }
 
-  addSheet(bookletId: string, data: CollectionSheet): Observable<void> {
+  addSheet(bookletId: string, data: CollectionItem): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/${bookletId}/sheets`, data);
   }
 
-  updateSheet(bookletId: string, sheetId: string, data: CollectionSheet): Observable<void> {
+  updateSheet(bookletId: string, sheetId: string, data: CollectionItem): Observable<void> {
     return this.http.put<void>(`${this.baseUrl}/${bookletId}/sheets/${sheetId}`, data);
   }
 

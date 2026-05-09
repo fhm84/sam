@@ -153,17 +153,18 @@ export class SheetCollections implements OnInit, OnChanges {
   protected onAdd(): void {
     if (!this.canAdd) return;
     const payload = {
+      type: 'SHEET' as const,
       identifier: this.identifierForm.controls.identifier.value,
       sheetId: this.sheetId as any,
     };
     this.saving = true;
-    this.collectionsApi.addSheet(this.selectedCollection!.id!.toString(), payload).subscribe({
+    this.collectionsApi.addItem(this.selectedCollection!.id!.toString(), payload).subscribe({
       next: () => {
         this.saving = false;
         this.addDialogVisible = false;
         this.messageService.add({
           severity: 'success',
-          summary: this.t.t('collections.sheets.messages.added'),
+          summary: this.t.t('collections.items.messages.added'),
         });
         this.loadCollections();
       },
@@ -175,7 +176,7 @@ export class SheetCollections implements OnInit, OnChanges {
 
   // ── Remove ────────────────────────────────────────────
   protected confirmRemove(collection: SheetCollection): void {
-    const collectionSheetId = collection.sheets?.[0]?.id?.toString();
+    const collectionSheetId = collection.items?.[0]?.id?.toString();
     if (!collectionSheetId) return;
     this.confirmationService.confirm({
       message: this.t
@@ -185,11 +186,11 @@ export class SheetCollections implements OnInit, OnChanges {
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        this.collectionsApi.removeSheet(collection.id!.toString(), collectionSheetId).subscribe({
+        this.collectionsApi.removeItem(collection.id!.toString(), collectionSheetId).subscribe({
           next: () => {
             this.messageService.add({
               severity: 'success',
-              summary: this.t.t('collections.sheets.messages.removed'),
+              summary: this.t.t('collections.items.messages.removed'),
             });
             this.loadCollections();
           },

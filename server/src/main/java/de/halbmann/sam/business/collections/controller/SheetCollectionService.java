@@ -1,22 +1,35 @@
 package de.halbmann.sam.business.collections.controller;
 
-import de.halbmann.sam.api.entity.collections.CollectionSheet;
-import de.halbmann.sam.api.entity.collections.CreateCollectionSheet;
+import de.halbmann.sam.api.entity.collections.CollectionItem;
+import de.halbmann.sam.api.entity.collections.CollectionItemType;
+import de.halbmann.sam.api.entity.collections.CreateCollectionItem;
 import de.halbmann.sam.api.entity.collections.SheetCollection;
 import de.halbmann.sam.api.entity.collections.SheetCollectionFilterRequest;
+import de.halbmann.sam.api.entity.documents.Attachment;
+import de.halbmann.sam.api.entity.documents.AttachmentType;
+import de.halbmann.sam.api.entity.documents.DocumentUpload;
 import de.halbmann.sam.api.entity.shared.PaginatedResponse;
 import de.halbmann.sam.api.entity.shared.PaginationRequest;
-import de.halbmann.sam.business.collections.boundary.CollectionSheetRepository;
+import de.halbmann.sam.business.collections.boundary.CollectionItemRepository;
 import de.halbmann.sam.business.collections.boundary.SheetCollectionRepository;
-import de.halbmann.sam.business.collections.entity.CollectionSheetEntity;
+import de.halbmann.sam.business.collections.entity.CollectionItemEntity;
 import de.halbmann.sam.business.collections.entity.SheetCollectionEntity;
+import de.halbmann.sam.business.collections.entity.SheetCollectionItemEntity;
+import de.halbmann.sam.business.collections.entity.TextCollectionItemEntity;
+import de.halbmann.sam.business.documents.boundary.AttachmentRepository;
+import de.halbmann.sam.business.documents.controller.DocumentsService;
+import de.halbmann.sam.business.documents.entity.AttachmentEntity;
 import de.halbmann.sam.business.sheets.boundary.SheetRepository;
 import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
 import de.halbmann.sam.core.entity.PaginatedEntities;
 import de.halbmann.sam.core.exception.EntityNotFoundException;
+import de.halbmann.sam.core.exception.ValidationException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,16 +41,22 @@ public class SheetCollectionService {
     SheetCollectionRepository repository;
 
     @Inject
-    CollectionSheetRepository collectionSheetRepository;
+    CollectionItemRepository collectionItemRepository;
 
     @Inject
     SheetCollectionMapper mapper;
 
     @Inject
-    CollectionSheetMapper collectionSheetMapper;
+    CollectionItemMapper collectionItemMapper;
 
     @Inject
     SheetRepository sheetRepository;
+
+    @Inject
+    DocumentsService documentsService;
+
+    @Inject
+    AttachmentRepository attachmentRepository;
 
     public PaginatedResponse<SheetCollection> findCollections(final SheetCollectionFilterRequest filter) {
         PaginatedEntities<SheetCollectionEntity> result =
@@ -77,41 +96,58 @@ public class SheetCollectionService {
         repository.delete(entity);
     }
 
-    public PaginatedResponse<CollectionSheet> listSheets(
-            final String collectionId, final PaginationRequest pagination) {
+    public PaginatedResponse<CollectionItem> listItems(final String collectionId, final PaginationRequest pagination) {
         SheetCollectionEntity collection = repository
                 .findByIdOptional(UUID.fromString(collectionId))
                 .orElseThrow(() -> new EntityNotFoundException("SheetCollection", collectionId));
-        List<CollectionSheet> sheets = collection.getSheets().stream()
-                .map(collectionSheetMapper::toDto)
-                .toList();
-        PaginatedResponse<CollectionSheet> response = new PaginatedResponse<>();
-        response.setData(sheets);
+        List<CollectionItem> items =
+                collection.getItems().stream().map(collectionItemMapper::toDto).toList();
+        PaginatedResponse<CollectionItem> response = new PaginatedResponse<>();
+        response.setData(items);
         response.setPage(0);
-        response.setSize(sheets.size());
-        response.setTotalCount((long) sheets.size());
+        response.setSize(items.size());
+        response.setTotalCount((long) items.size());
         return response;
     }
 
-    public void addSheet(final String collectionId, final CreateCollectionSheet createCollectionSheet) {
+    public void addItem(final String collectionId, final CreateCollectionItem createCollectionItem) {
         SheetCollectionEntity collection = repository
                 .findByIdOptional(UUID.fromString(collectionId))
                 .orElseThrow(() -> new EntityNotFoundException("SheetCollection", collectionId));
-        SheetMusicEntity sheetEntity = sheetRepository
-                .findByIdOptional(createCollectionSheet.getSheetId())
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Sheet", createCollectionSheet.getSheetId().toString()));
-        CollectionSheetEntity csEntity = collectionSheetMapper.fromDto(createCollectionSheet);
-        csEntity.setSheet(sheetEntity);
-        collectionSheetRepository.persistAndFlush(csEntity);
-        collection.getSheets().add(csEntity);
+
+        CollectionItemEntity itemEntity;
+        if (createCollectionItem.getType() == CollectionItemType.SHEET) {
+            if (createCollectionItem.getSheetId() == null) {
+                throw new ValidationException("sheetId is required for SHEET items");
+            }
+            SheetMusicEntity sheetEntity = sheetRepository
+                    .findByIdOptional(createCollectionItem.getSheetId())
+                    .orElseThrow(() -> new EntityNotFoundException(
+                            "Sheet", createCollectionItem.getSheetId().toString()));
+            SheetCollectionItemEntity sheetItem = collectionItemMapper.fromSheetDto(createCollectionItem);
+            sheetItem.setSheet(sheetEntity);
+            itemEntity = sheetItem;
+        } else {
+            if (createCollectionItem.getTextContent() == null
+                    || createCollectionItem.getTextContent().isBlank()) {
+                throw new ValidationException("textContent is required for TEXT items");
+            }
+            itemEntity = collectionItemMapper.fromTextDto(createCollectionItem);
+        }
+
+        collectionItemRepository.persistAndFlush(itemEntity);
+        collection.getItems().add(itemEntity);
     }
 
-    public void updateSheet(final String collectionId, final String sheetId, final CollectionSheet dto) {
-        CollectionSheetEntity csEntity = collectionSheetRepository
-                .findByIdOptional(UUID.fromString(sheetId))
-                .orElseThrow(() -> new EntityNotFoundException("CollectionSheet", sheetId));
-        collectionSheetMapper.update(csEntity, dto);
+    public void updateItem(final String collectionId, final String itemId, final CollectionItem dto) {
+        CollectionItemEntity itemEntity = collectionItemRepository
+                .findByIdOptional(UUID.fromString(itemId))
+                .orElseThrow(() -> new EntityNotFoundException("CollectionItem", itemId));
+        if (itemEntity instanceof SheetCollectionItemEntity sheetItem) {
+            collectionItemMapper.updateSheetItem(sheetItem, dto);
+        } else if (itemEntity instanceof TextCollectionItemEntity textItem) {
+            collectionItemMapper.updateTextItem(textItem, dto);
+        }
     }
 
     public PaginatedResponse<SheetCollection> findCollectionsForSheet(
@@ -122,9 +158,8 @@ public class SheetCollectionService {
         response.setData(result.data().stream()
                 .map(entity -> {
                     SheetCollection dto = mapper.toDto(entity);
-                    // retain only the CollectionSheet entry for this specific sheet
-                    dto.setSheets(dto.getSheets().stream()
-                            .filter(cs -> sheetUuid.equals(cs.getSheetId()))
+                    dto.setItems(dto.getItems().stream()
+                            .filter(item -> sheetUuid.equals(item.getSheetId()))
                             .toList());
                     return dto;
                 })
@@ -135,14 +170,113 @@ public class SheetCollectionService {
         return response;
     }
 
-    public void removeSheet(final String collectionId, final String sheetId) {
+    public void reorderItems(final String collectionId, final List<String> orderedIds) {
         SheetCollectionEntity collection = repository
                 .findByIdOptional(UUID.fromString(collectionId))
                 .orElseThrow(() -> new EntityNotFoundException("SheetCollection", collectionId));
-        CollectionSheetEntity csEntity = collectionSheetRepository
-                .findByIdOptional(UUID.fromString(sheetId))
-                .orElseThrow(() -> new EntityNotFoundException("CollectionSheet", sheetId));
-        collection.getSheets().remove(csEntity);
-        collectionSheetRepository.delete(csEntity);
+        List<CollectionItemEntity> currentItems = collection.getItems();
+        // Validate all IDs belong to this collection before touching anything
+        orderedIds.forEach(id -> currentItems.stream()
+                .filter(item -> item.getId().toString().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new EntityNotFoundException("CollectionItem", id)));
+        // Update items_order directly via native SQL to avoid Envers inserting both a DEL
+        // and an ADD record for the same (rev, collection_id, item_id) within one transaction,
+        // which would violate the audit table PK.
+        // Two-pass approach: first shift all rows to a high temporary offset so the final
+        // 0..N values don't collide with existing ones while rows are being updated one by one
+        // (the join table has a PK on (sheet_collections_id, items_order) that enforces
+        // uniqueness per statement, so a single-pass update can hit transient duplicates).
+        var em = collectionItemRepository.getEntityManager();
+        UUID collUUID = UUID.fromString(collectionId);
+        int offset = orderedIds.size() + 1000;
+        for (int i = 0; i < orderedIds.size(); i++) {
+            em.createNativeQuery("UPDATE sheet_collections_items SET items_order = :ord"
+                            + " WHERE sheet_collections_id = :collId AND items_id = :itemId")
+                    .setParameter("ord", offset + i)
+                    .setParameter("collId", collUUID)
+                    .setParameter("itemId", UUID.fromString(orderedIds.get(i)))
+                    .executeUpdate();
+        }
+        for (int i = 0; i < orderedIds.size(); i++) {
+            em.createNativeQuery("UPDATE sheet_collections_items SET items_order = :ord"
+                            + " WHERE sheet_collections_id = :collId AND items_id = :itemId")
+                    .setParameter("ord", i)
+                    .setParameter("collId", collUUID)
+                    .setParameter("itemId", UUID.fromString(orderedIds.get(i)))
+                    .executeUpdate();
+        }
+    }
+
+    public void removeItem(final String collectionId, final String itemId) {
+        SheetCollectionEntity collection = repository
+                .findByIdOptional(UUID.fromString(collectionId))
+                .orElseThrow(() -> new EntityNotFoundException("SheetCollection", collectionId));
+        CollectionItemEntity itemEntity = collectionItemRepository
+                .findByIdOptional(UUID.fromString(itemId))
+                .orElseThrow(() -> new EntityNotFoundException("CollectionItem", itemId));
+        if (itemEntity instanceof TextCollectionItemEntity textItem && textItem.getAttachment() != null) {
+            cleanUpAttachment(textItem);
+        }
+        collection.getItems().remove(itemEntity);
+        collectionItemRepository.delete(itemEntity);
+    }
+
+    public record TextItemAttachment(String identifier, AttachmentEntity attachment) {}
+
+    public List<TextItemAttachment> getTextItemAttachments(final String collectionId) {
+        SheetCollectionEntity collection =
+                repository.findByIdOptional(UUID.fromString(collectionId)).orElse(null);
+        if (collection == null) {
+            return List.of();
+        }
+        return collection.getItems().stream()
+                .filter(TextCollectionItemEntity.class::isInstance)
+                .map(TextCollectionItemEntity.class::cast)
+                .filter(t -> t.getAttachment() != null && t.getAttachment().getDocument() != null)
+                .map(t -> new TextItemAttachment(t.getIdentifier() != null ? t.getIdentifier() : "", t.getAttachment()))
+                .toList();
+    }
+
+    // ── Text item attachment ───────────────────────────────────────────────────
+
+    public Attachment attachDocument(
+            final String collectionId, final String itemId, final String filename, final InputStream inputStream)
+            throws IOException, NoSuchAlgorithmException {
+        TextCollectionItemEntity textItem = loadTextItem(itemId);
+        if (textItem.getAttachment() != null) {
+            cleanUpAttachment(textItem);
+        }
+        // save() creates the Document + Attachment (with refcount) in one step
+        DocumentUpload upload = documentsService.save(filename, inputStream, AttachmentType.PROGRAM_NOTE);
+        AttachmentEntity attachment =
+                attachmentRepository.findById(upload.attachment().getId());
+        textItem.setAttachment(attachment);
+        return upload.attachment();
+    }
+
+    public void removeAttachment(final String collectionId, final String itemId) {
+        TextCollectionItemEntity textItem = loadTextItem(itemId);
+        if (textItem.getAttachment() == null) {
+            return;
+        }
+        cleanUpAttachment(textItem);
+    }
+
+    private TextCollectionItemEntity loadTextItem(final String itemId) {
+        CollectionItemEntity entity = collectionItemRepository
+                .findByIdOptional(UUID.fromString(itemId))
+                .orElseThrow(() -> new EntityNotFoundException("CollectionItem", itemId));
+        if (!(entity instanceof TextCollectionItemEntity textItem)) {
+            throw new ValidationException("Attachments are only supported for TEXT items");
+        }
+        return textItem;
+    }
+
+    private void cleanUpAttachment(final TextCollectionItemEntity textItem) {
+        String attachmentId = textItem.getAttachment().getId().toString();
+        textItem.setAttachment(null);
+        collectionItemRepository.getEntityManager().flush();
+        documentsService.deleteAttachment(attachmentId);
     }
 }

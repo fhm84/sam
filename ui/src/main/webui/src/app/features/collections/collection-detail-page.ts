@@ -35,6 +35,12 @@ export class CollectionDetailPage implements OnInit {
 
   protected readonly exportMenuItems = [
     {
+      label: this.t.t('collections.export.zipWithNotes'),
+      icon: 'pi pi-paperclip',
+      command: () => this.exportCollection('ZIP', true),
+    },
+    { separator: true },
+    {
       label: 'JSON',
       icon: 'pi pi-file',
       command: () => this.exportCollection('JSON'),
@@ -116,8 +122,8 @@ export class CollectionDetailPage implements OnInit {
     return new Date(date).toLocaleDateString();
   }
 
-  protected exportCollection(format: 'ZIP' | 'JSON' | 'CSV'): void {
-    this.api.export(this.collectionId(), format).subscribe({
+  protected exportCollection(format: 'ZIP' | 'JSON' | 'CSV', includeTextAttachments = false): void {
+    this.api.export(this.collectionId(), format, true, includeTextAttachments).subscribe({
       next: (response) => triggerDownload(response),
       error: () => {
         this.messageService.add({

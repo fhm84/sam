@@ -1,6 +1,6 @@
 package de.halbmann.sam.api.impl;
 
-import de.halbmann.sam.api.boundary.CollectionSheetsResource;
+import de.halbmann.sam.api.boundary.CollectionItemsResource;
 import de.halbmann.sam.api.boundary.SheetCollectionsResource;
 import de.halbmann.sam.api.entity.collections.SheetCollection;
 import de.halbmann.sam.api.entity.collections.SheetCollectionFilterRequest;
@@ -76,8 +76,8 @@ public class SheetCollectionsResourceImpl implements SheetCollectionsResource {
     }
 
     @Override
-    public Response generateToc(final String collectionId) {
-        byte[] pdf = tocService.generateToc(collectionId);
+    public Response generateToc(final String collectionId, final boolean includeTextItems) {
+        byte[] pdf = tocService.generateToc(collectionId, includeTextItems);
         String filename = "toc-" + collectionId + ".pdf";
         eventLogService.log(
                 EventType.COLLECTION_TOC_GENERATED,
@@ -105,8 +105,13 @@ public class SheetCollectionsResourceImpl implements SheetCollectionsResource {
     }
 
     @Override
-    public Response export(final String collectionId, final ExportFormat format) {
-        ExportResult result = sheetExportService.exportCollection(collectionId, format);
+    public Response export(
+            final String collectionId,
+            final ExportFormat format,
+            final boolean includeTextItems,
+            final boolean includeTextAttachments) {
+        ExportResult result =
+                sheetExportService.exportCollection(collectionId, format, includeTextItems, includeTextAttachments);
         eventLogService.log(
                 EventType.COLLECTION_EXPORT,
                 "collection",
@@ -119,7 +124,7 @@ public class SheetCollectionsResourceImpl implements SheetCollectionsResource {
     }
 
     @Override
-    public CollectionSheetsResource sheets(final String collectionId) {
-        return resourceContext.getResource(CollectionSheetsResourceImpl.class);
+    public CollectionItemsResource items(final String collectionId) {
+        return resourceContext.getResource(CollectionItemsResourceImpl.class);
     }
 }

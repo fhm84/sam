@@ -2,7 +2,8 @@ package de.halbmann.sam.business.collections.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.halbmann.sam.api.entity.collections.CollectionSheet;
+import de.halbmann.sam.api.entity.collections.CollectionItem;
+import de.halbmann.sam.api.entity.collections.CollectionItemType;
 import de.halbmann.sam.api.entity.sheets.Genre;
 import de.halbmann.sam.business.collections.controller.CollectionTocService.TocRow;
 import java.time.Duration;
@@ -49,7 +50,7 @@ class CollectionTocServiceTest {
 
     @Test
     void totalDurationAllNullReturnsNull() {
-        assertNull(service.computeTotalDuration(List.of(sheet(null), sheet(null))));
+        assertNull(service.computeTotalDuration(List.of(sheetItem(null), sheetItem(null))));
     }
 
     @Test
@@ -61,7 +62,8 @@ class CollectionTocServiceTest {
     void totalDurationSumsNonNullDurations() {
         assertEquals(
                 "3:30",
-                service.computeTotalDuration(List.of(sheet(Duration.ofMinutes(2)), sheet(Duration.ofSeconds(90)))));
+                service.computeTotalDuration(
+                        List.of(sheetItem(Duration.ofMinutes(2)), sheetItem(Duration.ofSeconds(90)))));
     }
 
     @Test
@@ -69,14 +71,14 @@ class CollectionTocServiceTest {
         assertEquals(
                 "1:30",
                 service.computeTotalDuration(
-                        List.of(sheet(Duration.ofMinutes(1)), sheet(null), sheet(Duration.ofSeconds(30)))));
+                        List.of(sheetItem(Duration.ofMinutes(1)), sheetItem(null), sheetItem(Duration.ofSeconds(30)))));
     }
 
-    // ── toRow ──────────────────────────────────────────────────────────────
+    // ── toRow (SHEET) ──────────────────────────────────────────────────────
 
     @Test
     void toRowAllFieldsPresent() {
-        CollectionSheet cs = sheet(Duration.ofSeconds(125));
+        CollectionItem cs = sheetItem(Duration.ofSeconds(125));
         cs.setIdentifier("3");
         cs.setTitle("My Song");
         cs.setSubtitle("A subtitle");
@@ -89,23 +91,46 @@ class CollectionTocServiceTest {
         assertEquals("A subtitle", row.subtitle());
         assertEquals("JAZZ", row.genre());
         assertEquals("2:05", row.duration());
+        assertFalse(row.isTextItem());
     }
 
     @Test
     void toRowNullFieldsFallBackToEmpty() {
-        TocRow row = service.toRow(new CollectionSheet());
+        CollectionItem cs = new CollectionItem();
+        cs.setType(CollectionItemType.SHEET);
+
+        TocRow row = service.toRow(cs);
 
         assertEquals("", row.identifier());
         assertEquals("", row.title());
         assertEquals("", row.subtitle());
         assertEquals("", row.genre());
         assertEquals("", row.duration());
+        assertFalse(row.isTextItem());
+    }
+
+    // ── toRow (TEXT) ───────────────────────────────────────────────────────
+
+    @Test
+    void toRowTextItemRenderedAsTextRow() {
+        CollectionItem item = new CollectionItem();
+        item.setType(CollectionItemType.TEXT);
+        item.setIdentifier("A");
+        item.setTextContent("Welcome to our concert!");
+
+        TocRow row = service.toRow(item);
+
+        assertEquals("A", row.identifier());
+        assertTrue(row.isTextItem());
+        assertEquals("Welcome to our concert!", row.subtitle());
+        assertNull(row.title());
     }
 
     // ── helpers ────────────────────────────────────────────────────────────
 
-    private CollectionSheet sheet(Duration duration) {
-        CollectionSheet cs = new CollectionSheet();
+    private CollectionItem sheetItem(Duration duration) {
+        CollectionItem cs = new CollectionItem();
+        cs.setType(CollectionItemType.SHEET);
         cs.setDuration(duration);
         return cs;
     }

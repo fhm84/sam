@@ -380,36 +380,56 @@
     },
     "export": {
       "zip": "Export ZIP",
+      "zipWithNotes": "Export ZIP (incl. Programme Notes)",
       "error": "Export failed"
     },
-    "sheets": {
-      "title": "Sheets",
-      "add": "Add Sheet",
-      "edit": "Edit Entry",
+    "items": {
+      "title": "Programme",
+      "addSheet": "Add Sheet",
+      "addTextBlock": "Add Text Block",
+      "editSheet": "Edit Sheet Entry",
+      "editTextBlock": "Edit Text Block",
       "columns": {
-        "identifier": "#",
-        "title": "Title",
+        "nr": "Nr.",
+        "title": "Title / Text",
+        "type": "Type",
         "genre": "Genre",
         "actions": "Actions"
+      },
+      "types": {
+        "SHEET": "Sheet",
+        "TEXT": "Text Block"
       },
       "form": {
         "sheet": "Sheet",
         "sheetPlaceholder": "Search for a sheet…",
         "identifier": "Position",
         "identifierTooltip": "Position or label within the collection, e.g. 1, A1, or Intro.",
-        "noResults": "No sheets found"
+        "noResults": "No sheets found",
+        "textContent": "Text",
+        "textContentPlaceholder": "Enter the text for this programme note…"
       },
       "delete": {
         "confirm": "Remove \"{title}\" from this collection?",
         "header": "Confirm removal"
       },
       "messages": {
-        "added": "Sheet added to collection",
+        "sheetAdded": "Sheet added to collection",
+        "textBlockAdded": "Text block added",
         "updated": "Entry updated",
-        "removed": "Sheet removed from collection",
+        "removed": "Item removed from collection",
+        "attachmentUploaded": "File attached",
+        "attachmentRemoved": "Attachment removed",
+        "reorderFailed": "Failed to save new order",
         "error": "An error occurred"
       },
-      "empty": "No sheets in this collection yet",
+      "attachment": {
+        "upload": "Attach file",
+        "remove": "Remove attachment",
+        "removeConfirm": "Remove the attached file from this text block?",
+        "removeHeader": "Remove attachment"
+      },
+      "empty": "No items in this collection yet",
       "preview": "View sheet details",
       "save": "Save",
       "cancel": "Cancel",

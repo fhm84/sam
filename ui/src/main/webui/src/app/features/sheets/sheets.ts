@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Subject, debounceTime } from 'rxjs';
@@ -66,6 +66,8 @@ Button,
 })
 export class Sheets implements OnInit {
   private static readonly DRAWER_BREAKPOINT = '(min-width: 960px)';
+
+  @ViewChild(SheetCollections) protected collectionsDialogPanel?: SheetCollections;
 
   protected readonly t = inject(TranslationService);
   private readonly api = inject(SheetsApiService);

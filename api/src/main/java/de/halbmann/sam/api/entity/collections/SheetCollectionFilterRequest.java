@@ -5,6 +5,11 @@ import jakarta.ws.rs.QueryParam;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Filter and pagination parameters for the sheet collection list endpoint. Extends
+ * {@link PaginationRequest} with a full-text search field ({@code q}), a name filter, and a
+ * collection-type filter.
+ */
 @Getter
 @Setter
 public class SheetCollectionFilterRequest extends PaginationRequest {

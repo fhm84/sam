@@ -1,12 +1,13 @@
 <!-- ── Membership table ──────────────────────────────────── -->
-<div class="flex flex-col gap-3">
+<div class="flex flex-col gap-3" data-testid="sheet-collections-panel">
   <p-table
+    data-testid="sheet-collections-table"
     [value]="collections()"
     [loading]="loading()"
   >
     <ng-template #header>
       <tr>
-        <th class="w-20">{{ 'collections.sheets.columns.identifier' | translate }}</th>
+        <th class="w-20">{{ 'collections.items.columns.identifier' | translate }}</th>
         <th>{{ 'sheets.collections.columnCollection' | translate }}</th>
         <th class="w-36">{{ 'collections.columns.type' | translate }}</th>
         <th class="w-20">{{ 'collections.columns.actions' | translate }}</th>
@@ -14,8 +15,8 @@
     </ng-template>
 
     <ng-template #body let-col>
-      <tr>
-        <td class="font-semibold text-[var(--sam-text-secondary)] [font-variant-numeric:tabular-nums]">{{ col.sheets?.[0]?.identifier }}</td>
+      <tr [attr.data-testid]="'collection-membership-row-' + col.id">
+        <td class="font-semibold text-[var(--sam-text-secondary)] [font-variant-numeric:tabular-nums]">{{ col.items?.[0]?.identifier }}</td>
         <td>
           <a
             class="text-[var(--p-primary-color)] no-underline font-medium hover:underline"
@@ -36,6 +37,7 @@
               [text]="true"
               size="small"
               severity="danger"
+              [attr.data-testid]="'btn-remove-from-collection-' + col.id"
               [pTooltip]="'common.remove' | translate"
               tooltipPosition="top"
               (onClick)="confirmRemove(col)"
@@ -52,19 +54,11 @@
     </ng-template>
   </p-table>
 
-  <div class="flex justify-start">
-    <p-button
-      icon="pi pi-folder-plus"
-      [label]="t.t('sheets.collections.add')"
-      size="small"
-      [outlined]="true"
-      (onClick)="openAdd()"
-    />
-  </div>
 </div>
 
 <!-- ── Add dialog ──────────────────────────────────────── -->
 <p-dialog
+  data-testid="dialog-add-to-collection"
   [header]="t.t('sheets.collections.add')"
   [(visible)]="addDialogVisible"
   [modal]="true"
@@ -90,11 +84,12 @@
               <input
                 pInputText
                 id="add-identifier"
+                data-testid="input-identifier"
                 formControlName="identifier"
-                [pTooltip]="t.t('collections.sheets.form.identifierTooltip')"
+                [pTooltip]="t.t('collections.items.form.identifierTooltip')"
                 tooltipPosition="right"
               />
-              <label for="add-identifier">{{ 'collections.sheets.form.identifier' | translate }}</label>
+              <label for="add-identifier">{{ 'collections.items.form.identifier' | translate }}</label>
             </p-floatlabel>
           </form>
         </div>
@@ -107,6 +102,7 @@
           pInputText
           type="text"
           class="w-full"
+          data-testid="input-search-collection"
           [placeholder]="t.t('sheets.collections.searchPlaceholder')"
           (input)="onSearchInput($event)"
         />
@@ -114,6 +110,7 @@
 
       <!-- Results table -->
       <p-table
+        data-testid="collection-search-results"
         [value]="searchResults()"
         [lazy]="true"
         [paginator]="true"
@@ -137,6 +134,7 @@
           <tr
             class="search-row cursor-pointer transition-colors duration-150"
             [class.search-row--selected]="isSelected(col)"
+            [attr.data-testid]="'collection-search-row-' + col.id"
             (click)="selectCollection(col)"
           >
             <td>
@@ -166,13 +164,15 @@
 
   <ng-template #footer>
     <p-button
-      [label]="t.t('collections.sheets.cancel')"
+      data-testid="btn-cancel-add-to-collection"
+      [label]="t.t('collections.items.cancel')"
       severity="secondary"
       [text]="true"
       (onClick)="addDialogVisible = false"
     />
     <p-button
-      [label]="t.t('collections.sheets.save')"
+      data-testid="btn-save-add-to-collection"
+      [label]="t.t('collections.items.save')"
       icon="pi pi-folder-plus"
       [disabled]="!canAdd || saving"
       [loading]="saving"
