@@ -15,6 +15,25 @@
         }
       </div>
     </ng-template>
+    <ng-template #end>
+      @if (!loading()) {
+        <div class="flex items-center gap-2">
+          <p-button
+            [label]="t.t('sheets.cancel')"
+            severity="secondary"
+            [text]="true"
+            (onClick)="onCancelled()"
+          />
+          <p-button
+            [label]="t.t('sheets.save')"
+            icon="pi pi-check"
+            [disabled]="formRef?.form?.invalid || formRef?.saving"
+            [loading]="formRef?.saving ?? false"
+            (onClick)="formRef?.submit()"
+          />
+        </div>
+      }
+    </ng-template>
   </p-toolbar>
 
   @if (loading()) {

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Panel } from 'primeng/panel';
 import { Toolbar } from 'primeng/toolbar';
@@ -20,6 +20,8 @@ import { SheetForm } from './sheet-form';
   styleUrl: './sheet-form-page.scss',
 })
 export class SheetFormPage extends DocumentHandler implements OnInit {
+  @ViewChild(SheetForm) protected formRef?: SheetForm;
+
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly api = inject(SheetsApiService);

@@ -10,7 +10,7 @@ export abstract class BaseForm<TEntity, TSaved = void> implements OnChanges {
   @Output() saved = new EventEmitter<TSaved>();
   @Output() cancelled = new EventEmitter<void>();
 
-  protected saving = false;
+  saving = false;
 
   abstract form: FormGroup;
   abstract getEntity(): TEntity | null;
@@ -32,6 +32,10 @@ export abstract class BaseForm<TEntity, TSaved = void> implements OnChanges {
 
   protected resetForm(): void {
     this.form.reset();
+  }
+
+  submit(): void {
+    this.onSave();
   }
 
   protected onSave(): void {
