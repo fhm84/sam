@@ -7,6 +7,7 @@ import {
   OnDestroy,
   OnInit,
   signal,
+  ViewChild,
 } from '@angular/core';
 import { SafeResourceUrl } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
@@ -17,7 +18,7 @@ import { Subject, debounceTime, forkJoin } from 'rxjs';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Dialog } from 'primeng/dialog';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { Button } from 'primeng/button';
 import { ProgressBar } from 'primeng/progressbar';
 import { FileUpload, FileSelectEvent } from 'primeng/fileupload';
@@ -29,6 +30,7 @@ import { InputIcon } from 'primeng/inputicon';
 import { InputText } from 'primeng/inputtext';
 import { Tag } from 'primeng/tag';
 import { Tooltip } from 'primeng/tooltip';
+import { Menu } from 'primeng/menu';
 import { Checkbox } from 'primeng/checkbox';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../core/translation.service';
@@ -74,6 +76,7 @@ type PickerContext = 'upload' | 'assign';
     Tag,
     Tooltip,
     Checkbox,
+    Menu,
     TranslatePipe,
     ClassificationDialog,
   ],
@@ -83,6 +86,8 @@ type PickerContext = 'upload' | 'assign';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Uploads implements OnInit, OnDestroy {
+  @ViewChild('rowMenu') private rowMenu!: Menu;
+
   protected readonly t = inject(TranslationService);
   private readonly documentsApi = inject(DocumentsApiService);
   private readonly sheetsApi = inject(SheetsApiService);
@@ -92,6 +97,26 @@ export class Uploads implements OnInit, OnDestroy {
   private readonly messageService = inject(MessageService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly router = inject(Router);
+
+  // ── Row action menu ───────────────────────────────────────────────
+  private readonly activeDoc = signal<DocumentDownload | null>(null);
+
+  protected readonly rowMenuItems = computed<MenuItem[]>(() => {
+    const doc = this.activeDoc();
+    if (!doc) return [];
+    return [
+      { label: this.t.t('classification.action'), icon: 'pi pi-sparkles', command: () => this.openClassify(doc) },
+      { label: this.t.t('uploads.assign.action'), icon: 'pi pi-link', command: () => this.openAssignPicker(doc) },
+      { label: this.t.t('uploads.download'), icon: 'pi pi-download', command: () => this.onDownload(doc) },
+      { separator: true },
+      { label: this.t.t('common.delete'), icon: 'pi pi-trash', styleClass: 'doc-menu-danger', command: () => this.confirmDelete(doc) },
+    ];
+  });
+
+  protected showDocMenu(event: Event, doc: DocumentDownload): void {
+    this.activeDoc.set(doc);
+    this.rowMenu.toggle(event);
+  }
 
   // ── Unlinked documents ────────────────────────────────────────────
   protected readonly documents = signal<DocumentDownload[]>([]);

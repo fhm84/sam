@@ -575,3 +575,14 @@ body.blocked-scroll {
   padding-top: 1rem;
 }
 
+// ─── Uploads row action menu — danger item ─────────────────────────────────
+// The menu uses appendTo="body" so it lives outside the component scope.
+
+.doc-menu-danger .p-menu-item-link,
+.doc-menu-danger .p-menu-item-link:hover {
+  color: var(--p-red-500) !important;
+
+  .p-menu-item-icon {
+    color: var(--p-red-500) !important;
+  }
+}

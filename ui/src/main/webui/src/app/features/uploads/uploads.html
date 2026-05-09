@@ -115,39 +115,13 @@
         <td>{{ formatSize(doc.size) }}</td>
         <td>{{ doc.mimeType }}</td>
         <td [title]="doc.checksumSha256">{{ truncateChecksum(doc.checksumSha256) }}</td>
-        <td class="flex gap-1">
+        <td>
           <p-button
-            icon="pi pi-sparkles"
+            icon="pi pi-ellipsis-v"
             [rounded]="true"
             [text]="true"
             styleClass="row-action"
-            [pTooltip]="t.t('classification.action')"
-            (onClick)="openClassify(doc)"
-          />
-          <p-button
-            icon="pi pi-link"
-            [rounded]="true"
-            [text]="true"
-            styleClass="row-action"
-            [pTooltip]="t.t('uploads.assign.action')"
-            (onClick)="openAssignPicker(doc)"
-          />
-          <p-button
-            icon="pi pi-download"
-            [rounded]="true"
-            [text]="true"
-            styleClass="row-action"
-            [pTooltip]="t.t('uploads.download')"
-            (onClick)="onDownload(doc)"
-          />
-          <p-button
-            icon="pi pi-trash"
-            [rounded]="true"
-            [text]="true"
-            styleClass="row-action row-action-danger"
-            [pTooltip]="'common.delete' | translate"
-            tooltipPosition="top"
-            (onClick)="confirmDelete(doc)"
+            (onClick)="showDocMenu($event, doc)"
           />
         </td>
       </tr>
@@ -419,6 +393,7 @@
   </ng-template>
 </p-dialog>
 
+<p-menu #rowMenu [model]="rowMenuItems()" [popup]="true" appendTo="body" />
 <p-confirmdialog />
 
 <!-- ── Classification dialog ────────────────────────────────────── -->
