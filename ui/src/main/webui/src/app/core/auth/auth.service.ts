@@ -17,6 +17,13 @@ export class AuthService {
     { initialValue: null },
   );
 
+  // Decoded access token payload — contains realm_access.roles which the
+  // userinfo endpoint does not return by default in Keycloak.
+  private readonly tokenPayload = toSignal<{ realm_access?: { roles: string[] } } | null>(
+    this.oidc.getPayloadFromAccessToken(),
+    { initialValue: null },
+  );
+
   readonly displayName = computed(() => {
     const ud = this.userData();
     if (!ud) return '';
@@ -26,7 +33,7 @@ export class AuthService {
   readonly isAdmin = computed(() => this.hasRole('admin'));
 
   hasRole(role: string): boolean {
-    return this.userData()?.realm_access?.roles?.includes(role) ?? false;
+    return this.tokenPayload()?.realm_access?.roles?.includes(role) ?? false;
   }
 
   login(): void {
