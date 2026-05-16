@@ -1,6 +1,6 @@
 import { Component, DestroyRef, inject, Input, OnChanges, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FloatLabel } from 'primeng/floatlabel';
 import { InputText } from 'primeng/inputtext';
 import { InputNumber } from 'primeng/inputnumber';
@@ -18,7 +18,7 @@ import { AuthService } from '../../core/auth/auth.service';
 
 @Component({
   selector: 'app-musician-form',
-  imports: [ReactiveFormsModule, FloatLabel, InputText, InputNumber, Button, Tooltip, AutoComplete, TranslatePipe],
+  imports: [ReactiveFormsModule, FormsModule, FloatLabel, InputText, InputNumber, Button, Tooltip, AutoComplete, TranslatePipe],
   providers: [MessageService],
   templateUrl: './musician-form.html',
 })
@@ -40,7 +40,7 @@ export class MusicianForm extends BaseForm<Musician, Musician> implements OnChan
 
   readonly linkedUser = signal<UserInfo | null>(null);
   readonly userSuggestions = signal<UserInfo[]>([]);
-  readonly userSearchValue = signal<UserInfo | null>(null);
+  userSearchModel: UserInfo | null = null;
   readonly linking = signal(false);
 
   getEntity = () => this.musician;
@@ -53,14 +53,14 @@ export class MusicianForm extends BaseForm<Musician, Musician> implements OnChan
       deathYear: m.deathYear ?? null,
     });
     this.linkedUser.set(null);
-    this.userSearchValue.set(null);
+    this.userSearchModel = null;
     if (m.userId && this.auth.isAdmin()) {
       this.adminUsersApi.getById(m.userId)
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: (u) => {
             this.linkedUser.set(u);
-            this.userSearchValue.set(u);
+            this.userSearchModel = u;
           },
           error: () => this.linkedUser.set(null),
         });
@@ -105,7 +105,7 @@ export class MusicianForm extends BaseForm<Musician, Musician> implements OnChan
           this.messageService.add({ severity: 'success', summary: this.t.t('musicians.form.linkSuccess') });
         },
         error: () => {
-          this.userSearchValue.set(this.linkedUser());
+          this.userSearchModel = this.linkedUser();
           this.linking.set(false);
           this.messageService.add({ severity: 'error', summary: this.t.t('musicians.form.linkError') });
         },
@@ -119,7 +119,7 @@ export class MusicianForm extends BaseForm<Musician, Musician> implements OnChan
       .subscribe({
         next: () => {
           this.linkedUser.set(null);
-          this.userSearchValue.set(null);
+          this.userSearchModel = null;
           this.linking.set(false);
           this.messageService.add({ severity: 'success', summary: this.t.t('musicians.form.unlinkSuccess') });
         },

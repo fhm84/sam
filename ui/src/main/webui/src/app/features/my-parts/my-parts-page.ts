@@ -9,7 +9,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { Tag } from 'primeng/tag';
-import { Skeleton } from 'primeng/skeleton';
 import { MyPartsApiService } from '../../core/api/my-parts-api.service';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../core/translation.service';
@@ -17,7 +16,7 @@ import { SheetWithMyParts } from '../../model/datamodels';
 
 @Component({
   selector: 'app-my-parts-page',
-  imports: [TableModule, Tag, RouterLink, Skeleton, TranslatePipe],
+  imports: [TableModule, Tag, RouterLink, TranslatePipe],
   templateUrl: './my-parts-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
