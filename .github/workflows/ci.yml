@@ -27,4 +27,4 @@ jobs:
         run: ./mvnw spotless:check
 
       - name: Run unit tests
-        run: ./mvnw test
+        run: ./mvnw test -Dquarkus.langchain4j.openai.api-key=dummy
