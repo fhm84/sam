@@ -115,6 +115,57 @@ class SecurityEnforcementTest {
         given().get("/api/musicians").then().statusCode(200);
     }
 
+    // ── Admin-only: musician user-link endpoints ───────────────────────────
+
+    @Test
+    void unauthenticated_linkMusicianUser_returns401() {
+        given().put("/api/musicians/00000000-0000-0000-0000-000000000001/user/some-user-id")
+                .then()
+                .statusCode(401);
+    }
+
+    @Test
+    void unauthenticated_unlinkMusicianUser_returns401() {
+        given().delete("/api/musicians/00000000-0000-0000-0000-000000000001/user")
+                .then()
+                .statusCode(401);
+    }
+
+    @Test
+    @TestSecurity(
+            user = "librarian1",
+            roles = {"music_librarian"})
+    void musicLibrarian_linkMusicianUser_returns403() {
+        given().put("/api/musicians/00000000-0000-0000-0000-000000000001/user/some-user-id")
+                .then()
+                .statusCode(403);
+    }
+
+    @Test
+    @TestSecurity(
+            user = "librarian1",
+            roles = {"music_librarian"})
+    void musicLibrarian_unlinkMusicianUser_returns403() {
+        given().delete("/api/musicians/00000000-0000-0000-0000-000000000001/user")
+                .then()
+                .statusCode(403);
+    }
+
+    // ── Admin-only: user search endpoint ──────────────────────────────────
+
+    @Test
+    void unauthenticated_adminUserSearch_returns401() {
+        given().get("/api/admin/users").then().statusCode(401);
+    }
+
+    @Test
+    @TestSecurity(
+            user = "librarian1",
+            roles = {"music_librarian"})
+    void musicLibrarian_adminUserSearch_returns403() {
+        given().get("/api/admin/users").then().statusCode(403);
+    }
+
     // ── music_librarian has write access ──────────────────────────────────
 
     @Test

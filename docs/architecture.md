@@ -279,6 +279,18 @@ Quarkus OIDC with self-hosted **Keycloak 26** (`docker-compose.keycloak.yml`; re
 
 All `*ResourceImpl` classes carry `@Authenticated` at class level. Write methods additionally carry `@RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})`. API interface definitions in the `api` module remain role-free so they can be used as REST clients in the `cli` module.
 
+#### Musician–User linking (admin UI)
+
+Admins can link a `Musician` record to an authenticated account via the musician edit form. The link is the `userId` field (OIDC subject claim) on `MusicianEntity`.
+
+Dedicated endpoints (admin-only):
+- `PUT /api/musicians/{id}/user/{userId}` — sets the link
+- `DELETE /api/musicians/{id}/user` — clears the link
+
+The general `PUT /api/musicians/{id}` (used by the form save) intentionally ignores `userId` via `@Mapping(target = "userId", ignore = true)` in `MusicianMapper`, so a librarian updating a musician's name can never accidentally clear an existing link.
+
+User lookup for the admin search autocomplete is backed by the **Keycloak Admin REST API** via `quarkus-keycloak-admin-rest-client`. The `AdminUsersResource` (`GET /api/admin/users?search=`, `GET /api/admin/users/{id}`) proxies user searches to Keycloak and is restricted to the `admin` role. In dev, the admin client authenticates against the `master` realm using the bootstrap admin credentials (`admin`/`admin`). In production, configure `KEYCLOAK_ADMIN_URL`, `KEYCLOAK_ADMIN_USER`, `KEYCLOAK_ADMIN_PASSWORD`, and `KEYCLOAK_REALM` environment variables.
+
 Test profile: `%test.quarkus.oidc.enabled=false`. Auth-specific tests use `@TestSecurity` from `quarkus-test-security`.
 
 ### Audit Trail
