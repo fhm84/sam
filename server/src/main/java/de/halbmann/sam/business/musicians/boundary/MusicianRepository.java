@@ -106,6 +106,10 @@ public class MusicianRepository implements PanacheRepositoryBase<MusicianEntity,
         return new PaginatedEntities<>(ordered, total);
     }
 
+    public Optional<MusicianEntity> findByUserId(String userId) {
+        return find("userId = :userId", Map.of("userId", userId)).firstResultOptional();
+    }
+
     public Optional<MusicianEntity> findMusicianByName(final String name) {
         try {
             return Optional.ofNullable(

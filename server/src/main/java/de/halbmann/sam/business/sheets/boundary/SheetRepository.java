@@ -174,6 +174,46 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
         return Sort.ascending("title");
     }
 
+    /**
+     * Returns sheets that contain at least one instrumentation whose instrument matches any of the
+     * given IDs. Results are ordered alphabetically by title. Uses a two-step ID-then-fetch
+     * approach to avoid Hibernate's HHH90003004 warning about DISTINCT + JOIN FETCH pagination.
+     */
+    public PaginatedEntities<SheetMusicEntity> findSheetsForInstruments(
+            List<String> instrumentIds, int page, int size) {
+        if (instrumentIds.isEmpty()) {
+            return new PaginatedEntities<>(List.of(), 0);
+        }
+
+        String existsClause =
+                "EXISTS (SELECT 1 FROM InstrumentationEntity i WHERE i.sheet = s AND i.instrument.id IN :ids)";
+
+        long count = ((Number) getEntityManager()
+                        .createQuery("SELECT COUNT(s) FROM SheetMusicEntity s WHERE " + existsClause)
+                        .setParameter("ids", instrumentIds)
+                        .getSingleResult())
+                .longValue();
+
+        List<UUID> sheetIds = getEntityManager()
+                .createQuery(
+                        "SELECT s.id FROM SheetMusicEntity s WHERE " + existsClause + " ORDER BY s.title ASC",
+                        UUID.class)
+                .setParameter("ids", instrumentIds)
+                .setFirstResult(page * size)
+                .setMaxResults(size)
+                .getResultList();
+
+        if (sheetIds.isEmpty()) {
+            return new PaginatedEntities<>(List.of(), count);
+        }
+
+        Map<UUID, SheetMusicEntity> byId = find("id IN :ids", Map.of("ids", sheetIds)).stream()
+                .collect(Collectors.toMap(SheetMusicEntity::getId, e -> e));
+        List<SheetMusicEntity> ordered =
+                sheetIds.stream().map(byId::get).filter(Objects::nonNull).toList();
+        return new PaginatedEntities<>(ordered, count);
+    }
+
     public void removeAttachment(AttachmentEntity attachment) {
         find("SELECT s FROM SheetMusicEntity s JOIN s.attachments a WHERE a.id = :id", Map.of("id", attachment.getId()))
                 .list()

@@ -34,6 +34,11 @@ export const routes: Routes = [
           import('./features/shares/shares.routes').then((m) => m.SHARES_ROUTES),
       },
       {
+        path: 'my-parts',
+        loadChildren: () =>
+          import('./features/my-parts/my-parts.routes').then((m) => m.MY_PARTS_ROUTES),
+      },
+      {
         path: 'musicians',
         loadChildren: () =>
           import('./features/musicians/musicians.routes').then((m) => m.MUSICIANS_ROUTES),

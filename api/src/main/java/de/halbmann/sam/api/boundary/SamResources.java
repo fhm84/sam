@@ -34,4 +34,7 @@ public interface SamResources {
 
     @Path("event-logs")
     EventLogResource eventLogs();
+
+    @Path("me/parts")
+    MyPartsResource myParts();
 }

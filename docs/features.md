@@ -18,8 +18,10 @@ For architectural decisions see `architecture.md`, for planned work see `roadmap
 7. [Instruments](#7-instruments)
 8. [Collections & Setlists](#8-collections--setlists)
 9. [Ensembles & Coverage](#9-ensembles--coverage)
-10. [Search & Discovery](#10-search--discovery)
-11. [UI & Personalisation](#11-ui--personalisation)
+10. [Shares & Public Access](#10-shares--public-access)
+11. [Event Log](#11-event-log)
+12. [Search & Discovery](#12-search--discovery)
+13. [UI & Personalisation](#13-ui--personalisation)
 
 ---
 
@@ -360,13 +362,117 @@ Each ensemble has a **membership roster** — the list of musicians who play in 
 | Instrument | Instrument reference | Optional — instrument played in this ensemble |
 | Conductor | Boolean | Marks the ensemble conductor |
 
-A musician may appear multiple times in the same ensemble (once per voice, for players who double on multiple parts). The `voice_id IS NULL` case is unique per musician per ensemble (prevents duplicate conductor entries). Each member can be linked to a Musician entity that has a `userId` (OIDC subject), enabling future musician-facing features like "my parts" views.
+A musician may appear multiple times in the same ensemble (once per voice, for players who double on multiple parts). The `voice_id IS NULL` case is unique per musician per ensemble (prevents duplicate conductor entries). Each member can be linked to a Musician entity that has a `userId` (OIDC subject). A musician may belong to the roster without a login (`userId = null`). For authenticated musicians, ensemble membership is the foundation for the "my parts" view (see roadmap).
 
 When the musician search filter contains text that matches no existing musician, the Add Member dialog shows a **"Create musician '…'"** button. Clicking it calls `POST /musicians` with the typed name, appends the new musician to the local list, auto-selects them, and shows a success toast — no page navigation required.
 
 ---
 
-## 10. Search & Discovery
+## 10. Shares & Public Access
+
+Resource-scoped share tokens allow specific content to be accessed by unauthenticated users via a URL.
+
+### Share token
+
+A share token links one authenticated creator to one target resource (a sheet instrumentation or a collection). Tokens can carry an optional expiry date and can be revoked at any time.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| Creator | User ID (OIDC sub) | The authenticated user who created the token |
+| Resource type | Enum | `SHEET_INSTRUMENTATION` · `COLLECTION` |
+| Resource ID | UUID | The specific resource being shared |
+| Expires at | DateTime | Optional; `null` = no expiry |
+| Revoked at | DateTime | Set on revocation; `null` = active |
+
+### Share management (authenticated)
+
+`GET /api/shares` · `POST /api/shares` · `DELETE /api/shares/{id}`
+
+The Angular **shares** page lists all tokens created by the current user, showing resource label, creation date, expiry, and status. Actions: **copy link** (copies the public URL to clipboard), **revoke** (immediately invalidates the token).
+
+### Public access (unauthenticated)
+
+`GET /public/share/{token}` — validates the token and returns the resource. No `Authorization` header required.
+
+The Angular **public-share** page renders:
+- For a **sheet instrumentation**: instrument name, part label, archive location, condition, and download links for attached documents.
+- For a **collection**: programme order, titles, composers, durations, and download links for attached documents.
+
+### Access logging
+
+Every public-share request is logged in `event_log` with `shareTokenId` set and `userId`/`username` as `null`. The event log UI shows "via share link" with the token ID as a tooltip.
+
+---
+
+## 11. Event Log
+
+A write-once access and activity log. Captures read events (downloads, exports) that Hibernate Envers does not track.
+
+### Recorded events
+
+| Event type | Trigger |
+|------------|---------|
+| `DOCUMENT_DOWNLOAD` | Single document served |
+| `DOCUMENT_BATCH_DOWNLOAD` | ZIP or merged-PDF batch download |
+| `SHEET_EXPORT` | Sheet exported as JSON, CSV, or ZIP |
+| `COLLECTION_EXPORT` | Collection exported |
+| `COLLECTION_TOC_GENERATED` | Collection table of contents PDF generated |
+| `GEMA_SETLIST_GENERATED` | GEMA setlist xlsx generated |
+| `DOCUMENT_CLASSIFIED` | AI classification run on a document |
+| `DOCUMENT_CLASSIFICATION_APPLIED` | AI classification result applied |
+
+### Log entry fields
+
+| Field | Notes |
+|-------|-------|
+| `occurredAt` | Timestamp with timezone |
+| `userId` | OIDC subject (null for share-link access) |
+| `username` | Snapshotted `preferred_username` (null for share-link access) |
+| `eventType` | One of the types above |
+| `entityType` / `entityId` | The target entity |
+| `metadata` | JSONB payload (filename, count, format, etc.) |
+| `shareTokenId` | Set when the event was triggered via a share link; `userId`/`username` are null in that case |
+
+IP addresses are not stored. `userId` + `username` give unambiguous attribution for authenticated access; share-link access is identified by `shareTokenId`.
+
+### Event log UI
+
+`/admin/event-logs` — read-only page with filtering by event type (multi-select), user ID, and entity type.
+
+---
+
+## 12. My Parts
+
+A personalised, read-only view for authenticated musicians showing only the sheets that contain at least one instrumentation for their instrument(s).
+
+### How it works
+
+1. The server resolves the calling user's `userId` (OIDC `sub` claim) to a `Musician` record.
+2. All `EnsembleMembership` rows for that musician are collected. The `instrument_id` of each non-null instrument membership is gathered into a set.
+3. `GET /api/me/parts` returns sheets that contain **at least one** `Instrumentation` whose `instrument_id` is in that set — regardless of which ensemble voice the musician is assigned to.
+4. Each sheet in the response carries a `myInstrumentations` field containing only the subset of that sheet's instrumentations that match the musician's instruments. Other instrumentations are not included.
+
+**Matching is instrument-based, not voice-based.** A doubling musician (Bb Trumpet + Flugelhorn memberships) sees all Bb Trumpet and Flugelhorn instrumentations for every sheet. This is intentional for small ensembles where part assignment is flexible.
+
+### Empty-state cases
+
+| Situation | Response |
+|---|---|
+| User's OIDC `sub` does not match any `Musician.userId` | Empty list + hint to contact librarian |
+| Musician is on the roster but has no instrument assignment (conductor-only) | Empty list |
+| No sheets contain the musician's instruments | Empty list |
+
+### Endpoint
+
+`GET /api/me/parts?page=0&size=20` — paginated, sorted alphabetically by title.
+
+### Angular UI
+
+Route `/my-parts` — paginated table with columns: Sheet (title + subtitle, links to sheet detail), Composer, Genre, My Parts (instrument+partLabel chips for each matching instrumentation). Translated as "Meine Stimmen" in German.
+
+---
+
+## 13. Search & Discovery
 
 ### Full-text search
 
@@ -394,7 +500,7 @@ The sheets list supports both **table view** and **card view** (user preference)
 
 ---
 
-## 11. UI & Personalisation
+## 13. UI & Personalisation
 
 ### Layout modes
 
@@ -442,7 +548,11 @@ All endpoints are under the `/api` base path.
 | Ensemble voices | `/api/ensembles/{id}/voices` | Sub-resource |
 | Voice options | `/api/ensembles/{id}/voices/{vid}/options` | Sub-resource |
 | Ensemble members | `/api/ensembles/{id}/members` | Sub-resource |
+| Shares | `/api/shares` | Authenticated share management (create, list, revoke) |
+| Public share | `/public/share/{token}` | Unauthenticated; token-validated resource access |
+| Event log | `/api/event-logs` | Read-only; requires authentication |
+| My parts | `/api/me/parts` | Authenticated; paginated sheets for the calling user's instruments |
 
 ### Access control
 
-All endpoints require authentication (valid OIDC bearer token). Write operations (POST, PUT, DELETE) additionally require the `music_librarian` or `admin` realm role. Read operations (GET) are accessible to any authenticated user. Role enforcement uses `@RolesAllowed` on the JAX-RS implementation classes; the API interface definitions remain role-free to stay usable as a REST client in the CLI module.
+All `/api/*` endpoints require authentication (valid OIDC bearer token). Write operations (POST, PUT, DELETE) additionally require the `music_librarian` or `admin` realm role. Read operations (GET) are accessible to any authenticated user. The `/public/share/{token}` endpoint is explicitly unauthenticated — it validates the share token manually in a separate resource class with no `@Authenticated` class-level annotation. Role enforcement uses `@RolesAllowed` on the JAX-RS implementation classes; the API interface definitions remain role-free to stay usable as a REST client in the CLI module.

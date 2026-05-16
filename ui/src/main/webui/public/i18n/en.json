@@ -9,6 +9,7 @@
     "uploads": "Uploads",
     "musicians": "Musicians",
     "shares": "My Shares",
+    "myParts": "My Parts",
     "profile": "Profile",
     "userPreferences": "User Preferences",
     "logout": "Logout",
@@ -1055,6 +1056,17 @@
       "revokeConfirm": "This link will no longer work. Are you sure?",
       "revokeSuccess": "Share revoked",
       "empty": "You have not created any share links yet."
+    }
+  },
+  "myParts": {
+    "title": "My Parts",
+    "subtitle": "Sheet music containing parts for your instruments across your ensembles.",
+    "empty": "No sheets found for your instruments. Make sure your musician account is linked in the ensemble roster.",
+    "columns": {
+      "title": "Sheet",
+      "composer": "Composer",
+      "genre": "Genre",
+      "myParts": "My Parts"
     }
   },
   "publicShare": {

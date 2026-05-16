@@ -500,6 +500,10 @@ export interface SheetMusicSearchResult extends SheetMusic {
     metrics?: SearchResultMetrics;
 }
 
+export interface SheetWithMyParts extends SheetMusicSearchResult {
+    myInstrumentations?: Instrumentation[];
+}
+
 export interface FileUpload extends FilePart {
     headers?: any;
 }

@@ -118,7 +118,7 @@ ensembles ──< ensemble_voices ──< voice_options >── instruments
 | `sheets` | UUID | title, subtitle, composer, arranger, genre, fingerprint |
 | `instrumentations` | UUID | sheet (FK), instrument (FK), partLabel, clef, notationType |
 | `instruments` | String | name, displayName, transposition |
-| `musicians` | UUID | name, birthYear, deathYear, ipi |
+| `musicians` | UUID | name, birthYear, deathYear, ipi, **userId** (OIDC subject — null for external/historical musicians) |
 | `documents` | UUID | filename, path, sha256, mimeType, size, refCount |
 | `attachments` | UUID | document (FK), type, displayName |
 | `sheet_collections` | UUID | name, description, type (FOLDER/SETLIST), date |
@@ -126,8 +126,11 @@ ensembles ──< ensemble_voices ──< voice_options >── instruments
 | `ensembles` | UUID | name, description |
 | `ensemble_voices` | UUID | ensemble (FK), label, weight, required |
 | `voice_options` | UUID | voice (FK), instrument (FK), type, factor |
+| `ensemble_memberships` | UUID | musician (FK), ensemble (FK), voice (FK, nullable), instrument (FK, nullable), conductor (bool) — one row per musician per voice per ensemble |
+| `shares` | UUID | creatorUserId, resourceType, resourceId, expiresAt, revokedAt, createdAt |
+| `event_log` | UUID | occurredAt, userId, username, eventType, entityType, entityId, metadata (JSONB), shareTokenId |
 
-All entities carry `version` (optimistic locking), `created`, `lastUpdate` timestamps, and have `_AUD` audit mirror tables via Hibernate Envers.
+All domain entities carry `version` (optimistic locking), `created`, `lastUpdate` timestamps, and have `_AUD` audit mirror tables via Hibernate Envers. `shares` and `event_log` are append-only and are not audited.
 
 ### Search Infrastructure (PostgreSQL)
 
@@ -259,9 +262,30 @@ The reviewed `ClassificationApplyRequest` is submitted. The service:
 
 This is used to pre-populate and confirm the archiving workflow with minimal manual input.
 
+### Authentication & Authorization
+
+Quarkus OIDC with self-hosted **Keycloak 26** (`docker-compose.keycloak.yml`; realm export at `keycloak/sam-realm.json`).
+
+| Concern | Mechanism |
+|---|---|
+| Identity | `Musician.userId` = OIDC `sub` claim. No separate User entity — a musician either has a login or doesn't. |
+| Ensemble access | Keycloak group `ensemble:{UUID}` in the JWT `groups` claim; read by `CurrentUserService.getAccessibleEnsembleIds()` |
+| Roles | Keycloak realm roles: `music_librarian` (full archive write access), `admin` (system config) |
+| Public access | `/public/share/{token}` endpoints bypass `@Authenticated`; token is validated manually in `PublicShareResourceImpl` |
+
+`CurrentUserService` (`@RequestScoped`) is the single injection point for identity in business logic — wraps JWT parsing, role checks, and ensemble-group resolution. Inject this instead of `JsonWebToken` directly.
+
+`MyPartsService` extends this pattern for the personalized sheet view: it calls `currentUserService.getUserId()` to look up the linked `MusicianEntity`, collects all instrument IDs from the musician's `EnsembleMembershipEntity` records, and returns only sheets that contain at least one matching instrumentation. Conductor memberships (null instrument) are skipped automatically.
+
+All `*ResourceImpl` classes carry `@Authenticated` at class level. Write methods additionally carry `@RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})`. API interface definitions in the `api` module remain role-free so they can be used as REST clients in the `cli` module.
+
+Test profile: `%test.quarkus.oidc.enabled=false`. Auth-specific tests use `@TestSecurity` from `quarkus-test-security`.
+
 ### Audit Trail
 
-Every entity is annotated with `@Audited` (Hibernate Envers). Each table has a corresponding `_AUD` table using `ValidityAuditStrategy` (tracks both revision start and end). This provides a complete history of all changes.
+Every domain entity is annotated with `@Audited` (Hibernate Envers). Each table has a corresponding `_AUD` table using `ValidityAuditStrategy` (tracks both revision start and end). This provides a complete history of all data mutations.
+
+Read events (document downloads, exports, AI classification, share-link access) are tracked separately in the `event_log` table via `EventLogService` — Envers only covers writes.
 
 ---
 
@@ -269,7 +293,7 @@ Every entity is annotated with `@Audited` (Hibernate Envers). Each table has a c
 
 | Concern | Technology | Version |
 |---------|-----------|---------|
-| Runtime | Quarkus | 3.32.3 |
+| Runtime | Quarkus | 3.33.1.1 (LTS) |
 | Language | Java | 21 |
 | ORM | Hibernate ORM + Panache | (via Quarkus BOM) |
 | Audit | Hibernate Envers | (via Quarkus BOM) |

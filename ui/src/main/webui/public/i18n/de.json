@@ -9,6 +9,7 @@
     "uploads": "Uploads",
     "musicians": "Musiker",
     "shares": "Meine Freigaben",
+    "myParts": "Meine Stimmen",
     "profile": "Profil",
     "userPreferences": "Benutzereinstellungen",
     "logout": "Abmelden",
@@ -1055,6 +1056,17 @@
       "revokeConfirm": "Dieser Link wird nicht mehr funktionieren. Sicher?",
       "revokeSuccess": "Freigabe widerrufen",
       "empty": "Noch keine Freigabelinks erstellt."
+    }
+  },
+  "myParts": {
+    "title": "Meine Stimmen",
+    "subtitle": "Noten mit Stimmen für deine Instrumente in deinen Ensembles.",
+    "empty": "Keine Noten für deine Instrumente gefunden. Stelle sicher, dass dein Musikerkonto im Ensemble-Besetzungsplan verknüpft ist.",
+    "columns": {
+      "title": "Note",
+      "composer": "Komponist",
+      "genre": "Genre",
+      "myParts": "Meine Stimmen"
     }
   },
   "publicShare": {

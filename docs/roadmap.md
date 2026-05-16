@@ -186,7 +186,7 @@ between a collection/setlist and a sheet), which already exists.
 
 ## 3. Musician-Facing
 
-### Musician–instrument assignment within ensemble — `in progress`
+### Musician–instrument assignment within ensemble — `done`
 
 Link a `Musician` entity to an ensemble, optionally specifying which voice and instrument
 they play. Enables:
@@ -196,12 +196,19 @@ they play. Enables:
 - Minimum-viable setlist (see Section 2)
 
 **Done:** `EnsembleMembership` data model (musician + ensemble + voice + instrument +
-conductor flag), REST API (`/ensembles/{id}/members`), and management UI in the ensemble
-detail page. Musicians are linked to system accounts via `userId` (OIDC subject) on the
-`Musician` entity — no separate `User` entity.
+conductor flag), REST API (`/ensembles/{id}/members`), management UI in the ensemble
+detail page, and the "My Parts" view (`GET /api/me/parts`, Angular route `/my-parts`).
+Musicians are linked to system accounts via `userId` (OIDC subject) on the `Musician`
+entity — no separate `User` entity.
 
-**Remaining:** "My parts" filtered view for authenticated musicians (frontend OIDC integration); ensemble access
-scoped to Keycloak group membership (`ensemble:{UUID}` groups).
+**Matching strategy:** instrument-based across all memberships. A musician who doubles
+(e.g. Bb Trumpet + Flugelhorn) sees all matching instrumentations. Results are grouped
+per sheet — one row per sheet with all matching parts shown as chips.
+
+**Still needs:** frontend OIDC integration to wire the actual logged-in user's `sub` claim
+into the API call. Until then the endpoint returns an empty list for all authenticated
+users (the security enforcement is in place; the JWT subject plumbing is the missing piece
+— see Full RBAC remaining work).
 
 **Stakeholders:** S3 (Musiker), S1 (music librarian)
 **Effort:** Medium–High (requires auth foundation)
@@ -271,18 +278,20 @@ SAM already stores ISWC and GEMA work numbers per sheet.
 
 ## 5. Access Control & Sharing
 
-### Setlist public page (guest access — minimal) — `planned`
+### Setlist public page (guest access — minimal) — `done`
+
+**Implementation note:** Implemented as part of the Share Links feature (see below). The
+music librarian creates a resource-scoped share token for a collection via
+`POST /api/shares`. The resulting public URL (`/public/share/{token}`) renders the
+collection's programme — title, composer, duration — without requiring login. Download
+links for attached documents are also included (a superset of the original spec).
 
 Publish a setlist as a read-only, unauthenticated page at a shareable URL. No login, no
 account. The music librarian or Dirigent marks a collection as "shared" and shares the link
 (e.g. via WhatsApp group before a concert).
 
-The page shows: ordered programme, title, composer, duration. No documents, no archive
-data.
-
 This is the simplest implementation of S5 (Guest) access and avoids the need for a full
-auth model. It is a useful stepping stone before implementing full role-based access
-control.
+auth model.
 
 **Stakeholders:** S2 (Dirigent), S5 (Guest)
 **Effort:** Low
@@ -304,10 +313,9 @@ control.
 
 **Remaining (Phase 4+):**
 - Frontend OIDC integration (Angular + Keycloak JS adapter or PKCE flow)
-- Role-aware UI (hide write actions for read-only users)
-- "My parts" view scoped to ensemble group membership
-- Conductor role for ensemble membership management
-- Guest / public setlist access
+- Role-aware UI (hide write actions for read-only users, show only accessible ensembles)
+- "My parts" view scoped to the logged-in musician's ensemble memberships
+- Conductor role surfaced in the UI (currently stored in data model, not yet used for access control)
 
 **Stakeholders:** All
 **Effort:** High
@@ -315,18 +323,21 @@ control.
 
 ---
 
-### Shared document links — `planned`
+### Shared document links — `done`
+
+**Implementation note:** Fully implemented. The `shares` table stores resource-scoped
+tokens (one token = one resource: a sheet instrumentation or a collection).
+`POST /api/shares` creates a token; `GET /public/share/{token}` is the unauthenticated
+endpoint. The Angular `shares` page lists all tokens for the current user with copy-link
+and revoke actions. The `public-share` page renders the resource for unauthenticated
+visitors with download links. All share-link access is logged in `event_log` with the
+`shareTokenId` column (userId/username set to null on share-link requests).
 
 Allow a specific document (e.g. a scanned part) to be shared via a time-limited or
 permanent public URL, independently of full guest access. The music librarian generates the
 link; anyone with it can download the file.
 
-A lightweight alternative to full guest access for ad-hoc file sharing. Tokens are
-resource-scoped (one token = one resource), not broad API keys.
-
-**Event log is pre-wired:** the `event_log` table has a `shareTokenId` column and
-`EventLogService` has a dedicated overload for share-token access. When the feature is
-built, the logging call is already there — just pass the token UUID.
+Tokens are resource-scoped (one token = one resource), not broad API keys.
 
 **Stakeholders:** S1 (music librarian), S3b (Guest musician)
 **Effort:** Low–Medium
@@ -634,7 +645,7 @@ answered before the relevant implementation work begins.
 | # | Question | Affects | Status |
 |---|----------|---------|--------|
 | 1 | Should a `Musician` user account link to the existing `Musician` entity, or be a separate `User` entity? | Auth, musician–instrument assignment, "my parts" view | **Resolved:** `userId` (OIDC subject) added to `Musician` — no separate User entity. External/historical musicians have `userId = null`. |
-| 2 | How is "selected content" for guests scoped — per-sheet flag, collection-based sharing, or ensemble-based? | Guest access, setlist public page | **Partially resolved:** Share links are resource-scoped (one token = one resource, not a broad key). Full guest/public access scoping (e.g. public setlist page) still open. |
+| 2 | How is "selected content" for guests scoped — per-sheet flag, collection-based sharing, or ensemble-based? | Guest access, setlist public page | **Resolved:** Resource-scoped share tokens implemented (one token = one sheet instrumentation or collection). Public setlist/sheet pages live at `/public/share/{token}`. Open-URL anonymous access (no link) intentionally deferred. |
 | 3 | Should document-level visibility be independently configurable, or always inherited from the sheet/instrumentation? | Shared document links, guest access | Open |
 | 4 | Is anonymous guest access (no link, open public URL) ever desirable? | Guest access scope | Open |
 | 5 | Should coverage snapshots be invalidated automatically, or remain manual? | Coverage accuracy, performance | Open |

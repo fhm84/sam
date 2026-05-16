@@ -1,0 +1,76 @@
+<div class="flex flex-col gap-4">
+  <div>
+    <h1 class="m-0 text-2xl font-semibold text-[var(--sam-text)]">
+      {{ 'myParts.title' | translate }}
+    </h1>
+    <p class="m-0 text-sm text-[var(--sam-text-muted)]">
+      {{ 'myParts.subtitle' | translate }}
+    </p>
+  </div>
+
+  <p-table
+    [value]="sheets()"
+    [loading]="loading()"
+    [lazy]="true"
+    [paginator]="true"
+    [rows]="rows"
+    [totalRecords]="totalRecords()"
+    [rowHover]="true"
+    styleClass="p-datatable-sm"
+    (onLazyLoad)="onLazyLoad($event)"
+  >
+    <ng-template #header>
+      <tr>
+        <th>{{ 'myParts.columns.title' | translate }}</th>
+        <th>{{ 'myParts.columns.composer' | translate }}</th>
+        <th>{{ 'myParts.columns.genre' | translate }}</th>
+        <th>{{ 'myParts.columns.myParts' | translate }}</th>
+      </tr>
+    </ng-template>
+
+    <ng-template #body let-sheet>
+      <tr>
+        <td>
+          <a
+            [routerLink]="['/sheets', sheet.id]"
+            class="font-medium text-[var(--sam-text)] hover:text-[var(--p-primary-color)] no-underline transition-colors"
+          >
+            {{ sheet.title }}
+          </a>
+          @if (sheet.subtitle) {
+            <div class="text-xs text-[var(--sam-text-muted)] mt-0.5">{{ sheet.subtitle }}</div>
+          }
+        </td>
+        <td>
+          <span class="text-sm text-[var(--sam-text-secondary)]">
+            {{ sheet.composer?.name || '—' }}
+          </span>
+        </td>
+        <td>
+          @if (sheet.genre) {
+            <p-tag [value]="sheet.genre" severity="secondary" styleClass="text-xs" />
+          }
+        </td>
+        <td>
+          <div class="flex flex-wrap gap-1">
+            @for (instr of sheet.myInstrumentations; track instr.id) {
+              <p-tag
+                [value]="partLabel(instr)"
+                severity="info"
+                styleClass="text-xs"
+              />
+            }
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="4" class="text-center text-[var(--sam-text-secondary)] !p-8">
+          {{ 'myParts.empty' | translate }}
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
