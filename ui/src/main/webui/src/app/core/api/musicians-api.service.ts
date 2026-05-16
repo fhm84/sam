@@ -32,4 +32,12 @@ export class MusiciansApiService {
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
+
+  linkUser(musicianId: string, userId: string): Observable<void> {
+    return this.http.put<void>(`${this.baseUrl}/${musicianId}/user/${userId}`, null);
+  }
+
+  unlinkUser(musicianId: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${musicianId}/user`);
+  }
 }

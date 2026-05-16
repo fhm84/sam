@@ -311,6 +311,14 @@ export interface Musician {
     userId?: string;
 }
 
+export interface UserInfo {
+    id: string;
+    username: string;
+    email?: string;
+    firstName?: string;
+    lastName?: string;
+}
+
 export interface MusicianFilterRequest extends PaginationRequest {
     name?: string;
 }

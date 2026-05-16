@@ -45,4 +45,16 @@ public class MusiciansResourceImpl implements MusiciansResource {
     public void delete(String musicianId) {
         musicianService.deleteMusician(musicianId);
     }
+
+    @Override
+    @RolesAllowed(Roles.ADMIN)
+    public void linkUser(String musicianId, String userId) {
+        musicianService.linkUser(musicianId, userId);
+    }
+
+    @Override
+    @RolesAllowed(Roles.ADMIN)
+    public void unlinkUser(String musicianId) {
+        musicianService.unlinkUser(musicianId);
+    }
 }

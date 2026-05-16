@@ -529,7 +529,17 @@
       "ipiHint": "Interested Parties Information Code",
       "ipiTooltip": "Interested Parties Information — ein eindeutiger 9-stelliger Code für Musikrechteinhaber. Leer lassen, wenn unbekannt.",
       "birthYear": "Geburtsjahr",
-      "deathYear": "Todesjahr"
+      "deathYear": "Todesjahr",
+      "linkedUser": "Verknüpftes Benutzerkonto",
+      "linkedUserHint": "Nach Name oder E-Mail suchen…",
+      "linkedUserTooltip": "Verknüpft diesen Musiker mit einem authentifizierten Benutzerkonto und ermöglicht die personalisierte Meine Stimmen-Ansicht.",
+      "linkedUserNone": "Kein Konto verknüpft",
+      "linkAction": "Verknüpfen",
+      "unlinkAction": "Verknüpfung aufheben",
+      "linkSuccess": "Benutzerkonto verknüpft",
+      "unlinkSuccess": "Verknüpfung aufgehoben",
+      "linkError": "Verknüpfung fehlgeschlagen",
+      "unlinkError": "Aufheben der Verknüpfung fehlgeschlagen"
     },
     "delete": {
       "confirm": "Möchten Sie den Musiker \"{name}\" wirklich löschen?",

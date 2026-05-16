@@ -74,6 +74,20 @@ public class MusicianService {
         musicianMapper.update(entity, musician);
     }
 
+    public void linkUser(final String musicianId, final String userId) {
+        final MusicianEntity entity = musicianRepository
+                .findByIdOptional(UUID.fromString(musicianId))
+                .orElseThrow(() -> new EntityNotFoundException("Musician", musicianId));
+        entity.setUserId(userId);
+    }
+
+    public void unlinkUser(final String musicianId) {
+        final MusicianEntity entity = musicianRepository
+                .findByIdOptional(UUID.fromString(musicianId))
+                .orElseThrow(() -> new EntityNotFoundException("Musician", musicianId));
+        entity.setUserId(null);
+    }
+
     public void deleteMusician(final String musicianId) {
         final MusicianEntity entity = musicianRepository
                 .findByIdOptional(UUID.fromString(musicianId))

@@ -1,4 +1,5 @@
 export { SheetsApiService } from './sheets-api.service';
+export { AdminUsersApiService } from './admin-users-api.service';
 export { InstrumentationsApiService } from './instrumentations-api.service';
 export { DocumentsApiService } from './documents-api.service';
 export { MusiciansApiService } from './musicians-api.service';

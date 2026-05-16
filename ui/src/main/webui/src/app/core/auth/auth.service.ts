@@ -23,6 +23,12 @@ export class AuthService {
     return ud.name ?? ud.preferred_username ?? ud.email ?? '';
   });
 
+  readonly isAdmin = computed(() => this.hasRole('admin'));
+
+  hasRole(role: string): boolean {
+    return this.userData()?.realm_access?.roles?.includes(role) ?? false;
+  }
+
   login(): void {
     this.oidc.authorize();
   }

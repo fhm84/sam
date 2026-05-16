@@ -60,6 +60,67 @@
     </div>
   </div>
 
+  <!-- Linked user account (admin only, edit mode only) -->
+  @if (auth.isAdmin() && isEdit) {
+    <div class="flex flex-col gap-2 pt-1 border-t border-[var(--p-surface-200)] dark:border-[var(--p-surface-700)]">
+      <div class="flex items-center gap-1.5 mt-2">
+        <span class="text-sm font-medium text-[var(--sam-text-secondary)]">
+          {{ 'musicians.form.linkedUser' | translate }}
+        </span>
+        <i
+          class="pi pi-info-circle text-xs text-[var(--sam-text-muted)] cursor-help"
+          [pTooltip]="t.t('musicians.form.linkedUserTooltip')"
+          tooltipPosition="right"
+        ></i>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <p-autocomplete
+          class="flex-1"
+          styleClass="w-full"
+          inputStyleClass="w-full"
+          [ngModel]="userSearchValue()"
+          (ngModelChange)="userSearchValue.set($event)"
+          [ngModelOptions]="{ standalone: true }"
+          [suggestions]="userSuggestions()"
+          [field]="'username'"
+          [optionLabel]="'username'"
+          [placeholder]="t.t('musicians.form.linkedUserHint')"
+          [disabled]="linking()"
+          [forceSelection]="true"
+          (completeMethod)="onUserSearch($event)"
+          (onSelect)="onUserSelect($event.value)"
+        >
+          <ng-template #item let-user>
+            <div class="flex flex-col">
+              <span class="font-medium text-sm">{{ userDisplayLabel(user) }}</span>
+              <span class="text-xs text-[var(--sam-text-muted)]">{{ user.username }}</span>
+            </div>
+          </ng-template>
+        </p-autocomplete>
+
+        @if (linkedUser()) {
+          <p-button
+            icon="pi pi-times"
+            severity="danger"
+            [text]="true"
+            [rounded]="true"
+            size="small"
+            [pTooltip]="t.t('musicians.form.unlinkAction')"
+            [loading]="linking()"
+            (onClick)="onUnlink()"
+          />
+        }
+      </div>
+
+      @if (!linkedUser()) {
+        <span class="text-xs text-[var(--sam-text-muted)]">
+          {{ 'musicians.form.linkedUserNone' | translate }}
+        </span>
+      }
+    </div>
+  }
+
   <div class="flex justify-end gap-2 pt-2">
     <p-button
       [label]="t.t('musicians.cancel')"

@@ -19,5 +19,6 @@ public interface MusicianMapper {
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "created", ignore = true)
     @Mapping(target = "lastUpdate", ignore = true)
+    @Mapping(target = "userId", ignore = true)
     void update(@MappingTarget final MusicianEntity entity, final Musician dto);
 }

@@ -32,4 +32,14 @@ public interface MusiciansResource {
     @DELETE
     @Path("{musicianId}")
     void delete(@PathParam("musicianId") String musicianId);
+
+    /** Links the musician to an authenticated user account via OIDC subject claim. */
+    @PUT
+    @Path("{musicianId}/user/{userId}")
+    void linkUser(@PathParam("musicianId") String musicianId, @PathParam("userId") String userId);
+
+    /** Removes the user-account link from this musician. */
+    @DELETE
+    @Path("{musicianId}/user")
+    void unlinkUser(@PathParam("musicianId") String musicianId);
 }

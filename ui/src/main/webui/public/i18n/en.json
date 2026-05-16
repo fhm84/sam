@@ -529,7 +529,17 @@
       "ipiHint": "Interested Parties Information code",
       "ipiTooltip": "Interested Parties Information — a unique 9-digit code assigned to music rights holders. Leave empty if unknown.",
       "birthYear": "Birth Year",
-      "deathYear": "Death Year"
+      "deathYear": "Death Year",
+      "linkedUser": "Linked user account",
+      "linkedUserHint": "Search by name or email…",
+      "linkedUserTooltip": "Links this musician to an authenticated user account, enabling the My Parts personalised view.",
+      "linkedUserNone": "No account linked",
+      "linkAction": "Link",
+      "unlinkAction": "Unlink",
+      "linkSuccess": "User account linked",
+      "unlinkSuccess": "User account unlinked",
+      "linkError": "Failed to link user account",
+      "unlinkError": "Failed to unlink user account"
     },
     "delete": {
       "confirm": "Are you sure you want to delete the musician \"{name}\"?",
