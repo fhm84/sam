@@ -359,7 +359,6 @@
                 <tr>
                   <th class="expand-col"></th>
                   <th>{{ 'sheets.instrumentations.columns.instrument' | translate }}</th>
-                  <th>{{ 'sheets.instrumentations.columns.partLabel' | translate }}</th>
                   <th class="docs-col">{{ 'sheets.instrumentations.columns.documents' | translate }}</th>
                   <th>{{ 'sheets.instrumentations.columns.actions' | translate }}</th>
                 </tr>
@@ -377,8 +376,9 @@
                       (onClick)="dtCompact.toggleRow(instr, $event)"
                     />
                   </td>
-                  <td>{{ instr.instrument?.name }}</td>
-                  <td>{{ instr.partLabel }}</td>
+                  <td>
+                    {{ instr.instrument?.displayName || instr.instrument?.name }}{{ instr.instrument?.transposition ? ' (' + instr.instrument?.transposition + ')' : '' }}@if (instr.partLabel) {<span class="text-[var(--sam-text-muted)]"> · {{ instr.partLabel }}</span>}
+                  </td>
                   <td class="docs-col">
                     <div class="doc-badges">
                       @for (badge of instrDocBadges(instr.id!); track badge.type) {
@@ -434,18 +434,18 @@
               </ng-template>
               <ng-template #expandedrow let-instr>
                 <tr class="expansion-row">
-                  <td colspan="5" class="expansion-cell">
+                  <td colspan="4" class="expansion-cell">
                     <div class="instr-meta-row">
                       @if (instr.clef) {
                         <span class="instr-meta-item">
                           <span class="detail-label">{{ 'sheets.instrumentations.columns.clef' | translate }}:</span>
-                          <span>{{ 'sheets.clef.' + instr.clef | translate }}</span>
+                          <span>{{ 'instruments.clef.' + instr.clef | translate }}</span>
                         </span>
                       }
                       @if (instr.notationType) {
                         <span class="instr-meta-item">
                           <span class="detail-label">{{ 'sheets.instrumentations.form.notationType' | translate }}:</span>
-                          <span>{{ 'sheets.notationType.' + instr.notationType | translate }}</span>
+                          <span>{{ 'instruments.notationType.' + instr.notationType | translate }}</span>
                         </span>
                       }
                       @if (instr.physicalCondition) {
@@ -481,7 +481,7 @@
               </ng-template>
               <ng-template #emptymessage>
                 <tr>
-                  <td colspan="5" class="!p-6 text-center text-[var(--sam-text-muted)]">{{ 'sheets.instrumentations.empty' | translate }}</td>
+                  <td colspan="4" class="!p-6 text-center text-[var(--sam-text-muted)]">{{ 'sheets.instrumentations.empty' | translate }}</td>
                 </tr>
               </ng-template>
             </p-table>
@@ -760,7 +760,6 @@
             <tr>
               <th class="expand-col"></th>
               <th>{{ 'sheets.instrumentations.columns.instrument' | translate }}</th>
-              <th>{{ 'sheets.instrumentations.columns.partLabel' | translate }}</th>
               <th>{{ 'sheets.instrumentations.columns.clef' | translate }}</th>
               <th class="docs-col">{{ 'sheets.instrumentations.columns.documents' | translate }}</th>
               <th>{{ 'sheets.instrumentations.columns.actions' | translate }}</th>
@@ -779,9 +778,10 @@
                   (onClick)="dtFull.toggleRow(instr, $event)"
                 />
               </td>
-              <td>{{ instr.instrument?.name }}</td>
-              <td>{{ instr.partLabel }}</td>
-              <td>{{ instr.clef }}</td>
+              <td>
+                {{ instr.instrument?.displayName || instr.instrument?.name }}{{ instr.instrument?.transposition ? ' (' + instr.instrument?.transposition + ')' : '' }}@if (instr.partLabel) {<span class="text-[var(--sam-text-muted)]"> · {{ instr.partLabel }}</span>}
+              </td>
+              <td>{{ instr.clef ? ('instruments.clef.' + instr.clef | translate) : '' }}</td>
               <td class="docs-col">
                 <div class="doc-badges">
                   @for (badge of instrDocBadges(instr.id!); track badge.type) {
@@ -837,12 +837,12 @@
           </ng-template>
           <ng-template #expandedrow let-instr>
             <tr class="expansion-row">
-              <td colspan="7" class="expansion-cell">
+              <td colspan="6" class="expansion-cell">
                 <div class="instr-meta-row">
                   @if (instr.notationType) {
                     <span class="instr-meta-item">
                       <span class="detail-label">{{ 'sheets.instrumentations.form.notationType' | translate }}:</span>
-                      <span>{{ 'sheets.notationType.' + instr.notationType | translate }}</span>
+                      <span>{{ 'instruments.notationType.' + instr.notationType | translate }}</span>
                     </span>
                   }
                   @if (instr.physicalCondition) {
@@ -878,7 +878,7 @@
           </ng-template>
           <ng-template #emptymessage>
             <tr>
-              <td colspan="7" class="!p-6 text-center text-[var(--sam-text-muted)]">{{ 'sheets.instrumentations.empty' | translate }}</td>
+              <td colspan="6" class="!p-6 text-center text-[var(--sam-text-muted)]">{{ 'sheets.instrumentations.empty' | translate }}</td>
             </tr>
           </ng-template>
         </p-table>
