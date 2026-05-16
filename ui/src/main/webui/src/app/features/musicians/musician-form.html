@@ -74,9 +74,25 @@
         ></i>
       </div>
 
-      <div class="flex items-center gap-2">
+      @if (linkedUser()) {
+        <!-- Linked state: read-only chip + unlink -->
+        <div class="flex items-center justify-between px-3 py-2 rounded-lg bg-[var(--p-surface-100)] dark:bg-[var(--p-surface-800)]">
+          <div class="flex items-center gap-2">
+            <i class="pi pi-user text-sm text-[var(--p-primary-color)]"></i>
+            <span class="text-sm font-medium">{{ userDisplayLabel(linkedUser()!) }}</span>
+          </div>
+          <p-button
+            [label]="t.t('musicians.form.unlinkAction')"
+            severity="danger"
+            [text]="true"
+            size="small"
+            [loading]="linking()"
+            (onClick)="onUnlink()"
+          />
+        </div>
+      } @else {
+        <!-- Not linked: search autocomplete -->
         <p-autocomplete
-          class="flex-1"
           styleClass="w-full"
           inputStyleClass="w-full"
           [(ngModel)]="userSearchModel"
@@ -96,22 +112,6 @@
             </div>
           </ng-template>
         </p-autocomplete>
-
-        @if (linkedUser()) {
-          <p-button
-            icon="pi pi-times"
-            severity="danger"
-            [text]="true"
-            [rounded]="true"
-            size="small"
-            [pTooltip]="t.t('musicians.form.unlinkAction')"
-            [loading]="linking()"
-            (onClick)="onUnlink()"
-          />
-        }
-      </div>
-
-      @if (!linkedUser()) {
         <span class="text-xs text-[var(--sam-text-muted)]">
           {{ 'musicians.form.linkedUserNone' | translate }}
         </span>

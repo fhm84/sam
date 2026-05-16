@@ -551,6 +551,7 @@
       "deleted": "Musician deleted successfully",
       "error": "An error occurred"
     },
+    "linkedAccountTooltip": "Linked to a user account",
     "search": "Search by name",
     "empty": "No musicians found",
     "save": "Save",

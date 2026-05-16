@@ -11,6 +11,7 @@ import { InputIcon } from 'primeng/inputicon';
 import { Toolbar } from 'primeng/toolbar';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { MusiciansApiService } from '../../core/api';
+import { AuthService } from '../../core/auth/auth.service';
 import { Musician, MusicianFilterRequest } from '../../model/datamodels';
 import { BaseCrudList } from '../../shared/base/base-crud-list';
 import { CrudApi } from '../../shared/base/crud-api.interface';
@@ -37,6 +38,7 @@ Button,
 })
 export class Musicians extends BaseCrudList<Musician, MusicianFilterRequest> {
   api: CrudApi<Musician, MusicianFilterRequest> = inject(MusiciansApiService);
+  protected readonly auth = inject(AuthService);
   translationPrefix = 'musicians';
   getItemId = (m: Musician) => m.id!;
   getItemName = (m: Musician) => m.name;

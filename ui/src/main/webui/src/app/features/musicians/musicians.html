@@ -46,7 +46,18 @@
 
     <ng-template #body let-musician>
       <tr>
-        <td class="font-medium">{{ musician.name }}</td>
+        <td class="font-medium">
+          <span class="inline-flex items-center gap-1.5">
+            {{ musician.name }}
+            @if (auth.isAdmin() && musician.userId) {
+              <i
+                class="pi pi-link text-xs text-[var(--p-primary-color)]"
+                [pTooltip]="t.t('musicians.linkedAccountTooltip')"
+                tooltipPosition="top"
+              ></i>
+            }
+          </span>
+        </td>
         <td>{{ musician.ipi }}</td>
         <td>{{ musician.birthYear }}</td>
         <td>{{ musician.deathYear }}</td>

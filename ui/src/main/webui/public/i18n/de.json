@@ -551,6 +551,7 @@
       "deleted": "Musiker erfolgreich gelöscht",
       "error": "Ein Fehler ist aufgetreten"
     },
+    "linkedAccountTooltip": "Mit einem Benutzerkonto verknüpft",
     "search": "Nach Name suchen",
     "empty": "Keine Musiker gefunden",
     "save": "Speichern",
