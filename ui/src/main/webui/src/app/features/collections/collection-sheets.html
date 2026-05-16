@@ -4,6 +4,17 @@
     <h2 class="m-0 text-xl font-semibold text-[var(--sam-text)]">{{ 'collections.items.title' | translate }}</h2>
     <div class="flex gap-2">
       <p-button
+        data-testid="btn-my-parts-filter"
+        icon="pi pi-user"
+        [label]="t.t('collections.items.myPartsFilter')"
+        size="small"
+        [severity]="myPartsOnly() ? 'primary' : 'secondary'"
+        [outlined]="!myPartsOnly()"
+        [pTooltip]="t.t('collections.items.myPartsFilterTooltip')"
+        tooltipPosition="top"
+        (onClick)="toggleMyPartsOnly()"
+      />
+      <p-button
         data-testid="btn-add-sheet"
         icon="pi pi-music"
         [label]="t.t('collections.items.addSheet')"

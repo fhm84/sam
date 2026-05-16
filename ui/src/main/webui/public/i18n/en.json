@@ -431,6 +431,8 @@
         "removeConfirm": "Remove the attached file from this text block?",
         "removeHeader": "Remove attachment"
       },
+      "myPartsFilter": "My Parts",
+      "myPartsFilterTooltip": "Show only sheets where you have a part",
       "empty": "No items in this collection yet",
       "preview": "View sheet details",
       "save": "Save",

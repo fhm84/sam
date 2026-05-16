@@ -20,7 +20,9 @@ import java.util.List;
 public interface CollectionItemsResource {
 
     @GET
-    PaginatedResponse<CollectionItem> listAll(@BeanParam PaginationRequest paginationRequest);
+    PaginatedResponse<CollectionItem> listAll(
+            @BeanParam PaginationRequest paginationRequest,
+            @QueryParam("myPartsOnly") @DefaultValue("false") boolean myPartsOnly);
 
     @POST
     void addItem(CreateCollectionItem createCollectionItem);

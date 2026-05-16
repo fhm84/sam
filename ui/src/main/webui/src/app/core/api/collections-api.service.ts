@@ -50,10 +50,12 @@ export class CollectionsApiService {
   listItems(
     collectionId: string,
     pagination: PaginationRequest = {},
+    myPartsOnly = false,
   ): Observable<PaginatedResponse<CollectionItem>> {
     let params = new HttpParams();
     if (pagination.page !== undefined) params = params.set('page', pagination.page);
     if (pagination.size !== undefined) params = params.set('size', pagination.size);
+    if (myPartsOnly) params = params.set('myPartsOnly', 'true');
     return this.http.get<PaginatedResponse<CollectionItem>>(
       `${this.baseUrl}/${collectionId}/items`,
       { params },

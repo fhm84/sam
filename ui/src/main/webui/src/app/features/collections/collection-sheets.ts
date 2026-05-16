@@ -60,6 +60,7 @@ export class CollectionSheets implements OnInit, OnChanges {
   protected readonly items = signal<CollectionItem[]>([]);
   protected readonly totalRecords = signal(0);
   protected readonly loading = signal(false);
+  protected readonly myPartsOnly = signal(false);
   protected rows = 1000;
   protected currentPage = 0;
 
@@ -400,10 +401,16 @@ export class CollectionSheets implements OnInit, OnChanges {
     });
   }
 
+  protected toggleMyPartsOnly(): void {
+    this.myPartsOnly.update((v) => !v);
+    this.currentPage = 0;
+    this.loadItems();
+  }
+
   private loadItems(): void {
     this.loading.set(true);
     this.collectionsApi
-      .listItems(this.collectionId, { page: this.currentPage, size: this.rows })
+      .listItems(this.collectionId, { page: this.currentPage, size: this.rows }, this.myPartsOnly())
       .subscribe({
         next: (res) => {
           this.items.set(res.data ?? []);

@@ -8,6 +8,7 @@ import de.halbmann.sam.api.entity.documents.FileUploadRequest;
 import de.halbmann.sam.api.entity.shared.PaginatedResponse;
 import de.halbmann.sam.api.entity.shared.PaginationRequest;
 import de.halbmann.sam.business.collections.controller.SheetCollectionService;
+import de.halbmann.sam.security.CurrentUserService;
 import de.halbmann.sam.security.Roles;
 import io.quarkus.security.Authenticated;
 import jakarta.annotation.security.RolesAllowed;
@@ -30,9 +31,13 @@ public class CollectionItemsResourceImpl implements CollectionItemsResource {
     @Inject
     SheetCollectionService service;
 
+    @Inject
+    CurrentUserService currentUserService;
+
     @Override
-    public PaginatedResponse<CollectionItem> listAll(final PaginationRequest paginationRequest) {
-        return service.listItems(collectionId, paginationRequest);
+    public PaginatedResponse<CollectionItem> listAll(
+            final PaginationRequest paginationRequest, final boolean myPartsOnly) {
+        return service.listItems(collectionId, paginationRequest, myPartsOnly, currentUserService.getUserId());
     }
 
     @Override

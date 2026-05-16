@@ -19,6 +19,10 @@ import de.halbmann.sam.business.collections.entity.TextCollectionItemEntity;
 import de.halbmann.sam.business.documents.boundary.AttachmentRepository;
 import de.halbmann.sam.business.documents.controller.DocumentsService;
 import de.halbmann.sam.business.documents.entity.AttachmentEntity;
+import de.halbmann.sam.business.ensembles.boundary.EnsembleMembershipRepository;
+import de.halbmann.sam.business.ensembles.entity.EnsembleMembershipEntity;
+import de.halbmann.sam.business.instruments.entity.InstrumentEntity;
+import de.halbmann.sam.business.musicians.boundary.MusicianRepository;
 import de.halbmann.sam.business.sheets.boundary.SheetRepository;
 import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
 import de.halbmann.sam.core.entity.PaginatedEntities;
@@ -31,7 +35,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 @Transactional
@@ -57,6 +65,12 @@ public class SheetCollectionService {
 
     @Inject
     AttachmentRepository attachmentRepository;
+
+    @Inject
+    MusicianRepository musicianRepository;
+
+    @Inject
+    EnsembleMembershipRepository membershipRepository;
 
     public PaginatedResponse<SheetCollection> findCollections(final SheetCollectionFilterRequest filter) {
         PaginatedEntities<SheetCollectionEntity> result =
@@ -96,18 +110,49 @@ public class SheetCollectionService {
         repository.delete(entity);
     }
 
-    public PaginatedResponse<CollectionItem> listItems(final String collectionId, final PaginationRequest pagination) {
+    public PaginatedResponse<CollectionItem> listItems(
+            final String collectionId,
+            final PaginationRequest pagination,
+            final boolean myPartsOnly,
+            final String userId) {
         SheetCollectionEntity collection = repository
                 .findByIdOptional(UUID.fromString(collectionId))
                 .orElseThrow(() -> new EntityNotFoundException("SheetCollection", collectionId));
+
+        List<CollectionItemEntity> source = collection.getItems();
+
+        if (myPartsOnly && userId != null) {
+            Set<String> myInstrumentIds = resolveInstrumentIds(userId);
+            source = source.stream()
+                    .filter(item -> item instanceof SheetCollectionItemEntity sheetItem
+                            && sheetItem.getSheet() != null
+                            && sheetItem.getSheet().getInstrumentations().stream()
+                                    .anyMatch(i -> i.getInstrument() != null
+                                            && myInstrumentIds.contains(
+                                                    i.getInstrument().getId())))
+                    .toList();
+        }
+
         List<CollectionItem> items =
-                collection.getItems().stream().map(collectionItemMapper::toDto).toList();
+                source.stream().map(collectionItemMapper::toDto).toList();
         PaginatedResponse<CollectionItem> response = new PaginatedResponse<>();
         response.setData(items);
         response.setPage(0);
         response.setSize(items.size());
         response.setTotalCount((long) items.size());
         return response;
+    }
+
+    private Set<String> resolveInstrumentIds(final String userId) {
+        return musicianRepository
+                .findByUserId(userId)
+                .map(musician ->
+                        membershipRepository.list("musician = :musician", Map.of("musician", musician)).stream()
+                                .map(EnsembleMembershipEntity::getInstrument)
+                                .filter(Objects::nonNull)
+                                .map(InstrumentEntity::getId)
+                                .collect(Collectors.toSet()))
+                .orElse(Set.of());
     }
 
     public void addItem(final String collectionId, final CreateCollectionItem createCollectionItem) {

@@ -431,6 +431,8 @@
         "removeConfirm": "Angehängte Datei von diesem Textblock entfernen?",
         "removeHeader": "Anhang entfernen"
       },
+      "myPartsFilter": "Meine Stimmen",
+      "myPartsFilterTooltip": "Nur Noten anzeigen, für die ich eine Stimme habe",
       "empty": "Noch keine Einträge in dieser Sammlung",
       "preview": "Notendetails anzeigen",
       "save": "Speichern",
