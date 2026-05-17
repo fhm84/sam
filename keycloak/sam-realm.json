@@ -16,6 +16,16 @@
 
   "clients": [
     {
+      "clientId": "sam-backend",
+      "enabled": true,
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "sam-backend-secret"
+    },
+    {
       "clientId": "sam-ui",
       "enabled": true,
       "publicClient": true,
@@ -89,6 +99,14 @@
       "emailVerified": true,
       "credentials": [{ "type": "password", "value": "librarian1", "temporary": false }],
       "realmRoles": ["music_librarian"]
+    },
+    {
+      "username": "service-account-sam-backend",
+      "enabled": true,
+      "serviceAccountClientId": "sam-backend",
+      "clientRoles": {
+        "realm-management": ["view-users"]
+      }
     },
     {
       "username": "musician1",
