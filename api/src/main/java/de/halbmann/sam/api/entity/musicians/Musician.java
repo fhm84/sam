@@ -1,6 +1,8 @@
 package de.halbmann.sam.api.entity.musicians;
 
 import jakarta.validation.constraints.NotBlank;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,31 +14,35 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode
 public class Musician {
 
-    /**
-     * Unique identifier for the musician
-     */
     UUID id;
 
-    /**
-     * Full name
-     */
     @NotBlank
     String name;
 
-    /**
-     * Year of birth
-     */
     Integer birthYear;
 
-    /**
-     * Year of death
-     */
     Integer deathYear;
 
     /**
      * Interested Party Information (IPI)-Number
      */
     String ipi;
+
+    /**
+     * Instruments this musician plays (globally, independent of any ensemble membership).
+     */
+    List<MusicianInstrument> instruments = new ArrayList<>();
+
+    /**
+     * Contact details — null for historical/external musicians (composers, arrangers)
+     * who have no active system presence.
+     */
+    MusicianContact contact;
+
+    /**
+     * Ensemble membership context — null for external contributors with no membership role.
+     */
+    MusicianMembership membership;
 
     /**
      * OIDC subject claim linking this musician to an authenticated user account.

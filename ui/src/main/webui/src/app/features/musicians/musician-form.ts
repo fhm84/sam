@@ -1,47 +1,69 @@
-import { Component, DestroyRef, inject, Input, OnChanges, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, Input, OnChanges, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FloatLabel } from 'primeng/floatlabel';
 import { InputText } from 'primeng/inputtext';
 import { InputNumber } from 'primeng/inputnumber';
+import { Select } from 'primeng/select';
+import { AutoComplete, AutoCompleteCompleteEvent } from 'primeng/autocomplete';
+import { Textarea } from 'primeng/textarea';
 import { Button } from 'primeng/button';
 import { Tooltip } from 'primeng/tooltip';
-import { AutoComplete, AutoCompleteCompleteEvent } from 'primeng/autocomplete';
 import { MessageService } from 'primeng/api';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
-import { AdminUsersApiService, MusiciansApiService } from '../../core/api';
+import { AdminUsersApiService, InstrumentsApiService, MusiciansApiService } from '../../core/api';
 import { convertEmptyStringsToNull } from '../../shared/utils/object.utils';
-import { Musician, UserInfo } from '../../model/datamodels';
+import { Instrument, Musician, MusicianContact, MusicianInstrument, MusicianMembership, MusicianRole, MusicianStatus, UserInfo } from '../../model/datamodels';
 import { map, Observable } from 'rxjs';
 import { BaseForm } from '../../shared/base/base-form';
 import { AuthService } from '../../core/auth/auth.service';
 
+const STATUSES: MusicianStatus[] = ['ACTIVE', 'INACTIVE', 'INVITED', 'PENDING'];
+const ROLES: MusicianRole[] = ['MEMBER', 'GUEST', 'SUBSTITUTE', 'CONDUCTOR'];
+
 @Component({
   selector: 'app-musician-form',
-  imports: [ReactiveFormsModule, FormsModule, FloatLabel, InputText, InputNumber, Button, Tooltip, AutoComplete, TranslatePipe],
+  imports: [ReactiveFormsModule, FormsModule, FloatLabel, InputText, InputNumber, Select, AutoComplete, Textarea, Button, Tooltip, TranslatePipe],
   providers: [MessageService],
   templateUrl: './musician-form.html',
 })
 export class MusicianForm extends BaseForm<Musician, Musician> implements OnChanges {
   private readonly api = inject(MusiciansApiService);
   private readonly adminUsersApi = inject(AdminUsersApiService);
+  private readonly instrumentsApi = inject(InstrumentsApiService);
   private readonly messageService = inject(MessageService);
   private readonly destroyRef = inject(DestroyRef);
   protected readonly auth = inject(AuthService);
 
   @Input() musician: Musician | null = null;
 
+  protected readonly statusOptions = computed(() =>
+    STATUSES.map((s) => ({ label: this.t.t(`musicians.status.${s}`), value: s })),
+  );
+
+  protected readonly roleOptions = computed(() =>
+    ROLES.map((r) => ({ label: this.t.t(`musicians.role.${r}`), value: r })),
+  );
+
   readonly form = new FormGroup({
     name: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     ipi: new FormControl('', { nonNullable: true }),
     birthYear: new FormControl<number | null>(null),
     deathYear: new FormControl<number | null>(null),
+    email: new FormControl('', { nonNullable: true }),
+    mobile: new FormControl('', { nonNullable: true }),
+    notes: new FormControl('', { nonNullable: true }),
+    status: new FormControl<MusicianStatus | null>(null),
+    role: new FormControl<MusicianRole | null>(null),
+    instruments: new FormControl<MusicianInstrument[]>([], { nonNullable: true }),
   });
 
   readonly linkedUser = signal<UserInfo | null>(null);
   readonly userSuggestions = signal<UserInfo[]>([]);
   userSearchModel: UserInfo | null = null;
   readonly linking = signal(false);
+
+  readonly instrumentSuggestions = signal<Instrument[]>([]);
 
   getEntity = () => this.musician;
 
@@ -51,6 +73,12 @@ export class MusicianForm extends BaseForm<Musician, Musician> implements OnChan
       ipi: m.ipi ?? '',
       birthYear: m.birthYear ?? null,
       deathYear: m.deathYear ?? null,
+      email: m.contact?.email ?? '',
+      mobile: m.contact?.mobile ?? '',
+      notes: m.contact?.notes ?? '',
+      status: m.membership?.status ?? null,
+      role: m.membership?.role ?? null,
+      instruments: m.instruments ?? [],
     });
     this.linkedUser.set(null);
     this.userSearchModel = null;
@@ -68,7 +96,21 @@ export class MusicianForm extends BaseForm<Musician, Musician> implements OnChan
   }
 
   buildSaveRequest(): Observable<Musician> {
-    const payload = convertEmptyStringsToNull(this.form.getRawValue()) as Musician;
+    const raw = convertEmptyStringsToNull(this.form.getRawValue()) as Record<string, unknown>;
+
+    const contact: MusicianContact = { email: raw['email'] as string, mobile: raw['mobile'] as string, notes: raw['notes'] as string };
+    const membership: MusicianMembership = { status: raw['status'] as MusicianStatus, role: raw['role'] as MusicianRole };
+
+    const payload: Musician = {
+      name: raw['name'] as string,
+      ipi: raw['ipi'] as string | undefined,
+      birthYear: raw['birthYear'] as number | undefined,
+      deathYear: raw['deathYear'] as number | undefined,
+      instruments: raw['instruments'] as MusicianInstrument[],
+      contact: Object.values(contact).some((v) => v != null) ? contact : undefined,
+      membership: Object.values(membership).some((v) => v != null) ? membership : undefined,
+    };
+
     return this.isEdit
       ? this.api.update(this.musician!.id!, payload).pipe(map(() => ({ ...payload, id: this.musician!.id, userId: this.musician!.userId }) as Musician))
       : this.api.create(payload);
@@ -128,5 +170,37 @@ export class MusicianForm extends BaseForm<Musician, Musician> implements OnChan
           this.messageService.add({ severity: 'error', summary: this.t.t('musicians.form.unlinkError') });
         },
       });
+  }
+
+  onInstrumentSearch(event: AutoCompleteCompleteEvent): void {
+    if (!event.query.trim()) {
+      this.instrumentSuggestions.set([]);
+      return;
+    }
+    this.instrumentsApi.find({ name: event.query, size: 20 })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((result) => this.instrumentSuggestions.set(result.data ?? []));
+  }
+
+  onInstrumentSelect(instrument: Instrument): void {
+    const current = this.form.controls.instruments.value;
+    if (current.some((mi) => mi.instrumentId === instrument.id)) {
+      return;
+    }
+    const mi: MusicianInstrument = {
+      instrumentId: instrument.id,
+      instrumentName: instrument.name ?? instrument.displayName,
+      primary: current.length === 0,
+    };
+    this.form.controls.instruments.setValue([...current, mi]);
+  }
+
+  onInstrumentRemove(instrumentId: string): void {
+    const updated = this.form.controls.instruments.value.filter((mi) => mi.instrumentId !== instrumentId);
+    this.form.controls.instruments.setValue(updated);
+  }
+
+  instrumentLabel(mi: MusicianInstrument): string {
+    return mi.instrumentName ?? mi.instrumentId ?? '';
   }
 }

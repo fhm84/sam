@@ -60,6 +60,124 @@
     </div>
   </div>
 
+  <!-- Status / Role -->
+  <div class="flex gap-4">
+    <div class="flex-1 min-w-0">
+      <p-floatlabel variant="on" class="block">
+        <p-select
+          inputId="musician-status"
+          formControlName="status"
+          [options]="statusOptions()"
+          optionLabel="label"
+          optionValue="value"
+          [showClear]="true"
+          styleClass="w-full"
+          appendTo="body"
+        />
+        <label for="musician-status">{{ 'musicians.form.status' | translate }}</label>
+      </p-floatlabel>
+    </div>
+
+    <div class="flex-1 min-w-0">
+      <p-floatlabel variant="on" class="block">
+        <p-select
+          inputId="musician-role"
+          formControlName="role"
+          [options]="roleOptions()"
+          optionLabel="label"
+          optionValue="value"
+          [showClear]="true"
+          styleClass="w-full"
+          appendTo="body"
+        />
+        <label for="musician-role">{{ 'musicians.form.role' | translate }}</label>
+      </p-floatlabel>
+    </div>
+  </div>
+
+  <!-- Email / Mobile -->
+  <div class="flex gap-4">
+    <div class="flex-1 min-w-0">
+      <p-floatlabel variant="on" class="block">
+        <input pInputText id="musician-email" formControlName="email" class="w-full" />
+        <label for="musician-email">{{ 'musicians.form.email' | translate }}</label>
+      </p-floatlabel>
+    </div>
+
+    <div class="flex-1 min-w-0">
+      <p-floatlabel variant="on" class="block">
+        <input pInputText id="musician-mobile" formControlName="mobile" class="w-full" />
+        <label for="musician-mobile">{{ 'musicians.form.mobile' | translate }}</label>
+      </p-floatlabel>
+    </div>
+  </div>
+
+  <!-- Instruments -->
+  <div class="flex flex-col gap-1.5">
+    <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+      <p-floatlabel variant="on" class="block">
+        <p-autocomplete
+          inputId="musician-instruments"
+          [suggestions]="instrumentSuggestions()"
+          optionLabel="name"
+          [forceSelection]="true"
+          [minLength]="1"
+          styleClass="w-full"
+          inputStyleClass="w-full"
+          [placeholder]="t.t('musicians.form.instrumentsHint')"
+          (completeMethod)="onInstrumentSearch($event)"
+          (onSelect)="onInstrumentSelect($event.value)"
+        />
+        <label for="musician-instruments">{{ 'musicians.form.instruments' | translate }}</label>
+      </p-floatlabel>
+      <i
+        class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
+        [pTooltip]="t.t('musicians.form.instrumentsTooltip')"
+        tooltipPosition="right"
+      ></i>
+    </div>
+
+    @if (form.controls.instruments.value.length > 0) {
+      <div class="flex flex-wrap gap-1.5 mt-1">
+        @for (mi of form.controls.instruments.value; track mi.instrumentId) {
+          <div class="flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-[var(--p-surface-100)] dark:bg-[var(--p-surface-800)] border border-[var(--sam-border)]">
+            @if (mi.primary) {
+              <i class="pi pi-star-fill text-[0.6rem] text-[var(--p-primary-color)]"></i>
+            }
+            <span>{{ instrumentLabel(mi) }}</span>
+            <button
+              type="button"
+              class="pi pi-times text-[0.6rem] ml-0.5 text-[var(--sam-text-muted)] hover:text-[var(--sam-text-secondary)] transition-colors"
+              (click)="onInstrumentRemove(mi.instrumentId!)"
+            ></button>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Notes -->
+  <div class="flex flex-col gap-1.5">
+    <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+      <p-floatlabel variant="on" class="block">
+        <textarea
+          pTextarea
+          id="musician-notes"
+          formControlName="notes"
+          rows="3"
+          class="w-full"
+          style="resize: vertical"
+        ></textarea>
+        <label for="musician-notes">{{ 'musicians.form.notes' | translate }}</label>
+      </p-floatlabel>
+      <i
+        class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
+        [pTooltip]="t.t('musicians.form.notesTooltip')"
+        tooltipPosition="right"
+      ></i>
+    </div>
+  </div>
+
   <!-- Linked user account (admin only, edit mode only) -->
   @if (auth.isAdmin() && isEdit) {
     <div class="flex flex-col gap-2 pt-1 border-t border-[var(--p-surface-200)] dark:border-[var(--p-surface-700)]">
@@ -96,6 +214,7 @@
           styleClass="w-full"
           inputStyleClass="w-full"
           [(ngModel)]="userSearchModel"
+          [ngModelOptions]="{ standalone: true }"
           [suggestions]="userSuggestions()"
           optionLabel="username"
           [placeholder]="t.t('musicians.form.linkedUserHint')"

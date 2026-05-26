@@ -312,11 +312,36 @@ export interface VoiceOption {
     type?: VoiceOptionType;
 }
 
+export type MusicianStatus = "ACTIVE" | "INACTIVE" | "INVITED" | "PENDING";
+
+export type MusicianRole = "MEMBER" | "GUEST" | "SUBSTITUTE" | "CONDUCTOR";
+
+export interface MusicianInstrument {
+    instrumentId?: string;
+    instrumentName?: string;
+    primary?: boolean;
+}
+
+export interface MusicianContact {
+    email?: string;
+    mobile?: string;
+    notes?: string;
+}
+
+export interface MusicianMembership {
+    lastInviteSentAt?: string;
+    role?: MusicianRole;
+    status?: MusicianStatus;
+}
+
 export interface Musician {
     birthYear?: number;
+    contact?: MusicianContact;
     deathYear?: number;
     id?: string;
+    instruments?: MusicianInstrument[];
     ipi?: string;
+    membership?: MusicianMembership;
     name: string;
     userId?: string;
 }

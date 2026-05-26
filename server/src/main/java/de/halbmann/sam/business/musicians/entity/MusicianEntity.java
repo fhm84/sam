@@ -1,10 +1,12 @@
 package de.halbmann.sam.business.musicians.entity;
 
+import de.halbmann.sam.api.entity.musicians.MusicianRole;
+import de.halbmann.sam.api.entity.musicians.MusicianStatus;
 import de.halbmann.sam.business.shared.entity.AbstractEntity;
-import jakarta.persistence.Cacheable;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.envers.Audited;
@@ -20,30 +22,32 @@ import org.hibernate.envers.Audited;
 @Table(name = "musicians")
 public class MusicianEntity extends AbstractEntity {
 
-    /**
-     * Full name
-     */
     String name;
 
-    /**
-     * Year of birth
-     */
     Integer birthYear;
 
-    /**
-     * Year of death
-     */
     Integer deathYear;
 
-    /**
-     * Interested Party Information (IPI)-Nummer
-     */
     String ipi;
 
-    /**
-     * OIDC subject claim linking this musician to an authenticated user account.
-     * Null for external/historical musicians (composers, arrangers) with no system login.
-     */
+    String email;
+
+    String mobile;
+
+    @Column(columnDefinition = "text")
+    String notes;
+
+    @Enumerated(EnumType.STRING)
+    MusicianStatus status;
+
+    @Enumerated(EnumType.STRING)
+    MusicianRole role;
+
+    @OneToMany(mappedBy = "musician", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<MusicianInstrumentEntity> instruments = new ArrayList<>();
+
+    LocalDateTime lastInviteSentAt;
+
     @Column(unique = true)
     String userId;
 }

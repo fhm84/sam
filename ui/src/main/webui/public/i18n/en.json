@@ -530,6 +530,15 @@
       "ipiTooltip": "Interested Parties Information — a unique 9-digit code assigned to music rights holders. Leave empty if unknown.",
       "birthYear": "Birth Year",
       "deathYear": "Death Year",
+      "status": "Status",
+      "role": "Role",
+      "email": "Email",
+      "mobile": "Mobile",
+      "instruments": "Instruments",
+      "instrumentsHint": "Search and add instruments…",
+      "instrumentsTooltip": "Instruments this musician plays. The first added is marked as primary.",
+      "notes": "Notes",
+      "notesTooltip": "Internal notes about this musician, not shown publicly.",
       "linkedUser": "Linked user account",
       "linkedUserHint": "Search by name or email…",
       "linkedUserTooltip": "Links this musician to an authenticated user account, enabling the My Parts personalised view.",
@@ -540,6 +549,18 @@
       "unlinkSuccess": "User account unlinked",
       "linkError": "Failed to link user account",
       "unlinkError": "Failed to unlink user account"
+    },
+    "status": {
+      "ACTIVE": "Active",
+      "INACTIVE": "Inactive",
+      "INVITED": "Invited",
+      "PENDING": "Pending"
+    },
+    "role": {
+      "MEMBER": "Member",
+      "GUEST": "Guest",
+      "SUBSTITUTE": "Substitute",
+      "CONDUCTOR": "Conductor"
     },
     "delete": {
       "confirm": "Are you sure you want to delete the musician \"{name}\"?",

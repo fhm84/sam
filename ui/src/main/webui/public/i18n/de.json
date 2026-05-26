@@ -530,6 +530,15 @@
       "ipiTooltip": "Interested Parties Information — ein eindeutiger 9-stelliger Code für Musikrechteinhaber. Leer lassen, wenn unbekannt.",
       "birthYear": "Geburtsjahr",
       "deathYear": "Todesjahr",
+      "status": "Status",
+      "role": "Rolle",
+      "email": "E-Mail",
+      "mobile": "Mobilnummer",
+      "instruments": "Instrumente",
+      "instrumentsHint": "Instrumente suchen und hinzufügen…",
+      "instrumentsTooltip": "Instrumente, die dieser Musiker spielt. Das zuerst hinzugefügte wird als Hauptinstrument markiert.",
+      "notes": "Notizen",
+      "notesTooltip": "Interne Notizen zu diesem Musiker, nicht öffentlich sichtbar.",
       "linkedUser": "Verknüpftes Benutzerkonto",
       "linkedUserHint": "Nach Name oder E-Mail suchen…",
       "linkedUserTooltip": "Verknüpft diesen Musiker mit einem authentifizierten Benutzerkonto und ermöglicht die personalisierte Meine Stimmen-Ansicht.",
@@ -540,6 +549,18 @@
       "unlinkSuccess": "Verknüpfung aufgehoben",
       "linkError": "Verknüpfung fehlgeschlagen",
       "unlinkError": "Aufheben der Verknüpfung fehlgeschlagen"
+    },
+    "status": {
+      "ACTIVE": "Aktiv",
+      "INACTIVE": "Inaktiv",
+      "INVITED": "Eingeladen",
+      "PENDING": "Ausstehend"
+    },
+    "role": {
+      "MEMBER": "Mitglied",
+      "GUEST": "Gast",
+      "SUBSTITUTE": "Aushilfe",
+      "CONDUCTOR": "Dirigent"
     },
     "delete": {
       "confirm": "Möchten Sie den Musiker \"{name}\" wirklich löschen?",
