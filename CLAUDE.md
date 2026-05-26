@@ -31,7 +31,9 @@ SAM (Sheet music Archiving & Management) is a Quarkus-based application for arch
 ./mvnw spotless:check
 
 # Generate TypeScript types from API entities (opt-in via profile; skipped in normal builds)
-./mvnw generate-sources -pl api -Pgenerate-ts
+# Profile lives in ui/pom.xml — must be run against the ui module, not api
+./mvnw generate-sources -pl ui -am -Pgenerate-ts
+# Or use the /sync-datamodels skill which runs this and shows the diff
 
 # Build native executable
 ./mvnw package -Dnative

@@ -45,7 +45,8 @@ nb-configuration.xml
 .certs/
 
 .qodo
-.claude/
+.claude/plans/
+.claude/settings.local.json
 /server/uploads/
 /migration/src/migration-data/
 /.playwright-mcp/
