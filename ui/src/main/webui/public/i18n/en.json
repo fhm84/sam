@@ -719,6 +719,17 @@
       "transposition": "Transposition",
       "transpositionTooltip": "The concert-pitch key this instrument sounds in. E.g. a Bb instrument sounds a major 2nd lower than written.",
       "transpositionPlaceholder": "Select transposition",
+      "family": "Family",
+      "familyTooltip": "The instrument family this instrument belongs to.",
+      "defaultClef": "Default Clef",
+      "defaultClefTooltip": "The clef this instrument typically uses when reading sheet music.",
+      "aliases": "OCR Aliases",
+      "aliasesTooltip": "Alternative names used to match this instrument during document import, e.g. 'Flh.', 'Flügelhorn'.",
+      "catalogSection": "Catalog Section",
+      "catalogSectionTooltip": "The section this instrument appears in, e.g. 'Brass · High'.",
+      "catalogPosition": "Position",
+      "catalogPositionTooltip": "Numeric ordering position within the catalog section.",
+      "catalogOrderHeader": "Catalog Order",
       "save": "Save",
       "cancel": "Cancel"
     },
@@ -744,6 +755,15 @@
       "ALTO": "Alto",
       "TENOR": "Tenor",
       "BASS": "Bass"
+    },
+    "family": {
+      "BRASS": "Brass",
+      "WOODWIND": "Woodwind",
+      "STRING": "String",
+      "PERCUSSION": "Percussion",
+      "KEYBOARD": "Keyboard",
+      "VOICE": "Voice",
+      "OTHER": "Other"
     },
     "notationType": {
       "STANDARD": "Standard",

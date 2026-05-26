@@ -263,7 +263,12 @@ export interface EventLogFilterRequest extends PaginationRequest {
 }
 
 export interface CreateInstrument {
+    aliases?: string[];
+    catalogPosition?: number;
+    catalogSection?: string;
+    defaultClef?: Clef;
     displayName?: string;
+    family?: InstrumentFamily;
     id: string;
     name: string;
     transposition?: InstrumentTransposing;
@@ -276,7 +281,12 @@ export interface CreateVoiceOption {
 }
 
 export interface Instrument {
+    aliases?: string[];
+    catalogPosition?: number;
+    catalogSection?: string;
+    defaultClef?: Clef;
     displayName?: string;
+    family?: InstrumentFamily;
     id?: string;
     name: string;
     transposition?: InstrumentTransposing;
@@ -535,6 +545,8 @@ export type CoverageStatus = "COMPLETE" | "PLAYABLE" | "INCOMPLETE";
 export type EventType = "DOCUMENT_DOWNLOAD" | "DOCUMENT_BATCH_DOWNLOAD" | "SHEET_EXPORT" | "COLLECTION_EXPORT" | "COLLECTION_TOC_GENERATED" | "GEMA_SETLIST_GENERATED" | "DOCUMENT_CLASSIFIED" | "DOCUMENT_CLASSIFICATION_APPLIED" | "SHARE_CREATED" | "SHARE_ACCESSED" | "SHARE_REVOKED";
 
 export type Clef = "TREBLE" | "ALTO" | "TENOR" | "BASS";
+
+export type InstrumentFamily = "BRASS" | "WOODWIND" | "STRING" | "PERCUSSION" | "KEYBOARD" | "VOICE" | "OTHER";
 
 export type InstrumentTransposing = "C" | "D" | "Eb" | "F" | "G" | "A" | "Ab" | "Bb";
 

@@ -719,6 +719,17 @@
       "transposition": "Transposition",
       "transpositionTooltip": "Die klingende Tonart dieses Instruments. Z.B. klingt ein B-Instrument eine große Sekunde tiefer als notiert.",
       "transpositionPlaceholder": "Transposition auswählen",
+      "family": "Instrumentenfamilie",
+      "familyTooltip": "Die Instrumentenfamilie, zu der dieses Instrument gehört.",
+      "defaultClef": "Standard-Notenschlüssel",
+      "defaultClefTooltip": "Der Notenschlüssel, den dieses Instrument üblicherweise verwendet.",
+      "aliases": "OCR-Aliasse",
+      "aliasesTooltip": "Alternative Bezeichnungen für den Abgleich beim Dokumentenimport, z.B. 'Flh.', 'Flügelhorn'.",
+      "catalogSection": "Katalogbereich",
+      "catalogSectionTooltip": "Der Bereich, in dem dieses Instrument erscheint, z.B. 'Blechblasinstrumente · Hoch'.",
+      "catalogPosition": "Position",
+      "catalogPositionTooltip": "Numerische Reihenfolge innerhalb des Katalogbereichs.",
+      "catalogOrderHeader": "Katalogreihenfolge",
       "save": "Speichern",
       "cancel": "Abbrechen"
     },
@@ -744,6 +755,15 @@
       "ALTO": "Altschlüssel",
       "TENOR": "Tenorschlüssel",
       "BASS": "Bassschlüssel"
+    },
+    "family": {
+      "BRASS": "Blechblasinstrumente",
+      "WOODWIND": "Holzblasinstrumente",
+      "STRING": "Streichinstrumente",
+      "PERCUSSION": "Schlagzeug",
+      "KEYBOARD": "Tasteninstrumente",
+      "VOICE": "Gesang",
+      "OTHER": "Sonstige"
     },
     "notationType": {
       "STANDARD": "Standard",

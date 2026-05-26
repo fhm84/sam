@@ -186,6 +186,33 @@ between a collection/setlist and a sheet), which already exists.
 
 ## 3. Musician-Facing
 
+### Musician profile enrichment — `planned`
+
+Add missing fields to the `Musician` entity surfaced in the Claude Design mockup
+(`Create Flows (PrimeNG).html`). Full details in `memory/plan_musician_fields.md`.
+
+Fields to add:
+- **email** and **mobile** — contact details for self-service folder access and
+  part distribution
+- **notes** — free-text textarea, admin-visible only (allergies, vacation patterns,
+  instrument quirks)
+- **status** — enum (`ACTIVE` / `INACTIVE` / `INVITED` / `PENDING`); drives the
+  "Active member" toggle in the UI
+- **lastInviteSentAt** — timestamp tracking whether an invite email was sent for
+  self-service onboarding
+- **role** — enum (`MEMBER` / `GUEST` / `SUBSTITUTE` / `CONDUCTOR`); general role
+  independent of per-ensemble `conductor` flag on `EnsembleMembership`
+- **global instruments** — new `musician_instruments` junction table linking musicians
+  to the instruments they *can play*, with an `isPrimary` flag; distinct from the
+  per-ensemble `EnsembleMembership.instrumentId`
+
+**Decision:** `name` field stays as a single full-name string — no first/last split.
+
+**Stakeholders:** S1 (music librarian), S3 (Musiker)
+**Effort:** Medium
+
+---
+
 ### Musician–instrument assignment within ensemble — `done`
 
 Link a `Musician` entity to an ensemble, optionally specifying which voice and instrument
@@ -247,6 +274,34 @@ Output: a simple printed checklist or PDF.
 ---
 
 ## 4. Statistics & Reporting
+
+### Home dashboard — `planned`
+
+A home page replacing the current empty landing screen. Two tabs, derived from the
+Claude Design `Hi-Fi Shell (PrimeNG).html`. Full details in `memory/plan_home_dashboard.md`.
+
+**Inbox tab:**
+- KPI row: to-classify count, instrumentations missing archive location, stale coverage
+  ensembles (≥7 days), new sheets this week
+- Activity feed (recent event log entries with display labels)
+- Right rail: quick-upload widget, "1 voice from playable" gap card, next concert card
+  (requires new `venue` field on `SheetCollection`)
+
+**Ensemble dashboard tab:**
+- Coverage KPI row (complete / playable / incomplete counts + total repertoire)
+- Most-missing voices card (gap report across full repertoire)
+- One-voice-away card (sheets within N% of PLAYABLE threshold)
+
+**New data model fields required:**
+- `venue` (String) on `SheetCollection`
+- `MEMBER_JOINED` / `MEMBER_LEFT` added to `EventType` enum
+- Coverage staleness threshold config (`sam.coverage.stale-threshold-days`)
+
+**Stakeholders:** S1 (music librarian), S2 (Dirigent), S4 (Administrator)
+**Effort:** High
+**Depends on:** Coverage snapshots, event log, ensemble memberships
+
+---
 
 ### Archive dashboard — `idea`
 
@@ -344,6 +399,27 @@ Tokens are resource-scoped (one token = one resource), not broad API keys.
 
 ---
 
+### Collection visibility & cover — `planned`
+
+Add two missing fields to `SheetCollection` surfaced in the Claude Design mockup
+(`Create Flows (PrimeNG).html`). Full details in `memory/plan_collection_fields.md`.
+
+- **visibility** — enum (`WHOLE_ENSEMBLE` / `ADMINS_ONLY` / `PRIVATE`); controls
+  who can see the collection. The design shows a "Whole ensemble" dropdown in the
+  create dialog. Will interact with `CurrentUserService.getAccessibleEnsembleIds()`.
+- **coverColor** — string (hex or named swatch); displayed as an initial-based
+  gradient tile in the collection list.
+- **coverImageId** — nullable UUID reference to an uploaded document/attachment;
+  overrides the color swatch when set.
+
+**Decision:** `CollectionType` enum stays as-is (`FOLDER` / `SETLIST`). The UI maps
+design labels: Concert → `SETLIST`; Season / Rehearsal / Custom → `FOLDER`.
+
+**Stakeholders:** S1 (music librarian), S2 (Dirigent)
+**Effort:** Low–Medium
+
+---
+
 ### Watermarking on shared / downloaded documents — `idea`
 
 When a document is downloaded via a shared link or a guest-accessible URL, optionally
@@ -379,6 +455,80 @@ Can be implemented as an extension of the checkout/lending feature (Section 1) w
 
 ---
 
+### Coverage breakdown enhancements — `planned`
+
+Extend the coverage engine to match the `Coverage Breakdown (PrimeNG).html` design.
+Full details in `memory/plan_coverage_breakdown.md`.
+
+- **Condition/substitute annotations** — surface `conditionPenalty` and
+  `substituteFactor` as named fields on `VoiceCoverageDetail` (values already computed)
+- **Multi-ensemble context view** — `GET /sheets/{id}/coverage` returns snapshots for
+  all ensembles at once, enabling side-by-side comparison
+- **Ensemble gap report** — `GET /ensembles/{id}/gaps` with per-voice missing count
+  across the full repertoire; shared with home dashboard "most-missing voices" widget
+- **Recommendation solver** — which 1–2 voices, if added, would move the most sheets
+  from INCOMPLETE → PLAYABLE
+
+**Stakeholders:** S2 (Dirigent), S1 (music librarian)
+**Effort:** Medium
+
+---
+
+### Classification queue — `planned`
+
+A batch inbox for working through a queue of unclassified documents. Shown in the
+Claude Design `Classify (PrimeNG).html`. Full details in `memory/plan_classify_queue.md`.
+
+The queue sits on top of the existing 2-step classify/apply workflow and adds:
+- Inbox tabs: Pending / Skipped / Done
+- Per-item confidence ordering and status tracking
+- Progress bar with estimated time
+- Pause/resume batch control
+- Three layout modes: Split (rail + viewer + form), Stack (card-flip), Chat (agent)
+
+Five open design questions must be resolved before implementation begins (see the
+plan file). This is a large standalone feature.
+
+**Stakeholders:** S1 (music librarian)
+**Effort:** High
+**Depends on:** Classification enhancements (see below)
+
+---
+
+### Classification form enhancements — `planned`
+
+Enrich the existing 2-step classify/apply workflow with richer AI output and a more
+complete apply request. Full details in `memory/plan_classify_enhancements.md`.
+
+- **Tags + notes** in `ClassificationApplyRequest` — both shown in the form but absent from the DTO
+- **Document type** (Part / Score / Solo) returned by AI analysis
+- **Field-level confidence scores** — per-field (title, composer, instrument, etc.)
+- **Multiple ranked alternatives** for sheet match and instrument match
+- **Sanity check validation** — pre-apply warnings (duplicate instrumentation, missing
+  archive location, instrument mismatch)
+- **Re-analyse endpoint** — re-run AI on an already-classified document
+
+**Stakeholders:** S1 (music librarian)
+**Effort:** Medium
+**Depends on:** None (extends existing classification)
+
+---
+
+### Sheet create wizard — `planned`
+
+Three fields shown in the `Create Flows (PrimeNG).html` create wizard are missing from
+the data model. Full details in `memory/plan_create_sheet.md`.
+
+- **Pages per part** — free-text string (e.g. "1–2", "6") on `Instrumentation`
+- **Source** — free-text string on `SheetMusic` (where the piece came from)
+- **Collection link at create time** — `collectionId` on `CreateSheetMusic` to assign
+  the sheet to a collection in one step
+
+**Stakeholders:** S1 (music librarian)
+**Effort:** Low
+
+---
+
 ### Automatic coverage snapshot invalidation — `planned`
 
 Currently, coverage snapshots must be manually recomputed after changes. Implement
@@ -390,6 +540,62 @@ Phase 3).
 
 **Stakeholders:** S2 (Dirigent), S4 (Administrator)
 **Effort:** Medium
+
+---
+
+### Sheet metadata enrichment — `planned`
+
+Add missing fields to `SheetMusicEntity` and related entities surfaced in the Claude
+Design mockup (`Sheet Detail (PrimeNG).html` / `Sheet Detail v2 (PrimeNG).html`).
+Full details in `memory/plan_sheet_detail_fields.md`.
+
+**Sheet-level fields:**
+- **tempo** (Integer, bpm) — "♩= 116 bpm" shown in Base Data card
+- **tonality** — fixed enum of all major/minor keys (e.g. Bb major, F minor)
+- **rightsStatus** — enum (`PUBLIC_DOMAIN` / `LICENSED` / `RESTRICTED` / `UNKNOWN`)
+- **gemaPflichtig** — 3-state enum (`YES` / `NO` / `UNKNOWN`)
+- **arrangementPublisher** + **arrangementRightsUntil** — simple fields for
+  "Musikverlag Tirol · until 2080"-style arranger rights; no separate entity
+
+**Attachment-level fields:**
+- **AttachmentKind** — new enum (`CLEAN` / `MARKED_UP` / `PHOTOCOPY` / `FACSIMILE` /
+  `SCORE`) as a separate field alongside the existing `AttachmentType`
+- **version** (Integer) + **replacedById** (self-referencing FK) — for v1/v2/v3
+  file lineage tracking
+
+**Collection:**
+- **ensemble FK on SheetCollection** — explicit link to which ensemble a setlist
+  belongs to (currently implied; the "Used in setlists" panel shows the ensemble name)
+
+**Deferred:** Duplicate / Merge / Split sheet operations (More menu in v2).
+
+**Stakeholders:** S1 (music librarian), S2 (Dirigent), S4 (Administrator)
+**Effort:** Medium
+
+---
+
+### Instrument catalogue enrichment — `planned`
+
+Add missing fields to the `Instrument` entity surfaced in the Claude Design mockup
+(`Create Flows (PrimeNG).html`). Full details in `memory/plan_instrument_fields.md`.
+
+Fields to add:
+- **family** — fixed enum (`BRASS` / `WOODWIND` / `STRING` / `PERCUSSION` /
+  `KEYBOARD` / `VOICE` / `OTHER`). The `family` field was already anticipated
+  (commented-out stub in `Instrument.java` / `CreateInstrument.java`) but never
+  implemented.
+- **defaultClef** — reuses the existing `Clef` enum (`TREBLE` / `ALTO` / `TENOR` /
+  `BASS`), added at the instrument level (currently only used at the instrumentation
+  level).
+- **OCR aliases** — a one-to-many `instrument_aliases` table; multi-value token
+  field in the UI (e.g. "Flügelhorn", "Flh.", "Flugelhorn"). Used by the AI
+  classification pipeline to match imported documents to instruments.
+- **catalogSection** and **catalogPosition** — string + integer fields that drive
+  the "Brass · High / #7" ordering shown in part lists and ensemble setups.
+
+**Stakeholders:** S1 (music librarian)
+**Effort:** Low–Medium
+**Depends on:** Instrument catalogue enrichment unlocks better OCR import matching
 
 ---
 
@@ -559,6 +765,32 @@ Once named user accounts exist, this log constitutes personal data:
 
 ## 7. UX & Discovery
 
+### Sheets overview filter & bulk actions — `planned`
+
+Extend the sheet list API and Angular UI to match the filter toolbar and bulk actions
+shown in the Claude Design `Sheets Overview (PrimeNG).html`. Full details in
+`memory/plan_sheets_overview.md`.
+
+**Missing filter dimensions** (to add to `SheetFilterRequest`):
+- Coverage status filter (COMPLETE / PLAYABLE / INCOMPLETE, per ensemble)
+- Difficulty level filter (multi-select)
+- Duration range filter (min/max)
+- Tags filter (multi-select, AND or OR)
+- "Has issues" flag (sheets with DAMAGED/LOST parts or INCOMPLETE coverage)
+
+**Missing sort:**
+- Composer sort (not currently in `ALLOWED_SORT_FIELDS`)
+
+**Missing bulk actions** (new endpoints):
+- Bulk add to setlist (`POST /collections/{id}/items/bulk`)
+- Bulk archive (`POST /sheets/bulk-archive`)
+- Bulk export (`POST /sheets/bulk-export`)
+
+**Stakeholders:** S1 (music librarian), S2 (Dirigent)
+**Effort:** Medium
+
+---
+
 ### Advanced combined search — `idea`
 
 A filter builder that combines multiple dimensions in a single query. Currently filters
@@ -653,3 +885,4 @@ answered before the relevant implementation work begins.
 | 7 | Which OIDC provider? Self-hosted (Keycloak) or SaaS (Auth0, Google)? | Auth implementation | **Resolved:** Self-hosted Keycloak 26. |
 | 8 | Should IP addresses be stored in the document access log, or omitted/anonymised? Requires GDPR/privacy policy decision. | Document access log | **Resolved: not stored.** `userId` (OIDC sub) + snapshotted `username` give unambiguous attribution; IP adds GDPR obligations without meaningful benefit in an ensemble context. |
 | 9 | What retention period for the document access log? (e.g. 12 months) | Document access log | Open |
+| 10 | All Claude Design files have now been reviewed for data model gaps. Resulting plans saved to `memory/plan_*.md` and added to the roadmap. | Multiple | **Resolved** |

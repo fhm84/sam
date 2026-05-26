@@ -2,6 +2,8 @@ package de.halbmann.sam.api.entity.instruments;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -26,8 +28,17 @@ public class CreateInstrument {
     String name;
 
     String displayName; // "Tenorhorn in B"
-    // InstrumentFamily family;    // BRASS
-    // InstrumentRole role;        // MIDDLE
+
+    InstrumentFamily family;
+
+    Clef defaultClef;
+
+    List<String> aliases = new ArrayList<>();
+
+    String catalogSection; // e.g. "Brass · High"
+
+    Integer catalogPosition; // ordering within the section
+
     /**
      * Specific key signature for this instrument (e.g., Bb Major, C Major)
      */

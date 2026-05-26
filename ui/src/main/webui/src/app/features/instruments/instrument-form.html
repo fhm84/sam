@@ -45,6 +45,54 @@
     </div>
   </div>
 
+  <!-- Family -->
+  <div class="flex flex-col gap-1.5">
+    <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+      <p-floatlabel variant="on" class="block">
+        <p-select
+          inputId="instrument-family"
+          formControlName="family"
+          [options]="familyOptions()"
+          optionLabel="label"
+          optionValue="value"
+          [showClear]="true"
+          styleClass="w-full"
+          appendTo="body"
+        />
+        <label for="instrument-family">{{ 'instruments.form.family' | translate }}</label>
+      </p-floatlabel>
+      <i
+        class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
+        [pTooltip]="t.t('instruments.form.familyTooltip')"
+        tooltipPosition="right"
+      ></i>
+    </div>
+  </div>
+
+  <!-- Default Clef -->
+  <div class="flex flex-col gap-1.5">
+    <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+      <p-floatlabel variant="on" class="block">
+        <p-select
+          inputId="instrument-defaultClef"
+          formControlName="defaultClef"
+          [options]="clefOptions()"
+          optionLabel="label"
+          optionValue="value"
+          [showClear]="true"
+          styleClass="w-full"
+          appendTo="body"
+        />
+        <label for="instrument-defaultClef">{{ 'instruments.form.defaultClef' | translate }}</label>
+      </p-floatlabel>
+      <i
+        class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
+        [pTooltip]="t.t('instruments.form.defaultClefTooltip')"
+        tooltipPosition="right"
+      ></i>
+    </div>
+  </div>
+
   <!-- Transposition -->
   <div class="flex flex-col gap-1.5">
     <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
@@ -62,6 +110,70 @@
       <i
         class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
         [pTooltip]="t.t('instruments.form.transpositionTooltip')"
+        tooltipPosition="right"
+      ></i>
+    </div>
+  </div>
+
+  <!-- OCR Aliases -->
+  <div class="flex flex-col gap-1.5">
+    <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+      <p-floatlabel variant="on" class="block">
+        <p-autocomplete
+          inputId="instrument-aliases"
+          formControlName="aliases"
+          [multiple]="true"
+          [typeahead]="false"
+          [addOnBlur]="true"
+          [addOnTab]="true"
+          separator=","
+          styleClass="w-full"
+          inputStyleClass="w-full"
+        />
+        <label for="instrument-aliases">{{ 'instruments.form.aliases' | translate }}</label>
+      </p-floatlabel>
+      <i
+        class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
+        [pTooltip]="t.t('instruments.form.aliasesTooltip')"
+        tooltipPosition="right"
+      ></i>
+    </div>
+  </div>
+
+  <!-- Catalog Order -->
+  <div class="text-[0.6875rem] font-semibold tracking-[0.07em] uppercase text-[var(--sam-text-muted)] pt-2 border-t border-[var(--sam-border)]">
+    {{ 'instruments.form.catalogOrderHeader' | translate }}
+  </div>
+
+  <div class="grid grid-cols-[1fr_auto] gap-3 items-start">
+    <!-- Catalog Section -->
+    <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+      <p-floatlabel variant="on" class="block">
+        <input pInputText id="instrument-catalogSection" formControlName="catalogSection" class="w-full" />
+        <label for="instrument-catalogSection">{{ 'instruments.form.catalogSection' | translate }}</label>
+      </p-floatlabel>
+      <i
+        class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
+        [pTooltip]="t.t('instruments.form.catalogSectionTooltip')"
+        tooltipPosition="right"
+      ></i>
+    </div>
+
+    <!-- Catalog Position -->
+    <div class="grid items-center gap-2 [grid-template-columns:6rem_2rem]">
+      <p-floatlabel variant="on" class="block">
+        <p-inputnumber
+          inputId="instrument-catalogPosition"
+          formControlName="catalogPosition"
+          [min]="1"
+          [showButtons]="false"
+          styleClass="w-full"
+        />
+        <label for="instrument-catalogPosition">{{ 'instruments.form.catalogPosition' | translate }}</label>
+      </p-floatlabel>
+      <i
+        class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
+        [pTooltip]="t.t('instruments.form.catalogPositionTooltip')"
         tooltipPosition="right"
       ></i>
     </div>
