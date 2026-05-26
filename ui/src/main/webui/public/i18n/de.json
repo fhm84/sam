@@ -346,11 +346,20 @@
       "description": "Beschreibung",
       "type": "Typ",
       "typePlaceholder": "Typ auswählen",
-      "date": "Datum"
+      "date": "Datum",
+      "visibility": "Sichtbarkeit",
+      "visibilityTooltip": "Legt fest, wer diese Sammlung sehen kann.",
+      "coverColor": "Deckfarbe",
+      "coverColorClear": "Farbe entfernen"
     },
     "types": {
       "FOLDER": "Ordner",
       "SETLIST": "Setliste"
+    },
+    "visibility": {
+      "WHOLE_ENSEMBLE": "Ganzes Ensemble",
+      "ADMINS_ONLY": "Nur Admins",
+      "PRIVATE": "Privat"
     },
     "delete": {
       "confirm": "Möchten Sie die Sammlung \"{name}\" wirklich löschen?",

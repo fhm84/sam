@@ -20,6 +20,7 @@
     </p-floatlabel>
   </div>
 
+  <!-- Type + Date -->
   <div class="flex gap-4">
     <div class="flex flex-col gap-1.5 flex-1">
       <p-floatlabel variant="on" class="block">
@@ -52,6 +53,59 @@
         </p-floatlabel>
       </div>
     }
+  </div>
+
+  <!-- Visibility -->
+  <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+    <p-floatlabel variant="on" class="block">
+      <p-select
+        inputId="collection-visibility"
+        formControlName="visibility"
+        [options]="visibilityOptions()"
+        optionLabel="label"
+        optionValue="value"
+        [showClear]="true"
+        styleClass="w-full"
+        appendTo="body"
+      />
+      <label for="collection-visibility">{{ 'collections.form.visibility' | translate }}</label>
+    </p-floatlabel>
+    <i
+      class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
+      [pTooltip]="t.t('collections.form.visibilityTooltip')"
+      tooltipPosition="right"
+    ></i>
+  </div>
+
+  <!-- Cover color swatches -->
+  <div class="flex flex-col gap-2">
+    <span class="text-xs font-semibold tracking-[0.07em] uppercase text-[var(--sam-text-muted)]">
+      {{ 'collections.form.coverColor' | translate }}
+    </span>
+    <div class="flex items-center gap-2 flex-wrap">
+      @for (color of coverColors; track color) {
+        <button
+          type="button"
+          class="w-7 h-7 rounded-full border-2 transition-all focus:outline-none"
+          [style.background-color]="color"
+          [class.border-[var(--p-primary-color)]]="form.controls.coverColor.value === color"
+          [class.scale-110]="form.controls.coverColor.value === color"
+          [class.border-transparent]="form.controls.coverColor.value !== color"
+          [pTooltip]="color"
+          tooltipPosition="top"
+          (click)="selectCoverColor(color)"
+        ></button>
+      }
+      @if (form.controls.coverColor.value) {
+        <button
+          type="button"
+          class="text-xs text-[var(--sam-text-muted)] hover:text-[var(--sam-text-secondary)] transition-colors ml-1"
+          (click)="form.controls.coverColor.setValue(null)"
+        >
+          {{ 'collections.form.coverColorClear' | translate }}
+        </button>
+      }
+    </div>
   </div>
 
   <div class="flex justify-end gap-2 pt-2">

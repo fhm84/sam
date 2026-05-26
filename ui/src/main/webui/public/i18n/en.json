@@ -346,11 +346,20 @@
       "description": "Description",
       "type": "Type",
       "typePlaceholder": "Select type",
-      "date": "Date"
+      "date": "Date",
+      "visibility": "Visibility",
+      "visibilityTooltip": "Controls who can see this collection.",
+      "coverColor": "Cover Color",
+      "coverColorClear": "Clear color"
     },
     "types": {
       "FOLDER": "Folder",
       "SETLIST": "Setlist"
+    },
+    "visibility": {
+      "WHOLE_ENSEMBLE": "Whole Ensemble",
+      "ADMINS_ONLY": "Admins Only",
+      "PRIVATE": "Private"
     },
     "delete": {
       "confirm": "Are you sure you want to delete the collection \"{name}\"?",

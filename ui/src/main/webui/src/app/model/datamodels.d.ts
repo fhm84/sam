@@ -99,13 +99,18 @@ export interface CreateCollectionSheet {
     sheetId: string;
 }
 
+export type CollectionVisibility = "WHOLE_ENSEMBLE" | "ADMINS_ONLY" | "PRIVATE";
+
 export interface SheetCollection {
+    coverColor?: string;
+    coverImageId?: string;
     date?: Date;
     description?: string;
     id?: string;
     items?: CollectionItem[];
     name: string;
     type?: CollectionType;
+    visibility?: CollectionVisibility;
 }
 
 export interface SheetCollectionFilterRequest extends PaginationRequest {
