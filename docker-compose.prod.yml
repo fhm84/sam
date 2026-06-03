@@ -1,0 +1,59 @@
+services:
+
+  # nginx reverse proxy: serves Angular SPA and proxies /api/* + /oidc-config.json to sam-server
+  sam-ui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: de.halbmann/sam-ui:latest
+    ports:
+      - "80:80"
+    depends_on:
+      - sam-server
+    restart: unless-stopped
+
+  # Quarkus backend: REST API + OIDC config endpoint
+  sam-server:
+    image: de.halbmann/sam:latest
+    environment:
+      # Database
+      DB_URL: jdbc:postgresql://database:5432/sam_music
+      DB_USER: ${DB_USER:-sam}
+      DB_PASS: ${DB_PASS:?DB_PASS is required}
+      # OIDC / Keycloak (token validation + oidc-config.json endpoint)
+      OIDC_SERVER_URL: ${OIDC_SERVER_URL:?OIDC_SERVER_URL is required}
+      OIDC_CLIENT_ID: ${OIDC_CLIENT_ID:-sam-ui}
+      # Keycloak admin client (used for user search in musician linking)
+      KEYCLOAK_ADMIN_URL: ${KEYCLOAK_ADMIN_URL:?KEYCLOAK_ADMIN_URL is required}
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM:-sam}
+      KEYCLOAK_BACKEND_CLIENT_ID: ${KEYCLOAK_BACKEND_CLIENT_ID:-sam-backend}
+      KEYCLOAK_BACKEND_CLIENT_SECRET: ${KEYCLOAK_BACKEND_CLIENT_SECRET:?KEYCLOAK_BACKEND_CLIENT_SECRET is required}
+      # AI — OpenAI for document classification
+      QUARKUS_LANGCHAIN4J_OPENAI_API_KEY: ${OPENAI_API_KEY:?OPENAI_API_KEY is required}
+      # Storage: local filesystem path inside the container
+      SAM_FILESYSTEM_BASE_PATH: /data/sam
+    volumes:
+      - sam-data:/data/sam
+    depends_on:
+      database:
+        condition: service_healthy
+    restart: unless-stopped
+
+  database:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: ${DB_USER:-sam}
+      POSTGRES_PASSWORD: ${DB_PASS:?DB_PASS is required}
+      POSTGRES_DB: sam_music
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-sam} -d sam_music"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
+  sam-data:

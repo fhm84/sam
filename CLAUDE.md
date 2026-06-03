@@ -38,6 +38,22 @@ SAM (Sheet music Archiving & Management) is a Quarkus-based application for arch
 # Build native executable
 ./mvnw package -Dnative
 
+# ── Docker images ────────────────────────────────────────────────────────────
+# Backend image (Jib — output: de.halbmann/sam:latest)
+./mvnw package -Dquarkus.container-image.build=true -pl server -am
+
+# Push to a registry (append registry/group overrides as needed)
+./mvnw package -Dquarkus.container-image.build=true -Dquarkus.container-image.push=true \
+  -Dquarkus.container-image.registry=ghcr.io \
+  -Dquarkus.container-image.group=your-org \
+  -pl server -am
+
+# Frontend image (multi-stage Dockerfile — output: de.halbmann/sam-ui:latest)
+docker build -t de.halbmann/sam-ui:latest .
+
+# Start full production stack (copy .env.example → .env, fill in secrets first)
+docker compose -f docker-compose.prod.yml up
+
 # Scan dependencies for CVEs (OWASP Dependency-Check; first run downloads NVD DB ~200MB)
 ./mvnw verify -Pdependency-check
 # With NVD API key for faster DB updates (free key at https://nvd.nist.gov/developers/request-an-api-key)
@@ -75,7 +91,7 @@ Six Maven modules under parent `de.halbmann:sam`:
 
 - **OIDC provider**: Keycloak 26 (`docker-compose.keycloak.yml`). Realm export at `keycloak/sam-realm.json`.
 - **Dev Keycloak**: `docker compose -f docker-compose.keycloak.yml up` — runs on port 8180, auto-imports realm.
-- **Angular OIDC config**: `ui/src/main/webui/public/oidc-config.json` — loaded at runtime by the Angular app (not baked into the build). Committed with dev defaults (`localhost:8180`). Override this file per deployment (CI, Docker, etc.) without rebuilding. Fields: `issuerUrl`, `clientId`.
+- **Angular OIDC config**: The Angular app fetches `/oidc-config.json` at startup. In **dev**, the static file `ui/src/main/webui/public/oidc-config.json` is served (committed with `localhost:8180` defaults). In **production**, `OidcConfigResource` (`server/.../OidcConfigResource.java`) — a `@PermitAll` JAX-RS endpoint at that same path — takes precedence and returns `{issuerUrl, clientId}` read from `quarkus.oidc.auth-server-url` / `quarkus.oidc.client-id`, which are set via `OIDC_SERVER_URL` and `OIDC_CLIENT_ID` env vars. No image rebuild needed to change the Keycloak URL.
 - **Realm roles**: `admin`, `music_librarian`. Groups use `ensemble:{UUID}` naming for per-ensemble access.
 - **Auth enforcement**: `@Authenticated` at class level on all `*ResourceImpl` classes (all endpoints require a token). Write methods additionally carry `@RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})`. Role constants are in `server/src/main/java/de/halbmann/sam/security/Roles.java`.
 - **Do NOT put `@RolesAllowed` on the `api` module interfaces** — they are also used as REST clients by the `cli` module.
