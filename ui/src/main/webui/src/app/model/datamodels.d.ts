@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 4.0.0 on 2026-05-09 16:24:46.
+// Generated using typescript-generator version 4.0.0 on 2026-06-03 22:47:58.
 
 export interface SheetEnrichment {
     suggestedAdditionalNotes?: string;
@@ -8,6 +8,15 @@ export interface SheetEnrichment {
     suggestedStyle?: Style;
     suggestedTags?: string[];
     suggestedYearOfComposition?: number;
+}
+
+export interface UserInfo {
+    displayLabel?: string;
+    email?: string;
+    firstName?: string;
+    id: string;
+    lastName?: string;
+    username: string;
 }
 
 export interface ClassificationApplyRequest {
@@ -98,8 +107,6 @@ export interface CreateCollectionSheet {
     identifier: string;
     sheetId: string;
 }
-
-export type CollectionVisibility = "WHOLE_ENSEMBLE" | "ADMINS_ONLY" | "PRIVATE";
 
 export interface SheetCollection {
     coverColor?: string;
@@ -317,28 +324,6 @@ export interface VoiceOption {
     type?: VoiceOptionType;
 }
 
-export type MusicianStatus = "ACTIVE" | "INACTIVE" | "INVITED" | "PENDING";
-
-export type MusicianRole = "MEMBER" | "GUEST" | "SUBSTITUTE" | "CONDUCTOR";
-
-export interface MusicianInstrument {
-    instrumentId?: string;
-    instrumentName?: string;
-    primary?: boolean;
-}
-
-export interface MusicianContact {
-    email?: string;
-    mobile?: string;
-    notes?: string;
-}
-
-export interface MusicianMembership {
-    lastInviteSentAt?: string;
-    role?: MusicianRole;
-    status?: MusicianStatus;
-}
-
 export interface Musician {
     birthYear?: number;
     contact?: MusicianContact;
@@ -351,22 +336,32 @@ export interface Musician {
     userId?: string;
 }
 
-export interface UserInfo {
-    id: string;
-    username: string;
+export interface MusicianContact {
     email?: string;
-    firstName?: string;
-    lastName?: string;
+    mobile?: string;
+    notes?: string;
 }
 
 export interface MusicianFilterRequest extends PaginationRequest {
     name?: string;
 }
 
+export interface MusicianInstrument {
+    instrumentId?: string;
+    instrumentName?: string;
+    primary?: boolean;
+}
+
 export interface MusicianMatch {
     id?: string;
     name?: string;
     score?: number;
+}
+
+export interface MusicianMembership {
+    lastInviteSentAt?: Date;
+    role?: MusicianRole;
+    status?: MusicianStatus;
 }
 
 export interface PaginatedResponse<T> {
@@ -568,6 +563,8 @@ export type CollectionItemType = "SHEET" | "TEXT";
 
 export type CollectionType = "FOLDER" | "SETLIST";
 
+export type CollectionVisibility = "WHOLE_ENSEMBLE" | "ADMINS_ONLY" | "PRIVATE";
+
 export type AttachmentType = "FULL_SCORE" | "PART" | "COVER" | "LYRICS" | "MIDI" | "AUDIO" | "ANNOTATIONS" | "IMAGE" | "ANALYSIS" | "TRANSCRIPTION" | "EXTERNAL_LINK" | "MUSIC_XML" | "PROGRAM_NOTE" | "OTHER" | "UNSPECIFIED";
 
 export type CoverageStatus = "COMPLETE" | "PLAYABLE" | "INCOMPLETE";
@@ -581,6 +578,10 @@ export type InstrumentFamily = "BRASS" | "WOODWIND" | "STRING" | "PERCUSSION" | 
 export type InstrumentTransposing = "C" | "D" | "Eb" | "F" | "G" | "A" | "Ab" | "Bb";
 
 export type VoiceOptionType = "PRIMARY" | "ALTERNATE" | "FALLBACK";
+
+export type MusicianRole = "MEMBER" | "GUEST" | "SUBSTITUTE" | "CONDUCTOR";
+
+export type MusicianStatus = "ACTIVE" | "INACTIVE" | "INVITED" | "PENDING";
 
 export type SortOrder = "ASC" | "DESC";
 

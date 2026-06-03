@@ -1,11 +1,16 @@
 package de.halbmann.sam.api.entity.admin;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 /**
  * Minimal user representation sourced from the Keycloak Admin API.
  */
-public record UserInfo(String id, String username, String email, String firstName, String lastName) {
+public record UserInfo(@NotBlank String id, @NotNull String username, String email, String firstName, String lastName) {
 
-    /** Returns a human-readable display label for use in dropdowns. */
+    /**
+     * Returns a human-readable display label for use in dropdowns.
+     */
     public String displayLabel() {
         StringBuilder sb = new StringBuilder();
         if (firstName != null && !firstName.isBlank()) sb.append(firstName).append(" ");
