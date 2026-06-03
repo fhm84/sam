@@ -94,6 +94,55 @@ sam (parent)
  +-- cli            PicoCLI batch import tool (REST client)
 ```
 
+## Configuration
+
+### Environment Variables (Production)
+
+These are read at startup via MicroProfile Config placeholders in `application.properties`.
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `DB_URL` | `jdbc:postgresql://localhost:5432/sam_music` | JDBC connection URL |
+| `DB_USER` | `sam` | Database username |
+| `DB_PASS` | `s4mP@ssword` | Database password |
+| `OIDC_SERVER_URL` | — | Keycloak realm base URL, e.g. `https://auth.example.com/realms/sam` |
+| `OIDC_CLIENT_ID` | `sam-ui` | OIDC client ID registered in Keycloak |
+| `KEYCLOAK_ADMIN_URL` | — | Keycloak server URL for the admin REST API |
+| `KEYCLOAK_REALM` | `sam` | Keycloak realm used for admin user lookup |
+| `KEYCLOAK_BACKEND_CLIENT_ID` | `sam-backend` | Service account client ID (needs `view-users` role) |
+| `KEYCLOAK_BACKEND_CLIENT_SECRET` | — | Service account client secret |
+
+### Application Config (`application.properties`)
+
+SAM-specific config keys are defined as constants in `server/.../EnvConsts.java`.
+
+| Key | Default | Description |
+|-----|---------|-------------|
+| `sam.filesystem.base.path` | — | **Required.** Storage root for uploaded files. See [Storage Backends](#storage-backends). |
+| `sam.files.types` | *(allow all)* | Optional file-type filter applied on upload. Whitelist: `pdf\|xml`; blacklist (prefix `^`): `^exe\|bat`. |
+| `sam.coverage.base-score` | `0.7` | Minimum score (0–1) awarded to an ensemble voice with any positive instrumentation match. |
+| `sam.classification.agentic` | `false` | Enable agentic LLM entity resolution pass after AI classification. |
+| `sam.admin.keycloak.realm` | — | Keycloak realm queried by the admin user-search endpoint (set per profile). |
+
+### Storage Backends
+
+`sam.filesystem.base.path` selects the backend automatically from its URI scheme:
+
+| Value | Backend | Notes |
+|-------|---------|-------|
+| `/data/sam-docs` (bare path) | Local filesystem | Equivalent to `file:///data/sam-docs` |
+| `s3://my-bucket/sam-docs` | AWS S3 | Requires AWS SDK credentials (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION` or `quarkus.s3.*` properties) |
+
+### LLM Providers
+
+Set `quarkus.langchain4j.chat-model.provider` and enable exactly one provider:
+
+| Provider value | Required additional config |
+|----------------|---------------------------|
+| `openai` (default) | `quarkus.langchain4j.openai.api-key=<key>`; model defaults to `gpt-4o` |
+| `ollama` | `quarkus.langchain4j.ollama.base-url=http://localhost:11434`; `quarkus.langchain4j.ollama.chat-model.model-id=llava` |
+| `vertexai` (Gemini) | `quarkus.langchain4j.vertexai.gemini.project-id=<id>` and `.location=<region>`; model: `gemini-2.0-flash` |
+
 ## Roadmap
 
 ### Planned Features

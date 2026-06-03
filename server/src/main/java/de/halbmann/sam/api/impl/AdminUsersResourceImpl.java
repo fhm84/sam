@@ -1,5 +1,6 @@
 package de.halbmann.sam.api.impl;
 
+import de.halbmann.sam.EnvConsts;
 import de.halbmann.sam.api.boundary.AdminUsersResource;
 import de.halbmann.sam.api.entity.admin.UserInfo;
 import de.halbmann.sam.security.Roles;
@@ -20,7 +21,7 @@ public class AdminUsersResourceImpl implements AdminUsersResource {
     @Inject
     Keycloak keycloak;
 
-    @ConfigProperty(name = "sam.admin.keycloak.realm")
+    @ConfigProperty(name = EnvConsts.KEYCLOAK_ADMIN_REALM)
     String realm;
 
     @Override

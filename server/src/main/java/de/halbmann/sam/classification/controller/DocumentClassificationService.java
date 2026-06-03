@@ -1,5 +1,6 @@
 package de.halbmann.sam.classification.controller;
 
+import de.halbmann.sam.EnvConsts;
 import de.halbmann.sam.api.entity.classification.ClassificationApplyRequest;
 import de.halbmann.sam.api.entity.classification.ClassificationApplyResult;
 import de.halbmann.sam.api.entity.classification.ClassificationStatus;
@@ -85,7 +86,7 @@ public class DocumentClassificationService {
     @Inject
     MeterRegistry registry;
 
-    @ConfigProperty(name = "sam.classification.agentic", defaultValue = "false")
+    @ConfigProperty(name = EnvConsts.CLASSIFICATION_AGENTIC, defaultValue = "false")
     boolean agenticMode;
 
     /**

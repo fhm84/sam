@@ -1,5 +1,6 @@
 package de.halbmann.sam.business.ensembles.controller;
 
+import de.halbmann.sam.EnvConsts;
 import de.halbmann.sam.api.entity.ensembles.CoverageResult;
 import de.halbmann.sam.api.entity.ensembles.VoiceCoverageDetail;
 import de.halbmann.sam.business.ensembles.boundary.EnsembleRepository;
@@ -22,7 +23,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 @Transactional
 public class CoverageEvaluationService {
 
-    @ConfigProperty(name = "sam.coverage.base-score", defaultValue = "0.7")
+    @ConfigProperty(name = EnvConsts.COVERAGE_BASE_SCORE, defaultValue = "0.7")
     double baseScore;
 
     @Inject

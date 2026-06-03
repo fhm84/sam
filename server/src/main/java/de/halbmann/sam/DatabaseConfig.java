@@ -20,7 +20,6 @@ public class DatabaseConfig {
     void configure() throws SQLException {
         try (Connection c = dataSource.getConnection();
                 Statement s = c.createStatement()) {
-
             s.execute("SET pg_trgm.similarity_threshold = 0.35");
         }
     }

@@ -117,11 +117,13 @@ ensembles ──< ensemble_voices ──< voice_options >── instruments
 |--------|----|------------|
 | `sheets` | UUID | title, subtitle, composer, arranger, genre, fingerprint |
 | `instrumentations` | UUID | sheet (FK), instrument (FK), partLabel, clef, notationType |
-| `instruments` | String | name, displayName, transposition |
-| `musicians` | UUID | name, birthYear, deathYear, ipi, **userId** (OIDC subject — null for external/historical musicians) |
+| `instruments` | String | name, displayName, transposition, **family**, **defaultClef**, **catalogSection**, **catalogPosition** |
+| `instrument_aliases` | (instrument_id, alias_order) | alias strings for OCR matching; ordered list per instrument |
+| `musicians` | UUID | name, birthYear, deathYear, ipi, **userId** (OIDC subject — null for external/historical musicians), **email**, **mobile**, **notes**, **status**, **role**, **lastInviteSentAt** |
+| `musician_instruments` | UUID | musician (FK), instrument (FK), isPrimary — instrument assignments driving "My Parts" personalisation |
 | `documents` | UUID | filename, path, sha256, mimeType, size, refCount |
 | `attachments` | UUID | document (FK), type, displayName |
-| `sheet_collections` | UUID | name, description, type (FOLDER/SETLIST), date |
+| `sheet_collections` | UUID | name, description, type (FOLDER/SETLIST), date, **visibility**, **coverColor**, **coverImageId** (FK → documents) |
 | `booklets` | UUID | name, description |
 | `ensembles` | UUID | name, description |
 | `ensemble_voices` | UUID | ensemble (FK), label, weight, required |

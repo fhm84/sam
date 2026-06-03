@@ -1,14 +1,39 @@
 package de.halbmann.sam;
 
+/**
+ * Central registry of SAM application configuration keys. All custom {@code sam.*} MicroProfile
+ * Config property names are defined here so they can be referenced by both the consuming bean and
+ * the documentation without hard-coding the string in multiple places.
+ */
 public interface EnvConsts {
 
-    /**
-     * Config key for the base-path for storing the documents (like the sheets pdf files).
-     */
+    /** Storage root: bare path for local FS ({@code /data/sam}) or S3 URI ({@code s3://bucket/prefix}). Required. */
     String FILESYSTEM_BASE_PATH = "sam.filesystem.base.path";
 
     /**
-     * Config key for the allowed file types for uploaded documents.
+     * Optional file-extension whitelist or blacklist applied on upload.
+     * Whitelist: {@code pdf|xml|mp3}. Blacklist (prefix {@code ^}): {@code ^exe|bat}.
+     * Absent → all file types are accepted.
      */
     String FILETYPES = "sam.files.types";
+
+    /**
+     * Keycloak realm name used by the admin REST client for user search.
+     * Must be set per profile (dev/prod); no default.
+     */
+    String KEYCLOAK_ADMIN_REALM = "sam.admin.keycloak.realm";
+
+    /**
+     * Minimum coverage score (0.0–1.0) awarded to an ensemble voice that has at least one
+     * positive instrumentation match. Prevents a single part from contributing near-zero.
+     * Default: {@code 0.7}.
+     */
+    String COVERAGE_BASE_SCORE = "sam.coverage.base-score";
+
+    /**
+     * When {@code true}, a second AI pass using {@code ClassificationAgent} autonomously resolves
+     * entity references (sheet, musicians, instruments) after initial classification before
+     * returning the suggestion to the UI. Default: {@code false}.
+     */
+    String CLASSIFICATION_AGENTIC = "sam.classification.agentic";
 }
