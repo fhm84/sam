@@ -5,6 +5,7 @@ import jakarta.ws.rs.QueryParam;
 import lombok.Getter;
 import lombok.Setter;
 
+/** Query parameters for the musician list endpoint. */
 @Getter
 @Setter
 public class MusicianFilterRequest extends PaginationRequest {

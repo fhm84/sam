@@ -15,20 +15,49 @@ import jakarta.ws.rs.core.MediaType;
 @Consumes(MediaType.APPLICATION_JSON)
 public interface MusiciansResource {
 
+    /**
+     * Returns a paginated list of musicians matching the given filter criteria.
+     *
+     * @param filterRequest name filter and pagination parameters
+     * @return paginated list of matching musicians
+     */
     @GET
     PaginatedResponse<Musician> findMusicians(@BeanParam MusicianFilterRequest filterRequest);
 
+    /**
+     * Creates a new musician record.
+     *
+     * @param musician the musician to create
+     * @return the persisted musician including its generated ID
+     */
     @POST
     Musician add(Musician musician);
 
+    /**
+     * Loads a single musician by their ID.
+     *
+     * @param musicianId the musician ID
+     * @return the musician
+     */
     @GET
     @Path("{musicianId}")
     Musician load(@PathParam("musicianId") String musicianId);
 
+    /**
+     * Updates an existing musician record.
+     *
+     * @param musicianId the musician ID
+     * @param musician   the updated musician data
+     */
     @PUT
     @Path("{musicianId}")
     void update(@PathParam("musicianId") String musicianId, Musician musician);
 
+    /**
+     * Deletes a musician by their ID.
+     *
+     * @param musicianId the musician ID
+     */
     @DELETE
     @Path("{musicianId}")
     void delete(@PathParam("musicianId") String musicianId);

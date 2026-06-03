@@ -5,6 +5,7 @@ import jakarta.ws.rs.QueryParam;
 import lombok.Getter;
 import lombok.Setter;
 
+/** Query parameters for the instrument list endpoint. */
 @Getter
 @Setter
 public class InstrumentFilterRequest extends PaginationRequest {

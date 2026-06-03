@@ -19,6 +19,13 @@ import jakarta.ws.rs.core.MediaType;
 @Consumes(MediaType.APPLICATION_JSON)
 public interface MyPartsResource {
 
+    /**
+     * Returns a paginated list of sheets that have at least one instrumentation matching the calling
+     * musician's instrument assignments across their ensemble memberships.
+     *
+     * @param filter pagination parameters
+     * @return paginated list of sheets with the caller's matching parts highlighted
+     */
     @GET
     PaginatedResponse<SheetWithMyParts> getMyParts(@BeanParam PaginationRequest filter);
 }

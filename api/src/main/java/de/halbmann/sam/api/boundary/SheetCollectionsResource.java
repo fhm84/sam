@@ -18,24 +18,60 @@ import jakarta.ws.rs.core.Response;
 @Consumes(MediaType.APPLICATION_JSON)
 public interface SheetCollectionsResource {
 
+    /**
+     * Returns a paginated list of sheet collections matching the given filter criteria.
+     *
+     * @param filterRequest pagination and filter parameters
+     * @return paginated list of matching collections
+     */
     @GET
     PaginatedResponse<SheetCollection> findSheetCollections(@BeanParam SheetCollectionFilterRequest filterRequest);
 
+    /**
+     * Creates a new sheet collection.
+     *
+     * @param sheetCollection the collection to create
+     * @return the persisted collection including its generated ID
+     */
     @POST
     SheetCollection add(SheetCollection sheetCollection);
 
+    /**
+     * Loads a single collection by its ID.
+     *
+     * @param collectionId the collection ID
+     * @return the collection
+     */
     @GET
     @Path("{collectionId}")
     SheetCollection load(@PathParam("collectionId") String collectionId);
 
+    /**
+     * Updates an existing collection.
+     *
+     * @param collectionId   the collection ID
+     * @param sheetCollection the updated collection data
+     */
     @PUT
     @Path("{collectionId}")
     void update(@PathParam("collectionId") String collectionId, SheetCollection sheetCollection);
 
+    /**
+     * Deletes a collection by its ID.
+     *
+     * @param collectionId the collection ID
+     */
     @DELETE
     @Path("{collectionId}")
     void delete(@PathParam("collectionId") String collectionId);
 
+    /**
+     * Generates a PDF table-of-contents document for the given collection.
+     *
+     * @param collectionId      the collection ID
+     * @param includeTextItems  whether to render free-text blocks in the TOC; defaults to {@code true}
+     * @return the generated PDF as a download response
+     */
     @GET
     @Path("{collectionId}/toc")
     @Produces("application/pdf")
@@ -43,6 +79,12 @@ public interface SheetCollectionsResource {
             @PathParam("collectionId") String collectionId,
             @QueryParam("includeTextItems") @DefaultValue("true") boolean includeTextItems);
 
+    /**
+     * Generates a GEMA setlist Excel file for the given collection.
+     *
+     * @param collectionId the collection ID
+     * @return the generated xlsx file as a download response
+     */
     @GET
     @Path("{collectionId}/gema-setlist")
     @Produces("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
@@ -73,6 +115,12 @@ public interface SheetCollectionsResource {
             @QueryParam("includeTextItems") @DefaultValue("true") boolean includeTextItems,
             @QueryParam("includeTextAttachments") @DefaultValue("false") boolean includeTextAttachments);
 
+    /**
+     * Provides access to the items sub-resource for the given collection.
+     *
+     * @param collectionId the collection ID
+     * @return the items sub-resource
+     */
     @Path("{collectionId}/items")
     CollectionItemsResource items(@PathParam("collectionId") String collectionId);
 }

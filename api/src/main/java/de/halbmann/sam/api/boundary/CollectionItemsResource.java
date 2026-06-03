@@ -19,32 +19,73 @@ import java.util.List;
 @Consumes(MediaType.APPLICATION_JSON)
 public interface CollectionItemsResource {
 
+    /**
+     * Returns a paginated list of items in the collection.
+     *
+     * @param paginationRequest pagination parameters
+     * @param myPartsOnly       when {@code true}, only sheet items that match the calling musician's
+     *                          instrument assignments are returned
+     * @return paginated list of collection items
+     */
     @GET
     PaginatedResponse<CollectionItem> listAll(
             @BeanParam PaginationRequest paginationRequest,
             @QueryParam("myPartsOnly") @DefaultValue("false") boolean myPartsOnly);
 
+    /**
+     * Adds a new item (sheet reference or free-text block) to the collection.
+     *
+     * @param createCollectionItem the item to add
+     */
     @POST
     void addItem(CreateCollectionItem createCollectionItem);
 
+    /**
+     * Updates an existing collection item.
+     *
+     * @param itemId          the item ID
+     * @param collectionItem  the updated item data
+     */
     @PUT
     @Path("{itemId}")
     void updateItem(@PathParam("itemId") String itemId, CollectionItem collectionItem);
 
+    /**
+     * Removes an item from the collection.
+     *
+     * @param itemId the item ID
+     */
     @DELETE
     @Path("{itemId}")
     void removeItem(@PathParam("itemId") String itemId);
 
+    /**
+     * Uploads a file attachment (e.g. a programme note PDF) for a text block item.
+     *
+     * @param itemId  the item ID
+     * @param request the multipart upload including file and attachment type
+     * @return the created attachment record
+     */
     @POST
     @Path("{itemId}/attachment")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     Attachment uploadAttachment(@PathParam("itemId") String itemId, @BeanParam FileUploadRequest request);
 
+    /**
+     * Removes the attachment from the given collection item.
+     *
+     * @param itemId the item ID
+     */
     @DELETE
     @Path("{itemId}/attachment")
     void removeAttachment(@PathParam("itemId") String itemId);
 
+    /**
+     * Replaces the display order of all items in the collection with the given ordered list of IDs.
+     *
+     * @param orderedIds IDs of all items in the desired order
+     */
     @PUT
     @Path("order")
     void reorderItems(List<String> orderedIds);

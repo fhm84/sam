@@ -12,14 +12,28 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 /**
- * Resource endpoints for managing documents. This is used in multiple environments: standalone (for general/global documents upload/list), in context of a sheet and in context of an instrumentation.
+ * Resource endpoints for managing documents. Usable in three contexts: standalone (global unlinked
+ * documents), within a sheet ({@code /sheets/{id}/documents}), or within an instrumentation
+ * ({@code /sheets/{id}/instrumentations/{id}/documents}).
  */
 @Path("documents")
 public interface DocumentsResource {
 
+    /**
+     * Lists attachments in the current context (sheet, instrumentation, or global).
+     *
+     * @param filterRequest pagination parameters
+     * @return paginated list of attachments
+     */
     @GET
     PaginatedResponse<Attachment> list(@BeanParam DocumentFilterRequest filterRequest);
 
+    /**
+     * Lists documents that have been uploaded but are not yet linked to any sheet or instrumentation.
+     *
+     * @param filterRequest pagination parameters
+     * @return paginated list of unlinked documents
+     */
     @GET
     @Path("unlinked")
     PaginatedResponse<DocumentDownload> listUnlinkedDocuments(@BeanParam DocumentFilterRequest filterRequest);
@@ -50,11 +64,26 @@ public interface DocumentsResource {
     @Produces({"application/zip", "application/pdf"})
     Response downloadBatchByIds(BatchDownloadRequest request);
 
+    /**
+     * Downloads the raw file for an attachment or document. Supports conditional GET via
+     * {@code If-None-Match} / ETag to allow efficient client-side caching.
+     *
+     * @param docIdentifier the attachment or document ID
+     * @param ifNoneMatch   optional ETag from a previous response for cache validation
+     * @return the file content, or 304 Not Modified if the ETag matches
+     */
     @GET
     @Path("{docIdentifier}")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     Response load(@PathParam("docIdentifier") String docIdentifier, @HeaderParam("If-None-Match") String ifNoneMatch);
 
+    /**
+     * Uploads a new document file. The document is stored and returned as an unlinked record until
+     * explicitly linked to a sheet or instrumentation via {@code POST /{id}/link}.
+     *
+     * @param request the multipart form data containing the file and optional attachment type
+     * @return the created document and its initial (unlinked) attachment record
+     */
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     DocumentUpload uploadDocument(@BeanParam FileUploadRequest request);
@@ -98,9 +127,11 @@ public interface DocumentsResource {
             @PathParam("docIdentifier") String docIdentifier, ClassificationApplyRequest request);
 
     /**
-     * Delete the document identified by given identifier. If sheetId and/or instrumentationId is set, given id is interpreted as attachment id (only removing the "business" link - the attachment), else it's interpreted as documentId. If and only if the document is not linked anywhere (refCount = 0), the document is physically deleted.
+     * Deletes a document or attachment. When the identifier refers to an attachment, only that
+     * business link is removed. The underlying physical file is deleted only when no other
+     * attachments reference it (ref-count reaches zero).
      *
-     * @param docIdentifier
+     * @param docIdentifier the attachment or document ID
      */
     @DELETE
     @Path("{docIdentifier}")

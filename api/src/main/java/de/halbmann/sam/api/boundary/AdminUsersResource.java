@@ -12,9 +12,21 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 public interface AdminUsersResource {
 
+    /**
+     * Searches Keycloak users by name, username, or email fragment.
+     *
+     * @param search the search string
+     * @return list of matching user records
+     */
     @GET
     List<UserInfo> searchUsers(@QueryParam("search") String search);
 
+    /**
+     * Loads a single Keycloak user by their subject ID.
+     *
+     * @param userId the Keycloak user ID (subject claim)
+     * @return the user record
+     */
     @GET
     @Path("{userId}")
     UserInfo getUser(@PathParam("userId") String userId);

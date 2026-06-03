@@ -15,28 +15,66 @@ import java.util.List;
 @Consumes(MediaType.APPLICATION_JSON)
 public interface InstrumentationsResource {
 
+    /**
+     * Returns all instrumentations for the parent sheet.
+     *
+     * @return list of instrumentations
+     */
     @GET
     List<Instrumentation> listAll();
 
+    /**
+     * Loads a single instrumentation by its ID.
+     *
+     * @param instrumentationId the instrumentation ID
+     * @return the instrumentation
+     */
     @GET
     @Path("{instrumentationId}")
     Instrumentation get(@PathParam("instrumentationId") String instrumentationId);
 
+    /**
+     * Adds a single instrumentation to the parent sheet.
+     *
+     * @param instrumentation the instrumentation to add
+     */
     @POST
     void add(CreateInstrumentation instrumentation);
 
+    /**
+     * Adds multiple instrumentations to the parent sheet in a single request.
+     *
+     * @param instrumentations the instrumentations to add
+     */
     @POST
     @Path("bulk")
     void add(List<CreateInstrumentation> instrumentations);
 
+    /**
+     * Updates an existing instrumentation.
+     *
+     * @param instrumentationId the instrumentation ID
+     * @param instrumentation   the updated instrumentation data
+     */
     @PUT
     @Path("{instrumentationId}")
     void update(@PathParam("instrumentationId") String instrumentationId, Instrumentation instrumentation);
 
+    /**
+     * Deletes an instrumentation by its ID.
+     *
+     * @param instrumentationId the instrumentation ID
+     */
     @DELETE
     @Path("{instrumentationId}")
     void delete(@PathParam("instrumentationId") String instrumentationId);
 
+    /**
+     * Provides access to the documents sub-resource for a specific instrumentation (individual part files).
+     *
+     * @param instrumentationId the instrumentation ID
+     * @return the documents sub-resource
+     */
     @Path("{instrumentationId}/documents")
     DocumentsResource documents(@PathParam("instrumentationId") String instrumentationId);
 }

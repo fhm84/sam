@@ -16,16 +16,38 @@ import jakarta.ws.rs.core.MediaType;
 @Consumes(MediaType.APPLICATION_JSON)
 public interface CollectionSheetsResource {
 
+    /**
+     * Returns a paginated list of sheet entries in the booklet.
+     *
+     * @param paginationRequest pagination parameters
+     * @return paginated list of booklet sheet entries
+     */
     @GET
     PaginatedResponse<CollectionSheet> listAll(@BeanParam PaginationRequest paginationRequest);
 
+    /**
+     * Adds a sheet entry to the booklet.
+     *
+     * @param createCollectionSheet the sheet entry to add
+     */
     @POST
     void addSheet(CreateCollectionSheet createCollectionSheet);
 
+    /**
+     * Updates a sheet entry within the booklet (e.g. page number or notes).
+     *
+     * @param sheetId         the sheet entry ID
+     * @param collectionSheet the updated sheet entry data
+     */
     @PUT
     @Path("{sheetId}")
     void updateSheet(@PathParam("sheetId") String sheetId, CollectionSheet collectionSheet);
 
+    /**
+     * Removes a sheet entry from the booklet.
+     *
+     * @param sheetId the sheet entry ID
+     */
     @DELETE
     @Path("{sheetId}")
     void removeSheet(@PathParam("sheetId") String sheetId);

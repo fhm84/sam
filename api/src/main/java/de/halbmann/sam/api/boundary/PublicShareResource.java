@@ -15,6 +15,13 @@ import java.util.UUID;
 @Produces(MediaType.APPLICATION_JSON)
 public interface PublicShareResource {
 
+    /**
+     * Returns the public metadata for a share link (resource type, label, expiry).
+     * Used by the share landing page to display information before the user downloads.
+     *
+     * @param token the share token UUID
+     * @return the share info
+     */
     @GET
     @Path("{token}")
     PublicShareInfo getInfo(@PathParam("token") UUID token);

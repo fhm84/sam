@@ -2,6 +2,7 @@ package de.halbmann.sam.api.entity.sheets;
 
 import jakarta.json.bind.adapter.JsonbAdapter;
 
+/** Serialises {@link DifficultyLevel} as its numeric grade and deserialises it back. */
 public class DifficultyJsonbAdapter implements JsonbAdapter<DifficultyLevel, Integer> {
 
     @Override
