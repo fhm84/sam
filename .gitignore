@@ -50,3 +50,7 @@ nb-configuration.xml
 /server/uploads/
 /migration/src/migration-data/
 /.playwright-mcp/
+
+# Generated review/analysis artifacts
+/docs/code-review-findings.md
+/docs/security-review-findings.md
