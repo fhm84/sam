@@ -111,23 +111,6 @@ class GemaSetlistServiceTest {
         assertEquals("", parts[1]);
     }
 
-    // ── sanitizeFilename ───────────────────────────────────────────────────
-
-    @Test
-    void sanitizeFilenameNullReturnsDefault() {
-        assertEquals("collection", service.sanitizeFilename(null));
-    }
-
-    @Test
-    void sanitizeFilenameReplacesUmlauts() {
-        assertEquals("Fruehlingsstueck", service.sanitizeFilename("Frühlingsstück"));
-    }
-
-    @Test
-    void sanitizeFilenameReplacesSpecialChars() {
-        assertEquals("Hello_World_", service.sanitizeFilename("Hello/World!"));
-    }
-
     // ── generateGemaSetlist round-trip ─────────────────────────────────────
 
     @Test

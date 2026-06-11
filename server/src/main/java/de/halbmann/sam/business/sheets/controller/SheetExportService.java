@@ -10,6 +10,7 @@ import de.halbmann.sam.business.collections.controller.SheetCollectionService.Te
 import de.halbmann.sam.business.documents.controller.DocumentsService;
 import de.halbmann.sam.business.documents.controller.StreamWriter;
 import de.halbmann.sam.business.documents.entity.AttachmentEntity;
+import de.halbmann.sam.business.shared.controller.FilenameUtils;
 import de.halbmann.storage.api.FileSystemWrapper;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -249,15 +250,7 @@ public class SheetExportService {
     }
 
     private static String sanitizeFilename(String name) {
-        if (name == null || name.isBlank()) return "export";
-        String s = name.replace("ä", "ae")
-                .replace("Ä", "Ae")
-                .replace("ö", "oe")
-                .replace("Ö", "Oe")
-                .replace("ü", "ue")
-                .replace("Ü", "Ue")
-                .replace("ß", "ss");
-        return s.replaceAll("[^a-zA-Z0-9._\\- ]", "_").trim();
+        return FilenameUtils.sanitizeFilename(name);
     }
 
     private static String uniqueZipName(String name, Set<String> used) {

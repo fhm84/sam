@@ -214,8 +214,10 @@ public class DocumentsResourceImpl implements DocumentsResource {
                     .tag(etagValue)
                     .build();
         } catch (final Exception ex) {
-            log.atInfo().setCause(ex).log(() -> String.format("Loading document (%s) resulted in", docIdentifier));
-            return Response.noContent().build();
+            log.atWarn()
+                    .setCause(ex)
+                    .log(() -> String.format("Failed to build response for document (%s)", docIdentifier));
+            return Response.serverError().build();
         }
     }
 

@@ -4,6 +4,7 @@ import de.halbmann.sam.api.entity.collections.CollectionItemType;
 import de.halbmann.sam.api.entity.collections.SheetCollection;
 import de.halbmann.sam.api.entity.musicians.Musician;
 import de.halbmann.sam.api.entity.sheets.SheetMusic;
+import de.halbmann.sam.business.shared.controller.FilenameUtils;
 import de.halbmann.sam.business.sheets.controller.ExportResult;
 import de.halbmann.sam.business.sheets.controller.SheetService;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -66,7 +67,7 @@ public class GemaSetlistService {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             workbook.write(out);
 
-            String filename = sanitizeFilename(collection.getName()) + "-gema-setlist.xlsx";
+            String filename = FilenameUtils.sanitizeFilename(collection.getName(), "collection") + "-gema-setlist.xlsx";
             return new ExportResult(os -> os.write(out.toByteArray()), filename, CONTENT_TYPE);
 
         } catch (Exception e) {
@@ -225,17 +226,5 @@ public class GemaSetlistService {
         long minutes = totalSeconds / 60;
         long seconds = totalSeconds % 60;
         return String.format("%d:%02d", minutes, seconds);
-    }
-
-    String sanitizeFilename(final String name) {
-        if (name == null || name.isBlank()) return "collection";
-        String s = name.replace("ä", "ae")
-                .replace("Ä", "Ae")
-                .replace("ö", "oe")
-                .replace("Ö", "Oe")
-                .replace("ü", "ue")
-                .replace("Ü", "Ue")
-                .replace("ß", "ss");
-        return s.replaceAll("[^a-zA-Z0-9._\\- ]", "_").trim();
     }
 }
