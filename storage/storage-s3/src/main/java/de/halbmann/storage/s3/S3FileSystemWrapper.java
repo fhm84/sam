@@ -106,7 +106,10 @@ public class S3FileSystemWrapper implements FileSystemWrapper {
                     .build());
             return true;
         } catch (S3Exception e) {
-            return false;
+            if (e.statusCode() == 404) {
+                return false;
+            }
+            throw e;
         }
     }
 
