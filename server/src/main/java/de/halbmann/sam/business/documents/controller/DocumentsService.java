@@ -277,10 +277,6 @@ public class DocumentsService {
             }
         });
 
-        if (document.getRefCount() > 0 && document.getId() != null) {
-            documentRepository.incrementRefCount(document);
-        }
-
         return document;
     }
 
