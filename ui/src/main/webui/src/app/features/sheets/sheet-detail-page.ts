@@ -1,4 +1,5 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Button } from 'primeng/button';
@@ -66,6 +67,7 @@ export class SheetDetailPage implements OnInit {
   private readonly router = inject(Router);
   private readonly api = inject(SheetsApiService);
   private readonly messageService = inject(MessageService);
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly sheetId = signal('');
   protected readonly autoEnrich = signal(false);
@@ -88,7 +90,7 @@ export class SheetDetailPage implements OnInit {
     const id = this.route.snapshot.paramMap.get('id')!;
     this.sheetId.set(id);
     this.autoEnrich.set(this.route.snapshot.queryParamMap.get('enrich') === 'true');
-    this.api.load(id).subscribe({ next: (s) => this.sheet.set(s) });
+    this.api.load(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({ next: (s) => this.sheet.set(s) });
   }
 
   protected goBack(): void {
@@ -105,7 +107,7 @@ export class SheetDetailPage implements OnInit {
   }
 
   protected exportSheet(format: 'ZIP' | 'JSON' | 'CSV'): void {
-    this.api.export(this.sheetId(), format).subscribe({
+    this.api.export(this.sheetId(), format).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response) => triggerDownload(response),
       error: () => {
         this.messageService.add({

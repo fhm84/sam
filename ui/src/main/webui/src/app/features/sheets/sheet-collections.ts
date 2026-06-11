@@ -97,7 +97,7 @@ export class SheetCollections implements OnInit, OnChanges {
 
   private loadCollections(): void {
     this.loading.set(true);
-    this.collectionsApi.getCollectionsForSheet(this.sheetId, { page: 0, size: 100 }).subscribe({
+    this.collectionsApi.getCollectionsForSheet(this.sheetId, { page: 0, size: 100 }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         this.collections.set(res.data ?? []);
         this.loading.set(false);
@@ -138,6 +138,7 @@ export class SheetCollections implements OnInit, OnChanges {
     const currentIds = new Set(this.collections().map((c) => c.id?.toString()));
     this.collectionsApi
       .find({ name: this.currentQuery || undefined, page: this.searchPage, size: this.searchRows })
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {
           this.searchResults.set((res.data ?? []).filter((c) => !currentIds.has(c.id?.toString())));
@@ -158,7 +159,7 @@ export class SheetCollections implements OnInit, OnChanges {
       sheetId: this.sheetId as any,
     };
     this.saving = true;
-    this.collectionsApi.addItem(this.selectedCollection!.id!.toString(), payload).subscribe({
+    this.collectionsApi.addItem(this.selectedCollection!.id!.toString(), payload).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.saving = false;
         this.addDialogVisible = false;
@@ -186,7 +187,7 @@ export class SheetCollections implements OnInit, OnChanges {
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        this.collectionsApi.removeItem(collection.id!.toString(), collectionSheetId).subscribe({
+        this.collectionsApi.removeItem(collection.id!.toString(), collectionSheetId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
           next: () => {
             this.messageService.add({
               severity: 'success',

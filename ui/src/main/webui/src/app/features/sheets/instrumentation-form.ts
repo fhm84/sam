@@ -1,4 +1,5 @@
 import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FloatLabel } from 'primeng/floatlabel';
 import { Select } from 'primeng/select';
@@ -57,7 +58,7 @@ export class InstrumentationForm extends BaseForm<Instrumentation> implements On
   getEntity = () => this.instrumentation;
 
   ngOnInit(): void {
-    this.instrumentsApi.find({ size: FETCH_ALL_SIZE }).subscribe((res) => {
+    this.instrumentsApi.find({ size: FETCH_ALL_SIZE }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe((res) => {
       this.instrumentOptions.set(
         (res.data ?? []).map((i: Instrument) => ({ label: instrumentLabel(i), value: i.id! })),
       );

@@ -1,4 +1,5 @@
-import { Directive, EventEmitter, inject, OnChanges, Output } from '@angular/core';
+import { DestroyRef, Directive, EventEmitter, inject, OnChanges, Output } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { TranslationService } from '../../core/translation.service';
@@ -6,6 +7,7 @@ import { TranslationService } from '../../core/translation.service';
 @Directive()
 export abstract class BaseForm<TEntity, TSaved = void> implements OnChanges {
   protected readonly t = inject(TranslationService);
+  protected readonly destroyRef = inject(DestroyRef);
 
   @Output() saved = new EventEmitter<TSaved>();
   @Output() cancelled = new EventEmitter<void>();
@@ -42,7 +44,7 @@ export abstract class BaseForm<TEntity, TSaved = void> implements OnChanges {
     if (this.form.invalid) return;
 
     this.saving = true;
-    this.buildSaveRequest().subscribe({
+    this.buildSaveRequest().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (result) => {
         this.saving = false;
         this.saved.emit(result);

@@ -252,6 +252,7 @@ export class Sheets implements OnInit {
   private loadAvailableLetters(): void {
     this.api
       .getAvailableLetters(this.selectedGenre() ?? undefined)
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((letters) => this.availableLetters.set(letters));
   }
 
@@ -276,7 +277,7 @@ export class Sheets implements OnInit {
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        this.api.delete(sheet.id!).subscribe({
+        this.api.delete(sheet.id!).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
           next: () => {
             this.messageService.add({
               severity: 'success',
@@ -315,7 +316,7 @@ export class Sheets implements OnInit {
     const wasFavorite = sheet.favorite;
     this.sheets.update((list) => list.map((s) => (s.id === sheet.id ? { ...s, favorite: !wasFavorite } : s)));
     const req = wasFavorite ? this.api.unfavorite(sheet.id!) : this.api.favorite(sheet.id!);
-    req.subscribe({
+    req.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       error: () =>
         this.sheets.update((list) => list.map((s) => (s.id === sheet.id ? { ...s, favorite: wasFavorite } : s))),
     });
@@ -324,7 +325,7 @@ export class Sheets implements OnInit {
   // ── Ensemble context ──────────────────────────────────
 
   private loadEnsembles(): void {
-    this.ensemblesApi.find({ size: 200 }).subscribe((res) => this.ensembles.set(res.data ?? []));
+    this.ensemblesApi.find({ size: 200 }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe((res) => this.ensembles.set(res.data ?? []));
   }
 
   protected onEnsembleChange(ensemble: Ensemble | null): void {
@@ -338,7 +339,7 @@ export class Sheets implements OnInit {
   }
 
   private loadCoverageStatus(ensembleId: string): void {
-    this.ensemblesApi.getCoverageStatus(ensembleId).subscribe({
+    this.ensemblesApi.getCoverageStatus(ensembleId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (status) => this.coverageStatus.set(status),
       error: () => this.coverageStatus.set({}),
     });
@@ -348,7 +349,7 @@ export class Sheets implements OnInit {
     const ensemble = this.selectedEnsemble();
     if (!ensemble?.id || this.coverageComputing()) return;
     this.coverageComputing.set(true);
-    this.ensemblesApi.computeCoverage(ensemble.id).subscribe({
+    this.ensemblesApi.computeCoverage(ensemble.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (status) => {
         this.coverageStatus.set(status);
         this.coverageComputing.set(false);
@@ -403,6 +404,7 @@ export class Sheets implements OnInit {
         titleStartsWith: this.selectedLetter() || undefined,
         ensemble: this.selectedEnsemble()?.id || undefined,
       })
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {
           this.sheets.set(res.data ?? []);
