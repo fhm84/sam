@@ -122,6 +122,8 @@ export class Uploads implements OnInit, OnDestroy {
   protected readonly documents = signal<DocumentDownload[]>([]);
   protected readonly totalRecords = signal(0);
   protected readonly loading = signal(true);
+  private docsPage = 0;
+  protected docsRows = 20;
   protected readonly activeUploads = signal<ActiveUpload[]>([]);
 
   // ── Upload target (persists while page is open) ───────────────────
@@ -200,7 +202,6 @@ export class Uploads implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.loadDocuments();
     this.pickerSearch$
       .pipe(debounceTime(300), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.doPickerSearch());
@@ -271,6 +272,12 @@ export class Uploads implements OnInit, OnDestroy {
     this.pickerPage = 0;
     this.pickerQuery = (event.target as HTMLInputElement).value;
     this.pickerSearch$.next(this.pickerQuery);
+  }
+
+  protected onDocumentsLazyLoad(event: TableLazyLoadEvent): void {
+    this.docsPage = Math.floor((event.first ?? 0) / (event.rows ?? this.docsRows));
+    this.docsRows = event.rows ?? this.docsRows;
+    this.loadDocuments();
   }
 
   protected onPickerLazyLoad(event: TableLazyLoadEvent): void {
@@ -514,7 +521,7 @@ export class Uploads implements OnInit, OnDestroy {
 
   private loadDocuments(): void {
     this.loading.set(true);
-    this.documentsApi.listUnlinked().subscribe({
+    this.documentsApi.listUnlinked({ page: this.docsPage, size: this.docsRows }).subscribe({
       next: (res) => {
         this.documents.set(res.data ?? []);
         this.totalRecords.set(res.totalCount ?? 0);

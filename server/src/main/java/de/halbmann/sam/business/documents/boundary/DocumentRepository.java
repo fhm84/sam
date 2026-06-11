@@ -1,9 +1,9 @@
 package de.halbmann.sam.business.documents.boundary;
 
 import de.halbmann.sam.business.documents.entity.DocumentEntity;
+import de.halbmann.sam.core.entity.PaginatedEntities;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -23,8 +23,7 @@ public class DocumentRepository implements PanacheRepositoryBase<DocumentEntity,
         document.setRefCount(document.getRefCount() - 1);
     }
 
-    public List<DocumentEntity> findUnlinked() {
-        // TODO: add pagination!
-        return find("refCount = 0").list();
+    public PaginatedEntities<DocumentEntity> findUnlinked(int page, int size) {
+        return new PaginatedEntities<>(find("refCount = 0").page(page, size).list(), count("refCount = 0"));
     }
 }

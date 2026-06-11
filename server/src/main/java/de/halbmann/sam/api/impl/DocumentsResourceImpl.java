@@ -13,7 +13,6 @@ import de.halbmann.sam.business.documents.controller.DocumentsService;
 import de.halbmann.sam.business.documents.controller.MergedPdfEntry;
 import de.halbmann.sam.business.documents.controller.StreamWriter;
 import de.halbmann.sam.business.documents.entity.AttachmentEntity;
-import de.halbmann.sam.business.documents.entity.DocumentEntity;
 import de.halbmann.sam.business.eventlog.controller.EventLogService;
 import de.halbmann.sam.classification.controller.DocumentClassificationService;
 import de.halbmann.sam.security.Roles;
@@ -76,15 +75,15 @@ public class DocumentsResourceImpl implements DocumentsResource {
 
     @Override
     public PaginatedResponse<DocumentDownload> listUnlinkedDocuments(DocumentFilterRequest filterRequest) {
-        List<DocumentEntity> unlinkedDocuments = documentsService.listUnlinkedDocuments();
+        var result = documentsService.listUnlinkedDocuments(filterRequest.getPage(), filterRequest.getSize());
         PaginatedResponse<DocumentDownload> response = new PaginatedResponse<>();
-        response.setData(unlinkedDocuments.stream()
+        response.setData(result.data().stream()
                 .map(d -> new DocumentDownload(
                         null, d.getId(), d.getFilename(), d.getSize(), d.getMimeType(), d.getSha256()))
                 .toList());
         response.setPage(filterRequest.getPage());
-        response.setSize(response.getData().size());
-        response.setTotalCount(response.getData().size());
+        response.setSize(result.data().size());
+        response.setTotalCount(result.totalCount());
         return response;
     }
 

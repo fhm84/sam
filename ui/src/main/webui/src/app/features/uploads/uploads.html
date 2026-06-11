@@ -91,7 +91,15 @@
   </div>
 
   <!-- ── Unlinked documents table ───────────────────────────────── -->
-  <p-table [value]="documents()" [loading]="loading()" [rows]="20">
+  <p-table
+    [value]="documents()"
+    [loading]="loading()"
+    [rows]="docsRows"
+    [lazy]="true"
+    [paginator]="true"
+    [totalRecords]="totalRecords()"
+    (onLazyLoad)="onDocumentsLazyLoad($event)"
+  >
     <ng-template #caption>
       <div class="flex items-center gap-2">
         <span class="font-semibold text-base">{{ 'uploads.table.title' | translate }}</span>

@@ -13,6 +13,7 @@ import de.halbmann.sam.business.sheets.boundary.InstrumentationRepository;
 import de.halbmann.sam.business.sheets.boundary.SheetRepository;
 import de.halbmann.sam.business.sheets.entity.InstrumentationEntity;
 import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
+import de.halbmann.sam.core.entity.PaginatedEntities;
 import de.halbmann.sam.core.exception.EntityNotFoundException;
 import de.halbmann.sam.core.exception.StorageException;
 import de.halbmann.sam.storage.MimeTypeUtils;
@@ -300,8 +301,8 @@ public class DocumentsService {
                 stream, doc.getId(), doc.getFilename(), doc.getSize(), doc.getMimeType(), doc.getSha256());
     }
 
-    public List<DocumentEntity> listUnlinkedDocuments() {
-        return documentRepository.findUnlinked();
+    public PaginatedEntities<DocumentEntity> listUnlinkedDocuments(int page, int size) {
+        return documentRepository.findUnlinked(page, size);
     }
 
     public void unlinkAttachments(Collection<AttachmentEntity> attachments) {
