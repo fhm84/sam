@@ -21,7 +21,7 @@ function makeCollection(overrides: Partial<SheetCollection> = {}): SheetCollecti
 
 describe('SheetCollections', () => {
   let component: SheetCollections;
-  let collectionsApi: { find: ReturnType<typeof vi.fn>; getCollectionsForSheet: ReturnType<typeof vi.fn>; addSheet: ReturnType<typeof vi.fn>; removeSheet: ReturnType<typeof vi.fn> };
+  let collectionsApi: { find: ReturnType<typeof vi.fn>; getCollectionsForSheet: ReturnType<typeof vi.fn>; addItem: ReturnType<typeof vi.fn>; removeItem: ReturnType<typeof vi.fn> };
   let messageService: MessageService;
   let confirmationService: ConfirmationService;
 
@@ -29,8 +29,8 @@ describe('SheetCollections', () => {
     collectionsApi = {
       find: vi.fn().mockReturnValue(paginatedOf([])),
       getCollectionsForSheet: vi.fn().mockReturnValue(paginatedOf([])),
-      addSheet: vi.fn().mockReturnValue(of(undefined)),
-      removeSheet: vi.fn().mockReturnValue(of(undefined)),
+      addItem: vi.fn().mockReturnValue(of(undefined)),
+      removeItem: vi.fn().mockReturnValue(of(undefined)),
     };
 
     await TestBed.overrideComponent(SheetCollections, {
@@ -136,10 +136,10 @@ describe('SheetCollections', () => {
   it('onAdd does nothing when canAdd is false', () => {
     (component as any).selectedCollection = null;
     (component as any).onAdd();
-    expect(collectionsApi.addSheet).not.toHaveBeenCalled();
+    expect(collectionsApi.addItem).not.toHaveBeenCalled();
   });
 
-  it('onAdd calls addSheet with correct payload and reloads on success', () => {
+  it('onAdd calls addItem with correct payload and reloads on success', () => {
     const col = makeCollection({ id: 'col-999' as any });
     (component as any).selectedCollection = col;
     (component as any).identifierForm.controls.identifier.setValue('2b');
@@ -147,7 +147,8 @@ describe('SheetCollections', () => {
 
     (component as any).onAdd();
 
-    expect(collectionsApi.addSheet).toHaveBeenCalledWith('col-999', {
+    expect(collectionsApi.addItem).toHaveBeenCalledWith('col-999', {
+      type: 'SHEET',
       identifier: '2b',
       sheetId: 'sheet-123',
     });
@@ -158,23 +159,23 @@ describe('SheetCollections', () => {
   // ── confirmRemove ─────────────────────────────────────
 
   it('confirmRemove does nothing when collection has no sheets entry', () => {
-    const col = makeCollection({ sheets: [] });
+    const col = makeCollection({ items: [] });
     const confirmSpy = vi.spyOn(confirmationService, 'confirm');
     (component as any).confirmRemove(col);
     expect(confirmSpy).not.toHaveBeenCalled();
   });
 
-  it('confirmRemove calls confirm and removeSheet on accept', () => {
+  it('confirmRemove calls confirm and removeItem on accept', () => {
     const col = makeCollection({
       id: 'col-1' as any,
-      sheets: [{ id: 'cs-1' as any, sheetId: 'sheet-123' as any }] as any,
+      items: [{ id: 'cs-1' as any, sheetId: 'sheet-123' as any }] as any,
     });
     vi.spyOn(confirmationService, 'confirm').mockImplementation(({ accept }: any) => accept?.());
     collectionsApi.getCollectionsForSheet.mockReturnValue(paginatedOf([]));
 
     (component as any).confirmRemove(col);
 
-    expect(collectionsApi.removeSheet).toHaveBeenCalledWith('col-1', 'cs-1');
+    expect(collectionsApi.removeItem).toHaveBeenCalledWith('col-1', 'cs-1');
   });
 
   // ── loadCollections on input change ───────────────────

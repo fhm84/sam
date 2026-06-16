@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, inject, Input, OnInit } from '@angular/core';
+import { Component, computed, inject, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FloatLabel } from 'primeng/floatlabel';
 import { InputText } from 'primeng/inputtext';
@@ -30,7 +30,6 @@ export const COVER_COLORS = [
 })
 export class CollectionForm extends BaseForm<SheetCollection> implements OnInit {
   private readonly api = inject(CollectionsApiService);
-  private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject(TranslationService);
 
   @Input() collection: SheetCollection | null = null;

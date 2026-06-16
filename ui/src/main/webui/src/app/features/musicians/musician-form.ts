@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, inject, Input, OnChanges, signal } from '@angular/core';
+import { Component, computed, inject, Input, OnChanges, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FloatLabel } from 'primeng/floatlabel';
@@ -32,7 +32,6 @@ export class MusicianForm extends BaseForm<Musician, Musician> implements OnChan
   private readonly adminUsersApi = inject(AdminUsersApiService);
   private readonly instrumentsApi = inject(InstrumentsApiService);
   private readonly messageService = inject(MessageService);
-  private readonly destroyRef = inject(DestroyRef);
   protected readonly auth = inject(AuthService);
 
   @Input() musician: Musician | null = null;

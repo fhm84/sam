@@ -9,7 +9,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { CollectionSheets } from './collection-sheets';
 import { CollectionsApiService, SheetsApiService } from '../../core/api';
 import { TranslationService } from '../../core/translation.service';
-import { CollectionSheet, SheetMusicSearchResult } from '../../model/datamodels';
+import { CollectionItem, SheetMusicSearchResult } from '../../model/datamodels';
 
 function paginatedOf<T>(data: T[], totalCount = data.length) {
   return of({ data, totalCount, page: 0, size: data.length });
@@ -19,27 +19,27 @@ function makeSearchResult(id: string, title = 'Test Sheet'): SheetMusicSearchRes
   return { id, title } as any;
 }
 
-function makeCollectionSheet(id: string, sheetId: string, identifier = 'A1'): CollectionSheet {
-  return { id, sheetId, identifier, title: 'Some Sheet' } as any;
+function makeCollectionItem(id: string, sheetId: string, identifier = 'A1'): CollectionItem {
+  return { id, sheetId, identifier, title: 'Some Sheet', type: 'SHEET' };
 }
 
 describe('CollectionSheets', () => {
   let component: CollectionSheets;
   let collectionsApi: {
-    listSheets: ReturnType<typeof vi.fn>;
-    addSheet: ReturnType<typeof vi.fn>;
-    updateSheet: ReturnType<typeof vi.fn>;
-    removeSheet: ReturnType<typeof vi.fn>;
+    listItems: ReturnType<typeof vi.fn>;
+    addItem: ReturnType<typeof vi.fn>;
+    updateItem: ReturnType<typeof vi.fn>;
+    removeItem: ReturnType<typeof vi.fn>;
   };
   let sheetsApi: { find: ReturnType<typeof vi.fn>; load: ReturnType<typeof vi.fn> };
   let confirmationService: ConfirmationService;
 
   beforeEach(async () => {
     collectionsApi = {
-      listSheets: vi.fn().mockReturnValue(paginatedOf([])),
-      addSheet: vi.fn().mockReturnValue(of(undefined)),
-      updateSheet: vi.fn().mockReturnValue(of(undefined)),
-      removeSheet: vi.fn().mockReturnValue(of(undefined)),
+      listItems: vi.fn().mockReturnValue(paginatedOf([])),
+      addItem: vi.fn().mockReturnValue(of(undefined)),
+      updateItem: vi.fn().mockReturnValue(of(undefined)),
+      removeItem: vi.fn().mockReturnValue(of(undefined)),
     };
     sheetsApi = {
       find: vi.fn().mockReturnValue(paginatedOf([])),
@@ -76,23 +76,16 @@ describe('CollectionSheets', () => {
     confirmationService = (component as any).confirmationService as ConfirmationService;
   });
 
-  // ── canAdd ─────────────────────────────────────────────
+  // ── canAddSheet ──────────────────────────────────────────
 
-  it('canAdd is false when no sheet selected', () => {
+  it('canAddSheet is false when no sheet selected', () => {
     (component as any).selectedSheet = null;
-    expect((component as any).canAdd).toBe(false);
+    expect((component as any).canAddSheet).toBe(false);
   });
 
-  it('canAdd is false when sheet selected but identifier empty', () => {
+  it('canAddSheet is true when a sheet is selected', () => {
     (component as any).selectedSheet = makeSearchResult('s1');
-    (component as any).identifierForm.controls.identifier.setValue('');
-    expect((component as any).canAdd).toBe(false);
-  });
-
-  it('canAdd is true when sheet selected and identifier filled', () => {
-    (component as any).selectedSheet = makeSearchResult('s1');
-    (component as any).identifierForm.controls.identifier.setValue('1a');
-    expect((component as any).canAdd).toBe(true);
+    expect((component as any).canAddSheet).toBe(true);
   });
 
   // ── isSelected ─────────────────────────────────────────
@@ -128,141 +121,163 @@ describe('CollectionSheets', () => {
     expect((component as any).difficultyLevelKey(7)).toBe('');
   });
 
-  // ── openAdd ────────────────────────────────────────────
+  // ── openAddSheet ───────────────────────────────────────
 
-  it('openAdd resets state and shows dialog', () => {
+  it('openAddSheet resets state and shows dialog', () => {
     (component as any).selectedSheet = makeSearchResult('s1');
     (component as any).identifierForm.controls.identifier.setValue('X');
     sheetsApi.find.mockClear();
 
-    (component as any).openAdd();
+    (component as any).openAddSheet();
 
     expect((component as any).selectedSheet).toBeNull();
     expect((component as any).identifierForm.controls.identifier.value).toBe('');
-    expect((component as any).addDialogVisible).toBe(true);
+    expect((component as any).addSheetDialogVisible).toBe(true);
     expect(sheetsApi.find).toHaveBeenCalledOnce();
+  });
+
+  it('openAddSheet resets createAnother to false', () => {
+    (component as any).createAnother = true;
+    (component as any).openAddSheet();
+    expect((component as any).createAnother).toBe(false);
   });
 
   // ── openEdit ───────────────────────────────────────────
 
   it('openEdit populates form and shows edit dialog', () => {
-    const sheet = makeCollectionSheet('cs1', 's1', '2b');
-    (component as any).openEdit(sheet);
-    expect((component as any).editingSheet).toBe(sheet);
+    const item = makeCollectionItem('cs1', 's1', '2b');
+    (component as any).openEdit(item);
+    expect((component as any).editingItem).toBe(item);
     expect((component as any).identifierForm.controls.identifier.value).toBe('2b');
     expect((component as any).editDialogVisible).toBe(true);
   });
 
-  // ── onAdd ──────────────────────────────────────────────
+  // ── onAddSheet ───────────────────────────────────────────
 
-  it('onAdd does nothing when canAdd is false', () => {
+  it('onAddSheet does nothing when canAddSheet is false', () => {
     (component as any).selectedSheet = null;
-    (component as any).onAdd();
-    expect(collectionsApi.addSheet).not.toHaveBeenCalled();
+    (component as any).onAddSheet();
+    expect(collectionsApi.addItem).not.toHaveBeenCalled();
   });
 
-  it('onAdd calls addSheet and reloads on success', () => {
+  it('onAddSheet calls addItem and reloads on success', () => {
     (component as any).selectedSheet = makeSearchResult('s2');
     (component as any).identifierForm.controls.identifier.setValue('3c');
-    collectionsApi.listSheets.mockClear();
+    collectionsApi.listItems.mockClear();
 
-    (component as any).onAdd();
+    (component as any).onAddSheet();
 
-    expect(collectionsApi.addSheet).toHaveBeenCalledWith('col-1', { identifier: '3c', sheetId: 's2' });
-    expect((component as any).addDialogVisible).toBe(false);
-    expect(collectionsApi.listSheets).toHaveBeenCalled();
+    expect(collectionsApi.addItem).toHaveBeenCalledWith('col-1', {
+      type: 'SHEET',
+      identifier: '3c',
+      sheetId: 's2',
+    });
+    expect((component as any).addSheetDialogVisible).toBe(false);
+    expect(collectionsApi.listItems).toHaveBeenCalled();
   });
 
   // ── createAnother ──────────────────────────────────────
 
-  it('openAdd resets createAnother to false', () => {
-    (component as any).createAnother = true;
-    (component as any).openAdd();
-    expect((component as any).createAnother).toBe(false);
-  });
-
-  it('onAdd with createAnother=true keeps dialog open and resets selection and identifier', () => {
-    (component as any).addDialogVisible = true;
+  it('onAddSheet with createAnother=true keeps dialog open and resets selection and identifier', () => {
+    (component as any).addSheetDialogVisible = true;
     (component as any).selectedSheet = makeSearchResult('s3');
     (component as any).identifierForm.controls.identifier.setValue('5');
     (component as any).createAnother = true;
 
-    (component as any).onAdd();
+    (component as any).onAddSheet();
 
-    expect((component as any).addDialogVisible).toBe(true);
+    expect((component as any).addSheetDialogVisible).toBe(true);
     expect((component as any).selectedSheet).toBeNull();
     expect((component as any).identifierForm.controls.identifier.value).toBe('');
   });
 
-  it('onAdd with createAnother=true still calls addSheet and reloads sheets', () => {
+  it('onAddSheet with createAnother=true still calls addItem and reloads items', () => {
     (component as any).selectedSheet = makeSearchResult('s3');
     (component as any).identifierForm.controls.identifier.setValue('5');
     (component as any).createAnother = true;
-    collectionsApi.listSheets.mockClear();
+    collectionsApi.listItems.mockClear();
 
-    (component as any).onAdd();
+    (component as any).onAddSheet();
 
-    expect(collectionsApi.addSheet).toHaveBeenCalledWith('col-1', { identifier: '5', sheetId: 's3' });
-    expect(collectionsApi.listSheets).toHaveBeenCalled();
+    expect(collectionsApi.addItem).toHaveBeenCalledWith('col-1', {
+      type: 'SHEET',
+      identifier: '5',
+      sheetId: 's3',
+    });
+    expect(collectionsApi.listItems).toHaveBeenCalled();
   });
 
-  it('onAdd with createAnother=false closes dialog as normal', () => {
+  it('onAddSheet with createAnother=false closes dialog as normal', () => {
     (component as any).selectedSheet = makeSearchResult('s4');
     (component as any).identifierForm.controls.identifier.setValue('6');
     (component as any).createAnother = false;
 
-    (component as any).onAdd();
+    (component as any).onAddSheet();
 
-    expect((component as any).addDialogVisible).toBe(false);
+    expect((component as any).addSheetDialogVisible).toBe(false);
   });
 
   // ── onUpdate ───────────────────────────────────────────
 
-  it('onUpdate does nothing when form is invalid', () => {
-    (component as any).editingSheet = makeCollectionSheet('cs1', 's1');
-    (component as any).identifierForm.controls.identifier.setValue('');
+  it('onUpdate does nothing when text item form is invalid', () => {
+    (component as any).editingItem = {
+      id: 'cs1',
+      identifier: 'A1',
+      type: 'TEXT',
+      textContent: '',
+    } as CollectionItem;
+    (component as any).textForm.reset({ identifier: 'A1', textContent: '' });
+
     (component as any).onUpdate();
-    expect(collectionsApi.updateSheet).not.toHaveBeenCalled();
+
+    expect(collectionsApi.updateItem).not.toHaveBeenCalled();
   });
 
-  it('onUpdate does nothing when editingSheet is null', () => {
-    (component as any).editingSheet = null;
+  it('onUpdate does nothing when editingItem is null', () => {
+    (component as any).editingItem = null;
     (component as any).onUpdate();
-    expect(collectionsApi.updateSheet).not.toHaveBeenCalled();
+    expect(collectionsApi.updateItem).not.toHaveBeenCalled();
   });
 
-  it('onUpdate calls updateSheet with correct payload', () => {
-    const sheet = makeCollectionSheet('cs1', 's1', '1a');
-    (component as any).editingSheet = sheet;
+  it('onUpdate calls updateItem with correct payload', () => {
+    const item = makeCollectionItem('cs1', 's1', '1a');
+    (component as any).editingItem = item;
     (component as any).identifierForm.reset({ identifier: '2b' });
-    collectionsApi.listSheets.mockClear();
+    collectionsApi.listItems.mockClear();
 
     (component as any).onUpdate();
 
-    expect(collectionsApi.updateSheet).toHaveBeenCalledWith('col-1', 'cs1', { identifier: '2b', sheetId: 's1' });
+    expect(collectionsApi.updateItem).toHaveBeenCalledWith('col-1', 'cs1', {
+      ...item,
+      identifier: '2b',
+    });
     expect((component as any).editDialogVisible).toBe(false);
-    expect(collectionsApi.listSheets).toHaveBeenCalled();
+    expect(collectionsApi.listItems).toHaveBeenCalled();
   });
 
   // ── confirmRemove ──────────────────────────────────────
 
-  it('confirmRemove calls confirm and removeSheet on accept', () => {
-    const sheet = makeCollectionSheet('cs1', 's1');
+  it('confirmRemove calls confirm and removeItem on accept', () => {
+    const item = makeCollectionItem('cs1', 's1');
     vi.spyOn(confirmationService, 'confirm').mockImplementation(({ accept }: any) => accept?.());
-    collectionsApi.listSheets.mockClear();
+    collectionsApi.listItems.mockClear();
 
-    (component as any).confirmRemove(sheet);
+    (component as any).confirmRemove(item);
 
-    expect(collectionsApi.removeSheet).toHaveBeenCalledWith('col-1', 'cs1');
-    expect(collectionsApi.listSheets).toHaveBeenCalled();
+    expect(collectionsApi.removeItem).toHaveBeenCalledWith('col-1', 'cs1');
+    expect(collectionsApi.listItems).toHaveBeenCalled();
   });
 
-  // ── loadSheets on input change ─────────────────────────
+  // ── loadItems on input change ───────────────────────────
 
-  it('ngOnChanges triggers loadSheets with collectionId', () => {
-    collectionsApi.listSheets.mockClear();
+  it('ngOnChanges triggers loadItems with collectionId', () => {
+    collectionsApi.listItems.mockClear();
     component.collectionId = 'col-2';
     component.ngOnChanges();
-    expect(collectionsApi.listSheets).toHaveBeenCalledWith('col-2', expect.any(Object));
+    expect(collectionsApi.listItems).toHaveBeenCalledWith(
+      'col-2',
+      expect.any(Object),
+      expect.any(Boolean),
+    );
   });
 });
