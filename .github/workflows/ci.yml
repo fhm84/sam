@@ -28,3 +28,24 @@ jobs:
 
       - name: Run unit tests
         run: ./mvnw test
+
+  ui-test:
+    name: UI Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: ui/src/main/webui/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ui/src/main/webui
+        run: npm ci
+
+      - name: Run UI unit tests
+        working-directory: ui/src/main/webui
+        run: npm test
