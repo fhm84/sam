@@ -625,104 +625,51 @@ worth deciding deliberately (see the composite-role discussion in
 
 ## 5. Key Flows
 
+Full sequence diagrams for these flows live in `docs/flows/` (one `.puml` file per flow,
+viewable in any PlantUML renderer or IDE plugin — matching the one-diagram-per-file
+convention already used by `docs/architecture.puml` and `src/site/resources/*.puml`
+elsewhere in this repo). This section gives the short version of each.
+
 ### Flow 1 – AI-assisted archival of a new physical score
 
-This is the most complete end-to-end flow and the main workflow for the Music librarian.
+This is the most complete end-to-end flow and the main workflow for the Music librarian:
+scan → upload to staging → *Classify* (text extraction, vision fallback for scanned
+pages) → review pre-filled form → *Apply* (creates/resolves Sheet, Instrumentation,
+Attachment) → record physical location and condition on the resulting instrumentation.
 
-```
-Music librarian                     SAM UI                     SAM Server / LLM
-    │                            │                               │
-    │── scans score to PDF ─────►│                               │
-    │── uploads to staging area ►│── POST /api/documents ───────►│
-    │                            │◄── document stored (unlinked) ─│
-    │── clicks "Classify" ──────►│── POST /documents/{id}/classify►│
-    │                            │                         extract text (PDFBox)
-    │                            │                         or vision fallback (LLM)
-    │                            │                         match musicians, instruments
-    │                            │◄── SheetClassification ────────│
-    │◄── review form pre-filled ─│                               │
-    │                            │                               │
-    │── adjusts, confirms ──────►│── POST /documents/{id}/apply ─►│
-    │                            │                         create/resolve Sheet
-    │                            │                         create Instrumentation
-    │                            │                         link Attachment
-    │                            │◄── ClassificationApplyResult ──│
-    │◄── sheet detail opens ─────│                               │
-    │                            │                               │
-    │── opens instrumentation ──►│                               │
-    │── enters physical location►│── PUT /instrumentations/{id} ─►│
-    │── sets condition = GOOD ──►│                               │
-    │◄── saved ──────────────────│                               │
-```
+→ `docs/flows/flow-1-ai-assisted-archival.puml`
 
 ---
 
 ### Flow 2 – Concert programme check (Conductor)
 
-```
-Conductor                     SAM UI                     SAM Server
-    │                            │                             │
-    │── opens Sheets list ──────►│── GET /api/sheets?ensemble=x►│
-    │                            │                   return sheets + snapshot badges
-    │◄── list with COMPLETE /    │                             │
-    │    PLAYABLE / INCOMPLETE   │                             │
-    │    badges per piece ───────│                             │
-    │                            │                             │
-    │── clicks incomplete piece ►│── GET /sheets/{id}/coverage►│
-    │                            │                   live evaluation
-    │◄── coverage detail:        │                             │
-    │    which voices missing    │                             │
-    │    score breakdown ────────│                             │
-    │                            │                             │
-    │── creates setlist ────────►│── POST /api/sheet-collections►│
-    │── adds pieces ────────────►│── POST /collections/{id}/sheets►│
-    │◄── setlist ready ──────────│                             │
-```
+Opens the Sheets list scoped to an ensemble, reads coverage badges (`COMPLETE` /
+`PLAYABLE` / `INCOMPLETE`), drills into an incomplete piece for the per-voice breakdown,
+then creates a setlist and adds suitable pieces to it.
+
+→ `docs/flows/flow-2-concert-programme-check.puml`
 
 ---
 
 ### Flow 3 – Musician retrieves their part
 
-```
-Musician                      SAM UI
-    │                            │
-    │── searches by title ──────►│── GET /api/sheets?q=...
-    │◄── results ────────────────│
-    │── opens sheet detail ─────►│
-    │── opens Instrumentations ─►│
-    │   tab                      │
-    │◄── table shows:            │
-    │    Instrument | Part Label  │
-    │    | Archive Location       │
-    │    | Condition              │
-    │                            │
-    │── expands row for their    │
-    │   instrument ─────────────►│
-    │◄── attached files listed ──│
-    │── downloads part PDF ─────►│── GET /api/documents/{id}
-    │◄── file download ──────────│
-```
+Searches by title, opens the sheet's *Instrumentations* tab, finds the row for their
+instrument (archive location, condition), expands it for attached files, and downloads
+the part.
+
+→ `docs/flows/flow-3-musician-retrieves-part.puml`
 
 ---
 
 ### Flow 4 – Share creation and guest access
 
-```
-Music librarian                SAM UI                     SAM Server                Guest
-    │                            │                             │                        │
-    │── Shares → New share ─────►│── POST /api/shares ────────►│                        │
-    │   (resource + expiry)      │                   create token, creator = caller     │
-    │◄── public URL shown ───────│◄── ShareResponse ───────────│                        │
-    │── copies link, sends via   │                             │                        │
-    │   WhatsApp ─────────────────────────────────────────────────────────────────────►│
-    │                            │                             │── opens /public/share/{token}
-    │                            │                             │◄── GET /public/share/{token}
-    │                            │                             │   validate: not expired/revoked
-    │                            │                             │── render resource ────►│
-    │                            │                             │   log event_log         │
-    │                            │                             │   (shareTokenId set,    │
-    │                            │                             │    userId/username null)│
-```
+Music librarian creates a resource-scoped share token (`POST /api/shares`) for one
+instrumentation or collection, copies the public URL, and distributes it. The guest opens
+`/public/share/{token}` with no login; the server validates the token isn't expired or
+revoked, renders the resource, and logs the access with `shareTokenId` set instead of a
+`userId`.
+
+→ `docs/flows/flow-4-share-creation-guest-access.puml`
 
 ---
 

@@ -1,0 +1,23 @@
+@startuml
+title Flow 3 - Musician retrieves their part
+
+actor "Musician" as Mus
+participant "SAM UI" as UI
+participant "SAM Server" as Server
+
+Mus -> UI: searches by title
+UI -> Server: GET /api/sheets?q=...
+Server --> UI: results
+UI --> Mus: results
+
+Mus -> UI: opens sheet detail ->\nInstrumentations tab
+UI --> Mus: table: Instrument | Part Label |\nArchive Location | Condition
+
+Mus -> UI: expands row for their instrument
+UI --> Mus: attached files listed
+
+Mus -> UI: downloads part PDF
+UI -> Server: GET /api/documents/{id}
+Server --> UI: file
+UI --> Mus: file download
+@enduml

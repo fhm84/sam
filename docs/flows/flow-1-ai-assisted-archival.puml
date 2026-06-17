@@ -1,0 +1,33 @@
+@startuml
+title Flow 1 - AI-assisted archival of a new physical score (Music librarian)
+
+actor "Music librarian" as Lib
+participant "SAM UI" as UI
+participant "SAM Server" as Server
+participant "LLM Provider" as LLM
+
+Lib -> UI: scans score to PDF,\nuploads to staging area
+UI -> Server: POST /api/documents
+Server --> UI: document stored (unlinked)
+
+Lib -> UI: clicks "Classify"
+UI -> Server: POST /documents/{id}/classify
+Server -> Server: extract text (PDFBox)
+alt text extraction insufficient (scanned/image-only)
+  Server -> LLM: vision fallback
+  LLM --> Server: detected metadata
+end
+Server -> Server: match musicians/instruments\n(pg_trgm trigram similarity)
+Server --> UI: SheetClassification
+UI --> Lib: review form pre-filled
+
+Lib -> UI: adjusts fields, confirms
+UI -> Server: POST /documents/{id}/apply
+Server -> Server: create/resolve Sheet,\ncreate Instrumentation,\nlink Attachment
+Server --> UI: ClassificationApplyResult
+UI --> Lib: sheet detail opens
+
+Lib -> UI: opens instrumentation,\nenters physical location,\nsets condition = GOOD
+UI -> Server: PUT /instrumentations/{id}
+Server --> UI: saved
+@enduml

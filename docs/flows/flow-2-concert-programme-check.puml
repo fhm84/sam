@@ -1,0 +1,24 @@
+@startuml
+title Flow 2 - Concert programme check (Conductor)
+
+actor "Conductor" as Cond
+participant "SAM UI" as UI
+participant "SAM Server" as Server
+
+Cond -> UI: opens Sheets list
+UI -> Server: GET /api/sheets?ensemble=x
+Server --> UI: sheets + snapshot badges
+UI --> Cond: list with COMPLETE / PLAYABLE / INCOMPLETE badges
+
+Cond -> UI: clicks incomplete piece
+UI -> Server: GET /sheets/{id}/coverage
+Server -> Server: live evaluation
+Server --> UI: coverage detail\n(which voices missing, score breakdown)
+UI --> Cond: shows coverage detail
+
+Cond -> UI: creates setlist
+UI -> Server: POST /api/sheet-collections
+Cond -> UI: adds pieces
+UI -> Server: POST /collections/{id}/sheets
+Server --> UI: setlist ready
+@enduml

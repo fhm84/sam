@@ -1,0 +1,21 @@
+@startuml
+title Flow 4 - Share creation and guest access
+
+actor "Music librarian" as Lib
+participant "SAM UI" as UI
+participant "SAM Server" as Server
+actor "Guest" as Guest
+
+Lib -> UI: Shares -> New share\n(resource + expiry)
+UI -> Server: POST /api/shares
+Server -> Server: create token,\ncreator = caller
+Server --> UI: ShareResponse
+UI --> Lib: public URL shown
+
+Lib -> Guest: copies link,\nsends via WhatsApp
+
+Guest -> Server: GET /public/share/{token}
+Server -> Server: validate: not expired/revoked
+Server --> Guest: render resource
+Server -> Server: log event_log\n(shareTokenId set,\nuserId/username null)
+@enduml
