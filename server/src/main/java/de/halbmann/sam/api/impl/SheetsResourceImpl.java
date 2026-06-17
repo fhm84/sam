@@ -107,6 +107,19 @@ public class SheetsResourceImpl implements SheetsResource {
     }
 
     @Override
+    public ExploreShelves getExploreShelves(final String ensembleId) {
+        return sheetService.getExploreShelves(ensembleId);
+    }
+
+    @Override
+    public Response getSurprisePick(final String ensembleId) {
+        return sheetService
+                .getSurprisePick(ensembleId)
+                .map(pick -> Response.ok(pick).build())
+                .orElseGet(() -> Response.noContent().build());
+    }
+
+    @Override
     public List<String> getGenres() {
         return sheetService.getDistinctGenres();
     }

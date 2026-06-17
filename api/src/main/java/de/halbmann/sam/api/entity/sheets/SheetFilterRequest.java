@@ -56,4 +56,10 @@ public class SheetFilterRequest extends PaginationRequest {
      */
     @QueryParam("ensemble")
     private String ensemble;
+
+    /**
+     * Filter to sheets carrying this exact tag.
+     */
+    @QueryParam("tag")
+    private String tag;
 }

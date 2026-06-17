@@ -333,7 +333,33 @@
       "error": "Export failed"
     },
     "save": "Save",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "explore": {
+      "surprise": {
+        "title": "Surprise pick",
+        "shuffle": "Shuffle",
+        "empty": "No sheets in the archive yet."
+      },
+      "tagCloud": {
+        "title": "Browse by tag",
+        "empty": "No tags yet — add some to your sheets to browse by mood or occasion."
+      },
+      "shelves": {
+        "quickFillers": {
+          "title": "Quick fillers",
+          "subtitle": "Under 3:30 — for warm-ups, encores, or fitting one more in"
+        },
+        "bigFinishes": {
+          "title": "Big finishes",
+          "subtitle": "Five minutes and up — closers, overtures, medleys"
+        },
+        "recentlyAdded": {
+          "title": "Recently added",
+          "subtitle": "Added in the last 30 days"
+        },
+        "empty": "Nothing here yet."
+      }
+    }
   },
   "collections": {
     "title": "Sheet Collections",

@@ -8,9 +8,11 @@ import de.halbmann.sam.api.entity.shared.PaginatedResponse;
 import de.halbmann.sam.api.entity.shared.PaginationRequest;
 import de.halbmann.sam.api.entity.shared.SearchResultMetrics;
 import de.halbmann.sam.api.entity.sheets.CreateSheetMusic;
+import de.halbmann.sam.api.entity.sheets.ExploreShelves;
 import de.halbmann.sam.api.entity.sheets.SheetFilterRequest;
 import de.halbmann.sam.api.entity.sheets.SheetMusic;
 import de.halbmann.sam.api.entity.sheets.SheetMusicSearchResult;
+import de.halbmann.sam.api.entity.sheets.TagCount;
 import de.halbmann.sam.business.collections.controller.SheetCollectionService;
 import de.halbmann.sam.business.documents.controller.AttachmentLinkService;
 import de.halbmann.sam.business.ensembles.controller.CoverageSnapshotService;
@@ -91,7 +93,7 @@ public class SheetService {
             }
 
             PaginatedResponse<SheetMusic> sheets =
-                    getAllSheets(filterRequest, parameters, filterRequest.getTitleStartsWith());
+                    getAllSheets(filterRequest, parameters, filterRequest.getTitleStartsWith(), filterRequest.getTag());
             response = new PaginatedResponse<>();
             response.setPage(filterRequest.getPage());
             response.setSize(sheets.getSize());
@@ -108,18 +110,76 @@ public class SheetService {
     }
 
     private void attachCoverage(PaginatedResponse<SheetMusicSearchResult> response, String ensembleId) {
-        List<UUID> sheetIds = response.getData().stream().map(SheetMusic::getId).toList();
+        attachCoverage(response.getData(), ensembleId);
+    }
+
+    private void attachCoverage(List<SheetMusicSearchResult> results, String ensembleId) {
+        if (results.isEmpty()) {
+            return;
+        }
+        List<UUID> sheetIds = results.stream().map(SheetMusic::getId).toList();
         Map<UUID, CoverageSnapshotSummary> coverageMap =
                 coverageSnapshotService.findSummaries(UUID.fromString(ensembleId), sheetIds);
-        response.getData().forEach(r -> r.setCoverage(coverageMap.get(r.getId())));
+        results.forEach(r -> r.setCoverage(coverageMap.get(r.getId())));
+    }
+
+    private static final int EXPLORE_SHELF_LIMIT = 12;
+
+    private static final int EXPLORE_TAG_CLOUD_LIMIT = 30;
+
+    /**
+     * Curated shelves for the Sheets Overview's Explore view. When {@code ensembleId} is given,
+     * coverage snapshots are attached so shelves can show ensemble-relative coverage badges.
+     */
+    public ExploreShelves getExploreShelves(final String ensembleId) {
+        List<SheetMusicSearchResult> quickFillers =
+                mapToSearchResults(sheetRepository.findQuickFillers(EXPLORE_SHELF_LIMIT));
+        List<SheetMusicSearchResult> bigFinishes =
+                mapToSearchResults(sheetRepository.findBigFinishes(EXPLORE_SHELF_LIMIT));
+        List<SheetMusicSearchResult> recentlyAdded =
+                mapToSearchResults(sheetRepository.findRecentlyAdded(EXPLORE_SHELF_LIMIT));
+        List<TagCount> tagCloud = sheetRepository.findTopTags(EXPLORE_TAG_CLOUD_LIMIT);
+
+        if (ensembleId != null) {
+            List<SheetMusicSearchResult> all = new ArrayList<>();
+            all.addAll(quickFillers);
+            all.addAll(bigFinishes);
+            all.addAll(recentlyAdded);
+            attachCoverage(all, ensembleId);
+        }
+
+        return new ExploreShelves(quickFillers, bigFinishes, recentlyAdded, tagCloud);
+    }
+
+    /**
+     * A single random sheet for the Explore view's "surprise pick", or empty if the archive has
+     * no sheets yet.
+     */
+    public Optional<SheetMusicSearchResult> getSurprisePick(final String ensembleId) {
+        Optional<SheetMusicSearchResult> pick =
+                sheetRepository.findRandomSheet().map(sheetMusicMapper::toDto).map(SheetMusicSearchResult::new);
+        pick.ifPresent(result -> {
+            if (ensembleId != null) {
+                attachCoverage(List.of(result), ensembleId);
+            }
+        });
+        return pick;
+    }
+
+    private List<SheetMusicSearchResult> mapToSearchResults(List<SheetMusicEntity> entities) {
+        return entities.stream()
+                .map(sheetMusicMapper::toDto)
+                .map(SheetMusicSearchResult::new)
+                .toList();
     }
 
     private PaginatedResponse<SheetMusic> getAllSheets(
             final PaginationRequest paginationRequest,
             final Map<String, Object> parameters,
-            final String titleStartsWith) {
+            final String titleStartsWith,
+            final String tag) {
         PaginatedEntities<SheetMusicEntity> result =
-                sheetRepository.findSheetEntities(paginationRequest, parameters, titleStartsWith);
+                sheetRepository.findSheetEntities(paginationRequest, parameters, titleStartsWith, tag);
 
         PaginatedResponse<SheetMusic> response = new PaginatedResponse<>();
         response.setData(result.data().stream().map(sheetMusicMapper::toDto).toList());

@@ -333,7 +333,33 @@
       "error": "Export fehlgeschlagen"
     },
     "save": "Speichern",
-    "cancel": "Abbrechen"
+    "cancel": "Abbrechen",
+    "explore": {
+      "surprise": {
+        "title": "Überraschungstipp",
+        "shuffle": "Neu mischen",
+        "empty": "Noch keine Noten im Archiv."
+      },
+      "tagCloud": {
+        "title": "Nach Tag durchsuchen",
+        "empty": "Noch keine Tags — fügen Sie Ihren Noten Tags hinzu, um nach Stimmung oder Anlass zu stöbern."
+      },
+      "shelves": {
+        "quickFillers": {
+          "title": "Kurze Lückenfüller",
+          "subtitle": "Unter 3:30 — für Einspielen, Zugaben oder um noch ein Stück unterzubringen"
+        },
+        "bigFinishes": {
+          "title": "Große Finals",
+          "subtitle": "Fünf Minuten und mehr — Schlussstücke, Ouvertüren, Medleys"
+        },
+        "recentlyAdded": {
+          "title": "Zuletzt hinzugefügt",
+          "subtitle": "In den letzten 30 Tagen hinzugefügt"
+        },
+        "empty": "Hier gibt es noch nichts."
+      }
+    }
   },
   "collections": {
     "title": "Notensammlungen",

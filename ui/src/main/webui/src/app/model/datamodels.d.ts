@@ -493,6 +493,13 @@ export interface DifficultyJsonbAdapter extends JsonbAdapter<short, number> {
 export interface DurationJsonbAdapter extends JsonbAdapter<long, string> {
 }
 
+export interface ExploreShelves {
+    bigFinishes?: SheetMusicSearchResult[];
+    quickFillers?: SheetMusicSearchResult[];
+    recentlyAdded?: SheetMusicSearchResult[];
+    tagCloud?: TagCount[];
+}
+
 export interface Instrumentation {
     attachments?: Attachment[];
     clef?: Clef;
@@ -512,6 +519,7 @@ export interface SheetFilterRequest extends PaginationRequest {
     favorite?: boolean;
     genre?: string;
     query?: string;
+    tag?: string;
     title?: string;
     titleStartsWith?: string;
 }
@@ -550,6 +558,11 @@ export interface SheetMusicSearchResult extends SheetMusic {
 
 export interface SheetWithMyParts extends SheetMusicSearchResult {
     myInstrumentations?: Instrumentation[];
+}
+
+export interface TagCount {
+    count?: number;
+    tag?: string;
 }
 
 export interface FileUpload extends FilePart {
