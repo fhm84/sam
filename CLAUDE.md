@@ -175,3 +175,6 @@ After implementing a feature or bugfix:
 2. If architecture changed, verify docs/architecture.md sections match
 3. If UI patterns changed, check memory files (ui-architecture.md, etc.)
 4. If adding new modules or resources, update the module structure in architecture.md
+5. If a `docs/roadmap.md` item shipped, flip its status (`idea`/`planned`/`in progress` → `done`) instead of leaving it stale
+6. If the change affects who can do what (new/changed `@RolesAllowed`, new endpoint, new share/visibility behavior, new personalised view), check `docs/stakeholders.md` — its use cases and the Section 6 access-control model drift silently and easily (e.g. RBAC and share links stayed marked "planned" long after they shipped)
+7. If a new feature or endpoint is user-facing, check `docs/features.md` for a missing or stale entry
