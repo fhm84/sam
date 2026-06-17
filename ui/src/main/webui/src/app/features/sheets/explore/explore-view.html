@@ -1,0 +1,99 @@
+<div class="flex flex-col gap-8" data-testid="explore-view">
+  <section data-testid="explore-surprise">
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="m-0 text-lg font-semibold text-[var(--sam-text)]">{{ 'sheets.explore.surprise.title' | translate }}</h2>
+      <p-button
+        data-testid="btn-explore-shuffle"
+        icon="pi pi-refresh"
+        [label]="t.t('sheets.explore.surprise.shuffle')"
+        [outlined]="true"
+        size="small"
+        [loading]="loadingSurprise()"
+        (onClick)="shuffle()"
+      />
+    </div>
+    @if (!loadingSurprise()) {
+      @if (surprise()) {
+        <div
+          class="explore-card explore-card--hero cursor-pointer"
+          data-testid="explore-surprise-card"
+          (click)="onCardClick(surprise()!)"
+        >
+          <div class="flex flex-col gap-1 min-w-0">
+            <span class="font-semibold text-[1.1rem] text-[var(--sam-text)]">{{ surprise()!.title }}</span>
+            @if (surprise()!.composer?.name) {
+              <span class="text-[0.9rem] text-[var(--sam-text-muted)]">{{ surprise()!.composer?.name }}</span>
+            }
+          </div>
+          <div class="flex flex-wrap gap-[0.375rem] mt-2">
+            @if (surprise()!.genre) {
+              <p-tag icon="pi pi-tag" [value]="'sheets.genres.' + surprise()!.genre | translate" severity="secondary" />
+            }
+            @if (surprise()!.duration) {
+              <p-tag icon="pi pi-clock" [value]="formatDuration(surprise()!.duration)" severity="secondary" />
+            }
+          </div>
+        </div>
+      } @else {
+        <div class="p-6 text-center text-[var(--sam-text-muted)]" data-testid="explore-surprise-empty">
+          {{ 'sheets.explore.surprise.empty' | translate }}
+        </div>
+      }
+    }
+  </section>
+
+  <section data-testid="explore-tag-cloud">
+    <h2 class="m-0 mb-3 text-lg font-semibold text-[var(--sam-text)]">{{ 'sheets.explore.tagCloud.title' | translate }}</h2>
+    @if ((shelves()?.tagCloud?.length ?? 0) > 0) {
+      <div class="flex flex-wrap gap-2">
+        @for (tagCount of shelves()!.tagCloud; track tagCount.tag) {
+          <button
+            type="button"
+            class="tag-chip"
+            [class]="tagWeightClass(tagCount.count, maxTagCount(shelves()!.tagCloud))"
+            [attr.data-testid]="'explore-tag-' + tagCount.tag"
+            (click)="onTagClick(tagCount)"
+          >#{{ tagCount.tag }}</button>
+        }
+      </div>
+    } @else if (!loadingShelves()) {
+      <div class="p-4 text-[var(--sam-text-muted)]" data-testid="explore-tag-cloud-empty">
+        {{ 'sheets.explore.tagCloud.empty' | translate }}
+      </div>
+    }
+  </section>
+
+  @for (shelf of shelfList(); track shelf.key) {
+    <section [attr.data-testid]="'explore-shelf-' + shelf.key">
+      <div class="flex flex-col gap-0.5 mb-3">
+        <h2 class="m-0 text-lg font-semibold text-[var(--sam-text)]">{{ ('sheets.explore.shelves.' + shelf.key + '.title') | translate }}</h2>
+        <p class="m-0 text-[0.85rem] text-[var(--sam-text-muted)]">{{ ('sheets.explore.shelves.' + shelf.key + '.subtitle') | translate }}</p>
+      </div>
+      @if (!loadingShelves()) {
+        @if ((shelf.items?.length ?? 0) > 0) {
+          <div class="explore-shelf-row">
+            @for (sheet of shelf.items; track sheet.id) {
+              <div
+                class="explore-card cursor-pointer"
+                [attr.data-testid]="'explore-card-' + sheet.id"
+                (click)="onCardClick(sheet)"
+              >
+                <span class="font-medium text-[0.95rem] text-[var(--sam-text)] block truncate">{{ sheet.title }}</span>
+                @if (sheet.composer?.name) {
+                  <span class="text-[0.8rem] text-[var(--sam-text-muted)] block truncate">{{ sheet.composer?.name }}</span>
+                }
+                @if (sheet.duration) {
+                  <p-tag icon="pi pi-clock" [value]="formatDuration(sheet.duration)" severity="secondary" styleClass="mt-2" />
+                }
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="p-4 text-[var(--sam-text-muted)]" [attr.data-testid]="'explore-shelf-empty-' + shelf.key">
+            {{ 'sheets.explore.shelves.empty' | translate }}
+          </div>
+        }
+      }
+    </section>
+  }
+</div>

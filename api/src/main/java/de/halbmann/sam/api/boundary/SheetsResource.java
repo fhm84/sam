@@ -101,6 +101,27 @@ public interface SheetsResource {
     void unfavorite(@PathParam("sheetId") String sheetId);
 
     /**
+     * Returns curated discovery shelves (quick fillers, big finishes, recently added, tag cloud)
+     * for the Sheets Overview's Explore view.
+     *
+     * @param ensembleId optional ensemble context; when set, coverage snapshots are attached
+     * @return the explore shelves
+     */
+    @GET
+    @Path("explore")
+    ExploreShelves getExploreShelves(@QueryParam("ensemble") String ensembleId);
+
+    /**
+     * Returns a single random sheet for the Explore view's "surprise pick".
+     *
+     * @param ensembleId optional ensemble context; when set, a coverage snapshot is attached
+     * @return 200 with the picked sheet, or 204 if the archive has no sheets yet
+     */
+    @GET
+    @Path("explore/surprise")
+    Response getSurprisePick(@QueryParam("ensemble") String ensembleId);
+
+    /**
      * Returns all distinct genre values used across sheet music.
      *
      * @return a sorted list of genre strings

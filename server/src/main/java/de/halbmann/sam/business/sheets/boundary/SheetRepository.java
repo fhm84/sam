@@ -3,6 +3,7 @@ package de.halbmann.sam.business.sheets.boundary;
 import de.halbmann.sam.api.entity.shared.PaginationRequest;
 import de.halbmann.sam.api.entity.shared.SortOrder;
 import de.halbmann.sam.api.entity.sheets.Genre;
+import de.halbmann.sam.api.entity.sheets.TagCount;
 import de.halbmann.sam.business.documents.entity.AttachmentEntity;
 import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
 import de.halbmann.sam.core.controller.SortFieldValidator;
@@ -11,6 +12,10 @@ import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -35,6 +40,14 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
             "iswc",
             "gemaWorkNumber",
             "additionalNotes");
+
+    /** Explore view shelf thresholds. */
+    private static final Duration QUICK_FILLER_MAX_DURATION =
+            Duration.ofMinutes(3).plusSeconds(30);
+
+    private static final Duration BIG_FINISH_MIN_DURATION = Duration.ofMinutes(5);
+
+    private static final int RECENTLY_ADDED_WINDOW_DAYS = 30;
 
     @SuppressWarnings("unchecked")
     public List<Object[]> searchSheets(final String query, final int page, final int size) {
@@ -127,7 +140,8 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
     public PaginatedEntities<SheetMusicEntity> findSheetEntities(
             final PaginationRequest paginationRequest,
             final Map<String, Object> parameters,
-            final String titleStartsWith) {
+            final String titleStartsWith,
+            final String tag) {
         final Map<String, Object> nonNullParams = parameters.entrySet().stream()
                 .filter(entry -> entry.getValue() != null)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
@@ -139,6 +153,11 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
         if (titleStartsWith != null && !titleStartsWith.isBlank()) {
             conditions.add("lower(title) like :titlePrefix");
             queryParams.put("titlePrefix", titleStartsWith.toLowerCase(Locale.ROOT) + "%");
+        }
+
+        if (tag != null && !tag.isBlank()) {
+            conditions.add(":tag member of tags");
+            queryParams.put("tag", tag);
         }
 
         final String filter = String.join(" and ", conditions);
@@ -158,6 +177,57 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
                 .list();
 
         return new PaginatedEntities<>(sheets, totalItems);
+    }
+
+    /**
+     * Sheets short enough to use as warm-ups, encores, or to fit one more piece into a program.
+     */
+    public List<SheetMusicEntity> findQuickFillers(int limit) {
+        return find("duration is not null and duration < ?1 order by duration", QUICK_FILLER_MAX_DURATION)
+                .page(0, limit)
+                .list();
+    }
+
+    /**
+     * Sheets long enough to serve as closers, overtures, or medleys.
+     */
+    public List<SheetMusicEntity> findBigFinishes(int limit) {
+        return find("duration is not null and duration >= ?1 order by duration desc", BIG_FINISH_MIN_DURATION)
+                .page(0, limit)
+                .list();
+    }
+
+    /**
+     * Sheets added within the last {@value #RECENTLY_ADDED_WINDOW_DAYS} days.
+     */
+    public List<SheetMusicEntity> findRecentlyAdded(int limit) {
+        LocalDateTime since = LocalDateTime.now(ZoneOffset.UTC).minusDays(RECENTLY_ADDED_WINDOW_DAYS);
+        return find("created >= ?1 order by created desc", since).page(0, limit).list();
+    }
+
+    /**
+     * The most frequently used tags across all sheets, for the Explore view's tag cloud.
+     */
+    @SuppressWarnings("unchecked")
+    public List<TagCount> findTopTags(int limit) {
+        List<Object[]> rows = getEntityManager()
+                .createNativeQuery(
+                        "select tag, count(*) as cnt from sheet_music_tags group by tag order by cnt desc limit :limit")
+                .setParameter("limit", limit)
+                .getResultList();
+        return rows.stream()
+                .map(row -> new TagCount((String) row[0], ((Number) row[1]).longValue()))
+                .toList();
+    }
+
+    /**
+     * A single random sheet, for the Explore view's "surprise pick".
+     */
+    public Optional<SheetMusicEntity> findRandomSheet() {
+        List<UUID> ids = getEntityManager()
+                .createNativeQuery("select id from sheets order by random() limit 1", UUID.class)
+                .getResultList();
+        return ids.isEmpty() ? Optional.empty() : findByIdOptional(ids.get(0));
     }
 
     private Sort prepareSort(PaginationRequest paginationRequest) {

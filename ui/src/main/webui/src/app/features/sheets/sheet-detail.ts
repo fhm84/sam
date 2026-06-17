@@ -24,7 +24,7 @@ import { InstrumentationDocuments, DocToggleEvent, DocsLoadedEvent } from './ins
 import { EnrichmentDialog } from './enrichment-dialog/enrichment-dialog';
 import { SheetCollections } from './sheet-collections';
 import { ShareDialogComponent } from '../../shared/share-dialog/share-dialog';
-import { instrumentLabel } from '../../shared/utils/format.utils';
+import { formatDuration, instrumentLabel } from '../../shared/utils/format.utils';
 
 @Component({
   selector: 'app-sheet-detail',
@@ -445,17 +445,7 @@ export class SheetDetail extends DocumentHandler implements OnChanges {
   }
 
   protected formatDuration(iso: unknown): string {
-    if (!iso || typeof iso !== 'string') return '';
-    // Parse ISO 8601 duration string like "PT1H3M30S" or "PT3M30S"
-    const match = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?/);
-    if (!match) return iso;
-    const h = parseInt(match[1] ?? '0', 10);
-    const m = parseInt(match[2] ?? '0', 10);
-    const s = Math.round(parseFloat(match[3] ?? '0'));
-    if (h > 0) {
-      return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-    }
-    return `${m}:${String(s).padStart(2, '0')}`;
+    return formatDuration(iso);
   }
 
   private sanitizeFilename(title: string): string {

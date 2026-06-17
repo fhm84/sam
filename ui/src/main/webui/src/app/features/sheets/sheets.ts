@@ -35,6 +35,7 @@ import { GENRES, STYLES } from '../../shared/constants';
 import { Dialog } from 'primeng/dialog';
 import { SheetDetail } from './sheet-detail';
 import { SheetCollections } from './sheet-collections';
+import { ExploreView } from './explore/explore-view';
 
 @Component({
   selector: 'app-sheets',
@@ -53,6 +54,7 @@ Button,
     TranslatePipe,
     SheetDetail,
     SheetCollections,
+    ExploreView,
     Drawer,
     Dialog,
     Toolbar,
@@ -83,7 +85,7 @@ export class Sheets implements OnInit {
   protected readonly sheets = signal<SheetMusicSearchResult[]>([]);
   protected readonly totalRecords = signal(0);
   protected readonly loading = signal(true);
-  protected readonly viewMode = signal<'list' | 'cards'>('cards');
+  protected readonly viewMode = signal<'list' | 'cards' | 'explore'>('cards');
   protected readonly filterPanelOpen = signal(false);
   protected readonly genreOptions = computed(() =>
     GENRES.map((g) => ({ label: this.t.t(`sheets.genres.${g}`), value: g })),
@@ -97,6 +99,7 @@ export class Sheets implements OnInit {
   protected readonly selectedLetter = signal<string | null>(null);
   protected readonly availableLetters = signal<string[]>([]);
   protected readonly hasTextSearch = signal(false);
+  protected readonly tagFilter = signal<string | null>(null);
   protected readonly debugMode = signal(false);
   protected readonly activeFilterCount = computed(
     () => (this.selectedGenre() ? 1 : 0) + (this.selectedLetter() ? 1 : 0),
@@ -118,6 +121,7 @@ export class Sheets implements OnInit {
   protected readonly viewOptions = [
     { icon: 'pi pi-th-large', value: 'cards' },
     { icon: 'pi pi-list', value: 'list' },
+    { icon: 'pi pi-compass', value: 'explore' },
   ];
 
   protected currentPage = 0;
@@ -137,9 +141,11 @@ export class Sheets implements OnInit {
         this.loadData();
       });
 
-    this.viewMode.set(this.layoutPref.getViewMode('sheets'));
+    this.viewMode.set(this.layoutPref.getViewMode('sheets', ['list', 'cards', 'explore'] as const, 'cards'));
     this.loadAvailableLetters();
-    this.loadData();
+    if (this.viewMode() !== 'explore') {
+      this.loadData();
+    }
     this.loadEnsembles();
   }
 
@@ -219,6 +225,26 @@ export class Sheets implements OnInit {
 
   protected onViewModeChange(): void {
     this.layoutPref.setViewMode('sheets', this.viewMode());
+    this.currentPage = 0;
+    if (this.viewMode() !== 'explore') {
+      this.loadData();
+    }
+  }
+
+  protected onExploreTagSelected(tag: string): void {
+    this.tagFilter.set(tag);
+    this.viewMode.set('cards');
+    this.layoutPref.setViewMode('sheets', 'cards');
+    this.currentPage = 0;
+    this.loadData();
+  }
+
+  protected onExploreOpenSheet(sheet: SheetMusicSearchResult): void {
+    this.openDetail(sheet);
+  }
+
+  protected clearTagFilter(): void {
+    this.tagFilter.set(null);
     this.currentPage = 0;
     this.loadData();
   }
@@ -335,7 +361,9 @@ export class Sheets implements OnInit {
     if (ensemble?.id) {
       this.loadCoverageStatus(ensemble.id);
     }
-    this.loadData();
+    if (this.viewMode() !== 'explore') {
+      this.loadData();
+    }
   }
 
   private loadCoverageStatus(ensembleId: string): void {
@@ -403,6 +431,7 @@ export class Sheets implements OnInit {
         genre: this.selectedGenre() || undefined,
         titleStartsWith: this.selectedLetter() || undefined,
         ensemble: this.selectedEnsemble()?.id || undefined,
+        tag: this.tagFilter() || undefined,
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({

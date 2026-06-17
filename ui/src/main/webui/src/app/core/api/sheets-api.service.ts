@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import {
   CreateSheetMusic,
   CoverageResult,
+  ExploreShelves,
   PaginatedResponse,
   SheetEnrichment,
   SheetFilterRequest,
@@ -27,7 +28,20 @@ export class SheetsApiService {
     if (filter.genre) params = params.set('genre', filter.genre);
     if (filter.titleStartsWith) params = params.set('titleStartsWith', filter.titleStartsWith);
     if (filter.ensemble) params = params.set('ensemble', filter.ensemble);
+    if (filter.tag) params = params.set('tag', filter.tag);
     return this.http.get<PaginatedResponse<SheetMusicSearchResult>>(this.baseUrl, { params });
+  }
+
+  explore(ensembleId?: string): Observable<ExploreShelves> {
+    let params = new HttpParams();
+    if (ensembleId) params = params.set('ensemble', ensembleId);
+    return this.http.get<ExploreShelves>(`${this.baseUrl}/explore`, { params });
+  }
+
+  surprise(ensembleId?: string): Observable<SheetMusicSearchResult | null> {
+    let params = new HttpParams();
+    if (ensembleId) params = params.set('ensemble', ensembleId);
+    return this.http.get<SheetMusicSearchResult | null>(`${this.baseUrl}/explore/surprise`, { params });
   }
 
   load(id: string): Observable<SheetMusic> {

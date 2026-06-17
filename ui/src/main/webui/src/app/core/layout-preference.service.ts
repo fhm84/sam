@@ -1,13 +1,19 @@
 import { Injectable } from '@angular/core';
 
+type DefaultMode = 'list' | 'cards';
+
 @Injectable({ providedIn: 'root' })
 export class LayoutPreferenceService {
-  getViewMode(page: string): 'list' | 'cards' {
+  getViewMode<T extends string = DefaultMode>(
+    page: string,
+    validModes: readonly T[] = ['list', 'cards'] as unknown as readonly T[],
+    defaultMode: T = 'cards' as T,
+  ): T {
     const stored = localStorage.getItem(`sam.layout.${page}`);
-    return stored === 'list' || stored === 'cards' ? stored : 'cards';
+    return stored != null && (validModes as readonly string[]).includes(stored) ? (stored as T) : defaultMode;
   }
 
-  setViewMode(page: string, mode: 'list' | 'cards'): void {
+  setViewMode<T extends string>(page: string, mode: T): void {
     localStorage.setItem(`sam.layout.${page}`, mode);
   }
 }
