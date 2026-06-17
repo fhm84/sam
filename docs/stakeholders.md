@@ -32,14 +32,21 @@ look in practice. It complements `architecture.md` (technical structure) and
 | S4 | Administrator | Administrator | Is the system set up correctly? | authenticated, full access |
 | S5 | Guest | Gast | See what the ensemble plays / find a specific piece | unauthenticated or link-only |
 
-> **Role overlap:** In smaller ensembles the Notenwart and Dirigent are frequently the
-> same person. Use cases for both roles should be considered when designing workflows for
+> **Role overlap:** In smaller ensembles the Music librarian and Conductor are frequently
+> the same person. Use cases for both roles should be considered when designing workflows for
 > that combined user.
 
-> **Current state:** SAM does not yet implement authentication or authorisation. All
-> roles currently have unrestricted access. The model described here reflects the
-> **planned** access structure. See [Section 6](#6-access-control-model) for design
-> considerations.
+> **Current state:** SAM implements authentication via OIDC (self-hosted Keycloak 26).
+> Two realm roles exist today — `admin` and `music_librarian` — both granted full write
+> access across the archive; any other authenticated user has read-only access to
+> everything (there is no separate `CONDUCTOR` or `MUSICIAN` role at the API level — see
+> [Section 6](#6-access-control-model)). The personalised experiences described for S2
+> and S3 below (coverage-aware browsing, "My Parts") are additive views built on top of
+> that flat read access, not access *restrictions* — any authenticated user can still
+> browse the full archive. Guest (S5) access is implemented separately via resource-scoped
+> share links, not a login role. The Angular route guard only checks "is logged in," not
+> role, so admin-only nav entries are visible to all authenticated users even though the
+> underlying write calls are rejected server-side for non-privileged users.
 
 ---
 
@@ -71,7 +78,7 @@ someone with a strong sense of order rather than technical expertise.
 
 ### S2 – Conductor (Dirigent)
 
-The Dirigent decides what the ensemble plays. They need to know not just whether a piece
+The Conductor decides what the ensemble plays. They need to know not just whether a piece
 exists in the archive, but whether the ensemble has *all the parts needed* to actually
 perform it.
 
@@ -96,15 +103,17 @@ perform it.
 
 ### S3 – Musician (Musiker)
 
-The Musiker needs their specific part — either physically from the archive folder or as a
+The Musician needs their specific part — either physically from the archive folder or as a
 digital file for home practice. Their interaction with SAM is typically read-only and
 goal-directed: find the right file, download it, done.
 
 There are two sub-variants with different access expectations:
 
 - **S3a — Authenticated musician:** A registered ensemble member with a personal login.
-  Sees the full repertoire of their ensemble(s). Can download any part. Their user
-  account may be linked to an existing `Musician` entity in the data model.
+  Can browse and download from the full archive like any authenticated user (there is no
+  per-ensemble read restriction today — see [Section 6](#6-access-control-model)). Their
+  user account may be linked to an existing `Musician` entity in the data model, which
+  unlocks the personalised My Parts view (UC-M5).
 - **S3b — Guest musician (anonymous):** Uses a shared link or a public URL to access
   a specific sheet or collection. No account required. Access is intentionally limited
   to what the ensemble has chosen to share.
@@ -120,7 +129,8 @@ There are two sub-variants with different access expectations:
 - Uncertainty whether a digital version even exists
 
 **SAM features most relevant**
-- Sheet search (scoped to ensemble repertoire for authenticated musicians)
+- Sheet search (full archive — not scoped per ensemble; see [Section 6](#6-access-control-model))
+- My Parts (UC-M5) — personalised, instrument-scoped view for linked accounts
 - Instrumentation detail (physical location)
 - Document download (individual parts)
 
@@ -143,8 +153,13 @@ ensemble member.
 - Instruments catalogue management
 - Ensemble and voice definition management
 - Coverage snapshot recomputation
-- User and role management *(planned)*
-- Content visibility / sharing settings *(planned)*
+- Keycloak user lookup (`AdminUsersResource`, admin-only) and linking a `Musician` record
+  to a login (`linkUser` / `unlinkUser`, admin-only) — the only two genuinely
+  admin-exclusive actions in the system today
+- Content visibility / sharing settings — share links are implemented (see S5); persistent
+  per-sheet/collection visibility flags are still *(planned)*
+- *(stub)* `/admin/configuration` route exists but currently renders only a page title —
+  no settings are implemented yet
 
 ---
 
@@ -169,9 +184,14 @@ a partner ensemble checking what the band plays, or a musician who has not yet r
 - May be further restricted to specific collections, sheets, or even individual documents
 
 **SAM features most relevant**
-- Public/shared collection view *(planned)*
-- Read-only sheet detail *(planned — scoped)*
-- Document download where explicitly permitted *(planned)*
+- Public share link for a collection (`/public/share/{token}`) — renders programme order, titles, composers, durations
+- Public share link for a single sheet instrumentation — renders instrument, part label, archive location, condition
+- Document download via the shared link, where attachments exist on the shared resource
+
+**By design:** sharing is per-resource and creator-initiated — the link must be generated
+and distributed by an authenticated user (see UC-N6). Open/anonymous browsing of the
+archive (no token, no link) was deliberately deferred in favour of explicit,
+resource-scoped tokens — see `docs/roadmap.md` open question #2.
 
 ---
 
@@ -193,8 +213,8 @@ These goals are derived directly from stakeholder needs. They are listed in prio
 
 ```
   ┌──────────────────┐    ┌──────────────────┐    ┌──────────────────┐
-  │  S1 Notenwart    │    │  S2 Dirigent     │    │  S3 Musiker      │
-  │  (Archive Mgr)   │    │  (Conductor)     │    │  (Musician)      │
+  │  S1 Archive Mgr  │    │  S2 Conductor    │    │  S3 Musician     │
+  │  (Notenwart)     │    │  (Dirigent)      │    │  (Musiker)       │
   └────────┬─────────┘    └────────┬─────────┘    └────────┬─────────┘
            │                       │                        │
            │  manages archive      │  plans repertoire      │  finds parts
@@ -286,7 +306,7 @@ strings for reference only.
 3. Optionally adds a note explaining the circumstances.
 4. Saves.
 
-**Outcome:** The Dirigent and Musiker can see the condition before rehearsal and plan
+**Outcome:** The Conductor and Musician can see the condition before rehearsal and plan
 accordingly.
 
 ---
@@ -323,7 +343,7 @@ accordingly.
 
 #### UC-D1: Check if a piece is playable by the ensemble
 
-**Actor:** Dirigent  
+**Actor:** Conductor  
 **Goal:** Know whether the ensemble has all required parts before scheduling a rehearsal  
 **Precondition:** Ensemble is defined in SAM with voice definitions
 
@@ -342,7 +362,7 @@ accordingly.
 
 #### UC-D2: Build a setlist for a concert
 
-**Actor:** Dirigent  
+**Actor:** Conductor  
 **Goal:** Compose an ordered programme for a specific concert  
 **Precondition:** Sheets are in the archive; coverage has been evaluated
 
@@ -353,11 +373,15 @@ accordingly.
 4. Adds suitable pieces to the setlist, assigning position labels.
 5. Reviews the assembled programme.
 
+**Note:** creating/editing a collection currently requires the `music_librarian` or
+`admin` role — a Conductor without one of those roles cannot perform this use case today.
+See the `CONDUCTOR` composite-role discussion in [Section 6.2.2](#622-target--composite-roles-mapped-to-use-cases).
+
 ---
 
 #### UC-D3: Identify gaps in the repertoire
 
-**Actor:** Dirigent  
+**Actor:** Conductor  
 **Goal:** Know which pieces are *almost* playable and what specific parts are missing  
 **Precondition:** Coverage snapshots have been computed for the ensemble
 
@@ -373,7 +397,7 @@ accordingly.
 
 #### UC-M1: Find my part before rehearsal
 
-**Actor:** Musiker  
+**Actor:** Musician  
 **Goal:** Know where the physical part is located in the archive  
 **Precondition:** Part location has been recorded by Music librarian
 
@@ -388,7 +412,7 @@ accordingly.
 
 #### UC-M2: Download a part for home practice
 
-**Actor:** Musiker  
+**Actor:** Musician  
 **Goal:** Get a digital copy of their part to practise at home  
 **Precondition:** Digital file has been attached to the instrumentation
 
@@ -401,28 +425,61 @@ accordingly.
 
 ### S3 – Musician (authenticated)
 
-#### UC-M3: Browse the ensemble's full repertoire
+#### UC-M3: Browse the full archive
 
-**Actor:** Musiker (S3a — authenticated)
-**Goal:** Get an overview of all pieces the ensemble has in the archive
+**Actor:** Musician (S3a — authenticated)
+**Goal:** Get an overview of all pieces in the archive
 
 **Main flow**
 1. Logs in to SAM.
-2. Opens *Sheets*, optionally filtered by their ensemble.
+2. Opens *Sheets*.
 3. Browses the list; coverage badges show playability at a glance.
 4. Opens a sheet to see instrumentation details and download their part.
+
+**Note:** any authenticated user can browse the entire archive today — there is no
+per-ensemble read restriction. "Their ensemble's repertoire" is not yet a scoped view;
+see UC-M5 for the one personalised view that does exist (My Parts, scoped by instrument).
 
 ---
 
 #### UC-M4: Access a shared link without an account
 
-**Actor:** Musiker (S3b — guest musician)
+**Actor:** Musician (S3b — guest musician)
 **Goal:** Download a part received via a shared link before rehearsal
 
-**Main flow** *(planned — not yet implemented)*
-1. Receives a URL from the Music librarian (e.g. via WhatsApp group).
-2. Opens the link — SAM shows the sheet detail in read-only mode, no login required.
+**Main flow**
+1. Receives a URL from the Music librarian (e.g. via WhatsApp group) — created via
+   *Shares → New share* for the relevant sheet instrumentation (see UC-N6).
+2. Opens the link (`/public/share/{token}`) — SAM shows the instrumentation detail
+   (instrument, part label, archive location, condition) in read-only mode, no login
+   required.
 3. Downloads their part directly.
+
+**Note:** the link is scoped to one instrumentation, not the whole sheet or archive. An
+expired or revoked token shows an error instead of the resource.
+
+---
+
+#### UC-M5: View My Parts
+
+**Actor:** Musician (S3a — authenticated)
+**Goal:** See only the sheets that contain a part for an instrument they actually play,
+without manually filtering the full archive
+
+**Precondition:** An admin has linked the musician's login to their `Musician` record
+(`linkUser`), and that `Musician` has at least one `EnsembleMembership` with an instrument
+assigned
+
+**Main flow**
+1. Logs in to SAM, opens */my-parts* ("Meine Stimmen").
+2. SAM resolves the logged-in user to a `Musician`, collects every instrument from their
+   ensemble membership(s) (across all ensembles, doubling instruments included), and
+   returns sheets containing at least one matching instrumentation.
+3. Each row shows the sheet plus only the matching instrumentation(s) as chips.
+
+**Empty-state cases:** no `Musician` linked to this login; musician on the roster with no
+instrument assigned (e.g. conductor-only); or no sheets match their instrument(s) — each
+shows a distinct empty state with a hint to contact the Music librarian.
 
 ---
 
@@ -433,10 +490,12 @@ accordingly.
 **Actor:** Guest (S5)
 **Goal:** See tonight's concert programme without needing an account
 
-**Main flow** *(planned — not yet implemented)*
-1. Receives a public link to a setlist collection.
-2. Opens the link — SAM shows the ordered programme in read-only mode.
-3. Can click individual pieces to read basic metadata (title, composer, duration).
+**Main flow**
+1. Receives a public link to a setlist collection, created via *Shares → New share*
+   (resource type `COLLECTION`) by the Music librarian or Conductor.
+2. Opens the link (`/public/share/{token}`) — SAM shows the ordered programme in
+   read-only mode: position, title, composer, duration.
+3. Can download attached documents for entries that have them.
 
 ---
 
@@ -445,10 +504,56 @@ accordingly.
 **Actor:** Guest (S5)
 **Goal:** Access a document that the ensemble has made publicly available
 
-**Main flow** *(planned — not yet implemented)*
-1. Navigates to a public sheet or document URL.
-2. SAM confirms the document has been marked as publicly accessible.
-3. Downloads the file.
+**Main flow**
+1. Navigates to a public share URL for a sheet instrumentation
+   (resource type `SHEET_INSTRUMENTATION`).
+2. SAM validates the token (`GET /public/share/{token}`) — confirms it is active
+   (not expired or revoked) — and returns the resource.
+3. Downloads the attached file.
+
+---
+
+#### UC-N6: Create a share link
+
+**Actor:** Any authenticated user (commonly S1 Music librarian or S2 Conductor)
+**Goal:** Give someone without a SAM account access to one specific sheet instrumentation
+or collection
+
+**Main flow**
+1. Opens *Shares → New share*.
+2. Picks the resource type (`SHEET_INSTRUMENTATION` or `COLLECTION`) and the specific
+   resource.
+3. Optionally sets an expiry date.
+4. Saves. SAM generates a token and shows the public URL — *copy link* puts it on the
+   clipboard for sharing via WhatsApp, email, etc.
+5. Can *revoke* the link at any time from the *Shares* list, immediately invalidating it.
+
+**Note:** share creation is not role-gated — any authenticated user can create and manage
+their own share tokens (`SharesResourceImpl` is scoped by creator, not by
+`music_librarian`/`admin`). Every link is resource-scoped to exactly one sheet
+instrumentation or collection, never the whole archive.
+
+---
+
+#### UC-N7: Enrich an existing sheet's metadata with AI
+
+**Actor:** Music librarian
+**Goal:** Fill in missing metadata on a sheet that's already archived, without re-reading
+the original document
+
+**Precondition:** Sheet exists with at least its core fields (title, composer, etc.)
+
+**Main flow**
+1. Opens the sheet detail, clicks *Enrich with AI* (sparkles button).
+2. SAM analyses the known metadata and suggests: tags, and — only for fields that are
+   currently empty — style, difficulty level, year of composition, additional notes.
+3. Reviews suggestions; each is a pre-checked, individually deselectable checkbox (tags
+   as chips).
+4. Clicks *Apply selected* — SAM saves the chosen fields and reloads the sheet.
+
+**Note:** unlike classification (UC-N1 alternative flow), this requires no document —
+it reasons purely from existing metadata, and never overwrites a field the user has
+already filled in.
 
 ---
 
@@ -498,6 +603,26 @@ accordingly.
 
 ---
 
+#### UC-A4: Review access and activity history
+
+**Actor:** Administrator (or any authenticated user — see note)
+**Goal:** Understand who accessed or exported a document/sheet/collection, and when
+
+**Main flow**
+1. Opens */admin/event-logs*.
+2. Filters by event type (multi-select: downloads, exports, classification, etc.), user
+   ID, or entity type.
+3. Reviews matching entries — each shows timestamp, actor (`username`, or "via share
+   link" with the token ID for unauthenticated access), event type, and target entity.
+
+**Note:** despite living under the `/admin/` route, `EventLogResourceImpl` carries no
+`@RolesAllowed` restriction — any authenticated user can call `GET /api/event-logs`
+directly today. Read-only and contains no sensitive data beyond `userId`/`username`, but
+worth deciding deliberately (see the composite-role discussion in
+[Section 6](#6-access-control-model)) rather than leaving it as an accident of routing.
+
+---
+
 ## 5. Key Flows
 
 ### Flow 1 – AI-assisted archival of a new physical score
@@ -532,10 +657,10 @@ Music librarian                     SAM UI                     SAM Server / LLM
 
 ---
 
-### Flow 2 – Concert programme check (Dirigent)
+### Flow 2 – Concert programme check (Conductor)
 
 ```
-Dirigent                      SAM UI                     SAM Server
+Conductor                     SAM UI                     SAM Server
     │                            │                             │
     │── opens Sheets list ──────►│── GET /api/sheets?ensemble=x►│
     │                            │                   return sheets + snapshot badges
@@ -559,7 +684,7 @@ Dirigent                      SAM UI                     SAM Server
 ### Flow 3 – Musician retrieves their part
 
 ```
-Musiker                       SAM UI
+Musician                      SAM UI
     │                            │
     │── searches by title ──────►│── GET /api/sheets?q=...
     │◄── results ────────────────│
@@ -580,105 +705,156 @@ Musiker                       SAM UI
 
 ---
 
+### Flow 4 – Share creation and guest access
+
+```
+Music librarian                SAM UI                     SAM Server                Guest
+    │                            │                             │                        │
+    │── Shares → New share ─────►│── POST /api/shares ────────►│                        │
+    │   (resource + expiry)      │                   create token, creator = caller     │
+    │◄── public URL shown ───────│◄── ShareResponse ───────────│                        │
+    │── copies link, sends via   │                             │                        │
+    │   WhatsApp ─────────────────────────────────────────────────────────────────────►│
+    │                            │                             │── opens /public/share/{token}
+    │                            │                             │◄── GET /public/share/{token}
+    │                            │                             │   validate: not expired/revoked
+    │                            │                             │── render resource ────►│
+    │                            │                             │   log event_log         │
+    │                            │                             │   (shareTokenId set,    │
+    │                            │                             │    userId/username null)│
+```
+
+---
+
 ## 6. Access Control Model
 
-> **Status: planned — not yet implemented.**
-> SAM currently runs without authentication. This section captures the intended model
-> to guide future implementation decisions.
+> **Status: implemented (Phase 1–3 of RBAC).** Authentication, role enforcement, and
+> resource-scoped sharing are live. What's documented below as "target" is not — it's a
+> proposal for closing the remaining gaps, kept separate from "today" so the two are never
+> confused.
 
 ---
 
 ### 6.1 Current state
 
-All routes and API endpoints are publicly accessible with no authentication. SAM is
-effectively a single-user, trusted-network application. This is acceptable for an initial
-deployment on a private server but does not scale to multi-user or internet-facing use.
+Authentication is OIDC via a self-hosted Keycloak 26 (`docker-compose.keycloak.yml` for
+dev, realm export at `keycloak/sam-realm.json`). `@Authenticated` is enforced at the class
+level on every `*ResourceImpl`; write methods additionally carry
+`@RolesAllowed({"music_librarian", "admin"})`. `CurrentUserService` exposes the JWT
+subject, realm roles, and `ensemble:{UUID}` group membership, but nothing currently reads
+the group claim to scope access — it's wired but unused. The Angular route guard
+(`authGuard`) checks authentication only, not role, so every authenticated user sees every
+nav entry (including `/admin/*`); unauthorized write attempts fail server-side with 403
+rather than being hidden client-side.
+
+Two findings worth flagging explicitly (surfaced while writing this section, not
+yet decided on):
+- **No `CONDUCTOR` write tier exists.** The originally planned model gave the Conductor
+  write access to collections/setlists only. In the current code, `SheetCollectionsResourceImpl`
+  and `CollectionItemsResourceImpl` require the same `music_librarian`/`admin` roles as
+  everything else — a Conductor who isn't also a librarian cannot create a setlist today.
+- **`EventLogResourceImpl` has no `@RolesAllowed` at all** — any authenticated user can
+  call `GET /api/event-logs` directly, despite the Angular route living under `/admin/`.
+  Low risk (read-only, no sensitive data beyond `userId`/`username`), but it's an artifact
+  of routing rather than a deliberate access decision.
 
 ---
 
-### 6.2 Planned role model
+### 6.2 Role matrices
 
-| Role | Maps to | Read access | Write access | Scope |
-|------|---------|-------------|--------------|-------|
-| `ADMIN` | S4 Administrator | Everything | Everything | Global |
-| `MANAGER` | S1 Music librarian | Everything | Sheets, instrumentations, documents | Global |
-| `CONDUCTOR` | S2 Dirigent | Everything | Collections / setlists only | Global |
-| `MUSICIAN` | S3a Musician | Ensemble repertoire + own parts | None | Per ensemble |
-| `GUEST` | S5 Guest | Explicitly published content only | None | Per item |
+#### 6.2.1 Today — what's actually enforced
 
-The `MANAGER` and `CONDUCTOR` distinction allows the Music librarian to manage the archive
-without accidentally restructuring ensemble definitions, and the Dirigent to plan
-concerts without touching the archive.
+| Capability | `admin` | `music_librarian` | authenticated, no special role | unauthenticated + valid share token |
+|---|---|---|---|---|
+| Browse/search/read archive (sheets, collections, instrumentations, coverage) | ✅ | ✅ | ✅ | ➖ (only the one shared resource) |
+| Create/edit/delete sheets, instrumentations, documents; run AI classify/apply/enrich | ✅ | ✅ | ❌ | ❌ |
+| Create/edit/delete collections & setlist items | ✅ | ✅ | ❌ | ❌ |
+| Create/edit/delete musicians & instruments | ✅ | ✅ | ❌ | ❌ |
+| Create/edit/delete ensembles, voices, voice options, members; compute coverage | ✅ | ✅ | ❌ | ❌ |
+| Link/unlink a `Musician` to a login; search Keycloak users | ✅ | ❌ | ❌ | ❌ |
+| Create/list/revoke **own** share tokens | ✅ | ✅ | ✅ | ❌ |
+| View My Parts (own personalised view, if linked) | ✅ | ✅ | ✅ | ❌ |
+| View event log (`GET /api/event-logs`) | ✅ | ✅ | ✅ *(see finding above)* | ❌ |
+| Access exactly the resource named by a share token | n/a | n/a | n/a | ✅ |
+
+The practical read model today is flat: **any login = read everything.** The only
+differentiators are (a) the two write roles, both equally powerful except for user
+linking, and (b) the unauthenticated, token-scoped guest path.
+
+#### 6.2.2 Target — composite roles mapped to use cases
+
+This reframes the same capabilities as named composite roles, so each persona maps to
+one role instead of a list of individual checks. None of this requires a rewrite — it's
+additive on top of 6.2.1.
+
+| Composite role | Maps to | Built from | New work required |
+|---|---|---|---|
+| `ARCHIVE_ADMIN` | S4 Administrator | Everything `music_librarian` has, plus user/account linking | None — already `admin` today |
+| `ARCHIVE_MANAGER` | S1 Music librarian | Write: sheets, instrumentations, documents, classification, musicians, instruments, ensembles/voices/members. Read: everything | None — already `music_librarian` today |
+| `CONDUCTOR` | S2 Conductor | Read: everything. Write: collections/setlist items + trigger coverage compute only | New 3rd Keycloak role; narrow `@RolesAllowed` on `SheetCollectionsResourceImpl`, `CollectionItemsResourceImpl`, and the ensemble coverage-compute endpoint to accept it alongside `music_librarian`/`admin` |
+| `MUSICIAN` | S3a Authenticated musician | Read: everything (unchanged). Own: My Parts, own share tokens | Formalizing this as an explicit role buys nothing functionally yet (it's already the default for any login) — only worth adding once read access needs to be *restricted* (e.g. per-ensemble), per Option C below |
+| `GUEST` | S5 / S3b | Read: exactly one resource per token, until expiry/revocation | None — already implemented as token-based access, deliberately not a Keycloak role |
+
+**Recommendation:** don't add `CONDUCTOR` speculatively. Add it only when a real Conductor
+needs to build setlists without also holding `music_librarian` — until then, give
+conductors the `music_librarian` role as a practical stand-in (it's a superset, just
+broader than strictly necessary). `MUSICIAN` as a distinct role is even lower priority
+since it changes nothing observable today.
 
 ---
 
 ### 6.3 Content visibility scoping
 
-Three options are under consideration for how "selected content" is defined for guests
-and musicians. These are not mutually exclusive.
+Three options were considered for how "selected content" is defined for guests and
+musicians. Status, updated against what shipped:
 
-**Option A — Per-sheet visibility flag**
+**Option A — Per-sheet visibility flag** — *(still planned)*. Tracked as
+`SheetCollection.visibility` in `docs/roadmap.md` ("Collection visibility & cover");
+no equivalent field exists on `SheetMusicEntity` itself yet.
 
-Each sheet has a `visibility` field: `PRIVATE` (default) · `INTERNAL` (authenticated
-users) · `PUBLIC` (guests and unauthenticated access).
+**Option B — Collection-based / resource-scoped sharing** — *(implemented, in a
+different shape than proposed)*. Rather than a persistent "shared" flag on a collection,
+SAM implemented **resource-scoped tokens** (`shares` table): one token = one collection or
+one sheet instrumentation, with optional expiry and explicit revocation. More flexible
+than a boolean flag (multiple links, independent expiry) at the cost of the librarian
+needing to actively generate and distribute each link (see UC-N6).
 
-- Simple to implement and understand.
-- Music librarian sets visibility per sheet when archiving.
-- Downside: coarse-grained — all or nothing per sheet.
-
-**Option B — Collection-based sharing**
-
-A collection (folder or setlist) can be marked as shared. All sheets within it become
-visible to the target audience (guests or musicians) for the duration of the sharing.
-
-- Natural fit for setlists: "share tonight's concert programme".
-- Does not expose the full archive — only what is explicitly curated.
-- More flexible than per-sheet flags for time-limited sharing.
-
-**Option C — Ensemble-based scoping for musicians**
-
-An authenticated `MUSICIAN` user is linked to one or more ensembles. They see all sheets
-for which a coverage snapshot exists for their ensemble — i.e. pieces their band plays.
-
-- No manual curation needed; driven by the ensemble model.
-- Requires that musician user accounts are linked to the existing `Musician` entity.
-- Does not cover guest access (still needs Option A or B).
-
-**Recommendation:** Implement Option C for authenticated musicians (low curation overhead)
-and Option B for guest access (explicit, time-limited sharing). Option A can be added
-later for edge cases.
+**Option C — Ensemble-based scoping for musicians** — *(not implemented as a read
+restriction; partially realized as a different, additive feature)*. The plan was to
+*restrict* a `MUSICIAN` role to their ensemble's repertoire. What exists instead is **My
+Parts** (UC-M5): an *instrument-based*, *additive* personal view layered on top of
+unrestricted read access — it doesn't gate what a musician *can* see, only what's
+highlighted for them. Genuine ensemble-scoped read restriction is still open; the unused
+`ensemble:{UUID}` group claim on the JWT (see 6.1) is the most likely foundation for it.
 
 ---
 
 ### 6.4 Authentication mechanism
 
-Quarkus has first-class support for OIDC (OpenID Connect) via `quarkus-oidc`. The
-natural choices for a self-hosted ensemble application:
-
-| Option | Complexity | Notes |
-|--------|-----------|-------|
-| Keycloak (self-hosted) | Medium | Full-featured; good fit if already running |
-| Auth0 / Okta (SaaS) | Low | No server to maintain; free tier sufficient for small ensembles |
-| Quarkus built-in basic auth | Very low | Acceptable for early implementation; no SSO |
-| Google / GitHub OAuth | Low | Reduces account management burden; users need a Google/GitHub account |
-
-For a volunteer-run ensemble with non-technical members, a hosted OIDC provider
-(Auth0 or Google) is likely the lowest-friction path. Keycloak is worth considering
-if the ensemble already runs its own infrastructure.
+**Resolved and implemented:** self-hosted Keycloak 26, via `quarkus-oidc` on the backend
+and `angular-auth-oidc-client` on the frontend. Dev environment: realm auto-imported from
+`keycloak/sam-realm.json` via `docker compose -f docker-compose.keycloak.yml up` (port
+8180). Production config (`OidcConfigResource`) reads `OIDC_SERVER_URL` /
+`OIDC_CLIENT_ID` from env vars — no rebuild needed to point at a different Keycloak.
 
 ---
 
 ### 6.5 Open design questions
 
-- Should a `Musician` user account be **linked to the existing `Musician` entity**
-  (composer/arranger reference)? This would allow showing "your parts" automatically
-  but requires the user account to know the musician's instrument(s).
-- Should **document-level** visibility be independently configurable, or always inherited
-  from the sheet/instrumentation?
-- Is **anonymous guest access** (no link, just a public URL) ever desirable, or should
-  all guest access require a shared token/link?
-- How should **role assignment** work in practice? Self-registration + admin approval,
-  or admin-only provisioning?
+Most of the original open questions here are now resolved — see `docs/roadmap.md`
+Section 8 for the authoritative, up-to-date list (it already tracks resolution status and
+is updated alongside feature work, so this doc intentionally doesn't duplicate it).
+Genuinely new questions surfaced while writing this section:
+
+- Should `CONDUCTOR` be added as a real Keycloak role (6.2.2), or is routing conductors
+  through `music_librarian` an acceptable permanent simplification for ensembles this
+  size?
+- Should `EventLogResourceImpl` get an explicit `@RolesAllowed` (matching its `/admin/`
+  route), or is "any authenticated user can read the event log" an acceptable, deliberate
+  choice worth just documenting as such?
+- Now that `CurrentUserService` already resolves `ensemble:{UUID}` group membership, is
+  there an actual demand for restricting general archive *read* access per ensemble
+  (true Option C), or does "read everything, personalize via My Parts" remain sufficient?
 
 ---
 
@@ -697,11 +873,15 @@ if the ensemble already runs its own infrastructure.
 | Coverage | Abdeckung | Degree to which a sheet music entry has parts for all ensemble voices |
 | Coverage status | Abdeckungsstatus | COMPLETE / PLAYABLE / INCOMPLETE — playability classification |
 | Coverage snapshot | Abdeckungs-Snapshot | Precomputed coverage result for one ensemble × sheet pair |
-| Notenwart | — | Archive manager; responsible for maintaining the sheet music archive |
-| Dirigent | — | Conductor; plans repertoire and concerts |
-| Blaskapelle | — | Brass/wind band — the typical ensemble type SAM is designed for |
+| Archive manager | Notenwart | Responsible for maintaining the sheet music archive |
+| Conductor | Dirigent | Plans repertoire and concerts |
+| Brass band | Blaskapelle | The typical ensemble type SAM is designed for |
 | Attachment | Anhang | A digital file linked to a sheet or instrumentation |
 | Staging area | Eingangskorb | Unlinked document pool where uploaded files wait before being assigned |
 | Fingerprint | Fingerabdruck | Content-based hash used to detect duplicate sheet music entries |
 | ISWC | — | International Standard Musical Work Code — global piece identifier |
 | GEMA | — | German rights management society; GEMA work number identifies registered works |
+| Share token / share link | Freigabe-Link | Resource-scoped, optionally time-limited token granting unauthenticated read access to exactly one sheet instrumentation or collection |
+| My Parts | Meine Stimmen | Personalised, read-only view for an authenticated musician showing only sheets containing an instrumentation for an instrument they play |
+| Event log | Zugriffsprotokoll | Write-once log of read events (downloads, exports, classification) not captured by the Envers audit trail |
+| Composite role | — | A proposed bundle of capabilities mapped to a persona (e.g. `CONDUCTOR`), as distinct from the Keycloak realm roles actually enforced today (`admin`, `music_librarian`) |
