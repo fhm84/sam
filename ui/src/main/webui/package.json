@@ -23,7 +23,8 @@
   "private": true,
   "packageManager": "npm@11.7.0",
   "overrides": {
-    "esbuild": "^0.28.1"
+    "esbuild": "^0.28.1",
+    "undici": "^7.28.0"
   },
   "dependencies": {
     "@angular/animations": "^21.2.17",
