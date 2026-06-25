@@ -11,19 +11,19 @@ import org.mapstruct.*;
         unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface EnsembleMapper {
 
-    Ensemble toDto(final EnsembleEntity entity);
+    Ensemble toDto(EnsembleEntity entity);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "created", ignore = true)
     @Mapping(target = "lastUpdate", ignore = true)
     @Mapping(target = "voices", ignore = true)
-    EnsembleEntity fromDto(final CreateEnsemble dto);
+    EnsembleEntity fromDto(CreateEnsemble dto);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "created", ignore = true)
     @Mapping(target = "lastUpdate", ignore = true)
     @Mapping(target = "voices", ignore = true)
-    void update(@MappingTarget final EnsembleEntity entity, final Ensemble dto);
+    void update(@MappingTarget EnsembleEntity entity, Ensemble dto);
 }

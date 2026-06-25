@@ -12,7 +12,7 @@ import org.mapstruct.*;
         unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface EnsembleVoiceMapper {
 
-    EnsembleVoice toDto(final EnsembleVoiceEntity entity);
+    EnsembleVoice toDto(EnsembleVoiceEntity entity);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)
@@ -20,7 +20,7 @@ public interface EnsembleVoiceMapper {
     @Mapping(target = "lastUpdate", ignore = true)
     @Mapping(target = "ensemble", ignore = true)
     @Mapping(target = "options", ignore = true)
-    EnsembleVoiceEntity fromDto(final CreateEnsembleVoice dto);
+    EnsembleVoiceEntity fromDto(CreateEnsembleVoice dto);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)
@@ -28,5 +28,5 @@ public interface EnsembleVoiceMapper {
     @Mapping(target = "lastUpdate", ignore = true)
     @Mapping(target = "ensemble", ignore = true)
     @Mapping(target = "options", ignore = true)
-    void update(@MappingTarget final EnsembleVoiceEntity entity, final EnsembleVoice dto);
+    void update(@MappingTarget EnsembleVoiceEntity entity, EnsembleVoice dto);
 }

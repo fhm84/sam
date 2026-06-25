@@ -9,7 +9,7 @@ import org.mapstruct.*;
 public interface VoiceOptionMapper {
 
     @Mapping(target = "instrumentId", source = "instrument.id")
-    VoiceOption toDto(final VoiceOptionEntity entity);
+    VoiceOption toDto(VoiceOptionEntity entity);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)
@@ -17,7 +17,7 @@ public interface VoiceOptionMapper {
     @Mapping(target = "lastUpdate", ignore = true)
     @Mapping(target = "voice", ignore = true)
     @Mapping(target = "instrument", ignore = true)
-    VoiceOptionEntity fromDto(final CreateVoiceOption dto);
+    VoiceOptionEntity fromDto(CreateVoiceOption dto);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)
@@ -25,5 +25,5 @@ public interface VoiceOptionMapper {
     @Mapping(target = "lastUpdate", ignore = true)
     @Mapping(target = "voice", ignore = true)
     @Mapping(target = "instrument", ignore = true)
-    void update(@MappingTarget final VoiceOptionEntity entity, final VoiceOption dto);
+    void update(@MappingTarget VoiceOptionEntity entity, VoiceOption dto);
 }

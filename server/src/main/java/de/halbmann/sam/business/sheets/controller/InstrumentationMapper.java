@@ -13,7 +13,7 @@ import org.mapstruct.*;
         unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface InstrumentationMapper {
 
-    Instrumentation toDto(final InstrumentationEntity entity);
+    Instrumentation toDto(InstrumentationEntity entity);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)
@@ -22,7 +22,7 @@ public interface InstrumentationMapper {
     @Mapping(target = "sheet", ignore = true)
     @Mapping(target = "attachments", ignore = true)
     @Mapping(target = "instrument", ignore = true)
-    InstrumentationEntity fromDto(final CreateInstrumentation dto);
+    InstrumentationEntity fromDto(CreateInstrumentation dto);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)
@@ -31,5 +31,5 @@ public interface InstrumentationMapper {
     @Mapping(target = "sheet", ignore = true)
     @Mapping(target = "attachments", ignore = true)
     @Mapping(target = "instrument", ignore = true)
-    void update(@MappingTarget final InstrumentationEntity entity, final Instrumentation dto);
+    void update(@MappingTarget InstrumentationEntity entity, Instrumentation dto);
 }

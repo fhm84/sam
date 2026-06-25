@@ -14,7 +14,7 @@ import org.mapstruct.*;
         unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface SheetMusicMapper {
 
-    SheetMusic toDto(final SheetMusicEntity entity);
+    SheetMusic toDto(SheetMusicEntity entity);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)
@@ -26,7 +26,7 @@ public interface SheetMusicMapper {
     @Mapping(target = "instrumentations", ignore = true)
     @Mapping(target = "attachments", ignore = true)
     @Mapping(target = "fingerprint", ignore = true)
-    SheetMusicEntity fromDto(final CreateSheetMusic dto);
+    SheetMusicEntity fromDto(CreateSheetMusic dto);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)
@@ -38,7 +38,7 @@ public interface SheetMusicMapper {
     @Mapping(target = "instrumentations", ignore = true)
     @Mapping(target = "attachments", ignore = true)
     @Mapping(target = "fingerprint", ignore = true)
-    void update(@MappingTarget final SheetMusicEntity entity, final SheetMusic dto);
+    void update(@MappingTarget SheetMusicEntity entity, SheetMusic dto);
 
     // Dedicated method for the Set field
     @Named("toLowerSet")

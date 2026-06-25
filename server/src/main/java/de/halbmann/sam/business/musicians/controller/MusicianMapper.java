@@ -18,7 +18,7 @@ public interface MusicianMapper {
     @Mapping(target = "membership.status", source = "status")
     @Mapping(target = "membership.role", source = "role")
     @Mapping(target = "membership.lastInviteSentAt", source = "lastInviteSentAt")
-    Musician toDto(final MusicianEntity entity);
+    Musician toDto(MusicianEntity entity);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)
@@ -31,7 +31,7 @@ public interface MusicianMapper {
     @Mapping(target = "notes", source = "contact.notes")
     @Mapping(target = "status", source = "membership.status")
     @Mapping(target = "role", source = "membership.role")
-    MusicianEntity fromDto(final Musician dto);
+    MusicianEntity fromDto(Musician dto);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)
@@ -45,7 +45,7 @@ public interface MusicianMapper {
     @Mapping(target = "notes", source = "contact.notes")
     @Mapping(target = "status", source = "membership.status")
     @Mapping(target = "role", source = "membership.role")
-    void update(@MappingTarget final MusicianEntity entity, final Musician dto);
+    void update(@MappingTarget MusicianEntity entity, Musician dto);
 
     @AfterMapping
     default void nullifyEmptySubObjects(@MappingTarget final Musician musician) {

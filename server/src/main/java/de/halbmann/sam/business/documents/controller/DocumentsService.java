@@ -138,7 +138,7 @@ public class DocumentsService {
 
     public List<Attachment> loadAttachmentsByInstrumentation(String instrumentationId) {
         if (instrumentationId == null) {
-            return null;
+            return List.of();
         }
 
         InstrumentationEntity instrumentation = instrumentationRepository.findById(UUID.fromString(instrumentationId));
@@ -147,7 +147,7 @@ public class DocumentsService {
                     .map(attachmentMapper::toDto)
                     .toList();
         }
-        return null;
+        return List.of();
     }
 
     public DocumentDownload loadAttachmentByInstrumentation(String instrumentationId, String docId) {
@@ -174,7 +174,7 @@ public class DocumentsService {
 
     public List<Attachment> loadAttachmentsBySheet(String sheetId) {
         if (sheetId == null) {
-            return null;
+            return List.of();
         }
 
         SheetMusicEntity sheetMusic = sheetRepository.findById(UUID.fromString(sheetId));
@@ -183,7 +183,7 @@ public class DocumentsService {
                     .map(attachmentMapper::toDto)
                     .toList();
         }
-        return null;
+        return List.of();
     }
 
     public DocumentDownload loadAttachmentBySheet(String sheetId, String docId) {

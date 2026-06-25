@@ -10,19 +10,19 @@ import org.mapstruct.*;
         unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface SheetCollectionMapper {
 
-    SheetCollection toDto(final SheetCollectionEntity entity);
+    SheetCollection toDto(SheetCollectionEntity entity);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "created", ignore = true)
     @Mapping(target = "lastUpdate", ignore = true)
     @Mapping(target = "items", ignore = true)
-    SheetCollectionEntity fromDto(final SheetCollection dto);
+    SheetCollectionEntity fromDto(SheetCollection dto);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "created", ignore = true)
     @Mapping(target = "lastUpdate", ignore = true)
     @Mapping(target = "items", ignore = true)
-    void update(@MappingTarget final SheetCollectionEntity entity, final SheetCollection dto);
+    void update(@MappingTarget SheetCollectionEntity entity, SheetCollection dto);
 }
