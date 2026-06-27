@@ -25,13 +25,13 @@
 
         <compiler-plugin.version>3.15.0</compiler-plugin.version>
         <surefire-plugin.version>3.5.5</surefire-plugin.version>
-        <jandex-maven-plugin.version>3.5.3</jandex-maven-plugin.version>
-        <spotless-maven-plugin.version>3.3.0</spotless-maven-plugin.version>
+        <jandex-maven-plugin.version>3.6.0</jandex-maven-plugin.version>
+        <spotless-maven-plugin.version>3.7.0</spotless-maven-plugin.version>
         <palantir-java-format.version>2.89.0</palantir-java-format.version>
-        <dependency-check-maven.version>12.2.0</dependency-check-maven.version>
+        <dependency-check-maven.version>12.2.2</dependency-check-maven.version>
 
-        <quarkus.platform.version>3.33.1.1</quarkus.platform.version>
-        <lombok.version>1.18.44</lombok.version>
+        <quarkus.platform.version>3.37.0</quarkus.platform.version>
+        <lombok.version>1.18.46</lombok.version>
         <org.mapstruct.version>1.6.3</org.mapstruct.version>
 
         <tika-core.version>3.3.0</tika-core.version>
