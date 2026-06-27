@@ -5,6 +5,7 @@ import de.halbmann.sam.api.entity.sheets.SheetMusic;
 import de.halbmann.sam.business.documents.controller.AttachmentMapper;
 import de.halbmann.sam.business.musicians.controller.MusicianMapper;
 import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
+import java.util.Locale;
 import java.util.Set;
 import org.mapstruct.*;
 
@@ -48,6 +49,6 @@ public interface SheetMusicMapper {
     // Individual string transformation
     @Named("toLowerCase")
     default String toLowerCase(String source) {
-        return source != null ? source.toLowerCase() : null;
+        return source != null ? source.toLowerCase(Locale.ROOT) : null;
     }
 }

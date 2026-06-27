@@ -1,8 +1,10 @@
 package de.halbmann.sam.core.controller;
 
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
 
-public final class FingerprintService {
+@UtilityClass
+public class FingerprintService {
 
     @Getter
     private static final int FINGERPRINT_VERSION = 1;

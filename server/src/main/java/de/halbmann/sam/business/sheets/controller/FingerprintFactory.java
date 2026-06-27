@@ -5,7 +5,9 @@ import de.halbmann.sam.business.sheets.entity.FingerprintEntity;
 import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
 import de.halbmann.sam.core.controller.FingerprintService;
 import java.util.Optional;
+import lombok.experimental.UtilityClass;
 
+@UtilityClass
 public class FingerprintFactory {
 
     public static FingerprintEntity forSheet(final SheetMusicEntity sheet) {

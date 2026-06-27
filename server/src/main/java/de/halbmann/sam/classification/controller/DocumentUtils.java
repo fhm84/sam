@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import lombok.experimental.UtilityClass;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.ImageType;
@@ -23,6 +24,7 @@ import org.apache.pdfbox.tools.imageio.ImageIOUtil;
  * <p>The {@code cropImage} methods are used to crop a specified percentage of the top and bottom
  * parts of an image and combine them into a new image.
  */
+@UtilityClass
 public class DocumentUtils {
 
     static final int dpi = 90; // DPI for rendering the PDF
@@ -61,12 +63,12 @@ public class DocumentUtils {
     static BufferedImage cropImage(BufferedImage bim, int imageType) {
         int percentageTop = 20;
         // calculate the height for the top part of the image
-        int topHeight = (int) ((bim.getHeight() / 100.0) * percentageTop);
+        int topHeight = (int) (bim.getHeight() / 100.0 * percentageTop);
         BufferedImage topBim = bim.getSubimage(0, 0, bim.getWidth(), topHeight);
 
         int percentageBottom = 15;
         // calculate the height for the bottom part of the image
-        int bottomHeight = (int) ((bim.getHeight() / 100.0) * percentageBottom);
+        int bottomHeight = (int) (bim.getHeight() / 100.0 * percentageBottom);
         BufferedImage bottomBim = bim.getSubimage(0, bim.getHeight() - bottomHeight, bim.getWidth(), bottomHeight);
 
         // determine the width and height for the combined image

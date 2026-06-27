@@ -28,7 +28,8 @@ public abstract class AbstractBaseEntity implements Serializable {
 
     @PrePersist
     public void onCreate() {
-        lastUpdate = created = LocalDateTime.now(ZoneOffset.UTC);
+        created = LocalDateTime.now(ZoneOffset.UTC);
+        lastUpdate = created;
     }
 
     @PreUpdate

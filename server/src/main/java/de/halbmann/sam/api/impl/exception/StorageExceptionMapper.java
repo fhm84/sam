@@ -16,7 +16,7 @@ public class StorageExceptionMapper implements ExceptionMapper<StorageException>
 
     @Override
     public Response toResponse(StorageException exception) {
-        log.error("Storage error: {}", exception.getMessage(), exception);
+        log.error("Storage error", exception);
         ErrorResponse error = new ErrorResponse(
                 Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), "Internal Server Error", exception.getMessage());
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)

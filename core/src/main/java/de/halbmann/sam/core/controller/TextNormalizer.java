@@ -2,13 +2,15 @@ package de.halbmann.sam.core.controller;
 
 import java.text.Normalizer;
 import java.util.Locale;
+import lombok.experimental.UtilityClass;
 
-public final class TextNormalizer {
-
-    private TextNormalizer() {}
+@UtilityClass
+public class TextNormalizer {
 
     public static String normalize(String title) {
-        if (title == null) return "";
+        if (title == null) {
+            return "";
+        }
 
         String normalized = Normalizer.normalize(title, Normalizer.Form.NFKD);
 

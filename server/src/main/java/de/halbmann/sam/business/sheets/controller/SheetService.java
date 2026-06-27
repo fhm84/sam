@@ -21,7 +21,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @ApplicationScoped
 @Transactional
@@ -217,16 +216,5 @@ public class SheetService {
                 .orElseThrow(() -> new EntityNotFoundException("SheetMusic", sheetId));
         entity.setFavorite(favorite);
         sheetRepository.persistAndFlush(entity);
-    }
-
-    private Set<String> normalizeTags(Set<String> tags) {
-        if (tags == null) {
-            return Set.of();
-        }
-        return tags.stream()
-                .filter(Objects::nonNull)
-                .map(String::trim)
-                .map(String::toLowerCase)
-                .collect(Collectors.toSet());
     }
 }

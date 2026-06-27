@@ -109,7 +109,9 @@ public class ShareService {
     private String resolveResourceLabel(ShareEntity entity) {
         if (entity.getResourceType() == ShareType.INSTRUMENTATION) {
             InstrumentationEntity instr = instrumentationRepository.findById(entity.getResourceId());
-            if (instr == null) return null;
+            if (instr == null) {
+                return null;
+            }
             String name = instr.getInstrument() != null ? instr.getInstrument().getName() : "?";
             return instr.getPartLabel() != null ? name + " " + instr.getPartLabel() : name;
         } else if (entity.getResourceType() == ShareType.COLLECTION) {

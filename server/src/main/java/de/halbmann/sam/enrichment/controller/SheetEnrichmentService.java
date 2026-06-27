@@ -12,6 +12,7 @@ import io.micrometer.core.instrument.Timer;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.LinkedHashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -93,20 +94,24 @@ public class SheetEnrichmentService {
     }
 
     private Style parseStyle(String suggested, Style existing) {
-        if (suggested == null || existing != null) return null;
+        if (suggested == null || existing != null) {
+            return null;
+        }
         try {
             return Style.valueOf(
-                    suggested.trim().toUpperCase().replace(' ', '_').replace('-', '_'));
+                    suggested.trim().toUpperCase(Locale.ROOT).replace(' ', '_').replace('-', '_'));
         } catch (IllegalArgumentException e) {
             return null;
         }
     }
 
     private Integer parseDifficulty(String suggested, DifficultyLevel existing) {
-        if (suggested == null || existing != null) return null;
+        if (suggested == null || existing != null) {
+            return null;
+        }
         try {
             var level = DifficultyLevel.valueOf(
-                    suggested.trim().toUpperCase().replace(' ', '_').replace('-', '_'));
+                    suggested.trim().toUpperCase(Locale.ROOT).replace(' ', '_').replace('-', '_'));
             return level.getGrade();
         } catch (IllegalArgumentException e) {
             return null;
@@ -118,17 +123,23 @@ public class SheetEnrichmentService {
     }
 
     private String parseNotes(String suggested, String existing) {
-        if (suggested == null || suggested.isBlank()) return null;
-        if (existing != null && !existing.isBlank()) return null;
+        if (suggested == null || suggested.isBlank()) {
+            return null;
+        }
+        if (existing != null && !existing.isBlank()) {
+            return null;
+        }
         return suggested.trim();
     }
 
     private Set<String> filterTags(java.util.List<String> suggested, Set<String> existing) {
         Set<String> existingLower =
                 existing != null ? existing.stream().map(String::toLowerCase).collect(Collectors.toSet()) : Set.of();
-        if (suggested == null) return new LinkedHashSet<>();
+        if (suggested == null) {
+            return new LinkedHashSet<>();
+        }
         return suggested.stream()
-                .map(t -> t.trim().toLowerCase())
+                .map(t -> t.trim().toLowerCase(Locale.ROOT))
                 .filter(t -> !t.isBlank() && !existingLower.contains(t))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }

@@ -191,9 +191,13 @@ public class GemaSetlistService {
     }
 
     void replacePlaceholders(final Cell cell, final Map<String, String> vars) {
-        if (cell.getCellType() != CellType.STRING) return;
+        if (cell.getCellType() != CellType.STRING) {
+            return;
+        }
         String value = cell.getStringCellValue();
-        if (!value.contains("{{")) return;
+        if (!value.contains("{{")) {
+            return;
+        }
         for (Map.Entry<String, String> entry : vars.entrySet()) {
             String replacement = entry.getValue() != null ? entry.getValue() : "";
             value = value.replace("{{" + entry.getKey() + "}}", replacement);
@@ -206,12 +210,16 @@ public class GemaSetlistService {
      * Returns ["", ""] for null/blank input.
      */
     String[] splitName(final Musician musician) {
-        if (musician == null || musician.getName() == null) return new String[] {"", ""};
+        if (musician == null || musician.getName() == null) {
+            return new String[] {"", ""};
+        }
         return splitName(musician.getName().trim());
     }
 
     String[] splitName(final String fullName) {
-        if (fullName == null || fullName.isBlank()) return new String[] {"", ""};
+        if (fullName == null || fullName.isBlank()) {
+            return new String[] {"", ""};
+        }
         String name = fullName.trim();
         int lastSpace = name.lastIndexOf(' ');
         if (lastSpace > 0) {
@@ -221,7 +229,9 @@ public class GemaSetlistService {
     }
 
     String formatDuration(final Duration d) {
-        if (d == null) return null;
+        if (d == null) {
+            return null;
+        }
         long totalSeconds = d.getSeconds();
         long minutes = totalSeconds / 60;
         long seconds = totalSeconds % 60;

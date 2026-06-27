@@ -46,7 +46,7 @@ public class ShowSheetCommand implements Runnable {
             }
         } catch (NotFoundException e) {
             System.err.println("Sheet with ID " + id + " not found.");
-            throw new CommandLine.ExecutionException(new CommandLine(this), "Sheet not found");
+            throw new CommandLine.ExecutionException(new CommandLine(this), "Sheet not found", e);
         } catch (Exception e) {
             System.err.println("Error retrieving sheet: " + e.getMessage());
             throw new CommandLine.ExecutionException(new CommandLine(this), "Failed to retrieve sheet", e);

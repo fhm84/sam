@@ -231,10 +231,15 @@ public class DocumentsResourceImpl implements DocumentsResource {
 
             if (sheetId != null || instrumentationId != null) {
                 DocumentLinkRequest documentLinkRequest = new DocumentLinkRequest();
-                if (sheetId != null) documentLinkRequest.setSheetId(UUID.fromString(sheetId));
-                if (instrumentationId != null)
+                if (sheetId != null) {
+                    documentLinkRequest.setSheetId(UUID.fromString(sheetId));
+                }
+                if (instrumentationId != null) {
                     documentLinkRequest.setInstrumentationId(UUID.fromString(instrumentationId));
-                if (request.getType() != null) documentLinkRequest.setAttachmentType(request.getType());
+                }
+                if (request.getType() != null) {
+                    documentLinkRequest.setAttachmentType(request.getType());
+                }
                 Attachment attachment =
                         documentsService.linkDocument(upload.document().id(), documentLinkRequest);
 
@@ -305,12 +310,9 @@ public class DocumentsResourceImpl implements DocumentsResource {
             return false;
         }
 
-        if ("*".equals(ifNoneMatch.trim())) {
-            return true;
-        }
-
-        return Arrays.stream(ifNoneMatch.split(","))
-                .map(String::trim)
-                .anyMatch(tag -> tag.equals(currentEtag) || tag.equals("W/" + currentEtag));
+        return "*".equals(ifNoneMatch.trim())
+                || Arrays.stream(ifNoneMatch.split(","))
+                        .map(String::trim)
+                        .anyMatch(tag -> tag.equals(currentEtag) || tag.equals("W/" + currentEtag));
     }
 }

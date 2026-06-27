@@ -44,7 +44,7 @@ public enum InstrumentTransposing {
     Bb;
 
     public static InstrumentTransposing fromString(String s) {
-        for (InstrumentTransposing instrumentTransposing : InstrumentTransposing.values()) {
+        for (InstrumentTransposing instrumentTransposing : values()) {
             if (instrumentTransposing.name().equalsIgnoreCase(s)) {
                 return instrumentTransposing;
             }

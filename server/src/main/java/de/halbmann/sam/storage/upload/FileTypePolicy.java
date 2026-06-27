@@ -50,7 +50,7 @@ public class FileTypePolicy implements UploadPolicy {
                 .orElse("");
 
         // Example: enforce PDF files end with .pdf
-        if (context.mimeType().equals("application/pdf") && !ext.equals("pdf")) {
+        if ("application/pdf".equals(context.mimeType()) && !ext.equals("pdf")) {
             throw new IOException("File extension does not match detected PDF type");
         }
     }

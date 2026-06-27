@@ -1,15 +1,18 @@
 package de.halbmann.sam.business.shared.controller;
 
-public final class FilenameUtils {
+import lombok.experimental.UtilityClass;
 
-    private FilenameUtils() {}
+@UtilityClass
+public class FilenameUtils {
 
     public static String sanitizeFilename(String name) {
         return sanitizeFilename(name, "export");
     }
 
     public static String sanitizeFilename(String name, String fallback) {
-        if (name == null || name.isBlank()) return fallback;
+        if (name == null || name.isBlank()) {
+            return fallback;
+        }
         String s = name.replace("ä", "ae")
                 .replace("Ä", "Ae")
                 .replace("ö", "oe")

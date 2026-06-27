@@ -140,7 +140,7 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
 
         if (titleStartsWith != null && !titleStartsWith.isBlank()) {
             conditions.add("lower(title) like :titlePrefix");
-            queryParams.put("titlePrefix", titleStartsWith.toLowerCase() + "%");
+            queryParams.put("titlePrefix", titleStartsWith.toLowerCase(Locale.ROOT) + "%");
         }
 
         final String filter = String.join(" and ", conditions);

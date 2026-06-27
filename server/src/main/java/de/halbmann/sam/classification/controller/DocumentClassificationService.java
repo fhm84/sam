@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -337,8 +338,9 @@ public class DocumentClassificationService {
         appendIfPresent(sb, "Composer", r.composer());
         appendIfPresent(sb, "Arranger", r.arranger());
         appendIfPresent(sb, "Genre", r.genre());
-        if (r.yearOfComposition() != null)
+        if (r.yearOfComposition() != null) {
             sb.append("Year: ").append(r.yearOfComposition()).append("\n");
+        }
         appendIfPresent(sb, "Edition", r.edition());
         appendIfPresent(sb, "ISWC", r.iswc());
         if (r.instrumentation() != null) {
@@ -347,9 +349,12 @@ public class DocumentClassificationService {
             appendIfPresent(sb, "Part label", i.partLabel());
             appendIfPresent(sb, "Part number", i.partNumber());
             appendIfPresent(sb, "Transposition", i.transposition());
-            if (i.clef() != null) sb.append("Clef: ").append(i.clef()).append("\n");
-            if (i.notationType() != null)
+            if (i.clef() != null) {
+                sb.append("Clef: ").append(i.clef()).append("\n");
+            }
+            if (i.notationType() != null) {
                 sb.append("Notation type: ").append(i.notationType()).append("\n");
+            }
         }
         return sb.toString().trim();
     }
@@ -365,7 +370,9 @@ public class DocumentClassificationService {
     // -------------------------------------------------------------------------
 
     private UUID matchMusician(String name) {
-        if (name == null || name.isBlank()) return null;
+        if (name == null || name.isBlank()) {
+            return null;
+        }
         return musicianRepository
                 .findMusicianByName(name)
                 .map(MusicianEntity::getId)
@@ -415,7 +422,7 @@ public class DocumentClassificationService {
         }
         if (name != null && !name.isBlank()) {
             return instrumentRepository.findByName(name).orElseGet(() -> {
-                String slug = name.toLowerCase().replaceAll("[^a-z0-9]+", "-");
+                String slug = name.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]+", "-");
                 while (slug.endsWith("-")) {
                     slug = slug.substring(0, slug.length() - 1);
                 }

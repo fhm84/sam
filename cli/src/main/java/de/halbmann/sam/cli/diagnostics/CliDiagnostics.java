@@ -49,8 +49,8 @@ public class CliDiagnostics {
             } else {
                 LOG.debug("CliDiagnostics: no args");
             }
-        } catch (Throwable t) {
-            LOG.errorf(t, "CliDiagnostics: error: %s", t.getMessage());
+        } catch (Exception e) {
+            LOG.errorf(e, "CliDiagnostics: error: %s", e.getMessage());
         }
     }
 }

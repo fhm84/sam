@@ -41,7 +41,7 @@ public class ImportSheetCommand implements Runnable {
         final List<ImportResult> results = new ArrayList<>();
         for (File file : files) {
             if (file.isDirectory()) {
-                try (final Stream<Path> fileStream = Files.walk(file.toPath(), 1)) {
+                try (Stream<Path> fileStream = Files.walk(file.toPath(), 1)) {
                     fileStream
                             .map(Path::toFile)
                             .filter(File::isFile)

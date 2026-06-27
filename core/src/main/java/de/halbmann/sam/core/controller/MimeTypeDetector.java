@@ -51,7 +51,7 @@ public class MimeTypeDetector {
 
             return mimeTypeByDetector.toString();
         } catch (final IOException e) {
-            throw new RuntimeException("Tika was not able to analyse mimetype");
+            throw new RuntimeException("Tika was not able to analyse mimetype", e);
         }
     }
 }

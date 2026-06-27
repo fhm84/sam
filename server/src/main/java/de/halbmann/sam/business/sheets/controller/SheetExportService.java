@@ -131,7 +131,9 @@ public class SheetExportService {
         List<SheetExport> exports = new ArrayList<>();
         int index = 1;
         for (CollectionItem cs : collection.getItems()) {
-            if (cs.getType() != CollectionItemType.SHEET) continue;
+            if (cs.getType() != CollectionItemType.SHEET) {
+                continue;
+            }
             SheetMusic sheet = sheetService.getSheet(cs.getSheetId().toString());
             String identifier =
                     cs.getIdentifier() != null && !cs.getIdentifier().isBlank()
@@ -162,7 +164,9 @@ public class SheetExportService {
                 if (!textAttachments.isEmpty()) {
                     Set<String> usedNames = new LinkedHashSet<>();
                     for (TextItemAttachment ta : textAttachments) {
-                        if (ta.attachment().getDocument() == null) continue;
+                        if (ta.attachment().getDocument() == null) {
+                            continue;
+                        }
                         String prefix = ta.identifier().isBlank() ? "" : sanitizeFilename(ta.identifier()) + " - ";
                         String entryName = "Programmnotizen/"
                                 + uniqueZipName(prefix + ta.attachment().getDisplayName(), usedNames);
@@ -182,7 +186,9 @@ public class SheetExportService {
             throws IOException {
         Set<String> usedNames = new LinkedHashSet<>();
         for (AttachmentEntity att : attachments) {
-            if (att.getDocument() == null) continue;
+            if (att.getDocument() == null) {
+                continue;
+            }
             String entryName = prefix + uniqueZipName(att.getDisplayName(), usedNames);
             zip.putNextEntry(new ZipEntry(entryName));
             try (InputStream in = filesystem.openForRead(att.getDocument().getPath())) {
@@ -242,7 +248,9 @@ public class SheetExportService {
     }
 
     private static String csvField(String value) {
-        if (value == null || value.isEmpty()) return "";
+        if (value == null || value.isEmpty()) {
+            return "";
+        }
         if (value.contains(",") || value.contains("\"") || value.contains("\n")) {
             return "\"" + value.replace("\"", "\"\"") + "\"";
         }

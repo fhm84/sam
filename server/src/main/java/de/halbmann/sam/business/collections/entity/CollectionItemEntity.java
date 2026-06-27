@@ -2,7 +2,9 @@ package de.halbmann.sam.business.collections.entity;
 
 import de.halbmann.sam.business.shared.entity.AbstractEntity;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.envers.Audited;
 
@@ -12,6 +14,7 @@ import org.hibernate.envers.Audited;
  */
 @Getter
 @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Audited
 @Table(name = "collection_items")

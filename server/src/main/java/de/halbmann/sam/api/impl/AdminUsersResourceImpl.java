@@ -39,7 +39,7 @@ public class AdminUsersResourceImpl implements AdminUsersResource {
             UserRepresentation rep = keycloak.realm(realm).users().get(userId).toRepresentation();
             return toUserInfo(rep);
         } catch (NotFoundException e) {
-            throw new NotFoundException("User not found: " + userId);
+            throw new NotFoundException("User not found: " + userId, e);
         }
     }
 

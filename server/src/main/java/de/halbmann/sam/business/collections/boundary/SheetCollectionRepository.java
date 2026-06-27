@@ -11,6 +11,7 @@ import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -26,7 +27,7 @@ public class SheetCollectionRepository implements PanacheRepositoryBase<SheetCol
 
         if (nameFilter != null && !nameFilter.isEmpty()) {
             conditions.add("lower(name) like :name");
-            params.put("name", "%" + nameFilter.toLowerCase() + "%");
+            params.put("name", "%" + nameFilter.toLowerCase(Locale.ROOT) + "%");
         }
         if (typeFilter != null) {
             conditions.add("type = :type");

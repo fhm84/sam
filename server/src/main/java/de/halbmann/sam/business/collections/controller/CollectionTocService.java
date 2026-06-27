@@ -73,7 +73,9 @@ public class CollectionTocService {
     }
 
     String formatDuration(final Duration d) {
-        if (d == null) return "";
+        if (d == null) {
+            return "";
+        }
         long totalSeconds = d.getSeconds();
         long minutes = totalSeconds / 60;
         long seconds = totalSeconds % 60;

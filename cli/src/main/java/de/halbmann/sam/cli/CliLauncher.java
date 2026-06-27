@@ -14,9 +14,9 @@ public class CliLauncher {
         StaticArgsBridge.setArgs(args);
         try {
             Quarkus.run(args);
-        } catch (Throwable t) {
-            log.error("Quarkus.run failed: {}", t.getMessage(), t);
-            throw t;
+        } catch (RuntimeException e) {
+            log.error("Quarkus.run failed", e);
+            throw e;
         } finally {
             log.debug("Quarkus.run returned");
         }

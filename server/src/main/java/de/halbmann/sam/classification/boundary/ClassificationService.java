@@ -24,7 +24,7 @@ public class ClassificationService {
     private final SheetAnalyzer analyzer;
     private final MeterRegistry registry;
 
-    private final boolean debug = true;
+    private static final boolean debug = true;
 
     @Inject
     public ClassificationService(SheetAnalyzer analyzer, MeterRegistry registry) {
@@ -58,7 +58,9 @@ public class ClassificationService {
     }
 
     private static boolean isMeaningfulText(String text) {
-        if (text == null) return false;
+        if (text == null) {
+            return false;
+        }
         long printable = text.chars().filter(c -> c > 32 && c != 65533).count();
         return printable >= 50;
     }
@@ -82,8 +84,9 @@ public class ClassificationService {
         registry.counter("sam.classification.requests", "mode", mode).increment();
         try {
             return timer.recordCallable(action);
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
-            if (e instanceof RuntimeException re) throw re;
             throw new RuntimeException(e);
         }
     }

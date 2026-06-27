@@ -1,18 +1,18 @@
 package de.halbmann.sam.storage;
 
 import java.util.Optional;
+import lombok.experimental.UtilityClass;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.tika.mime.MimeType;
 import org.apache.tika.mime.MimeTypes;
 
-public final class MimeTypeUtils {
+@UtilityClass
+public class MimeTypeUtils {
 
     private static final MimeTypes MIME_TYPES = MimeTypes.getDefaultMimeTypes();
 
-    private MimeTypeUtils() {}
-
     public static String resolveExtension(String mimeType, String originalFilename) {
-        return MimeTypeUtils.extensionFor(mimeType)
+        return extensionFor(mimeType)
                 .or(() -> Optional.ofNullable(FilenameUtils.getExtension(originalFilename))
                         .filter(ext -> !ext.isBlank()))
                 .orElse("bin");
