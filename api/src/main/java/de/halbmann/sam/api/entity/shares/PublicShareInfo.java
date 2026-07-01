@@ -14,9 +14,9 @@ import lombok.Data;
  * for {@link ShareType#INSTRUMENTATION} tokens, collection-specific fields for
  * {@link ShareType#COLLECTION} tokens. Fields belonging to the other type are {@code null}.
  *
- * <p>When {@code expired} is {@code true} the token is no longer usable — this covers both
- * past-expiry-date tokens and explicitly revoked ones; callers do not need to distinguish between
- * the two cases.
+ * <p>When {@code expired} is {@code true} the token is no longer usable — either past its expiry
+ * date or explicitly revoked. Only the title-ish fields ({@code sheetTitle}/{@code collectionName})
+ * are populated in that case; attachments, instrumentation breakdowns, and sheet lists are omitted.
  */
 @Data
 public class PublicShareInfo {

@@ -37,6 +37,11 @@ export class PublicSharePage implements OnInit {
     });
   }
 
+  protected expiredTitle(): string | null {
+    const data = this.info();
+    return data ? (data.sheetTitle ?? data.collectionName ?? null) : null;
+  }
+
   protected downloadInstrumentation(): void {
     window.open(this.sharesApi.instrDownloadUrl(this.token));
   }

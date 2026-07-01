@@ -25,6 +25,9 @@
         class="rounded-xl border border-[var(--sam-border)] bg-white dark:bg-[var(--p-surface-900)] p-8 flex flex-col items-center gap-4 text-center"
       >
         <i class="pi pi-lock text-4xl text-[var(--sam-text-muted)]"></i>
+        @if (phase() === 'expired' && expiredTitle(); as title) {
+          <p class="m-0 text-sm font-medium text-[var(--sam-text-secondary)]">"{{ title }}"</p>
+        }
         <h2 class="m-0 text-xl font-semibold text-[var(--sam-text)]">
           {{ (phase() === 'expired' ? 'publicShare.expired' : 'publicShare.notFound') | translate }}
         </h2>
