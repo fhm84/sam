@@ -50,16 +50,17 @@ the exceptions, not the rule.
   moved to `FilenameUtils`. All 7 caller classes and 2 test classes updated;
   140 tests pass.
 
-## 4. Test coverage inverted relative to testability  ⬜
+## 4. Test coverage inverted relative to testability  ✅ (c2ad9f1)
 - **Files:** `core/src/test` (missing), `api/src/test` (missing)
 - **Severity:** Medium (feedback-loop cost)
 - **Problem:** `core` — the purest, easiest-to-test logic (fingerprinting, MIME
-  detection, `TextNormalizer`, `SortFieldValidator`) — has zero tests; so does
-  `api` despite `UserInfo.displayLabel()` carrying real branching. All 25 test
-  classes live in `server` where tests are slowest.
-- **Fix direction:** Add plain JUnit tests in `core` (no Quarkus needed) for
+  detection, `TextNormalizer`, `SortFieldValidator`) — had zero tests; so did
+  `api` despite `UserInfo.displayLabel()` carrying real branching. All tests
+  lived in `server` where they are slowest.
+- **Fix applied:** Added plain JUnit 5 tests in `core` (no Quarkus runtime) for
   `TextNormalizer`, `Hashing`, `MimeTypeDetector`, `SortFieldValidator`,
-  `FingerprintService`; one small test in `api` for `UserInfo.displayLabel()`.
+  `FingerprintService`; and `UserInfoTest` in `api` covering all 8 branches of
+  `displayLabel()`. 37 new fast tests; 177 total across all modules.
 
 ## 5. Ambiguous transaction boundaries  ✅
 - **Files:** 14 repository classes (all `business/.../boundary/*Repository.java`)
