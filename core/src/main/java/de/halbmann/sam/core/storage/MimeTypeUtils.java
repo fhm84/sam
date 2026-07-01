@@ -1,4 +1,4 @@
-package de.halbmann.sam.storage;
+package de.halbmann.sam.core.storage;
 
 import java.util.Optional;
 import lombok.experimental.UtilityClass;

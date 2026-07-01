@@ -1,6 +1,8 @@
 package de.halbmann.sam.storage.upload;
 
 import de.halbmann.sam.EnvConsts;
+import de.halbmann.sam.core.storage.upload.UploadContext;
+import de.halbmann.sam.core.storage.upload.UploadPolicy;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;

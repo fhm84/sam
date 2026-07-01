@@ -1,4 +1,4 @@
-package de.halbmann.sam.storage.upload;
+package de.halbmann.sam.core.storage.upload;
 
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
