@@ -39,4 +39,10 @@ public class EnvConsts {
      * returning the suggestion to the UI. Default: {@code false}.
      */
     public static final String CLASSIFICATION_AGENTIC = "sam.classification.agentic";
+
+    /**
+     * When {@code true}, the image rendered for the vision classification path is additionally
+     * written to a temp file for inspection. Default: {@code false}.
+     */
+    public static final String CLASSIFICATION_DEBUG = "sam.classification.debug";
 }

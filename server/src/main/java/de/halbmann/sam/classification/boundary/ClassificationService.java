@@ -1,5 +1,6 @@
 package de.halbmann.sam.classification.boundary;
 
+import de.halbmann.sam.EnvConsts;
 import de.halbmann.sam.classification.controller.DocumentUtils;
 import de.halbmann.sam.classification.entity.SheetAnalyzerResult;
 import dev.langchain4j.data.image.Image;
@@ -15,6 +16,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.Base64;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @Slf4j
 @ApplicationScoped
@@ -23,13 +25,16 @@ public class ClassificationService {
 
     private final SheetAnalyzer analyzer;
     private final MeterRegistry registry;
-
-    private static final boolean debug = true;
+    private final boolean debug;
 
     @Inject
-    public ClassificationService(SheetAnalyzer analyzer, MeterRegistry registry) {
+    public ClassificationService(
+            SheetAnalyzer analyzer,
+            MeterRegistry registry,
+            @ConfigProperty(name = EnvConsts.CLASSIFICATION_DEBUG, defaultValue = "false") boolean debug) {
         this.analyzer = analyzer;
         this.registry = registry;
+        this.debug = debug;
     }
 
     public SheetAnalyzerResult analyzePdf(InputStream fileInputStream) {

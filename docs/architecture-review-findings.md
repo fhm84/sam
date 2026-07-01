@@ -72,22 +72,22 @@ the exceptions, not the rule.
   repository annotations. Consider method-level annotations on mutating
   service methods instead of class-level.
 
-## 6. Config and code hygiene  ⬜
+## 6. Config and code hygiene  ✅
 - **Severity:** Low
 - **Items:**
-  - `ClassificationService`: hardcoded `private static final boolean debug = true`
-    — should be a `sam.classification.debug` config property (add to `EnvConsts`).
-  - `application.properties` line 39: real GCP project ID (`470958450342`)
-    committed — move to env/profile config.
-  - `server/pom.xml`: unused property `aws-java-nio-spi-s3.version` (leftover).
+  - `ClassificationService`: hardcoded debug flag → now `sam.classification.debug`
+    config property (default `false`), registered in `EnvConsts`.
+  - `application.properties`: GCP project ID replaced with `${GCP_PROJECT_ID:}`.
+  - `server/pom.xml`: unused `aws-java-nio-spi-s3.version` property removed.
 
-## 7. Documentation drift  ⬜
+## 7. Documentation drift  ✅
 - **File:** `docs/architecture.md` §6, root `CLAUDE.md`
 - **Severity:** Low
-- **Problem:** Tech-stack table still says Quarkus 3.33.1.1 / Spotless plugin
+- **Problem:** Tech-stack table still said Quarkus 3.33.1.1 / Spotless plugin
   3.3.0; commit `ce13c21` (2026-06-27) moved these to 3.37.0 / 3.7.0.
-- **Fix direction:** Update the version table; consider dropping exact patch
-  versions from docs entirely (they drift; the pom is the source of truth).
+- **Fix applied:** Table now pins major lines only (3.37.x, 21.x, …) with a note
+  that poms / `package.json` are authoritative; CLAUDE.md no longer cites an
+  exact Spotless version.
 
 ## 8. Accepted trade-offs (watch, no action yet)  ⬜
 - **Coverage snapshots have no invalidation** — editing instrumentations or

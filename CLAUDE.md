@@ -122,7 +122,7 @@ docker compose -f docker-compose.monitoring.yml up
 
 ## Code Style
 
-- Java 21, Palantir Java Format (via Spotless plugin, version 3.3.0)
+- Java 21, Palantir Java Format (via Spotless plugin)
 - Run `./mvnw spotless:apply` before committing
 
 ## Verification Policy

@@ -14,7 +14,6 @@
     <artifactId>server</artifactId>
 
     <properties>
-        <aws-java-nio-spi-s3.version>2.2.1</aws-java-nio-spi-s3.version>
         <quarkus-langchain4j.version>1.7.4</quarkus-langchain4j.version>
         <pdfbox-tools.version>3.0.7</pdfbox-tools.version>
         <flying-saucer-pdf.version>10.2.0</flying-saucer-pdf.version>
