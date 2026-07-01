@@ -6,7 +6,7 @@ import de.halbmann.sam.api.entity.shares.*;
 import de.halbmann.sam.business.collections.boundary.SheetCollectionRepository;
 import de.halbmann.sam.business.collections.entity.SheetCollectionEntity;
 import de.halbmann.sam.business.collections.entity.SheetCollectionItemEntity;
-import de.halbmann.sam.business.documents.controller.DocumentsService;
+import de.halbmann.sam.business.documents.controller.AttachmentLinkService;
 import de.halbmann.sam.business.eventlog.controller.EventLogService;
 import de.halbmann.sam.business.shares.boundary.ShareRepository;
 import de.halbmann.sam.business.shares.entity.ShareEntity;
@@ -50,7 +50,7 @@ public class ShareService {
     SheetCollectionRepository collectionRepository;
 
     @Inject
-    DocumentsService documentsService;
+    AttachmentLinkService attachmentLinkService;
 
     @Inject
     EventLogService eventLogService;
@@ -129,7 +129,11 @@ public class ShareService {
         return shareRepository.findValid(token).orElseThrow(() -> new EntityNotFoundException("share", token));
     }
 
-    /** Builds the public metadata response for a share token. Throws 404 if invalid. */
+    /**
+     * Builds the public metadata response for a share token. Throws 404 if the token does not
+     * exist. For an expired or revoked token, returns only the resource title (no attachments,
+     * instrumentation breakdown, or sheet list) with {@code expired} set.
+     */
     @Transactional
     public PublicShareInfo getPublicInfo(UUID token) {
         ShareEntity share =
@@ -141,6 +145,11 @@ public class ShareService {
         info.setExpiresAt(share.getExpiresAt());
         info.setExpired(share.isExpired() || share.isRevoked());
 
+        if (info.isExpired()) {
+            setExpiredResourceTitle(share, info);
+            return info;
+        }
+
         if (share.getResourceType() == ShareType.INSTRUMENTATION) {
             buildInstrumentationInfo(share.getResourceId(), info);
         } else if (share.getResourceType() == ShareType.COLLECTION) {
@@ -150,6 +159,21 @@ public class ShareService {
         }
 
         return info;
+    }
+
+    /** Sets only the display title for an expired/revoked share — no attachments or child lists. */
+    private void setExpiredResourceTitle(ShareEntity share, PublicShareInfo info) {
+        if (share.getResourceType() == ShareType.INSTRUMENTATION) {
+            InstrumentationEntity instr = instrumentationRepository.findById(share.getResourceId());
+            SheetMusicEntity sheet = instr != null ? instr.getSheet() : null;
+            info.setSheetTitle(sheet != null ? sheet.getTitle() : null);
+        } else if (share.getResourceType() == ShareType.COLLECTION) {
+            SheetCollectionEntity collection = collectionRepository.findById(share.getResourceId());
+            info.setCollectionName(collection != null ? collection.getName() : null);
+        } else if (share.getResourceType() == ShareType.SHEET) {
+            SheetMusicEntity sheet = sheetRepository.findById(share.getResourceId());
+            info.setSheetTitle(sheet != null ? sheet.getTitle() : null);
+        }
     }
 
     private void buildInstrumentationInfo(UUID instrumentationId, PublicShareInfo info) {
@@ -166,7 +190,7 @@ public class ShareService {
         info.setInstrumentName(
                 instr.getInstrument() != null ? instr.getInstrument().getName() : null);
         info.setPartLabel(instr.getPartLabel());
-        info.setAttachments(documentsService.loadAttachmentsByInstrumentation(instrumentationId.toString()));
+        info.setAttachments(attachmentLinkService.loadAttachmentsByInstrumentation(instrumentationId.toString()));
     }
 
     private void buildCollectionInfo(UUID collectionId, PublicShareInfo info) {
@@ -223,7 +247,7 @@ public class ShareService {
                 .map(this::toInstrumentationItem)
                 .toList();
         info.setInstrumentations(items);
-        info.setAttachments(documentsService.loadAttachmentsBySheet(sheetId.toString()));
+        info.setAttachments(attachmentLinkService.loadAttachmentsBySheet(sheetId.toString()));
     }
 
     /**

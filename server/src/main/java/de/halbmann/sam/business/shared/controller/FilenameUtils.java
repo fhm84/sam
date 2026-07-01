@@ -1,9 +1,23 @@
 package de.halbmann.sam.business.shared.controller;
 
+import java.util.Set;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class FilenameUtils {
+
+    public static String uniqueZipName(String displayName, Set<String> used) {
+        String base = displayName != null && !displayName.isBlank() ? displayName : "document";
+        String candidate = base;
+        int i = 1;
+        while (used.contains(candidate)) {
+            int dot = base.lastIndexOf('.');
+            candidate = dot > 0 ? base.substring(0, dot) + " (" + i + ")" + base.substring(dot) : base + " (" + i + ")";
+            i++;
+        }
+        used.add(candidate);
+        return candidate;
+    }
 
     public static String sanitizeFilename(String name) {
         return sanitizeFilename(name, "export");

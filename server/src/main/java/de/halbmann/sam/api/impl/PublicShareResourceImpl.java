@@ -8,7 +8,9 @@ import de.halbmann.sam.api.entity.shares.ShareType;
 import de.halbmann.sam.business.collections.boundary.SheetCollectionRepository;
 import de.halbmann.sam.business.collections.controller.CollectionTocService;
 import de.halbmann.sam.business.collections.entity.SheetCollectionEntity;
-import de.halbmann.sam.business.documents.controller.DocumentsService;
+import de.halbmann.sam.business.documents.controller.AttachmentLinkService;
+import de.halbmann.sam.business.documents.controller.DocumentBundleService;
+import de.halbmann.sam.business.documents.controller.DocumentStore;
 import de.halbmann.sam.business.documents.controller.MergedPdfEntry;
 import de.halbmann.sam.business.documents.controller.StreamWriter;
 import de.halbmann.sam.business.documents.entity.AttachmentEntity;
@@ -40,7 +42,13 @@ public class PublicShareResourceImpl implements PublicShareResource {
     ShareService shareService;
 
     @Inject
-    DocumentsService documentsService;
+    DocumentStore documentStore;
+
+    @Inject
+    AttachmentLinkService attachmentLinkService;
+
+    @Inject
+    DocumentBundleService documentBundleService;
 
     @Inject
     CollectionTocService collectionTocService;
@@ -121,7 +129,7 @@ public class PublicShareResourceImpl implements PublicShareResource {
             throw new ForbiddenException();
         }
         shareService.logAccess(share.getId(), "attachment", attachmentId);
-        DocumentDownload dl = documentsService.loadAttachment(attachmentId.toString());
+        DocumentDownload dl = documentStore.loadAttachment(attachmentId.toString());
         if (dl == null) {
             return Response.noContent().build();
         }
@@ -142,7 +150,7 @@ public class PublicShareResourceImpl implements PublicShareResource {
 
     private Response buildSheetAllResponse(UUID sheetId, AttachmentType type) {
         List<AttachmentEntity> attachments =
-                documentsService.loadAttachmentEntitiesBySheetInstrumentations(sheetId.toString(), type);
+                attachmentLinkService.loadAttachmentEntitiesBySheetInstrumentations(sheetId.toString(), type);
         if (attachments.isEmpty()) {
             return Response.noContent().build();
         }
@@ -150,7 +158,7 @@ public class PublicShareResourceImpl implements PublicShareResource {
         String title = sheet != null ? sheet.getTitle() : "sheet";
         String encodedFilename =
                 URLEncoder.encode(title + ".zip", StandardCharsets.UTF_8).replace("+", "%20");
-        StreamWriter zip = documentsService.buildZipForSheetInstrumentations(sheetId.toString(), type);
+        StreamWriter zip = documentBundleService.buildZipForSheetInstrumentations(sheetId.toString(), type);
         return Response.ok((StreamingOutput) zip::write)
                 .type("application/zip")
                 .header("Content-Disposition", "attachment; filename*=utf-8''" + encodedFilename)
@@ -159,7 +167,7 @@ public class PublicShareResourceImpl implements PublicShareResource {
     }
 
     private Response buildCollectionAllResponse(UUID collectionId, AttachmentType type) {
-        StreamWriter zip = documentsService.buildZipForCollectionInstrumentations(collectionId.toString(), type);
+        StreamWriter zip = documentBundleService.buildZipForCollectionInstrumentations(collectionId.toString(), type);
         if (zip == null) {
             return Response.noContent().build();
         }
@@ -176,13 +184,13 @@ public class PublicShareResourceImpl implements PublicShareResource {
 
     private Response buildInstrumentationResponse(UUID instrumentationId) {
         List<MergedPdfEntry> entries =
-                documentsService.buildMergeEntriesForInstrumentation(instrumentationId.toString(), null);
+                documentBundleService.buildMergeEntriesForInstrumentation(instrumentationId.toString(), null);
         if (entries.isEmpty()) {
             return Response.noContent().build();
         }
 
         if (entries.size() == 1) {
-            DocumentDownload dl = documentsService.loadAttachment(
+            DocumentDownload dl = documentStore.loadAttachment(
                     entries.get(0).attachment().getId().toString());
             if (dl == null) {
                 return Response.noContent().build();
@@ -208,7 +216,7 @@ public class PublicShareResourceImpl implements PublicShareResource {
         String baseName = instr != null && instr.getInstrument() != null
                 ? instr.getInstrument().getName()
                 : "instrumentation";
-        StreamWriter zip = documentsService.buildZip(attachments, baseName);
+        StreamWriter zip = documentBundleService.buildZip(attachments, baseName);
         String encodedFilename =
                 URLEncoder.encode(baseName + ".zip", StandardCharsets.UTF_8).replace("+", "%20");
         return Response.ok((StreamingOutput) zip::write)

@@ -9,7 +9,7 @@ import de.halbmann.sam.api.entity.sheets.CreateSheetMusic;
 import de.halbmann.sam.api.entity.sheets.SheetFilterRequest;
 import de.halbmann.sam.api.entity.sheets.SheetMusic;
 import de.halbmann.sam.api.entity.sheets.SheetMusicSearchResult;
-import de.halbmann.sam.business.documents.controller.DocumentsService;
+import de.halbmann.sam.business.documents.controller.AttachmentLinkService;
 import de.halbmann.sam.business.ensembles.controller.CoverageSnapshotService;
 import de.halbmann.sam.business.musicians.boundary.MusicianRepository;
 import de.halbmann.sam.business.musicians.entity.MusicianEntity;
@@ -39,7 +39,7 @@ public class SheetService {
     CoverageSnapshotService coverageSnapshotService;
 
     @Inject
-    DocumentsService documentsService;
+    AttachmentLinkService attachmentLinkService;
 
     public PaginatedResponse<SheetMusicSearchResult> findSheets(final SheetFilterRequest filterRequest) {
         PaginatedResponse<SheetMusicSearchResult> response;
@@ -183,12 +183,12 @@ public class SheetService {
                 .orElseThrow(() -> new EntityNotFoundException("SheetMusic", sheetId));
         // Unlink sheet-level attachments
         if (entity.getAttachments() != null) {
-            documentsService.unlinkAttachments(new ArrayList<>(entity.getAttachments()));
+            attachmentLinkService.unlinkAttachments(new ArrayList<>(entity.getAttachments()));
         }
         // Unlink instrumentation-level attachments (instrumentations are cascade-deleted next)
         for (final var instr : entity.getInstrumentations()) {
             if (instr.getAttachments() != null) {
-                documentsService.unlinkAttachments(new ArrayList<>(instr.getAttachments()));
+                attachmentLinkService.unlinkAttachments(new ArrayList<>(instr.getAttachments()));
             }
         }
         sheetRepository.delete(entity);

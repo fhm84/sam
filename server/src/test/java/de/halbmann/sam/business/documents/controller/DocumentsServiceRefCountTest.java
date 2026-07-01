@@ -5,13 +5,10 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import de.halbmann.sam.api.entity.documents.*;
-import de.halbmann.sam.business.collections.boundary.SheetCollectionRepository;
 import de.halbmann.sam.business.documents.boundary.AttachmentRepository;
 import de.halbmann.sam.business.documents.boundary.DocumentRepository;
 import de.halbmann.sam.business.documents.entity.AttachmentEntity;
 import de.halbmann.sam.business.documents.entity.DocumentEntity;
-import de.halbmann.sam.business.sheets.boundary.InstrumentationRepository;
-import de.halbmann.sam.business.sheets.boundary.SheetRepository;
 import de.halbmann.sam.core.storage.malware.VirusScanner;
 import de.halbmann.sam.core.storage.upload.UploadPolicy;
 import de.halbmann.storage.api.FileSystemWrapper;
@@ -51,16 +48,7 @@ class DocumentsServiceRefCountTest {
     DocumentRepository documentRepository;
 
     @Mock
-    SheetRepository sheetRepository;
-
-    @Mock
-    InstrumentationRepository instrumentationRepository;
-
-    @Mock
     AttachmentRepository attachmentRepository;
-
-    @Mock
-    SheetCollectionRepository sheetCollectionRepository;
 
     @Mock
     AttachmentMapper attachmentMapper;
@@ -68,11 +56,8 @@ class DocumentsServiceRefCountTest {
     @Mock
     DocumentMapper documentMapper;
 
-    @Mock
-    PdfMetadataEnricher pdfMetadataEnricher;
-
     @InjectMocks
-    DocumentsService service;
+    DocumentStore documentStore;
 
     private static final byte[] CONTENT = "hello refcount test".getBytes();
 
@@ -113,7 +98,7 @@ class DocumentsServiceRefCountTest {
         DocumentEntity existing = existingDoc();
         when(documentRepository.findBySha256(anyString())).thenReturn(Optional.of(existing));
 
-        DocumentEntity result = service.save("test.txt", new ByteArrayInputStream(CONTENT));
+        DocumentEntity result = documentStore.save("test.txt", new ByteArrayInputStream(CONTENT));
 
         verify(documentRepository, never()).incrementRefCount(any());
         assertEquals(2, existing.getRefCount());
@@ -140,7 +125,7 @@ class DocumentsServiceRefCountTest {
                         "abc123"));
         when(attachmentMapper.toDto(any(AttachmentEntity.class))).thenReturn(new Attachment());
 
-        service.save("test.txt", new ByteArrayInputStream(CONTENT), AttachmentType.PART);
+        documentStore.save("test.txt", new ByteArrayInputStream(CONTENT), AttachmentType.PART);
 
         verify(documentRepository, times(1)).incrementRefCount(existing);
     }

@@ -9,7 +9,9 @@ import de.halbmann.sam.api.entity.eventlog.EventType;
 import de.halbmann.sam.api.entity.shared.PaginatedResponse;
 import de.halbmann.sam.api.entity.sheets.BatchDownloadRequest;
 import de.halbmann.sam.api.entity.sheets.DownloadFormat;
-import de.halbmann.sam.business.documents.controller.DocumentsService;
+import de.halbmann.sam.business.documents.controller.AttachmentLinkService;
+import de.halbmann.sam.business.documents.controller.DocumentBundleService;
+import de.halbmann.sam.business.documents.controller.DocumentStore;
 import de.halbmann.sam.business.documents.controller.MergedPdfEntry;
 import de.halbmann.sam.business.documents.controller.StreamWriter;
 import de.halbmann.sam.business.documents.entity.AttachmentEntity;
@@ -40,7 +42,13 @@ import org.slf4j.event.Level;
 public class DocumentsResourceImpl implements DocumentsResource {
 
     @Inject
-    DocumentsService documentsService;
+    DocumentStore documentStore;
+
+    @Inject
+    AttachmentLinkService attachmentLinkService;
+
+    @Inject
+    DocumentBundleService documentBundleService;
 
     @Inject
     DocumentClassificationService classificationService;
@@ -58,9 +66,9 @@ public class DocumentsResourceImpl implements DocumentsResource {
     public PaginatedResponse<Attachment> list(DocumentFilterRequest filterRequest) {
         List<Attachment> attachments;
         if (instrumentationId != null) {
-            attachments = documentsService.loadAttachmentsByInstrumentation(instrumentationId);
+            attachments = attachmentLinkService.loadAttachmentsByInstrumentation(instrumentationId);
         } else if (sheetId != null) {
-            attachments = documentsService.loadAttachmentsBySheet(sheetId);
+            attachments = attachmentLinkService.loadAttachmentsBySheet(sheetId);
         } else {
             attachments = new ArrayList<>();
         }
@@ -75,7 +83,7 @@ public class DocumentsResourceImpl implements DocumentsResource {
 
     @Override
     public PaginatedResponse<DocumentDownload> listUnlinkedDocuments(DocumentFilterRequest filterRequest) {
-        var result = documentsService.listUnlinkedDocuments(filterRequest.getPage(), filterRequest.getSize());
+        var result = documentStore.listUnlinkedDocuments(filterRequest.getPage(), filterRequest.getSize());
         PaginatedResponse<DocumentDownload> response = new PaginatedResponse<>();
         response.setData(result.data().stream()
                 .map(d -> new DocumentDownload(
@@ -93,10 +101,10 @@ public class DocumentsResourceImpl implements DocumentsResource {
         String zipName;
 
         if (instrumentationId != null) {
-            entries = documentsService.buildMergeEntriesForInstrumentation(instrumentationId, type);
+            entries = documentBundleService.buildMergeEntriesForInstrumentation(instrumentationId, type);
             zipName = "instrumentation-" + instrumentationId;
         } else if (sheetId != null) {
-            entries = documentsService.buildMergeEntriesForSheet(sheetId, type, includeInstrumentations);
+            entries = documentBundleService.buildMergeEntriesForSheet(sheetId, type, includeInstrumentations);
             zipName = "sheet-" + sheetId + (type != null ? "-" + type.name().toLowerCase() : "");
         } else {
             return Response.status(Response.Status.BAD_REQUEST).build();
@@ -121,7 +129,7 @@ public class DocumentsResourceImpl implements DocumentsResource {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
-        List<MergedPdfEntry> entries = documentsService.buildMergeEntriesById(request.getIds());
+        List<MergedPdfEntry> entries = documentBundleService.buildMergeEntriesById(request.getIds());
         if (entries.isEmpty()) {
             return Response.noContent().build();
         }
@@ -143,7 +151,7 @@ public class DocumentsResourceImpl implements DocumentsResource {
 
     private Response buildResponse(List<MergedPdfEntry> entries, DownloadFormat format, String baseName) {
         if (format == DownloadFormat.MERGED_PDF) {
-            StreamWriter pdf = documentsService.buildMergedPdf(entries);
+            StreamWriter pdf = documentBundleService.buildMergedPdf(entries);
             if (pdf != null) {
                 String filename = URLEncoder.encode(baseName + ".pdf", StandardCharsets.UTF_8)
                         .replace("+", "%20");
@@ -159,7 +167,7 @@ public class DocumentsResourceImpl implements DocumentsResource {
 
         List<AttachmentEntity> attachments =
                 entries.stream().map(MergedPdfEntry::attachment).toList();
-        StreamWriter zip = documentsService.buildZip(attachments, baseName);
+        StreamWriter zip = documentBundleService.buildZip(attachments, baseName);
         String filename =
                 URLEncoder.encode(baseName + ".zip", StandardCharsets.UTF_8).replace("+", "%20");
         return Response.ok((StreamingOutput) zip::write)
@@ -173,12 +181,12 @@ public class DocumentsResourceImpl implements DocumentsResource {
     public Response load(String docIdentifier, String ifNoneMatch) {
         DocumentDownload attachment;
         if (instrumentationId != null) {
-            attachment = documentsService.loadAttachmentByInstrumentation(instrumentationId, docIdentifier);
+            attachment = attachmentLinkService.loadAttachmentByInstrumentation(instrumentationId, docIdentifier);
         } else if (sheetId != null) {
-            attachment = documentsService.loadAttachmentBySheet(sheetId, docIdentifier);
+            attachment = attachmentLinkService.loadAttachmentBySheet(sheetId, docIdentifier);
         } else {
-            attachment = Optional.ofNullable(documentsService.loadAttachment(docIdentifier))
-                    .orElse(documentsService.load(UUID.fromString(docIdentifier)));
+            attachment = Optional.ofNullable(documentStore.loadAttachment(docIdentifier))
+                    .orElse(documentStore.load(UUID.fromString(docIdentifier)));
         }
         if (attachment == null) {
             log.info("Document ({}) not found", docIdentifier);
@@ -227,7 +235,7 @@ public class DocumentsResourceImpl implements DocumentsResource {
                 .log(() -> "File-Upload ... filename: " + request.getFile().fileName());
 
         try (InputStream inputStream = Files.newInputStream(request.getFile().uploadedFile())) {
-            DocumentUpload upload = documentsService.save(request.getFile().fileName(), inputStream, request.getType());
+            DocumentUpload upload = documentStore.save(request.getFile().fileName(), inputStream, request.getType());
 
             if (sheetId != null || instrumentationId != null) {
                 DocumentLinkRequest documentLinkRequest = new DocumentLinkRequest();
@@ -241,7 +249,7 @@ public class DocumentsResourceImpl implements DocumentsResource {
                     documentLinkRequest.setAttachmentType(request.getType());
                 }
                 Attachment attachment =
-                        documentsService.linkDocument(upload.document().id(), documentLinkRequest);
+                        attachmentLinkService.linkDocument(upload.document().id(), documentLinkRequest);
 
                 log.atLevel(Level.INFO)
                         .log(() -> "File uploaded and linked - filename: "
@@ -264,7 +272,7 @@ public class DocumentsResourceImpl implements DocumentsResource {
     @Override
     @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public Attachment linkDocument(String docIdentifier, DocumentLinkRequest documentLink) {
-        return documentsService.linkDocument(UUID.fromString(docIdentifier), documentLink);
+        return attachmentLinkService.linkDocument(UUID.fromString(docIdentifier), documentLink);
     }
 
     @Override
@@ -299,9 +307,9 @@ public class DocumentsResourceImpl implements DocumentsResource {
     @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public void delete(String docIdentifier) {
         if (sheetId == null && instrumentationId == null) {
-            documentsService.deleteIfUnlinked(UUID.fromString(docIdentifier));
+            documentStore.deleteIfUnlinked(UUID.fromString(docIdentifier));
         } else {
-            documentsService.deleteAttachment(docIdentifier);
+            attachmentLinkService.deleteAttachment(docIdentifier);
         }
     }
 

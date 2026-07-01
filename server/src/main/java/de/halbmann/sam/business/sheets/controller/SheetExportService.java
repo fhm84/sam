@@ -7,7 +7,7 @@ import de.halbmann.sam.api.entity.sheets.ExportFormat;
 import de.halbmann.sam.api.entity.sheets.SheetMusic;
 import de.halbmann.sam.business.collections.controller.SheetCollectionService;
 import de.halbmann.sam.business.collections.controller.SheetCollectionService.TextItemAttachment;
-import de.halbmann.sam.business.documents.controller.DocumentsService;
+import de.halbmann.sam.business.documents.controller.AttachmentLinkService;
 import de.halbmann.sam.business.documents.controller.StreamWriter;
 import de.halbmann.sam.business.documents.entity.AttachmentEntity;
 import de.halbmann.sam.business.shared.controller.FilenameUtils;
@@ -37,7 +37,7 @@ public class SheetExportService {
     SheetCollectionService collectionService;
 
     @Inject
-    DocumentsService documentsService;
+    AttachmentLinkService attachmentLinkService;
 
     @Inject
     FileSystemWrapper filesystem;
@@ -154,7 +154,7 @@ public class SheetExportService {
 
                 Set<String> usedFolders = new LinkedHashSet<>();
                 for (SheetExport se : exports) {
-                    String folder = uniqueZipName(se.folder(), usedFolders) + "/";
+                    String folder = FilenameUtils.uniqueZipName(se.folder(), usedFolders) + "/";
                     zip.putNextEntry(new ZipEntry(folder + "sheet.json"));
                     zip.write(se.metadataJson().getBytes(StandardCharsets.UTF_8));
                     zip.closeEntry();
@@ -169,7 +169,8 @@ public class SheetExportService {
                         }
                         String prefix = ta.identifier().isBlank() ? "" : sanitizeFilename(ta.identifier()) + " - ";
                         String entryName = "Programmnotizen/"
-                                + uniqueZipName(prefix + ta.attachment().getDisplayName(), usedNames);
+                                + FilenameUtils.uniqueZipName(
+                                        prefix + ta.attachment().getDisplayName(), usedNames);
                         zip.putNextEntry(new ZipEntry(entryName));
                         try (InputStream in = filesystem.openForRead(
                                 ta.attachment().getDocument().getPath())) {
@@ -189,7 +190,7 @@ public class SheetExportService {
             if (att.getDocument() == null) {
                 continue;
             }
-            String entryName = prefix + uniqueZipName(att.getDisplayName(), usedNames);
+            String entryName = prefix + FilenameUtils.uniqueZipName(att.getDisplayName(), usedNames);
             zip.putNextEntry(new ZipEntry(entryName));
             try (InputStream in = filesystem.openForRead(att.getDocument().getPath())) {
                 in.transferTo(zip);
@@ -242,8 +243,8 @@ public class SheetExportService {
 
     private List<AttachmentEntity> collectSheetAttachments(String sheetId) {
         List<AttachmentEntity> all = new ArrayList<>();
-        all.addAll(documentsService.loadAttachmentEntitiesBySheet(sheetId, null));
-        all.addAll(documentsService.loadAttachmentEntitiesBySheetInstrumentations(sheetId, null));
+        all.addAll(attachmentLinkService.loadAttachmentEntitiesBySheet(sheetId, null));
+        all.addAll(attachmentLinkService.loadAttachmentEntitiesBySheetInstrumentations(sheetId, null));
         return all;
     }
 
@@ -259,18 +260,5 @@ public class SheetExportService {
 
     private static String sanitizeFilename(String name) {
         return FilenameUtils.sanitizeFilename(name);
-    }
-
-    private static String uniqueZipName(String name, Set<String> used) {
-        String base = name != null && !name.isBlank() ? name : "document";
-        String candidate = base;
-        int i = 1;
-        while (used.contains(candidate)) {
-            int dot = base.lastIndexOf('.');
-            candidate = dot > 0 ? base.substring(0, dot) + " (" + i + ")" + base.substring(dot) : base + " (" + i + ")";
-            i++;
-        }
-        used.add(candidate);
-        return candidate;
     }
 }

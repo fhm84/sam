@@ -17,7 +17,8 @@ import de.halbmann.sam.business.collections.entity.SheetCollectionEntity;
 import de.halbmann.sam.business.collections.entity.SheetCollectionItemEntity;
 import de.halbmann.sam.business.collections.entity.TextCollectionItemEntity;
 import de.halbmann.sam.business.documents.boundary.AttachmentRepository;
-import de.halbmann.sam.business.documents.controller.DocumentsService;
+import de.halbmann.sam.business.documents.controller.AttachmentLinkService;
+import de.halbmann.sam.business.documents.controller.DocumentStore;
 import de.halbmann.sam.business.documents.entity.AttachmentEntity;
 import de.halbmann.sam.business.ensembles.boundary.EnsembleMembershipRepository;
 import de.halbmann.sam.business.ensembles.entity.EnsembleMembershipEntity;
@@ -61,7 +62,10 @@ public class SheetCollectionService {
     SheetRepository sheetRepository;
 
     @Inject
-    DocumentsService documentsService;
+    DocumentStore documentStore;
+
+    @Inject
+    AttachmentLinkService attachmentLinkService;
 
     @Inject
     AttachmentRepository attachmentRepository;
@@ -293,7 +297,7 @@ public class SheetCollectionService {
             cleanUpAttachment(textItem);
         }
         // save() creates the Document + Attachment (with refcount) in one step
-        DocumentUpload upload = documentsService.save(filename, inputStream, AttachmentType.PROGRAM_NOTE);
+        DocumentUpload upload = documentStore.save(filename, inputStream, AttachmentType.PROGRAM_NOTE);
         AttachmentEntity attachment =
                 attachmentRepository.findById(upload.attachment().getId());
         textItem.setAttachment(attachment);
@@ -322,6 +326,6 @@ public class SheetCollectionService {
         String attachmentId = textItem.getAttachment().getId().toString();
         textItem.setAttachment(null);
         collectionItemRepository.getEntityManager().flush();
-        documentsService.deleteAttachment(attachmentId);
+        attachmentLinkService.deleteAttachment(attachmentId);
     }
 }

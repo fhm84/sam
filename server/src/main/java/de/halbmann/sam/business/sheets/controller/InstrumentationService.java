@@ -2,7 +2,7 @@ package de.halbmann.sam.business.sheets.controller;
 
 import de.halbmann.sam.api.entity.sheets.CreateInstrumentation;
 import de.halbmann.sam.api.entity.sheets.Instrumentation;
-import de.halbmann.sam.business.documents.controller.DocumentsService;
+import de.halbmann.sam.business.documents.controller.AttachmentLinkService;
 import de.halbmann.sam.business.instruments.boundary.InstrumentRepository;
 import de.halbmann.sam.business.instruments.entity.InstrumentEntity;
 import de.halbmann.sam.business.sheets.boundary.InstrumentationRepository;
@@ -36,7 +36,7 @@ public class InstrumentationService {
     InstrumentRepository instrumentRepository;
 
     @Inject
-    DocumentsService documentsService;
+    AttachmentLinkService attachmentLinkService;
 
     public List<Instrumentation> getInstrumentations(final String sheetId) {
         Sort sort = Sort.ascending("instrument.name", "partLabel");
@@ -99,7 +99,7 @@ public class InstrumentationService {
                 .findByIdOptional(UUID.fromString(instrumentationId))
                 .orElseThrow(() -> new EntityNotFoundException("Instrumentation", instrumentationId));
         if (entity.getAttachments() != null) {
-            documentsService.unlinkAttachments(new ArrayList<>(entity.getAttachments()));
+            attachmentLinkService.unlinkAttachments(new ArrayList<>(entity.getAttachments()));
         }
         instrumentationRepository.delete(entity);
     }

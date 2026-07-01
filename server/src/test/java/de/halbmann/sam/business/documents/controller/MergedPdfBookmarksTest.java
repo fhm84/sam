@@ -66,7 +66,8 @@ class MergedPdfBookmarksTest {
     }
 
     private static byte[] merge(List<MergedPdfEntry> entries, Map<String, byte[]> content) throws IOException {
-        StreamWriter writer = DocumentsService.doMerge(entries, path -> new ByteArrayInputStream(content.get(path)));
+        StreamWriter writer =
+                DocumentBundleService.doMerge(entries, path -> new ByteArrayInputStream(content.get(path)));
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         writer.write(baos);
         return baos.toByteArray();
@@ -119,7 +120,7 @@ class MergedPdfBookmarksTest {
     @Test
     void returnsNullWhenNoPdfEntriesPresent() {
         List<MergedPdfEntry> entries = List.of(nonPdfEntry("Cover"), nonPdfEntry("Notes"));
-        StreamWriter writer = DocumentsService.doMerge(entries, path -> null);
+        StreamWriter writer = DocumentBundleService.doMerge(entries, path -> null);
         assertNull(writer, "doMerge should return null when no PDF entries are present");
     }
 
