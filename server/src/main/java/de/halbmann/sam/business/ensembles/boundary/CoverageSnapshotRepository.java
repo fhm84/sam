@@ -6,13 +6,11 @@ import de.halbmann.sam.business.ensembles.entity.EnsembleEntity;
 import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @ApplicationScoped
-@Transactional
 public class CoverageSnapshotRepository implements PanacheRepositoryBase<CoverageSnapshotEntity, UUID> {
 
     public void upsert(EnsembleEntity ensemble, SheetMusicEntity sheet, CoverageResult result, String detailsJson) {

@@ -7,7 +7,6 @@ import de.halbmann.sam.core.entity.PaginatedEntities;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +15,6 @@ import java.util.Map;
 import java.util.UUID;
 
 @ApplicationScoped
-@Transactional
 public class SheetCollectionRepository implements PanacheRepositoryBase<SheetCollectionEntity, UUID> {
 
     public PaginatedEntities<SheetCollectionEntity> findCollections(

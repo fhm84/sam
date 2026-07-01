@@ -9,7 +9,6 @@ import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,7 +16,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
-@Transactional
 public class EnsembleRepository implements PanacheRepositoryBase<EnsembleEntity, UUID> {
 
     private static final Set<String> ALLOWED_SORT_FIELDS = Set.of("name", "description");

@@ -3,14 +3,12 @@ package de.halbmann.sam.business.shares.boundary;
 import de.halbmann.sam.business.shares.entity.ShareEntity;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 /** Data-access layer for {@link ShareEntity}. */
 @ApplicationScoped
-@Transactional
 public class ShareRepository implements PanacheRepositoryBase<ShareEntity, UUID> {
 
     /** Returns all shares created by the given user, newest first. */

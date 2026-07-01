@@ -11,7 +11,6 @@ import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.NoResultException;
-import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -19,7 +18,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
-@Transactional
 public class InstrumentRepository implements PanacheRepositoryBase<InstrumentEntity, String> {
 
     private static final Set<String> ALLOWED_SORT_FIELDS = Set.of("id", "name", "displayName", "transposition");

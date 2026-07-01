@@ -6,7 +6,6 @@ import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import io.quarkus.panache.common.Page;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +13,6 @@ import java.util.Map;
 import java.util.UUID;
 
 @ApplicationScoped
-@Transactional
 public class EventLogRepository implements PanacheRepositoryBase<EventLogEntity, UUID> {
 
     public record PagedResult(List<EventLogEntity> data, long totalCount) {}

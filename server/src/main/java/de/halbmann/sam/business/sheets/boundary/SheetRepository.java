@@ -11,12 +11,10 @@ import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
-@Transactional
 public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, UUID> {
 
     private static final Set<String> ALLOWED_SORT_FIELDS = Set.of(

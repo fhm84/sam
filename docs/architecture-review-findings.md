@@ -60,17 +60,18 @@ the exceptions, not the rule.
   `TextNormalizer`, `Hashing`, `MimeTypeDetector`, `SortFieldValidator`,
   `FingerprintService`; one small test in `api` for `UserInfo.displayLabel()`.
 
-## 5. Ambiguous transaction boundaries  ⬜
-- **Files:** 33 classes with `@Transactional` (both repositories *and* services)
+## 5. Ambiguous transaction boundaries  ✅
+- **Files:** 14 repository classes (all `business/.../boundary/*Repository.java`)
 - **Severity:** Low–Medium (latent correctness/perf risk)
-- **Problem:** When a service calls two repositories, the service must own the
-  transaction; repository-level `@Transactional` is redundant and invites
-  accidental per-call transactions if a resource ever calls a repository
-  directly. Class-level `@Transactional` on services also opens write
-  transactions for pure reads.
-- **Fix direction:** Own transactions at the service layer only; strip
-  repository annotations. Consider method-level annotations on mutating
-  service methods instead of class-level.
+- **Problem:** Repository-level `@Transactional` was redundant — services already
+  own the spanning transaction — and invited accidental per-call transactions if
+  a resource ever called a repository directly.
+- **Fix applied:** Stripped `@Transactional` (annotation + import) from all 14
+  repository classes. Services retain class-level `@Transactional`; the
+  "method-level on services" suggestion was deliberately deferred (high-churn,
+  Low–Medium value). `PublicShareResourceImpl`'s direct `findById` calls are
+  safe reads; the one association accessed (`instrument.getName()`) is EAGER
+  and requires no transaction. 138 tests pass.
 
 ## 6. Config and code hygiene  ✅
 - **Severity:** Low
