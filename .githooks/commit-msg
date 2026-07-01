@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Installed via `git config core.hooksPath .githooks`. See scripts/check-commit-msg.sh
+# for the actual validation logic (shared with the commit-lint CI job).
+set -euo pipefail
+exec "$(dirname "$0")/../scripts/check-commit-msg.sh" "$1"

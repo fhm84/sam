@@ -143,6 +143,24 @@ Set `quarkus.langchain4j.chat-model.provider` and enable exactly one provider:
 | `ollama` | `quarkus.langchain4j.ollama.base-url=http://localhost:11434`; `quarkus.langchain4j.ollama.chat-model.model-id=llava` |
 | `vertexai` (Gemini) | `quarkus.langchain4j.vertexai.gemini.project-id=<id>` and `.location=<region>`; model: `gemini-2.0-flash` |
 
+## Contributing
+
+### Commit Messages
+
+Commits follow [Conventional Commits](https://www.conventionalcommits.org/): `<type>(<scope>): <subject>`.
+
+- **Types:** `build`, `chore`, `ci`, `docs`, `feat`, `fix`, `perf`, `refactor`, `revert`, `style`, `test`
+- **Scope:** optional, usually a module (`ui`, `core`, `api`, `server`, `cli`, `storage`) or area (`docs`, `arch`); comma-separated for multiple (`test(core,api): ...`)
+- Examples: `fix(ui): pin transitive deps to patch Dependabot security alerts`, `test(core,api): add plain JUnit tests for pure business logic`
+
+Enable local validation once per clone:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+Pull requests are also checked by the `commit-lint` CI job (`.github/workflows/ci.yml`); both call the shared `scripts/check-commit-msg.sh`.
+
 ## Roadmap
 
 ### Planned Features

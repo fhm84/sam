@@ -10,6 +10,22 @@ permissions:
   contents: read
 
 jobs:
+  commit-lint:
+    name: Commit Message Lint
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Validate commit messages
+        run: |
+          git log --format=%s origin/${{ github.base_ref }}..HEAD | while IFS= read -r subject; do
+            echo "$subject" | ./scripts/check-commit-msg.sh
+          done
+
   test:
     name: Unit Tests
     runs-on: ubuntu-latest
