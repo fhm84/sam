@@ -36,18 +36,19 @@ the exceptions, not the rule.
 - **Fix applied:** Moved core's classes to `de.halbmann.sam.core.storage.*`;
   the `de.halbmann.sam.storage` package now exists only in server.
 
-## 3. `DocumentsService` god class  ⬜
-- **File:** `server/src/main/java/de/halbmann/sam/business/documents/controller/DocumentsService.java`
+## 3. `DocumentsService` god class  ✅ (81981a0)
+- **File:** `server/src/main/java/de/halbmann/sam/business/documents/controller/DocumentsService.java` (deleted)
 - **Severity:** Medium (maintainability; ~800 lines, ~30 public methods)
 - **Problem:** Four responsibilities in one class: content-addressed persistence
   with refCounting (`save`, `deleteIfUnlinked`), attachment linking
   (`linkDocument`, `linkAttachmentTo*`, `unlinkAttachments`), ZIP bundling
   (`buildZip*`), and PDF merging (`buildMergeEntries*`, `buildMergedPdf`).
-  `uniqueZipName` is duplicated in `SheetExportService`.
-- **Fix direction:** Split into `DocumentStore` (persistence + refCount),
-  `AttachmentLinkService`, and `DocumentBundleService` (zip + merged PDF);
-  share the ZIP-naming helper with `SheetExportService`. Best done as a
-  dedicated refactor with the existing refCount tests as a safety net.
+  `uniqueZipName` was duplicated in `SheetExportService`.
+- **Fix applied:** Split into `DocumentStore` (persistence + refCount),
+  `AttachmentLinkService` (link/unlink/delete + queries), and
+  `DocumentBundleService` (ZIP + merged PDF). Shared `uniqueZipName` helper
+  moved to `FilenameUtils`. All 7 caller classes and 2 test classes updated;
+  140 tests pass.
 
 ## 4. Test coverage inverted relative to testability  ⬜
 - **Files:** `core/src/test` (missing), `api/src/test` (missing)
