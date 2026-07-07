@@ -6,8 +6,38 @@ services:
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_HEALTH_ENABLED: "true"
     volumes:
       - ./keycloak:/opt/keycloak/data/import
     ports:
       - "8180:8080"
     restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - 'exec 3<>/dev/tcp/127.0.0.1/9000; echo -e ''GET /health/ready HTTP/1.1\r\nhost: localhost\r\nConnection: close\r\n\r\n'' >&3; grep -q ''"status": "UP"'' <&3'
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # Re-applies keycloak/configurator/sam/**/*.json to the running instance above
+  # (does not run by default; unlike --import-realm this is idempotent/repeatable):
+  #   docker compose -f docker-compose.keycloak.yml --profile configure run --rm keycloak-configurator
+  keycloak-configurator:
+    image: ghcr.io/cycrilabs/keycloak-configurator:latest
+    profiles: ["configure"]
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    volumes:
+      - ./keycloak/configurator:/config
+    command:
+      - configure
+      - -s
+      - http://keycloak:8080
+      - -u
+      - admin
+      - -p
+      - admin
+      - -c
+      - /config

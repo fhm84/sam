@@ -89,7 +89,7 @@ Six Maven modules under parent `de.halbmann:sam`:
 
 ## Security
 
-- **OIDC provider**: Keycloak 26 (`docker-compose.keycloak.yml`). Realm export at `keycloak/sam-realm.json`.
+- **OIDC provider**: Keycloak 26 (`docker-compose.keycloak.yml`). Realm export at `keycloak/sam-realm.json` (authoritative for dev startup via `--import-realm`, only applied on first boot). A parallel per-entity split under `keycloak/configurator/sam/` can be (re)applied to a running instance via `docker compose -f docker-compose.keycloak.yml --profile configure run --rm keycloak-configurator` (idempotent, uses [keycloak-configurator](https://github.com/CycriLabs/keycloak-configurator)) — see `keycloak/README.md` for how the two representations relate and must currently be kept in sync manually.
 - **Dev Keycloak**: `docker compose -f docker-compose.keycloak.yml up` — runs on port 8180, auto-imports realm.
 - **Angular OIDC config**: The Angular app fetches `/oidc-config.json` at startup. In **dev**, the static file `ui/src/main/webui/public/oidc-config.json` is served (committed with `localhost:8180` defaults). In **production**, `OidcConfigResource` (`server/.../OidcConfigResource.java`) — a `@PermitAll` JAX-RS endpoint at that same path — takes precedence and returns `{issuerUrl, clientId}` read from `quarkus.oidc.auth-server-url` / `quarkus.oidc.client-id`, which are set via `OIDC_SERVER_URL` and `OIDC_CLIENT_ID` env vars. No image rebuild needed to change the Keycloak URL.
 - **Realm roles**: `admin`, `music_librarian`. Groups use `ensemble:{UUID}` naming for per-ensemble access.

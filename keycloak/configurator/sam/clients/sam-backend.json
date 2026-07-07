@@ -1,0 +1,10 @@
+{
+  "clientId": "sam-backend",
+  "enabled": true,
+  "publicClient": false,
+  "serviceAccountsEnabled": true,
+  "standardFlowEnabled": false,
+  "directAccessGrantsEnabled": false,
+  "clientAuthenticatorType": "client-secret",
+  "secret": "sam-backend-secret"
+}
