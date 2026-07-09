@@ -33,26 +33,22 @@ Each option has a **factor** (0.0–1.0): 1.0 = ideal, lower values downweight s
 
 ## Coverage evaluation
 
-`GET /sheets/{id}/coverage?ensemble={ensembleId}` evaluates the piece on-demand.
+`GET /sheets/{id}/coverage?ensemble={ensembleId}` evaluates the piece on-demand and
+returns an overall coverage score, a status, and a per-voice breakdown showing which
+instrumentations were matched, the effective part count, and a human-readable
+explanation.
 
-The algorithm:
-1. Voices processed in priority order: required first, then by weight descending.
-2. Each sheet instrumentation is claimed by at most one voice (greedy allocation).
-3. Per voice: `effectiveCount = Σ(matchScore × option.factor)`, normalized to `targetCount`.
-4. A base score of **0.7** ensures any positive match contributes at least 70% of the voice's weight.
-5. Overall: weighted average across all voices.
-
-**Match scoring:** instruments must match exactly (by ID). Two optional modifiers can reduce score:
-- Clef factor (0.7 for non-native clef)
-- Notation-type factor (0.8 for percussion, 0.7 for tablature/graphic)
+How the score is computed — voice priority, greedy instrumentation allocation, the
+base score, clef/notation modifiers, and the exact status thresholds — is documented
+once in the [Coverage Evaluation concept](../architecture/concepts/coverage.md).
 
 **Status classification:**
 
-| Status | Condition |
-|--------|-----------|
-| `INCOMPLETE` | One or more required voices are below `minCount` |
-| `PLAYABLE` | All required voices covered; overall score < 85% |
-| `COMPLETE` | All required voices covered; overall score ≥ 85% |
+| Status | Meaning |
+|--------|---------|
+| `INCOMPLETE` | One or more required voices are not sufficiently covered — not playable |
+| `PLAYABLE` | All required voices covered, but overall coverage is still thin |
+| `COMPLETE` | All required voices covered with good balance |
 
 ## Coverage snapshots
 
