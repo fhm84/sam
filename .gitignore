@@ -52,5 +52,8 @@ nb-configuration.xml
 /.playwright-mcp/
 
 # Generated review/analysis artifacts
-/docs/code-review-findings.md
-/docs/security-review-findings.md
+/docs/reviews/code-review-findings.md
+/docs/reviews/security-review-findings.md
+
+# Obsidian vault state (docs/ opened as a vault)
+/docs/.obsidian/

@@ -3,8 +3,9 @@
 **S**heet music **A**rchiving & **M**anagement
 
 This document describes who uses SAM, what they need from it, and how the key workflows
-look in practice. It complements `architecture.md` (technical structure) and
-`features.md` (feature reference) with a human-centred perspective.
+look in practice. It complements the [architecture docs](README.md#architecture)
+(technical structure) and the [feature reference](features/README.md) with a
+human-centred perspective.
 
 ---
 
@@ -191,7 +192,7 @@ a partner ensemble checking what the band plays, or a musician who has not yet r
 **By design:** sharing is per-resource and creator-initiated — the link must be generated
 and distributed by an authenticated user (see UC-N6). Open/anonymous browsing of the
 archive (no token, no link) was deliberately deferred in favour of explicit,
-resource-scoped tokens — see `docs/roadmap.md` open question #2.
+resource-scoped tokens — see [roadmap open question #2](roadmap.md#8-open-questions).
 
 ---
 
@@ -625,10 +626,12 @@ worth deciding deliberately (see the composite-role discussion in
 
 ## 5. Key Flows
 
-Full sequence diagrams for these flows live in `docs/flows/` (one `.puml` file per flow,
-viewable in any PlantUML renderer or IDE plugin — matching the one-diagram-per-file
-convention already used by `docs/architecture.puml` and `src/site/resources/*.puml`
-elsewhere in this repo). This section gives the short version of each.
+Full sequence diagrams for these flows live in
+[`docs/architecture/runtime/`](architecture/runtime/README.md) (one `.puml` file per
+flow, viewable in any PlantUML renderer or IDE plugin — matching the
+one-diagram-per-file convention already used by `docs/architecture/architecture.puml`
+and `src/site/resources/*.puml` elsewhere in this repo). This section gives the short
+version of each.
 
 ### Flow 1 – AI-assisted archival of a new physical score
 
@@ -637,7 +640,7 @@ scan → upload to staging → *Classify* (text extraction, vision fallback for 
 pages) → review pre-filled form → *Apply* (creates/resolves Sheet, Instrumentation,
 Attachment) → record physical location and condition on the resulting instrumentation.
 
-→ `docs/flows/flow-1-ai-assisted-archival.puml`
+→ [flow-1-ai-assisted-archival.puml](architecture/runtime/flow-1-ai-assisted-archival.puml)
 
 ---
 
@@ -647,7 +650,7 @@ Opens the Sheets list scoped to an ensemble, reads coverage badges (`COMPLETE` /
 `PLAYABLE` / `INCOMPLETE`), drills into an incomplete piece for the per-voice breakdown,
 then creates a setlist and adds suitable pieces to it.
 
-→ `docs/flows/flow-2-concert-programme-check.puml`
+→ [flow-2-concert-programme-check.puml](architecture/runtime/flow-2-concert-programme-check.puml)
 
 ---
 
@@ -657,7 +660,7 @@ Searches by title, opens the sheet's *Instrumentations* tab, finds the row for t
 instrument (archive location, condition), expands it for attached files, and downloads
 the part.
 
-→ `docs/flows/flow-3-musician-retrieves-part.puml`
+→ [flow-3-musician-retrieves-part.puml](architecture/runtime/flow-3-musician-retrieves-part.puml)
 
 ---
 
@@ -669,7 +672,7 @@ instrumentation or collection, copies the public URL, and distributes it. The gu
 revoked, renders the resource, and logs the access with `shareTokenId` set instead of a
 `userId`.
 
-→ `docs/flows/flow-4-share-creation-guest-access.puml`
+→ [flow-4-share-creation-guest-access.puml](architecture/runtime/flow-4-share-creation-guest-access.puml)
 
 ---
 
@@ -756,7 +759,7 @@ Three options were considered for how "selected content" is defined for guests a
 musicians. Status, updated against what shipped:
 
 **Option A — Per-sheet visibility flag** — *(still planned)*. Tracked as
-`SheetCollection.visibility` in `docs/roadmap.md` ("Collection visibility & cover");
+`SheetCollection.visibility` in the [roadmap](roadmap.md#5-access-control--sharing) ("Collection visibility & cover");
 no equivalent field exists on `SheetMusicEntity` itself yet.
 
 **Option B — Collection-based / resource-scoped sharing** — *(implemented, in a
@@ -788,8 +791,8 @@ and `angular-auth-oidc-client` on the frontend. Dev environment: realm auto-impo
 
 ### 6.5 Open design questions
 
-Most of the original open questions here are now resolved — see `docs/roadmap.md`
-Section 8 for the authoritative, up-to-date list (it already tracks resolution status and
+Most of the original open questions here are now resolved — see
+[roadmap Section 8](roadmap.md#8-open-questions) for the authoritative, up-to-date list (it already tracks resolution status and
 is updated alongside feature work, so this doc intentionally doesn't duplicate it).
 Genuinely new questions surfaced while writing this section:
 

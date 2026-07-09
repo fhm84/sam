@@ -84,7 +84,7 @@ the exceptions, not the rule.
   - `server/pom.xml`: unused `aws-java-nio-spi-s3.version` property removed.
 
 ## 7. Documentation drift  ✅
-- **File:** `docs/architecture.md` §6, root `CLAUDE.md`
+- **File:** `docs/architecture/tech-stack.md` (formerly `docs/architecture.md` §6), root `CLAUDE.md`
 - **Severity:** Low
 - **Problem:** Tech-stack table still said Quarkus 3.33.1.1 / Spotless plugin
   3.3.0; commit `ce13c21` (2026-06-27) moved these to 3.37.0 / 3.7.0.

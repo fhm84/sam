@@ -5,9 +5,9 @@
 This document collects planned features, ideas under consideration, and open questions.
 It is intentionally informal — a living list rather than a project plan.
 
-For the **current feature set** see `features.md`.
-For **stakeholder context and use cases** see `stakeholders.md`.
-For **technical architecture** see `architecture.md`.
+For the **current feature set** see the [feature reference](features/README.md).
+For **stakeholder context and use cases** see [stakeholders](stakeholders.md).
+For **technical architecture** see the [architecture docs](README.md#architecture).
 
 Status values: `idea` · `planned` · `in progress` · `done`
 

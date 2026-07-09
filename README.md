@@ -80,7 +80,7 @@ A Quarkus-based application for archiving sheet music, managing instrumentations
 
 ## Architecture
 
-See [docs/architecture.md](docs/architecture.md) for module overview, data model, design decisions, and technology stack.
+See the [documentation map](docs/README.md) for the full docs — [module overview](docs/architecture/building-blocks.md), [data model](docs/architecture/data-model.md), [design decisions](docs/architecture/decisions/README.md), and [technology stack](docs/architecture/tech-stack.md).
 
 ## Module Structure
 
