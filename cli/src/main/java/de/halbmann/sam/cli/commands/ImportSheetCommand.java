@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import picocli.CommandLine;
@@ -23,7 +24,7 @@ import picocli.CommandLine;
         name = "import",
         description = "Import music sheet(s) from JSON file(s)",
         mixinStandardHelpOptions = true)
-public class ImportSheetCommand implements Runnable {
+public class ImportSheetCommand implements Callable<Integer> {
 
     @Inject
     SheetImporter sheetImporter;
@@ -37,7 +38,7 @@ public class ImportSheetCommand implements Runnable {
     boolean dryRun;
 
     @Override
-    public void run() {
+    public Integer call() {
         final List<ImportResult> results = new ArrayList<>();
         for (File file : files) {
             if (file.isDirectory()) {
@@ -47,7 +48,8 @@ public class ImportSheetCommand implements Runnable {
                             .filter(File::isFile)
                             .forEach(f -> results.add(sheetImporter.importFile(f, dryRun)));
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    System.err.println("Error reading directory " + file.getPath() + ": " + e.getMessage());
+                    return 1;
                 }
             } else {
                 results.add(sheetImporter.importFile(file, dryRun));
@@ -64,8 +66,6 @@ public class ImportSheetCommand implements Runnable {
             System.out.println("Import completed: " + successCount + " succeeded, " + failureCount + " failed.");
         }
 
-        if (failureCount > 0L) {
-            throw new CommandLine.ExecutionException(new CommandLine(this), "Some imports failed");
-        }
+        return failureCount > 0L ? 1 : 0;
     }
 }

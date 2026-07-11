@@ -18,6 +18,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import picocli.CommandLine;
 
@@ -32,7 +33,7 @@ import picocli.CommandLine;
         name = "export",
         description = "Export music sheets to JSON file(s), one per sheet",
         mixinStandardHelpOptions = true)
-public class ExportSheetsCommand implements Runnable {
+public class ExportSheetsCommand implements Callable<Integer> {
 
     @Inject
     @RestClient
@@ -47,27 +48,27 @@ public class ExportSheetsCommand implements Runnable {
     String query;
 
     @Override
-    public void run() {
+    public Integer call() {
         try {
             Files.createDirectories(outputDir);
         } catch (IOException e) {
-            throw new CommandLine.ExecutionException(
-                    new CommandLine(this), "Could not create output directory: " + outputDir, e);
+            System.err.println("Could not create output directory " + outputDir + ": " + e.getMessage());
+            return 1;
         }
 
         SheetFilterRequest request = new SheetFilterRequest();
         request.setSize(-1); // disable pagination, fetch everything in one call
         request.setQuery(query);
 
-        var sheets = client.sheets().findSheets(request);
-        if (sheets.getData().isEmpty()) {
-            System.out.println("No music sheets found.");
-            return;
-        }
-
         Set<String> usedNames = new HashSet<>();
         int count = 0;
         try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withFormatting(true))) {
+            var sheets = client.sheets().findSheets(request);
+            if (sheets.getData().isEmpty()) {
+                System.out.println("No music sheets found.");
+                return 0;
+            }
+
             for (SheetMusicSearchResult sheet : sheets.getData()) {
                 String filename = FilenameUtils.uniqueFilename(sheet.getTitle(), sheet.getId(), usedNames);
                 writeSheet(sheet, filename, jsonb);
@@ -75,10 +76,12 @@ public class ExportSheetsCommand implements Runnable {
                 count++;
             }
         } catch (Exception e) {
-            throw new CommandLine.ExecutionException(new CommandLine(this), "Failed to export sheets", e);
+            System.err.println("Error exporting sheets: " + e.getMessage());
+            return 1;
         }
 
         System.out.println("Export completed: " + count + " sheet(s) written to " + outputDir);
+        return 0;
     }
 
     private void writeSheet(final SheetMusicSearchResult sheet, final String filename, final Jsonb jsonb)

@@ -12,7 +12,7 @@ sam (parent)
  |    +-- storage-s3      AWS S3 implementation
  +-- server         Quarkus runtime: REST impls, JPA entities, services
  +-- ui             Angular frontend (served via Quarkus Quinoa)
- +-- cli            PicoCLI batch import tool (REST client)
+ +-- cli            PicoCLI batch import/export tool (REST client)
  +-- migration      Legacy-data conversion for the cli import tool
 ```
 

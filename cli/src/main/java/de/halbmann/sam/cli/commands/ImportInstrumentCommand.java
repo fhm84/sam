@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import picocli.CommandLine;
@@ -21,10 +22,9 @@ import picocli.CommandLine;
 @Singleton
 @CommandLine.Command(
         name = "importInstrument",
-        aliases = {"importInstrument"},
         description = "Import instrument(s) from JSON file(s)",
         mixinStandardHelpOptions = true)
-public class ImportInstrumentCommand implements Runnable {
+public class ImportInstrumentCommand implements Callable<Integer> {
 
     @Inject
     InstrumentImporter instrumentImporter;
@@ -38,7 +38,7 @@ public class ImportInstrumentCommand implements Runnable {
     boolean dryRun;
 
     @Override
-    public void run() {
+    public Integer call() {
         final List<ImportResult> results = new ArrayList<>();
         for (File file : files) {
             if (file.isDirectory()) {
@@ -48,7 +48,8 @@ public class ImportInstrumentCommand implements Runnable {
                             .filter(File::isFile)
                             .forEach(f -> results.add(instrumentImporter.importFile(f, dryRun)));
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    System.err.println("Error reading directory " + file.getPath() + ": " + e.getMessage());
+                    return 1;
                 }
             } else {
                 results.add(instrumentImporter.importFile(file, dryRun));
@@ -65,8 +66,6 @@ public class ImportInstrumentCommand implements Runnable {
             System.out.println("Import completed: " + successCount + " succeeded, " + failureCount + " failed.");
         }
 
-        if (failureCount > 0L) {
-            throw new CommandLine.ExecutionException(new CommandLine(this), "Some imports failed");
-        }
+        return failureCount > 0L ? 1 : 0;
     }
 }

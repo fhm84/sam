@@ -154,6 +154,13 @@ Verified by obtaining a real token from a running dev Keycloak via
 
 - **Musicians/ensembles** are not converted at all (`ensemble_mkn.json` is
   unread by any code) and not covered by `cli export` either — only sheets
-  and instruments round-trip today.
-- **Documents/attachments** are never exported or imported by the `cli`
-  commands (see "Exporting data back out" above).
+  round-trip today.
+- **No instrument export**: `cli importInstrument` exists, but there is no
+  `export` counterpart for instruments. A snapshot of a running instance can
+  only be replayed into a target that already has the instruments (e.g. from
+  this module's `data/instruments/`); instruments created later via the UI or
+  AI classification are not captured.
+- **Documents/attachments**: exported sheet JSON may include attachment
+  *metadata* (filename, MIME type, checksum), but `cli import` ignores it and
+  the actual files never move in either direction (see "Exporting data back
+  out" above).

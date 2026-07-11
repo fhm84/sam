@@ -70,7 +70,7 @@ Seven Maven modules under parent `de.halbmann:sam`:
 - **storage** — Parent POM for storage abstraction with three sub-modules: `storage-sdk` (SPI), `storage-local` (filesystem), `storage-s3` (AWS S3).
 - **server** — Quarkus runtime: REST resource implementations, Hibernate/Panache entities, Flyway migrations, MapStruct mappers, LangChain4j AI integration, document management, AI-based document classification. Requires PostgreSQL.
 - **ui** — Angular frontend served via Quarkus Quinoa. Source lives in `ui/src/main/webui/`.
-- **cli** — Quarkus PicoCLI application for importing sheet music data. Uses the `api` module as a REST client.
+- **cli** — Quarkus PicoCLI application for importing/exporting sheet music data (see `cli/README.md`). Uses the `api` module as a REST client, authenticating via the `sam-cli` OIDC service account.
 - **migration** — Converts a one-time legacy-system export into JSON files the `cli` module can import. See `migration/README.md` for the full data flow and order-of-operations.
 
 ## Key Patterns

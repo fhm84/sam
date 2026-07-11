@@ -6,13 +6,14 @@ import de.halbmann.sam.api.entity.sheets.SheetMusic;
 import io.quarkus.arc.Unremovable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.util.concurrent.Callable;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import picocli.CommandLine;
 
 @Unremovable
 @Singleton
 @CommandLine.Command(name = "list", description = "List all music sheets", mixinStandardHelpOptions = true)
-public class ListSheetsCommand implements Runnable {
+public class ListSheetsCommand implements Callable<Integer> {
 
     @Inject
     @RestClient
@@ -24,17 +25,18 @@ public class ListSheetsCommand implements Runnable {
     boolean verbose;
 
     @Override
-    public void run() {
+    public Integer call() {
         try {
             SheetFilterRequest request = new SheetFilterRequest();
+            request.setSize(-1); // disable pagination, list everything
             var sheets = client.sheets().findSheets(request);
 
             if (sheets.getData().isEmpty()) {
                 System.out.println("No music sheets found.");
-                return;
+                return 0;
             }
 
-            System.out.println("Found " + sheets.getSize() + " music sheet(s):");
+            System.out.println("Found " + sheets.getTotalCount() + " music sheet(s):");
 
             for (SheetMusic sheet : sheets.getData()) {
                 if (verbose) {
@@ -43,9 +45,10 @@ public class ListSheetsCommand implements Runnable {
                     printShortSheet(sheet);
                 }
             }
+            return 0;
         } catch (Exception e) {
             System.err.println("Error listing sheets: " + e.getMessage());
-            throw new CommandLine.ExecutionException(new CommandLine(this), "Failed to list sheets", e);
+            return 1;
         }
     }
 
@@ -54,7 +57,14 @@ public class ListSheetsCommand implements Runnable {
     }
 
     private void printDetailedSheet(SheetMusic sheet) {
-        System.out.println("  ID: " + sheet.getId());
-        System.out.println("  Title: " + sheet.getTitle());
+        System.out.printf(
+                "  [%s] %s - %s | genre: %s | %d part(s)%n",
+                sheet.getId(),
+                sheet.getTitle(),
+                sheet.getComposer() != null ? sheet.getComposer().getName() : "unknown composer",
+                sheet.getGenre() != null ? sheet.getGenre() : "-",
+                sheet.getInstrumentations() != null
+                        ? sheet.getInstrumentations().size()
+                        : 0);
     }
 }

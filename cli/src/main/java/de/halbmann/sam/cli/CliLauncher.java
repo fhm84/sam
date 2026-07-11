@@ -1,24 +1,28 @@
 package de.halbmann.sam.cli;
 
-import de.halbmann.sam.cli.diagnostics.StaticArgsBridge;
 import io.quarkus.runtime.Quarkus;
+import io.quarkus.runtime.QuarkusApplication;
 import io.quarkus.runtime.annotations.QuarkusMain;
-import lombok.extern.slf4j.Slf4j;
+import jakarta.inject.Inject;
+import picocli.CommandLine;
 
+/**
+ * Entry point: executes the Picocli top command exactly once and exits with its return code.
+ * The injected {@link CommandLine} comes from the quarkus-picocli extension and creates
+ * subcommands via CDI, so {@code @Inject} works inside commands.
+ */
 @QuarkusMain
-@Slf4j
-public class CliLauncher {
+public class CliLauncher implements QuarkusApplication {
+
+    @Inject
+    CommandLine commandLine;
 
     public static void main(String[] args) {
-        log.debug("Received args: {}", java.util.Arrays.toString(args));
-        StaticArgsBridge.setArgs(args);
-        try {
-            Quarkus.run(args);
-        } catch (RuntimeException e) {
-            log.error("Quarkus.run failed", e);
-            throw e;
-        } finally {
-            log.debug("Quarkus.run returned");
-        }
+        Quarkus.run(CliLauncher.class, args);
+    }
+
+    @Override
+    public int run(String... args) {
+        return commandLine.execute(args);
     }
 }
