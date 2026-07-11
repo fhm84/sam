@@ -40,6 +40,12 @@
             <artifactId>quarkus-rest-client-jsonb</artifactId>
         </dependency>
 
+        <!-- OIDC client-credentials auth for the SamResources REST client -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-rest-client-oidc-filter</artifactId>
+        </dependency>
+
         <!-- Optional: Quarkus Arc for CDI -->
         <dependency>
             <groupId>io.quarkus</groupId>

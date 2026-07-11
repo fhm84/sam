@@ -112,6 +112,8 @@ These are read at startup via MicroProfile Config placeholders in `application.p
 | `KEYCLOAK_REALM` | `sam` | Keycloak realm used for admin user lookup |
 | `KEYCLOAK_BACKEND_CLIENT_ID` | `sam-backend` | Service account client ID (needs `view-users` role) |
 | `KEYCLOAK_BACKEND_CLIENT_SECRET` | — | Service account client secret |
+| `SAM_CLI_CLIENT_ID` | `sam-cli` | `cli` module's service account client ID (needs `music_librarian` role), read together with `OIDC_SERVER_URL` above |
+| `SAM_CLI_CLIENT_SECRET` | — | `cli` module's service account client secret |
 
 ### Application Config (`application.properties`)
 

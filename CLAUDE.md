@@ -98,6 +98,7 @@ Seven Maven modules under parent `de.halbmann:sam`:
 - **Do NOT put `@RolesAllowed` on the `api` module interfaces** — they are also used as REST clients by the `cli` module.
 - **Test profile**: `%test.quarkus.oidc.enabled=false` — existing `@QuarkusTest` tests run without auth. Auth-specific tests use `@TestSecurity` from `quarkus-test-security`.
 - **`CurrentUserService`** (`@RequestScoped`, `server/.../security/`): provides `getUserId()`, `hasRole()`, `getAccessibleEnsembleIds()`, `canAccessEnsemble(UUID)` — inject this instead of `JsonWebToken` directly in business logic.
+- **`cli` authentication**: authenticates as the `sam-cli` Keycloak client (service account, `music_librarian` role) via OIDC client-credentials (`quarkus-rest-client-oidc-filter`), not a user login — see `migration/README.md`'s "Authentication" section for dev/prod config.
 
 ## Monitoring
 

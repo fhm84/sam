@@ -71,8 +71,9 @@ java -jar cli/target/quarkus-app/quarkus-run.jar import migration/src/migration-
 Point the CLI at the target server via
 `quarkus.rest-client."de.halbmann.sam.api.boundary.SamResources".url`
 (defaults to `http://localhost:8080/api`, see `cli/src/main/resources/application.properties`).
-Note the authentication gap under "Known gaps" below before trying this against
-anything other than a `quarkus.oidc.enabled=false` instance.
+`cli` authenticates as the `sam-cli` Keycloak client (service account, `music_librarian`
+realm role) via OIDC client-credentials — see "Authentication" below for how to
+point it at a different Keycloak/realm in production.
 
 Both commands accept `-d`/`--dry-run`. Note its actual scope: it only checks
 that each file **deserializes** into the expected DTO — it does not run Jakarta
@@ -117,21 +118,42 @@ sheet-level and every instrumentation's per-part attachments into one
 manifest tying a file back to which instrumentation it belonged to, so it
 isn't machine-reimportable today even though the bytes are there.
 
+## Authentication
+
+Every `*ResourceImpl` in `server` is `@Authenticated`, and write endpoints
+additionally require the `music_librarian` or `admin` realm role. `cli`
+authenticates as a dedicated Keycloak client, `sam-cli` — a confidential
+client with a service account, granted the `music_librarian` realm role
+(same pattern as `sam-backend`'s service account; see `keycloak/README.md`).
+`quarkus-rest-client-oidc-filter` acquires a client-credentials token and
+attaches it as a Bearer header to every `SamResources` call automatically
+(`cli/src/main/resources/application.properties`); there's no manual login
+step.
+
+- **Dev** (`quarkus:dev` or plain `mvn test`): uses the dev Keycloak
+  (`localhost:8180/realms/sam`) and the dev-only secret `sam-cli-secret`,
+  same convention as `sam-backend-secret`. Discovery and eager token
+  acquisition are both disabled
+  (`quarkus.oidc-client.discovery-enabled=false`,
+  `.early-tokens-acquisition=false`), so nothing reaches out to Keycloak at
+  CLI startup — only when a command actually calls the API (dry-run import
+  and pure-logic tests never do, so they stay hermetic).
+- **Prod**: override via `OIDC_SERVER_URL` (same variable `server` uses),
+  `SAM_CLI_CLIENT_ID` (default `sam-cli`), and `SAM_CLI_CLIENT_SECRET`
+  (required, no default). The `sam-cli` client and its service-account role
+  grant are defined in both `keycloak/sam-realm.json` and
+  `keycloak/configurator/sam/{clients,users}/`, kept in sync per
+  `keycloak/README.md`'s existing convention.
+
+Verified by obtaining a real token from a running dev Keycloak via
+`grant_type=client_credentials` and confirming `realm_access.roles` contains
+`music_librarian` — the exact claim path `server` reads
+(`quarkus.oidc.roles.role-claim-path=realm_access/roles`).
+
 ## Known gaps
 
 - **Musicians/ensembles** are not converted at all (`ensemble_mkn.json` is
   unread by any code) and not covered by `cli export` either — only sheets
   and instruments round-trip today.
 - **Documents/attachments** are never exported or imported by the `cli`
-  commands (see above).
-- **No authentication.** Every `*ResourceImpl` in `server` is `@Authenticated`,
-  and the `cli` module's REST client sends no bearer token at all — there is
-  no login step, no token config, nothing. Against a real OIDC-secured
-  instance (dev or prod), every `cli` command (`list`, `show`, `import`,
-  `export`) gets a 401. This is why `SheetImporterTest` only exercises
-  `--dry-run` (no network call) rather than hitting a real running server —
-  today `cli` can only successfully talk to an instance with
-  `quarkus.oidc.enabled=false` (the `test` profile), not a real dev or
-  production deployment. Wiring up a service-account token for `cli` is a
-  prerequisite for actually using any of these commands against a live
-  server, and is tracked as follow-up work, not fixed here.
+  commands (see "Exporting data back out" above).
