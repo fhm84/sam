@@ -13,23 +13,25 @@ sam (parent)
  +-- server         Quarkus runtime: REST impls, JPA entities, services
  +-- ui             Angular frontend (served via Quarkus Quinoa)
  +-- cli            PicoCLI batch import tool (REST client)
+ +-- migration      Legacy-data conversion for the cli import tool
 ```
 
 ## Module Dependencies
 
 ```
-   cli -------> api <------- server
-                 ^              |
-                 |              +----> core
-                 |              +----> storage-local ─┐
-                 |              +----> storage-s3    ─┴─> storage-sdk
-                 |
-                ui (consumes generated TypeScript types from api)
+   cli ----------> api <------- server
+   migration ------^  ^              |
+                      |              +----> core
+                      |              +----> storage-local ─┐
+                      |              +----> storage-s3    ─┴─> storage-sdk
+                      |
+                     ui (consumes generated TypeScript types from api)
 ```
 
 - **api** defines the contract. No runtime dependencies.
 - **server** implements everything. Only module with JPA, Hibernate, Flyway, LangChain4j.
 - **cli** consumes the same `api` interfaces as a MicroProfile REST Client.
+- **migration** depends only on `api` (for the DTOs it converts legacy data into) — its output is consumed by `cli`, not the other way around.
 - **ui** receives auto-generated TypeScript types from `api` DTOs via `typescript-generator-maven-plugin`.
 
 ## Related

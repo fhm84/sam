@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 
 public class DataConversion {
@@ -29,7 +30,7 @@ public class DataConversion {
     void shouldConvert() throws Exception {
         JsonArray jsonValues;
         try (Jsonb jsonb = JsonbBuilder.create()) {
-            Path dataFile = Paths.get("", "src", "test", "resources", "src/migration-data/noten_mkn.json");
+            Path dataFile = Paths.get("", "src", "migration-data", "noten_mkn.json");
             jsonValues = jsonb.fromJson(Files.newBufferedReader(dataFile), JsonArray.class);
 
             List<LegacyMapping> mappings = List.of(jsonb.fromJson(
@@ -49,9 +50,13 @@ public class DataConversion {
                 .map(Instrumentation::getInstrument)
                 .collect(Collectors.toSet());
 
-        // prepare directories
-        Files.createDirectories(Paths.get("", "src", "test", "resources", "src/migration-data/data", "sheets"));
-        Files.createDirectories(Paths.get("", "src", "test", "resources", "src/migration-data/data", "instruments"));
+        // prepare directories, clearing previous output so reruns are idempotent
+        Path sheetsDir = Paths.get("", "src", "migration-data/data", "sheets");
+        Path instrumentsDir = Paths.get("", "src", "migration-data/data", "instruments");
+        deleteDirectoryContents(sheetsDir);
+        deleteDirectoryContents(instrumentsDir);
+        Files.createDirectories(sheetsDir);
+        Files.createDirectories(instrumentsDir);
 
         // write data
         // write instruments json files
@@ -97,13 +102,11 @@ public class DataConversion {
         OutputStream outputStream;
         try {
             outputStream = Files.newOutputStream(
-                    Paths.get("", "src", "test", "resources", "src/migration-data/data", "sheets", filename),
-                    StandardOpenOption.CREATE_NEW);
+                    Paths.get("", "src", "migration-data/data", "sheets", filename), StandardOpenOption.CREATE_NEW);
         } catch (final FileAlreadyExistsException e) {
             filename = prepareFilename(sheetMusic.getTitle() + "-" + sheetMusic.getPublisher());
             outputStream = Files.newOutputStream(
-                    Paths.get("", "src", "test", "resources", "src/migration-data/data", "sheets", filename),
-                    StandardOpenOption.CREATE_NEW);
+                    Paths.get("", "src", "migration-data/data", "sheets", filename), StandardOpenOption.CREATE_NEW);
         }
         jsonb.toJson(sheetMusic, outputStream);
     }
@@ -113,7 +116,7 @@ public class DataConversion {
         OutputStream outputStream;
         try {
             outputStream = Files.newOutputStream(
-                    Paths.get("", "src", "test", "resources", "src/migration-data/data", "instruments", filename),
+                    Paths.get("", "src", "migration-data/data", "instruments", filename),
                     StandardOpenOption.CREATE_NEW);
             jsonb.toJson(instrument, outputStream);
         } catch (final FileAlreadyExistsException e) {
@@ -124,5 +127,16 @@ public class DataConversion {
     String prepareFilename(final String title) {
         // First of all, "cleanup" special characters like e.g. german umlauts
         return FilenameUtils.cleanUp(title) + ".json";
+    }
+
+    private static void deleteDirectoryContents(final Path dir) throws IOException {
+        if (!Files.isDirectory(dir)) {
+            return;
+        }
+        try (Stream<Path> files = Files.list(dir)) {
+            for (Path file : files.toList()) {
+                Files.delete(file);
+            }
+        }
     }
 }

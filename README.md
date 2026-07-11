@@ -92,6 +92,7 @@ sam (parent)
  +-- server         Quarkus runtime: REST impls, JPA entities, services
  +-- ui             Angular frontend (served via Quarkus Quinoa)
  +-- cli            PicoCLI batch import tool (REST client)
+ +-- migration      Legacy-data conversion for the cli import tool (see migration/README.md)
 ```
 
 ## Configuration

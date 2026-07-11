@@ -63,7 +63,7 @@ docker compose -f docker-compose.prod.yml up
 
 ## Module Architecture
 
-Six Maven modules under parent `de.halbmann:sam`:
+Seven Maven modules under parent `de.halbmann:sam`:
 
 - **api** — JAX-RS interfaces (`SamResources` as root), DTOs/entities, and MicroProfile REST Client annotations. TypeScript types can be generated into `ui/src/main/webui/src/app/model/datamodels.d.ts` via `typescript-generator-maven-plugin` (opt-in with `-Pgenerate-ts`; does not run in normal builds because the plugin cannot handle Java records).
 - **core** — Shared business logic and storage SDK integration (CDI beans, no Quarkus runtime dependency).
@@ -71,6 +71,7 @@ Six Maven modules under parent `de.halbmann:sam`:
 - **server** — Quarkus runtime: REST resource implementations, Hibernate/Panache entities, Flyway migrations, MapStruct mappers, LangChain4j AI integration, document management, AI-based document classification. Requires PostgreSQL.
 - **ui** — Angular frontend served via Quarkus Quinoa. Source lives in `ui/src/main/webui/`.
 - **cli** — Quarkus PicoCLI application for importing sheet music data. Uses the `api` module as a REST client.
+- **migration** — Converts a one-time legacy-system export into JSON files the `cli` module can import. See `migration/README.md` for the full data flow and order-of-operations.
 
 ## Key Patterns
 

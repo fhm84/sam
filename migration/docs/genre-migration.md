@@ -72,6 +72,7 @@
 | Modern Selection | CONCERT_WORK | MODERN | selection |
 | Soundtrack       | FILM_MUSIC   | MODERN |           |
 | Musical          | SHOW_MUSIC   | MODERN |           |
+| Ballade          | CONCERT_WORK | MODERN | ballad    |
 
 
 ### 5️⃣ Jazz / Swing / Big Band
@@ -113,6 +114,7 @@
 | Tarantella         | DANCE     | FOLKLORISTIC |             |
 | Jenka              | DANCE     | FOLKLORISTIC |             |
 | Galopp             | DANCE     | TRADITIONAL  |             |
+| Foxtrott           | DANCE     | TRADITIONAL  | foxtrot     |
 | Hawaiian Beat      | DANCE     | LATIN        | hawaii      |
 | Latin-Beat         | DANCE     | LATIN        | beat        |
 | Latin-Foxtrott     | DANCE     | LATIN        | foxtrot     |
@@ -128,6 +130,8 @@
 | Volkslieder             | FOLK_SONG | TRADITIONAL  |        |
 | Folklore                | FOLK_SONG | FOLKLORISTIC |        |
 | Kirchenlied             | SACRED    | TRADITIONAL  |        |
+| Choral                  | HYMN_CHORALE | TRADITIONAL |     |
+| Lied                    | FOLK_SONG | TRADITIONAL  |        |
 | Weihnachtsmedley        | CHRISTMAS | TRADITIONAL  | medley |
 
 

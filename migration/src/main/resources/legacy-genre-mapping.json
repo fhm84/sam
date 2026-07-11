@@ -68,5 +68,17 @@
   {"legacyGenre":"La Bamba","targetGenre":"FOLK_SONG","targetStyle":"LATIN","tags":["traditional"]},
   {"legacyGenre":"Musical","targetGenre":"SHOW_MUSIC","targetStyle":"MODERN","tags":[]},
   {"legacyGenre":"Weihnachtsmedley","targetGenre":"CHRISTMAS","targetStyle":"TRADITIONAL","tags":["medley"]},
-  {"legacyGenre":"Opening","targetGenre":"CONCERT_WORK","targetStyle":"MODERN","tags":["opening"]}
+  {"legacyGenre":"Opening","targetGenre":"CONCERT_WORK","targetStyle":"MODERN","tags":["opening"]},
+  {"legacyGenre":"Polka","targetGenre":"POLKA","targetStyle":"TRADITIONAL","tags":[]},
+  {"legacyGenre":"Samba-Marsch","targetGenre":"MARCH","targetStyle":"LATIN","tags":["samba"]},
+  {"legacyGenre":"Beat-Waltz","targetGenre":"WALTZ","targetStyle":"MODERN","tags":["beat"]},
+  {"legacyGenre":"Konzertwalzer","targetGenre":"WALTZ","targetStyle":"CLASSICAL","tags":["concert"]},
+  {"legacyGenre":"Disco-Beat","targetGenre":"POP_ROCK","targetStyle":"FUNK","tags":["disco"]},
+  {"legacyGenre":"Soundtrack","targetGenre":"FILM_MUSIC","targetStyle":"MODERN","tags":[]},
+  {"legacyGenre":"Ouvertüre","targetGenre":"OVERTURE","targetStyle":"CLASSICAL","tags":[]},
+  {"legacyGenre":"Choral","targetGenre":"HYMN_CHORALE","targetStyle":"TRADITIONAL","tags":[]},
+  {"legacyGenre":"Volkslieder","targetGenre":"FOLK_SONG","targetStyle":"TRADITIONAL","tags":[]},
+  {"legacyGenre":"Foxtrott","targetGenre":"DANCE","targetStyle":"TRADITIONAL","tags":["foxtrot"]},
+  {"legacyGenre":"Ballade","targetGenre":"CONCERT_WORK","targetStyle":"MODERN","tags":["ballad"]},
+  {"legacyGenre":"Lied","targetGenre":"FOLK_SONG","targetStyle":"TRADITIONAL","tags":[]}
 ]
