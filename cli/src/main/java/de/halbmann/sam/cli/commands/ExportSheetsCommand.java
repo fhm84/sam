@@ -8,23 +8,14 @@ import de.halbmann.sam.cli.util.FilenameUtils;
 import io.quarkus.arc.Unremovable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import jakarta.json.bind.Jsonb;
-import jakarta.json.bind.JsonbBuilder;
-import jakarta.json.bind.JsonbConfig;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import picocli.CommandLine;
 
 /**
  * Exports sheet music as plain {@code SheetMusic} JSON files, one per sheet — the same format
- * {@code cli import} reads back in. Metadata only: attachments/documents are not exported (see
+ * {@code import} reads back in. Metadata only: attachment files are not exported (see
  * migration/README.md for why).
  */
 @Unremovable
@@ -33,14 +24,11 @@ import picocli.CommandLine;
         name = "export",
         description = "Export music sheets to JSON file(s), one per sheet",
         mixinStandardHelpOptions = true)
-public class ExportSheetsCommand implements Callable<Integer> {
+public class ExportSheetsCommand extends AbstractExportCommand<SheetMusicSearchResult> {
 
     @Inject
     @RestClient
     SamResources client;
-
-    @CommandLine.Parameters(description = "Directory to write exported sheet JSON files into.")
-    Path outputDir;
 
     @CommandLine.Option(
             names = {"-q", "--query"},
@@ -48,51 +36,31 @@ public class ExportSheetsCommand implements Callable<Integer> {
     String query;
 
     @Override
-    public Integer call() {
-        try {
-            Files.createDirectories(outputDir);
-        } catch (IOException e) {
-            System.err.println("Could not create output directory " + outputDir + ": " + e.getMessage());
-            return 1;
-        }
-
+    protected List<SheetMusicSearchResult> fetchAll() {
         SheetFilterRequest request = new SheetFilterRequest();
         request.setSize(-1); // disable pagination, fetch everything in one call
         request.setQuery(query);
-
-        Set<String> usedNames = new HashSet<>();
-        int count = 0;
-        try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withFormatting(true))) {
-            var sheets = client.sheets().findSheets(request);
-            if (sheets.getData().isEmpty()) {
-                System.out.println("No music sheets found.");
-                return 0;
-            }
-
-            for (SheetMusicSearchResult sheet : sheets.getData()) {
-                String filename = FilenameUtils.uniqueFilename(sheet.getTitle(), sheet.getId(), usedNames);
-                writeSheet(sheet, filename, jsonb);
-                System.out.println("  ✓ Exported: " + sheet.getTitle() + " -> " + filename);
-                count++;
-            }
-        } catch (Exception e) {
-            System.err.println("Error exporting sheets: " + e.getMessage());
-            return 1;
-        }
-
-        System.out.println("Export completed: " + count + " sheet(s) written to " + outputDir);
-        return 0;
+        return client.sheets().findSheets(request).getData();
     }
 
-    private void writeSheet(final SheetMusicSearchResult sheet, final String filename, final Jsonb jsonb)
-            throws IOException {
-        try (OutputStream out = Files.newOutputStream(
-                outputDir.resolve(filename),
-                StandardOpenOption.CREATE,
-                StandardOpenOption.TRUNCATE_EXISTING,
-                StandardOpenOption.WRITE)) {
-            // serialize as the plain SheetMusic shape (drop search-only metrics/coverage fields)
-            jsonb.toJson(sheet, SheetMusic.class, out);
-        }
+    @Override
+    protected String filenameFor(final SheetMusicSearchResult sheet, final Set<String> usedNames) {
+        return FilenameUtils.uniqueFilename(sheet.getTitle(), sheet.getId(), usedNames);
+    }
+
+    @Override
+    protected String describe(final SheetMusicSearchResult sheet) {
+        return sheet.getTitle();
+    }
+
+    @Override
+    protected String noun() {
+        return "sheet(s)";
+    }
+
+    @Override
+    protected Class<?> serializeAs() {
+        // serialize as the plain SheetMusic shape (drops search-only metrics/coverage fields)
+        return SheetMusic.class;
     }
 }

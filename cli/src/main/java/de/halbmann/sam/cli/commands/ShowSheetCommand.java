@@ -2,11 +2,12 @@ package de.halbmann.sam.cli.commands;
 
 import de.halbmann.sam.api.boundary.SamResources;
 import de.halbmann.sam.api.entity.sheets.SheetMusic;
+import de.halbmann.sam.cli.CliErrorReporter;
 import io.quarkus.arc.Unremovable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.json.bind.Jsonb;
-import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.WebApplicationException;
 import java.util.concurrent.Callable;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import picocli.CommandLine;
@@ -25,6 +26,9 @@ public class ShowSheetCommand implements Callable<Integer> {
 
     @Inject
     Jsonb jsonb;
+
+    @Inject
+    CliErrorReporter errorReporter;
 
     @CommandLine.Parameters(index = "0", description = "ID of the music sheet to show")
     String id;
@@ -46,11 +50,16 @@ public class ShowSheetCommand implements Callable<Integer> {
                 printSheet(sheet);
             }
             return 0;
-        } catch (NotFoundException e) {
-            System.err.println("Sheet with ID " + id + " not found.");
+        } catch (WebApplicationException e) {
+            // the reactive REST client throws ClientWebApplicationException, not NotFoundException
+            if (e.getResponse() != null && e.getResponse().getStatus() == 404) {
+                System.err.println("Sheet with ID " + id + " not found.");
+            } else {
+                errorReporter.printError("Error retrieving sheet", e);
+            }
             return 1;
         } catch (Exception e) {
-            System.err.println("Error retrieving sheet: " + e.getMessage());
+            errorReporter.printError("Error retrieving sheet", e);
             return 1;
         }
     }

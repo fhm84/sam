@@ -3,55 +3,44 @@ package de.halbmann.sam.cli.controller;
 import de.halbmann.sam.api.boundary.SamResources;
 import de.halbmann.sam.api.entity.instruments.CreateInstrument;
 import de.halbmann.sam.api.entity.instruments.Instrument;
-import de.halbmann.sam.cli.entity.ImportResult;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import jakarta.json.bind.Jsonb;
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
+import jakarta.ws.rs.WebApplicationException;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 @Singleton
-public class InstrumentImporter {
+public class InstrumentImporter extends AbstractImporter<CreateInstrument> {
 
     @Inject
     @RestClient
     SamResources client;
 
-    @Inject
-    Jsonb jsonb;
+    @Override
+    protected Class<CreateInstrument> type() {
+        return CreateInstrument.class;
+    }
 
-    public ImportResult importFile(final File file, final boolean dryRun) {
-        if (!file.exists()) {
-            System.err.println("File not found: " + file.getPath());
-            return new ImportResult(file, false);
-        }
+    @Override
+    protected String describe(final CreateInstrument instrument) {
+        return instrument.getDisplayName() != null ? instrument.getDisplayName() : instrument.getId();
+    }
 
+    @Override
+    protected boolean exists(final CreateInstrument instrument) {
         try {
-            CreateInstrument instrument = parseJsonFile(file);
-            System.out.println("Processing " + file.getName() + " ...");
-
-            if (dryRun) {
-                System.out.println("  [DRY RUN] Would import: " + instrument.getDisplayName());
-            } else {
-                Instrument created = client.instruments().add(instrument);
-                System.out.println("  ✓ Imported: " + created.getDisplayName() + " (ID: " + created.getId() + ")");
+            client.instruments().load(instrument.getId());
+            return true;
+        } catch (WebApplicationException e) {
+            if (e.getResponse() != null && e.getResponse().getStatus() == 404) {
+                return false;
             }
-            return new ImportResult(file, true);
-        } catch (IOException e) {
-            System.err.println("  ✗ Error reading file " + file.getName() + ": " + e.getMessage());
-            return new ImportResult(file, false);
-        } catch (Exception e) {
-            System.err.println("  ✗ Error importing file " + file.getName() + ": " + e.getMessage());
-            return new ImportResult(file, false);
+            throw e;
         }
     }
 
-    private CreateInstrument parseJsonFile(File file) throws IOException {
-        try (var bis = new BufferedInputStream(Files.newInputStream(file.toPath()))) {
-            return jsonb.fromJson(bis, CreateInstrument.class);
-        }
+    @Override
+    protected void create(final CreateInstrument instrument) {
+        Instrument created = client.instruments().add(instrument);
+        System.out.println("  ✓ Imported: " + created.getDisplayName() + " (ID: " + created.getId() + ")");
     }
 }

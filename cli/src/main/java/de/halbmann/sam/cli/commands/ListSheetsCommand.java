@@ -3,6 +3,7 @@ package de.halbmann.sam.cli.commands;
 import de.halbmann.sam.api.boundary.SamResources;
 import de.halbmann.sam.api.entity.sheets.SheetFilterRequest;
 import de.halbmann.sam.api.entity.sheets.SheetMusic;
+import de.halbmann.sam.cli.CliErrorReporter;
 import io.quarkus.arc.Unremovable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -18,6 +19,9 @@ public class ListSheetsCommand implements Callable<Integer> {
     @Inject
     @RestClient
     SamResources client;
+
+    @Inject
+    CliErrorReporter errorReporter;
 
     @CommandLine.Option(
             names = {"-v", "--verbose"},
@@ -47,7 +51,7 @@ public class ListSheetsCommand implements Callable<Integer> {
             }
             return 0;
         } catch (Exception e) {
-            System.err.println("Error listing sheets: " + e.getMessage());
+            errorReporter.printError("Error listing sheets", e);
             return 1;
         }
     }

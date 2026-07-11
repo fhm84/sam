@@ -46,6 +46,12 @@
             <artifactId>quarkus-rest-client-oidc-filter</artifactId>
         </dependency>
 
+        <!-- Local bean validation of import files (dry-run and pre-flight) -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-hibernate-validator</artifactId>
+        </dependency>
+
         <!-- Optional: Quarkus Arc for CDI -->
         <dependency>
             <groupId>io.quarkus</groupId>

@@ -29,17 +29,22 @@ public class FilenameUtils {
 
     /**
      * Builds a filename for the given title that is unique within {@code usedNames}, disambiguating
-     * collisions with a short suffix from {@code id} rather than failing or overwriting a different
-     * sheet's file.
+     * collisions with the given discriminator rather than failing or overwriting another record's
+     * file.
      */
-    public static String uniqueFilename(final String title, final UUID id, final Set<String> usedNames) {
+    public static String uniqueFilename(final String title, final String discriminator, final Set<String> usedNames) {
         String base = sanitize(title);
         String candidate = base + ".json";
         if (usedNames.add(candidate)) {
             return candidate;
         }
-        candidate = base + "-" + id.toString().substring(0, 8) + ".json";
+        candidate = base + "-" + sanitize(discriminator) + ".json";
         usedNames.add(candidate);
         return candidate;
+    }
+
+    /** UUID convenience: uses the first 8 characters of the UUID as discriminator. */
+    public static String uniqueFilename(final String title, final UUID id, final Set<String> usedNames) {
+        return uniqueFilename(title, id.toString().substring(0, 8), usedNames);
     }
 }

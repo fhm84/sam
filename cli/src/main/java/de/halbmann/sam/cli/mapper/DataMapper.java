@@ -1,5 +1,11 @@
 package de.halbmann.sam.cli.mapper;
 
+import de.halbmann.sam.api.entity.ensembles.CreateEnsemble;
+import de.halbmann.sam.api.entity.ensembles.CreateEnsembleVoice;
+import de.halbmann.sam.api.entity.ensembles.Ensemble;
+import de.halbmann.sam.api.entity.ensembles.EnsembleVoice;
+import de.halbmann.sam.api.entity.instruments.CreateVoiceOption;
+import de.halbmann.sam.api.entity.instruments.VoiceOption;
 import de.halbmann.sam.api.entity.sheets.CreateInstrumentation;
 import de.halbmann.sam.api.entity.sheets.CreateSheetMusic;
 import de.halbmann.sam.api.entity.sheets.Instrumentation;
@@ -16,4 +22,10 @@ public interface DataMapper {
 
     @Mapping(target = "instrumentId", source = "instrument.id")
     CreateInstrumentation createFromInstrumentation(Instrumentation dto);
+
+    CreateEnsemble createFromEnsemble(Ensemble dto);
+
+    CreateEnsembleVoice createFromVoice(EnsembleVoice dto);
+
+    CreateVoiceOption createFromOption(VoiceOption dto);
 }

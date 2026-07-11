@@ -81,10 +81,12 @@ Bean Validation or any server-side rule, so a clean dry-run does not guarantee
 the server will accept the record (e.g. a blank title would still be reported
 as "would import").
 
-Import is **not idempotent** — rerunning `cli import` against the same server
-creates duplicate sheets, since nothing deduplicates by title. For a
-repeatable test environment, start from an empty database each time (or wipe
-the `sheets`/`instruments` tables) before reimporting.
+Imports are **idempotent** — records that already exist on the target are
+skipped, not duplicated (sheets match by exact title + publisher, instruments
+by natural ID, musicians/ensembles by name), so rerunning an import after a
+partial failure is safe. Files are also validated locally (Jakarta Bean
+Validation) before anything is sent; `--dry-run` runs exactly that validation
+and nothing else.
 
 ## Reusing this for a disposable test environment
 
@@ -107,6 +109,11 @@ reimport it into a fresh one without touching this migration module at all:
 java -jar cli/target/quarkus-app/quarkus-run.jar export ./snapshot
 # optionally scope it: --query <text> matches the same full-text search as `list`
 ```
+
+Instruments, musicians, and ensembles have equivalent commands
+(`exportInstrument`, `exportMusician`, `exportEnsemble` and their `import*`
+counterparts) — together they snapshot everything needed to seed a fresh
+instance except collections and document files (see "Known gaps").
 
 **Metadata only, by design** — documents/attachments are deliberately out of
 scope (see "Known gaps" below). This mirrors `GET /sheets/{id}/export?format=JSON`
@@ -152,14 +159,17 @@ Verified by obtaining a real token from a running dev Keycloak via
 
 ## Known gaps
 
-- **Musicians/ensembles** are not converted at all (`ensemble_mkn.json` is
-  unread by any code) and not covered by `cli export` either — only sheets
-  round-trip today.
-- **No instrument export**: `cli importInstrument` exists, but there is no
-  `export` counterpart for instruments. A snapshot of a running instance can
-  only be replayed into a target that already has the instruments (e.g. from
-  this module's `data/instruments/`); instruments created later via the UI or
-  AI classification are not captured.
+- **`ensemble_mkn.json` is still not converted** — no code reads the legacy
+  musician/ensemble roster export. However, musicians and ensembles created in
+  a running SAM instance now round-trip via
+  `cli exportMusician`/`importMusician` and `cli exportEnsemble`/
+  `importEnsemble` (ensembles include voices and instrument options;
+  memberships and user links are environment-specific and excluded — re-link
+  in the target). Instruments round-trip via `exportInstrument`/
+  `importInstrument`. See `cli/README.md` for the full command table.
+- **Collections** deliberately have no export/import: collection items
+  reference sheets by UUID, which change when imported into another
+  environment — a naive round-trip would silently produce broken collections.
 - **Documents/attachments**: exported sheet JSON may include attachment
   *metadata* (filename, MIME type, checksum), but `cli import` ignores it and
   the actual files never move in either direction (see "Exporting data back

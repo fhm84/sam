@@ -1,7 +1,7 @@
 package de.halbmann.sam.cli.commands;
 
 import de.halbmann.sam.cli.controller.AbstractImporter;
-import de.halbmann.sam.cli.controller.SheetImporter;
+import de.halbmann.sam.cli.controller.EnsembleImporter;
 import io.quarkus.arc.Unremovable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -10,21 +10,21 @@ import picocli.CommandLine;
 @Unremovable
 @Singleton
 @CommandLine.Command(
-        name = "import",
-        description = "Import music sheet(s) from JSON file(s)",
+        name = "importEnsemble",
+        description = "Import ensemble(s) with voices and options from JSON file(s)",
         mixinStandardHelpOptions = true)
-public class ImportSheetCommand extends AbstractImportCommand {
+public class ImportEnsembleCommand extends AbstractImportCommand {
 
     @Inject
-    SheetImporter sheetImporter;
+    EnsembleImporter ensembleImporter;
 
     @Override
     protected AbstractImporter<?> importer() {
-        return sheetImporter;
+        return ensembleImporter;
     }
 
     @Override
     protected String noun() {
-        return "sheets";
+        return "ensembles";
     }
 }

@@ -17,12 +17,21 @@ public class CliLauncher implements QuarkusApplication {
     @Inject
     CommandLine commandLine;
 
+    @Inject
+    CliErrorReporter errorReporter;
+
     public static void main(String[] args) {
         Quarkus.run(CliLauncher.class, args);
     }
 
     @Override
     public int run(String... args) {
+        // Safety net for exceptions no command handled itself: concise message, full stack trace
+        // only with --stacktrace, and a proper non-zero exit code instead of a raw dump.
+        commandLine.setExecutionExceptionHandler((e, cmd, parseResult) -> {
+            errorReporter.printError("Unexpected error", e);
+            return 1;
+        });
         return commandLine.execute(args);
     }
 }

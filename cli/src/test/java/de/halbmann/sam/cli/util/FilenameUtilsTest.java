@@ -31,6 +31,19 @@ class FilenameUtilsTest {
     }
 
     @Test
+    void uniqueFilenameSupportsStringDiscriminator() {
+        Set<String> used = new HashSet<>();
+
+        String first = FilenameUtils.uniqueFilename("TROMPETE_BB", "TROMPETE_BB", used);
+        String second = FilenameUtils.uniqueFilename("Polka", "other-key", used);
+        String collision = FilenameUtils.uniqueFilename("Polka", "disc", used);
+
+        assertEquals("TROMPETE_BB.json", first);
+        assertEquals("Polka.json", second);
+        assertEquals("Polka-disc.json", collision);
+    }
+
+    @Test
     void uniqueFilenameDisambiguatesCollisionsById() {
         Set<String> used = new HashSet<>();
         UUID firstId = UUID.randomUUID();

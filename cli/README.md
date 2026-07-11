@@ -24,22 +24,51 @@ java -jar cli/target/quarkus-app/quarkus-run.jar <command> [options]
 |---------|--------------|
 | `list [-v]` | List all sheets (ID + title; `-v` adds composer, genre, part count) |
 | `show <sheetId> [-j]` | Show one sheet (`-j` prints the full JSON) |
-| `import <file-or-dir>... [-d]` | Import sheets from `SheetMusic` JSON files, one sheet per file; creates the sheet, then its instrumentations |
+| `import <file-or-dir>... [-d]` | Import sheets from `SheetMusic` JSON files; creates the sheet, then its instrumentations |
 | `importInstrument <file-or-dir>... [-d]` | Import instruments from `CreateInstrument` JSON files |
-| `export <dir> [-q <query>]` | Export every sheet (optionally filtered by full-text query) as one `SheetMusic` JSON file per sheet — the same format `import` reads |
+| `importMusician <file-or-dir>... [-d]` | Import musicians (env-specific `userId`/`membership` are ignored) |
+| `importEnsemble <file-or-dir>... [-d]` | Import ensembles including voices and their instrument options |
+| `export <dir> [-q <query>]` | Export every sheet (optionally full-text filtered) as one `SheetMusic` JSON file |
+| `exportInstrument <dir>` | Export all instruments (filename = natural ID, e.g. `TROMPETE_BB.json`) |
+| `exportMusician <dir>` | Export all musicians, stripped of env-specific `userId`/`membership` |
+| `exportEnsemble <dir>` | Export all ensembles with voices + options (instrument refs are natural IDs) |
 
-Directories are scanned one level deep (no recursion). `-d`/`--dry-run` only
-checks that each file deserializes into the expected DTO — it makes no network
-call and does not run server-side validation.
+Every export format is exactly what the matching import command reads back in,
+so any of them round-trips into a fresh instance.
 
-Exit code is `0` on success and `1` when anything failed (including partial
-import failures), so the commands are scriptable.
+Directories are scanned one level deep (no recursion). Exit code is `0` on
+success and `1` when anything failed (including partial import failures), so
+the commands are scriptable.
 
-**Ordering matters for a fresh instance:** sheets reference instruments by ID and
-the server rejects unknown IDs — always `importInstrument` before `import`.
+### Import semantics
 
-**Import is not idempotent:** re-importing the same files creates duplicate
-sheets (nothing deduplicates by title).
+- **Idempotent — reruns are safe.** Records that already exist on the target
+  are skipped, not duplicated: sheets by exact title + publisher
+  (case-insensitive; same-titled sheets from *different* publishers are
+  distinct records, as in the legacy data), instruments by natural ID,
+  musicians and ensembles by exact name. The summary reports
+  `X imported, Y skipped, Z failed`.
+- **Validation before import.** Every file is checked against the API's
+  Jakarta Bean Validation rules locally (e.g. `title` must not be blank);
+  invalid files are reported per violation and counted as failures.
+- **`-d`/`--dry-run`** parses and validates only — it makes **no network
+  calls** whatsoever (no existence checks either), so it works without a
+  server or Keycloak.
+- **Ordering matters for a fresh instance:** sheets and ensemble voice options
+  reference instruments by ID and the server rejects unknown IDs — always
+  `importInstrument` first, then the rest in any order.
+
+## Debugging errors
+
+Errors print a one-line message plus a hint by default. `--stacktrace` (works
+on every command) prints the full stack trace:
+
+```bash
+java -jar cli/target/quarkus-app/quarkus-run.jar list --stacktrace
+```
+
+Uncaught errors are routed through the same handler — a clean message and exit
+code 1 instead of a raw dump. No debugger or log-level changes needed.
 
 ## Server URL and authentication
 
@@ -71,12 +100,14 @@ java -jar cli/target/quarkus-app/quarkus-run.jar \
 
 ## Known limitations
 
-- Sheets round-trip (`export` → `import`), including instrumentations; there is
-  **no instrument export** yet — `importInstrument` relies on JSON files you
-  already have (e.g. from the migration module).
+- **Collections** have no commands, deliberately: collection items reference
+  sheets by UUID, and sheet UUIDs change when imported into another
+  environment — a naive round-trip would silently produce broken collections,
+  and resolving by title instead is guessable but fragile.
 - Documents/attachments are metadata-only in exported JSON and ignored on
   import; the actual files never move. See `migration/README.md`, "Known gaps".
-- No musician/ensemble/collection commands.
+- Musician import strips `userId` (OIDC subject) and `membership` — re-link
+  users and ensemble memberships in the target environment.
 
 ## Diagnostics
 
@@ -84,6 +115,5 @@ java -jar cli/target/quarkus-app/quarkus-run.jar \
 registered subcommands at startup — useful when a command mysteriously isn't
 picked up (e.g. missing CDI registration). It is purely observational; command
 execution happens in `CliLauncher`, which runs the Picocli top command exactly
-once and exits with its return code. Log verbosity for the
-`de.halbmann.sam.cli.diagnostics` category can be tuned with
-`-Dsam.cli.diagnostics.level=DEBUG`.
+once and exits with its return code. For error details, use `--stacktrace`
+(see "Debugging errors" above).

@@ -35,5 +35,15 @@ class SheetImporterTest {
         ImportResult importResult = sheetImporter.importFile(missing, true);
 
         assertFalse(importResult.success());
+        assertEquals(ImportResult.Status.FAILED, importResult.status());
+    }
+
+    @Test
+    void testValidationFailsWithoutTitle() {
+        // bean validation runs locally even in dry-run; the fixture has no title (@NotBlank)
+        Path path = Paths.get("", "src", "test", "resources", "invalid-sheet.json");
+        ImportResult importResult = sheetImporter.importFile(path.toFile(), true);
+
+        assertEquals(ImportResult.Status.FAILED, importResult.status());
     }
 }
