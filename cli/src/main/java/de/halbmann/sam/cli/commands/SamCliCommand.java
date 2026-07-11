@@ -16,7 +16,8 @@ import picocli.CommandLine;
             ListSheetsCommand.class,
             ShowSheetCommand.class,
             ImportSheetCommand.class,
-            ImportInstrumentCommand.class
+            ImportInstrumentCommand.class,
+            ExportSheetsCommand.class
         })
 public class SamCliCommand implements Runnable {
 

@@ -71,6 +71,8 @@ java -jar cli/target/quarkus-app/quarkus-run.jar import migration/src/migration-
 Point the CLI at the target server via
 `quarkus.rest-client."de.halbmann.sam.api.boundary.SamResources".url`
 (defaults to `http://localhost:8080/api`, see `cli/src/main/resources/application.properties`).
+Note the authentication gap under "Known gaps" below before trying this against
+anything other than a `quarkus.oidc.enabled=false` instance.
 
 Both commands accept `-d`/`--dry-run`. Note its actual scope: it only checks
 that each file **deserializes** into the expected DTO — it does not run Jakarta
@@ -95,13 +97,41 @@ technical setup."
 
 ## Exporting data back out
 
-There's no dedicated "export legacy format" feature, but you don't need one:
-`GET /sheets/{id}/export?format=JSON` and `GET /collections/{id}/export?format=JSON`
-(`SheetExportService`) serialize the same `SheetMusic` class `cli import`
-reads back in, so a plain JSON sheet export is already round-trip compatible
-with this import path — useful as a lightweight way to snapshot a few sheets
-out of a running instance to seed a test environment, without touching this
-migration module at all. Caveats: it's per-sheet/per-collection (no bulk
-"export everything" endpoint yet — see the roadmap's "Full archive export"
-entry), and the ZIP variant bundles attachments that `cli import` does not
-read back (JSON-only, metadata only).
+`cli export <dir>` writes every sheet as one `SheetMusic` JSON file — the
+same shape `cli import` reads back in and the same shape this module's
+`data/sheets/` output uses — so you can snapshot a running instance and
+reimport it into a fresh one without touching this migration module at all:
+
+```bash
+java -jar cli/target/quarkus-app/quarkus-run.jar export ./snapshot
+# optionally scope it: --query <text> matches the same full-text search as `list`
+```
+
+**Metadata only, by design** — documents/attachments are deliberately out of
+scope (see "Known gaps" below). This mirrors `GET /sheets/{id}/export?format=JSON`
+(`SheetExportService`), which is also round-trip compatible with `cli import`
+for the same reason, but is per-sheet; `cli export` is the bulk equivalent.
+The ZIP export format bundles the real attachment files, but flattens
+sheet-level and every instrumentation's per-part attachments into one
+`documents/` folder with only the filename as identification — there's no
+manifest tying a file back to which instrumentation it belonged to, so it
+isn't machine-reimportable today even though the bytes are there.
+
+## Known gaps
+
+- **Musicians/ensembles** are not converted at all (`ensemble_mkn.json` is
+  unread by any code) and not covered by `cli export` either — only sheets
+  and instruments round-trip today.
+- **Documents/attachments** are never exported or imported by the `cli`
+  commands (see above).
+- **No authentication.** Every `*ResourceImpl` in `server` is `@Authenticated`,
+  and the `cli` module's REST client sends no bearer token at all — there is
+  no login step, no token config, nothing. Against a real OIDC-secured
+  instance (dev or prod), every `cli` command (`list`, `show`, `import`,
+  `export`) gets a 401. This is why `SheetImporterTest` only exercises
+  `--dry-run` (no network call) rather than hitting a real running server —
+  today `cli` can only successfully talk to an instance with
+  `quarkus.oidc.enabled=false` (the `test` profile), not a real dev or
+  production deployment. Wiring up a service-account token for `cli` is a
+  prerequisite for actually using any of these commands against a live
+  server, and is tracked as follow-up work, not fixed here.
