@@ -20,5 +20,17 @@ public class ExploreShelves {
 
     List<SheetMusicSearchResult> recentlyAdded = new ArrayList<>();
 
+    /** Most setlist appearances within the last 12 months. */
+    List<SheetMusicSearchResult> crowdPleasers = new ArrayList<>();
+
+    /** Never appeared in any setlist. */
+    List<SheetMusicSearchResult> hiddenGems = new ArrayList<>();
+
+    /**
+     * Coverage status {@code INCOMPLETE} for the requested ensemble. Empty when no ensemble is
+     * selected or no coverage snapshot has been computed yet.
+     */
+    List<SheetMusicSearchResult> needsAttention = new ArrayList<>();
+
     List<TagCount> tagCloud = new ArrayList<>();
 }

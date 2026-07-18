@@ -4,7 +4,7 @@ All endpoints are under the `/api` base path.
 
 | Resource | Base path | Notes |
 |----------|-----------|-------|
-| Sheets | `/api/sheets` | Includes `/enrich`, `/coverage` |
+| Sheets | `/api/sheets` | Includes `/enrich`, `/coverage`, `/explore` (+ `/explore/surprise`) |
 | Instrumentations | `/api/sheets/{id}/instrumentations` | Sub-resource |
 | Sheet documents | `/api/sheets/{id}/documents` | Sub-resource |
 | Instrumentation documents | `/api/sheets/{sid}/instrumentations/{iid}/documents` | Sub-resource |

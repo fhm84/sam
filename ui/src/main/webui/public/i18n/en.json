@@ -345,6 +345,18 @@
         "empty": "No tags yet — add some to your sheets to browse by mood or occasion."
       },
       "shelves": {
+        "needsAttention": {
+          "title": "Needs attention",
+          "subtitle": "Incomplete coverage for the selected ensemble — missing required voices"
+        },
+        "crowdPleasers": {
+          "title": "Crowd pleasers",
+          "subtitle": "Pulled into setlists most often over the last 12 months"
+        },
+        "hiddenGems": {
+          "title": "Hidden gems",
+          "subtitle": "Never been in a setlist — maybe their moment is now"
+        },
         "quickFillers": {
           "title": "Quick fillers",
           "subtitle": "Under 3:30 — for warm-ups, encores, or fitting one more in"

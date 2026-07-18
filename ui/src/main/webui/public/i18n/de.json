@@ -345,6 +345,18 @@
         "empty": "Noch keine Tags — fügen Sie Ihren Noten Tags hinzu, um nach Stimmung oder Anlass zu stöbern."
       },
       "shelves": {
+        "needsAttention": {
+          "title": "Braucht Aufmerksamkeit",
+          "subtitle": "Unvollständige Besetzung für das gewählte Ensemble — Pflichtstimmen fehlen"
+        },
+        "crowdPleasers": {
+          "title": "Publikumslieblinge",
+          "subtitle": "In den letzten 12 Monaten am häufigsten in Setlisten gelandet"
+        },
+        "hiddenGems": {
+          "title": "Verborgene Schätze",
+          "subtitle": "Noch nie in einer Setliste — vielleicht ist jetzt ihr Moment"
+        },
         "quickFillers": {
           "title": "Kurze Lückenfüller",
           "subtitle": "Unter 3:30 — für Einspielen, Zugaben oder um noch ein Stück unterzubringen"

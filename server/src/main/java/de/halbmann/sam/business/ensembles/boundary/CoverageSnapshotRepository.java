@@ -1,6 +1,7 @@
 package de.halbmann.sam.business.ensembles.boundary;
 
 import de.halbmann.sam.api.entity.ensembles.CoverageResult;
+import de.halbmann.sam.api.entity.ensembles.CoverageStatus;
 import de.halbmann.sam.business.ensembles.entity.CoverageSnapshotEntity;
 import de.halbmann.sam.business.ensembles.entity.EnsembleEntity;
 import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
@@ -43,6 +44,13 @@ public class CoverageSnapshotRepository implements PanacheRepositoryBase<Coverag
             return List.of();
         }
         return list("ensemble.id = ?1 and sheet.id in ?2", ensembleId, sheetIds);
+    }
+
+    /** Snapshots with {@code INCOMPLETE} status for the ensemble, worst coverage score first. */
+    public List<CoverageSnapshotEntity> findIncompleteByEnsemble(UUID ensembleId, int limit) {
+        return find("ensemble.id = ?1 and status = ?2 order by score", ensembleId, CoverageStatus.INCOMPLETE)
+                .page(0, limit)
+                .list();
     }
 
     public Optional<CoverageSnapshotEntity> findByEnsembleAndSheet(UUID ensembleId, UUID sheetId) {

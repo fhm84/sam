@@ -31,11 +31,19 @@ export class ExploreView implements OnInit, OnChanges {
   protected readonly surprise = signal<SheetMusicSearchResult | null>(null);
   protected readonly loadingSurprise = signal(true);
 
-  protected readonly shelfList = computed(() => [
-    { key: 'quickFillers' as const, items: this.shelves()?.quickFillers },
-    { key: 'bigFinishes' as const, items: this.shelves()?.bigFinishes },
-    { key: 'recentlyAdded' as const, items: this.shelves()?.recentlyAdded },
-  ]);
+  protected readonly shelfList = computed<{ key: string; items: SheetMusicSearchResult[] | undefined }[]>(() => {
+    const shelves = this.shelves();
+    return [
+      // Needs-attention is ensemble-relative; without a selected ensemble the backend
+      // always returns it empty, so don't render an empty shelf in that case.
+      ...(this.ensembleId ? [{ key: 'needsAttention', items: shelves?.needsAttention }] : []),
+      { key: 'crowdPleasers', items: shelves?.crowdPleasers },
+      { key: 'hiddenGems', items: shelves?.hiddenGems },
+      { key: 'quickFillers', items: shelves?.quickFillers },
+      { key: 'bigFinishes', items: shelves?.bigFinishes },
+      { key: 'recentlyAdded', items: shelves?.recentlyAdded },
+    ];
+  });
 
   ngOnInit(): void {
     this.loadShelves();
