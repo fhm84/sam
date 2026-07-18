@@ -8,6 +8,7 @@ Quarkus OIDC with self-hosted **Keycloak 26** (`docker-compose.keycloak.yml`; re
 | Ensemble access | Keycloak group `ensemble:{UUID}` in the JWT `groups` claim; read by `CurrentUserService.getAccessibleEnsembleIds()` |
 | Roles | Keycloak realm roles: `music_librarian` (full archive write access), `admin` (system config) |
 | Public access | `/public/share/{token}` endpoints bypass `@Authenticated`; token is validated manually in `PublicShareResourceImpl` |
+| Machine access | The `cli` module authenticates as the `sam-cli` Keycloak client (confidential client with a service account holding `music_librarian`) via OIDC client-credentials — no user login involved. See `cli/README.md`, "Server URL and authentication". |
 
 `CurrentUserService` (`@RequestScoped`) is the single injection point for identity in business logic — wraps JWT parsing, role checks, and ensemble-group resolution. Inject this instead of `JsonWebToken` directly.
 

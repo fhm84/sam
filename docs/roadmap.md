@@ -621,7 +621,7 @@ UI-based importer is accessible to non-technical music librariane without server
 
 ### Full archive export — `done`
 
-**Implementation note:** Sheet and collection export (ZIP/JSON/CSV) is implemented. Full archive export with all document files is a future enhancement.
+**Implementation note:** Sheet and collection export (ZIP/JSON/CSV) is implemented. The migration use case is additionally covered by the CLI: `export`/`import` plus `export…`/`import…` for instruments, musicians, and ensembles round-trip all metadata into a fresh instance (idempotent, validated — see `cli/README.md`). Full archive export with all document files is a future enhancement.
 Covers two use cases:
 
 - **Backup:** Off-site copy of the full archive independent of the storage backend.
