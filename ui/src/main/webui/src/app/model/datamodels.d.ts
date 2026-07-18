@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 4.1.1 on 2026-07-18 15:44:30.
+// Generated using typescript-generator version 4.1.1 on 2026-07-18 16:36:48.
 
 export interface SheetEnrichment {
     suggestedAdditionalNotes?: string;
@@ -495,6 +495,9 @@ export interface DurationJsonbAdapter extends JsonbAdapter<long, string> {
 
 export interface ExploreShelves {
     bigFinishes?: SheetMusicSearchResult[];
+    crowdPleasers?: SheetMusicSearchResult[];
+    hiddenGems?: SheetMusicSearchResult[];
+    needsAttention?: SheetMusicSearchResult[];
     quickFillers?: SheetMusicSearchResult[];
     recentlyAdded?: SheetMusicSearchResult[];
     tagCloud?: TagCount[];

@@ -1,5 +1,6 @@
 package de.halbmann.sam.business.sheets.boundary;
 
+import de.halbmann.sam.api.entity.collections.CollectionType;
 import de.halbmann.sam.api.entity.shared.PaginationRequest;
 import de.halbmann.sam.api.entity.shared.SortOrder;
 import de.halbmann.sam.api.entity.sheets.Genre;
@@ -12,8 +13,8 @@ import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.transaction.Transactional;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
@@ -48,6 +49,8 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
     private static final Duration BIG_FINISH_MIN_DURATION = Duration.ofMinutes(5);
 
     private static final int RECENTLY_ADDED_WINDOW_DAYS = 30;
+
+    private static final int CROWD_PLEASER_WINDOW_MONTHS = 12;
 
     @SuppressWarnings("unchecked")
     public List<Object[]> searchSheets(final String query, final int page, final int size) {
@@ -203,6 +206,58 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
     public List<SheetMusicEntity> findRecentlyAdded(int limit) {
         LocalDateTime since = LocalDateTime.now(ZoneOffset.UTC).minusDays(RECENTLY_ADDED_WINDOW_DAYS);
         return find("created >= ?1 order by created desc", since).page(0, limit).list();
+    }
+
+    /**
+     * Sheets with the most setlist appearances within the last
+     * {@value #CROWD_PLEASER_WINDOW_MONTHS} months (rolling). Only collections of type
+     * {@link CollectionType#SETLIST} with a date count as a "pull"; folders don't.
+     */
+    public List<SheetMusicEntity> findCrowdPleasers(int limit) {
+        LocalDate since = LocalDate.now(ZoneOffset.UTC).minusMonths(CROWD_PLEASER_WINDOW_MONTHS);
+        List<UUID> sheetIds = getEntityManager()
+                .createQuery("""
+                        SELECT i.sheet.id FROM SheetCollectionEntity c
+                        JOIN TREAT(c.items AS SheetCollectionItemEntity) i
+                        WHERE c.type = :type AND c.date >= :since
+                        GROUP BY i.sheet.id
+                        ORDER BY COUNT(c.id) DESC
+                        """, UUID.class)
+                .setParameter("type", CollectionType.SETLIST)
+                .setParameter("since", since)
+                .setMaxResults(limit)
+                .getResultList();
+        return findInOrder(sheetIds);
+    }
+
+    /**
+     * Sheets that have never appeared in any setlist, longest-neglected (oldest {@code created})
+     * first.
+     */
+    public List<SheetMusicEntity> findHiddenGems(int limit) {
+        return getEntityManager()
+                .createQuery("""
+                        SELECT s FROM SheetMusicEntity s
+                        WHERE NOT EXISTS (
+                            SELECT 1 FROM SheetCollectionEntity c
+                            JOIN TREAT(c.items AS SheetCollectionItemEntity) i
+                            WHERE i.sheet = s AND c.type = :type
+                        )
+                        ORDER BY s.created
+                        """, SheetMusicEntity.class)
+                .setParameter("type", CollectionType.SETLIST)
+                .setMaxResults(limit)
+                .getResultList();
+    }
+
+    /** Fetches the given sheets, preserving the order of {@code sheetIds}. */
+    private List<SheetMusicEntity> findInOrder(List<UUID> sheetIds) {
+        if (sheetIds.isEmpty()) {
+            return List.of();
+        }
+        Map<UUID, SheetMusicEntity> byId = find("id IN :ids", Map.of("ids", sheetIds)).stream()
+                .collect(Collectors.toMap(SheetMusicEntity::getId, e -> e));
+        return sheetIds.stream().map(byId::get).filter(Objects::nonNull).toList();
     }
 
     /**

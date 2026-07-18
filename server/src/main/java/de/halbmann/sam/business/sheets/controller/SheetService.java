@@ -138,6 +138,14 @@ public class SheetService {
                 mapToSearchResults(sheetRepository.findBigFinishes(EXPLORE_SHELF_LIMIT));
         List<SheetMusicSearchResult> recentlyAdded =
                 mapToSearchResults(sheetRepository.findRecentlyAdded(EXPLORE_SHELF_LIMIT));
+        List<SheetMusicSearchResult> crowdPleasers =
+                mapToSearchResults(sheetRepository.findCrowdPleasers(EXPLORE_SHELF_LIMIT));
+        List<SheetMusicSearchResult> hiddenGems =
+                mapToSearchResults(sheetRepository.findHiddenGems(EXPLORE_SHELF_LIMIT));
+        List<SheetMusicSearchResult> needsAttention = ensembleId == null
+                ? List.of()
+                : mapToSearchResults(
+                        coverageSnapshotService.findIncompleteSheets(UUID.fromString(ensembleId), EXPLORE_SHELF_LIMIT));
         List<TagCount> tagCloud = sheetRepository.findTopTags(EXPLORE_TAG_CLOUD_LIMIT);
 
         if (ensembleId != null) {
@@ -145,10 +153,14 @@ public class SheetService {
             all.addAll(quickFillers);
             all.addAll(bigFinishes);
             all.addAll(recentlyAdded);
+            all.addAll(crowdPleasers);
+            all.addAll(hiddenGems);
+            all.addAll(needsAttention);
             attachCoverage(all, ensembleId);
         }
 
-        return new ExploreShelves(quickFillers, bigFinishes, recentlyAdded, tagCloud);
+        return new ExploreShelves(
+                quickFillers, bigFinishes, recentlyAdded, crowdPleasers, hiddenGems, needsAttention, tagCloud);
     }
 
     /**

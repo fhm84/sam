@@ -82,6 +82,16 @@ public class CoverageSnapshotService {
         return Optional.of(status);
     }
 
+    /**
+     * Sheets whose coverage for the ensemble is {@code INCOMPLETE}, worst score first. Empty when
+     * no snapshot has been computed yet.
+     */
+    public List<SheetMusicEntity> findIncompleteSheets(UUID ensembleId, int limit) {
+        return coverageSnapshotRepository.findIncompleteByEnsemble(ensembleId, limit).stream()
+                .map(CoverageSnapshotEntity::getSheet)
+                .toList();
+    }
+
     public Map<UUID, CoverageSnapshotSummary> findSummaries(UUID ensembleId, List<UUID> sheetIds) {
         return coverageSnapshotRepository.findByEnsembleAndSheets(ensembleId, sheetIds).stream()
                 .collect(Collectors.toMap(e -> e.getSheet().getId(), this::toSummary));

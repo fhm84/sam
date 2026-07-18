@@ -2,14 +2,25 @@ package de.halbmann.sam.api.boundary;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.halbmann.sam.api.entity.ensembles.CoverageResult;
 import de.halbmann.sam.api.entity.sheets.SheetMusic;
+import de.halbmann.sam.business.ensembles.boundary.CoverageSnapshotRepository;
+import de.halbmann.sam.business.ensembles.boundary.EnsembleRepository;
+import de.halbmann.sam.business.sheets.boundary.SheetRepository;
+import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
+import io.quarkus.narayana.jta.QuarkusTransaction;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.security.TestSecurity;
 import io.restassured.http.ContentType;
+import jakarta.inject.Inject;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import java.time.Duration;
+import java.time.LocalDate;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -19,6 +30,15 @@ import org.junit.jupiter.api.Test;
         user = "librarian1",
         roles = {"music_librarian"})
 class SheetsExploreResourceTest {
+
+    @Inject
+    SheetRepository sheetRepository;
+
+    @Inject
+    EnsembleRepository ensembleRepository;
+
+    @Inject
+    CoverageSnapshotRepository coverageSnapshotRepository;
 
     private String createSheet(String title, Duration duration) throws Exception {
         SheetMusic sheet = new SheetMusic();
@@ -77,6 +97,112 @@ class SheetsExploreResourceTest {
                 .contentType(ContentType.JSON)
                 .body("id", notNullValue())
                 .body("title", notNullValue());
+    }
+
+    private String createSetlist(LocalDate date, String... sheetIds) {
+        String collectionId = given().contentType(ContentType.JSON)
+                .body(Map.of(
+                        "name", "Explore Setlist " + UUID.randomUUID(), "type", "SETLIST", "date", date.toString()))
+                .post("/api/sheet-collections")
+                .then()
+                .statusCode(200)
+                .extract()
+                .path("id");
+        for (String sheetId : sheetIds) {
+            given().contentType(ContentType.JSON)
+                    .body(Map.of("type", "SHEET", "sheetId", sheetId))
+                    .post("/api/sheet-collections/{collectionId}/items", collectionId)
+                    .then()
+                    .statusCode(204);
+        }
+        return collectionId;
+    }
+
+    @Test
+    void testExploreShelves_crowdPleasersCountRecentSetlistAppearancesOnly() throws Exception {
+        String uniqueSuffix = UUID.randomUUID().toString();
+        String pulledTitle = "Explore Crowd Pleaser " + uniqueSuffix;
+        String stalePullTitle = "Explore Stale Pull " + uniqueSuffix;
+        String neverPulledTitle = "Explore Never Pulled " + uniqueSuffix;
+
+        String pulledId = createSheet(pulledTitle, null);
+        String stalePullId = createSheet(stalePullTitle, null);
+        createSheet(neverPulledTitle, null);
+
+        // Two recent pulls for the crowd pleaser, one pull older than the 12-month window.
+        createSetlist(LocalDate.now(), pulledId);
+        createSetlist(LocalDate.now().minusMonths(2), pulledId);
+        createSetlist(LocalDate.now().minusYears(2), stalePullId);
+
+        given().get("/api/sheets/explore")
+                .then()
+                .statusCode(200)
+                .body("crowdPleasers.title", hasItem(pulledTitle))
+                .body("crowdPleasers.title", not(hasItem(stalePullTitle)))
+                .body("crowdPleasers.title", not(hasItem(neverPulledTitle)));
+    }
+
+    @Test
+    void testHiddenGems_excludeAnySheetThatEverAppearedInASetlist() throws Exception {
+        String uniqueSuffix = UUID.randomUUID().toString();
+        String pulledTitle = "Explore Pulled Gem " + uniqueSuffix;
+        String neverPulledTitle = "Explore Untouched Gem " + uniqueSuffix;
+
+        String pulledId = createSheet(pulledTitle, null);
+        createSheet(neverPulledTitle, null);
+        createSetlist(LocalDate.now().minusYears(3), pulledId);
+
+        // The REST shelf is capped, so assert against the repository with an uncapped limit:
+        // a setlist appearance at any point in time disqualifies, absence qualifies.
+        var hiddenGemTitles = sheetRepository.findHiddenGems(Integer.MAX_VALUE).stream()
+                .map(SheetMusicEntity::getTitle)
+                .toList();
+        assertTrue(hiddenGemTitles.contains(neverPulledTitle));
+        assertFalse(hiddenGemTitles.contains(pulledTitle));
+
+        given().get("/api/sheets/explore")
+                .then()
+                .statusCode(200)
+                .body("hiddenGems", notNullValue())
+                .body("hiddenGems.title", not(hasItem(pulledTitle)));
+    }
+
+    @Test
+    void testNeedsAttention_onlyPopulatedForEnsembleWithIncompleteCoverage() throws Exception {
+        String sheetTitle = "Explore Needs Attention " + UUID.randomUUID();
+        String sheetId = createSheet(sheetTitle, null);
+
+        String ensembleId = given().contentType(ContentType.JSON)
+                .body(Map.of("name", "Explore Ensemble " + UUID.randomUUID()))
+                .post("/api/ensembles")
+                .then()
+                .statusCode(200)
+                .extract()
+                .path("id");
+
+        // Seed a single INCOMPLETE snapshot directly — computing real coverage would snapshot
+        // every sheet in the shared test database and make shelf membership nondeterministic.
+        QuarkusTransaction.requiringNew().run(() -> {
+            var ensemble = ensembleRepository.findById(UUID.fromString(ensembleId));
+            var sheet = sheetRepository.findById(UUID.fromString(sheetId));
+            CoverageResult result = new CoverageResult();
+            result.setCoverageScore(0.2);
+            result.setMissingRequired(true);
+            coverageSnapshotRepository.upsert(ensemble, sheet, result, "[]");
+        });
+
+        // Without an ensemble the shelf stays empty.
+        given().get("/api/sheets/explore").then().statusCode(200).body("needsAttention", empty());
+
+        // With the ensemble the sheet shows up, including its coverage summary.
+        given().queryParam("ensemble", ensembleId)
+                .get("/api/sheets/explore")
+                .then()
+                .statusCode(200)
+                .body("needsAttention.title", hasItem(sheetTitle))
+                .body(
+                        "needsAttention.find { it.id == '%s' }.coverage.status".formatted(sheetId),
+                        equalTo("INCOMPLETE"));
     }
 
     @Test
