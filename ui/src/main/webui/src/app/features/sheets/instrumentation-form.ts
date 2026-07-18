@@ -48,6 +48,7 @@ export class InstrumentationForm extends BaseForm<Instrumentation> implements On
   readonly form = new FormGroup({
     instrumentId: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     partLabel: new FormControl('', { nonNullable: true }),
+    pages: new FormControl('', { nonNullable: true }),
     clef: new FormControl<Clef | null>(null),
     notationType: new FormControl<NotationType | null>(null),
     notes: new FormControl('', { nonNullable: true }),
@@ -69,6 +70,7 @@ export class InstrumentationForm extends BaseForm<Instrumentation> implements On
     this.form.patchValue({
       instrumentId: inst.instrument?.id ?? '',
       partLabel: inst.partLabel ?? '',
+      pages: inst.pages ?? '',
       clef: inst.clef ?? null,
       notationType: inst.notationType ?? null,
       notes: inst.notes ?? '',
@@ -82,6 +84,7 @@ export class InstrumentationForm extends BaseForm<Instrumentation> implements On
     const payload: CreateInstrumentation = convertEmptyStringsToNull({
       instrumentId: raw.instrumentId,
       partLabel: raw.partLabel || undefined,
+      pages: raw.pages || undefined,
       clef: raw.clef ?? undefined,
       notationType: raw.notationType ?? undefined,
       notes: raw.notes || undefined,
@@ -94,6 +97,7 @@ export class InstrumentationForm extends BaseForm<Instrumentation> implements On
           ...this.instrumentation!,
           instrument: { id: raw.instrumentId, name: '' },
           partLabel: payload.partLabel,
+          pages: payload.pages,
           clef: payload.clef,
           notationType: payload.notationType,
           notes: payload.notes,

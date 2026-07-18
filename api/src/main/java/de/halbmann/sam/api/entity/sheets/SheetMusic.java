@@ -155,6 +155,11 @@ public class SheetMusic {
      */
     String additionalNotes;
 
+    /**
+     * Where the piece came from (free text, e.g. "Musikverlag Tirol" or "donated by Hans M.").
+     */
+    String source;
+
     Set<String> tags = new HashSet<>();
 
     /**

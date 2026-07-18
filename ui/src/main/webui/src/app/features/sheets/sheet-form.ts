@@ -11,9 +11,9 @@ import { Dialog } from 'primeng/dialog';
 import { Panel } from 'primeng/panel';
 import { Tooltip } from 'primeng/tooltip';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
-import { SheetsApiService, MusiciansApiService } from '../../core/api';
+import { SheetsApiService, MusiciansApiService, CollectionsApiService } from '../../core/api';
 import { convertEmptyStringsToNull } from '../../shared/utils/object.utils';
-import { CreateSheetMusic, Genre, Musician, SheetMusic, Style } from '../../model/datamodels';
+import { CreateSheetMusic, Genre, Musician, SheetCollection, SheetMusic, Style } from '../../model/datamodels';
 import { map, Observable } from 'rxjs';
 import { BaseForm } from '../../shared/base/base-form';
 import { DIFFICULTY_LEVELS, FETCH_ALL_SIZE, GENRES, STYLES } from '../../shared/constants';
@@ -27,10 +27,12 @@ import { MusicianForm } from '../musicians/musician-form';
 export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnInit {
   private readonly api = inject(SheetsApiService);
   private readonly musiciansApi = inject(MusiciansApiService);
+  private readonly collectionsApi = inject(CollectionsApiService);
 
   @Input() sheet: SheetMusic | null = null;
 
   protected readonly musicians = signal<Musician[]>([]);
+  protected readonly collections = signal<SheetCollection[]>([]);
 
   protected showMusicianDialog = false;
   protected musicianDialogTarget: 'composer' | 'arranger' = 'composer';
@@ -66,7 +68,9 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
     gemaWorkNumber: new FormControl('', { nonNullable: true }),
     iswc: new FormControl('', { nonNullable: true }),
     additionalNotes: new FormControl('', { nonNullable: true }),
+    source: new FormControl('', { nonNullable: true }),
     tags: new FormControl<string[]>([], { nonNullable: true }),
+    collectionId: new FormControl<string | null>(null),
   });
 
   getEntity = () => this.sheet;
@@ -75,6 +79,11 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
     this.musiciansApi.find({ size: FETCH_ALL_SIZE }).subscribe((res) => {
       this.musicians.set(res.data ?? []);
     });
+    if (!this.isEdit) {
+      this.collectionsApi.find({ size: FETCH_ALL_SIZE }).subscribe((res) => {
+        this.collections.set(res.data ?? []);
+      });
+    }
   }
 
   patchFormValues(s: SheetMusic): void {
@@ -98,6 +107,7 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
       gemaWorkNumber: s.gemaWorkNumber ?? '',
       iswc: s.iswc ?? '',
       additionalNotes: s.additionalNotes ?? '',
+      source: s.source ?? '',
       tags: s.tags ?? [],
     });
   }
@@ -146,7 +156,9 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
       gemaWorkNumber: raw.gemaWorkNumber,
       iswc: raw.iswc,
       additionalNotes: raw.additionalNotes,
+      source: raw.source,
       tags: raw.tags.length > 0 ? raw.tags : undefined,
+      collectionId: !this.isEdit && raw.collectionId ? raw.collectionId : undefined,
     });
 
     return this.isEdit

@@ -8,6 +8,7 @@ Each [sheet](sheets.md) can have multiple instrumentations — one per instrumen
 |-------|------|-------|
 | Instrument | Instrument reference | From the [instruments](instruments.md) catalogue |
 | Part label | String | Distinguishes parts, e.g. "1st Trumpet", "Solo", "2. Bass" |
+| Pages | String | Page count of the printed part, free text (e.g. "1–2", "6") |
 | Clef | Enum | `TREBLE` · `ALTO` · `TENOR` · `BASS` |
 | Notation type | Enum | `STANDARD` · `TABLATURE` · `PERCUSSION` · `LEAD_SHEET` · `GRAPHIC` |
 | Notes | Free text | Part-specific performance notes |

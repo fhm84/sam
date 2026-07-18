@@ -18,18 +18,34 @@
     </div>
   </div>
 
-  <!-- Part Label -->
-  <div class="flex flex-col gap-1.5">
-    <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
-      <p-floatlabel variant="on" class="block">
-        <input pInputText id="instr-partLabel" formControlName="partLabel" class="w-full" />
-        <label for="instr-partLabel">{{ 'sheets.instrumentations.form.partLabel' | translate }}</label>
-      </p-floatlabel>
-      <i
-        class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
-        [pTooltip]="t.t('sheets.instrumentations.form.partLabelTooltip')"
-        tooltipPosition="right"
-      ></i>
+  <!-- Part Label / Pages -->
+  <div class="flex gap-4">
+    <div class="flex flex-col gap-1.5 flex-1 min-w-0">
+      <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+        <p-floatlabel variant="on" class="block">
+          <input pInputText id="instr-partLabel" formControlName="partLabel" class="w-full" />
+          <label for="instr-partLabel">{{ 'sheets.instrumentations.form.partLabel' | translate }}</label>
+        </p-floatlabel>
+        <i
+          class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
+          [pTooltip]="t.t('sheets.instrumentations.form.partLabelTooltip')"
+          tooltipPosition="right"
+        ></i>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-1.5 flex-1 min-w-0">
+      <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+        <p-floatlabel variant="on" class="block">
+          <input pInputText id="instr-pages" formControlName="pages" class="w-full" />
+          <label for="instr-pages">{{ 'sheets.instrumentations.form.pages' | translate }}</label>
+        </p-floatlabel>
+        <i
+          class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
+          [pTooltip]="t.t('sheets.instrumentations.form.pagesTooltip')"
+          tooltipPosition="right"
+        ></i>
+      </div>
     </div>
   </div>
 

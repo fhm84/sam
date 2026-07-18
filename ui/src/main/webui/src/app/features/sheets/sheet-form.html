@@ -192,7 +192,7 @@
     </div>
   </div>
 
-  <!-- Copyright (half-width) -->
+  <!-- Copyright / Source -->
   <div class="flex gap-4">
     <div class="flex flex-col gap-1.5 flex-1 min-w-0">
       <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
@@ -202,7 +202,19 @@
         </p-floatlabel>
       </div>
     </div>
-    <div class="flex-1 min-w-0"></div>
+    <div class="flex flex-col gap-1.5 flex-1 min-w-0">
+      <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+        <p-floatlabel variant="on" class="block">
+          <input pInputText id="sheet-source" formControlName="source" class="w-full" />
+          <label for="sheet-source">{{ 'sheets.form.source' | translate }}</label>
+        </p-floatlabel>
+        <i
+          class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
+          [pTooltip]="t.t('sheets.form.sourceTooltip')"
+          tooltipPosition="right"
+        ></i>
+      </div>
+    </div>
   </div>
 
   <!-- Duration (half-width) / empty right -->
@@ -262,6 +274,36 @@
       ></i>
     </div>
   </div>
+
+  <!-- Add to collection (create only) -->
+  @if (!isEdit) {
+    <div class="flex gap-4">
+      <div class="flex flex-col gap-1.5 flex-1 min-w-0">
+        <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+          <p-floatlabel variant="on" class="block">
+            <p-select
+              inputId="sheet-collection"
+              formControlName="collectionId"
+              [options]="collections()"
+              optionLabel="name"
+              optionValue="id"
+              [filter]="true"
+              [showClear]="true"
+              styleClass="w-full"
+              inputStyleClass="w-full"
+            />
+            <label for="sheet-collection">{{ 'sheets.form.collection' | translate }}</label>
+          </p-floatlabel>
+          <i
+            class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
+            [pTooltip]="t.t('sheets.form.collectionTooltip')"
+            tooltipPosition="right"
+          ></i>
+        </div>
+      </div>
+      <div class="flex-1 min-w-0"></div>
+    </div>
+  }
 
   <!-- Rights & Identifiers -->
   <div class="text-[0.6875rem] font-semibold tracking-[0.07em] uppercase text-[var(--sam-text-muted)] pt-2 border-t border-[var(--sam-border)]">{{ 'sheets.form.rightsSection' | translate }}</div>

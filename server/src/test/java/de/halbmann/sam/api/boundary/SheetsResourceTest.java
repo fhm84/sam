@@ -91,4 +91,71 @@ class SheetsResourceTest {
                 .body("totalCount", greaterThanOrEqualTo(1))
                 .body("data.title", hasItem("Kuschelpolka"));
     }
+
+    @Test
+    void testCreateSheetWizardFields() {
+        // collection to link at create time
+        final String collectionId = given().contentType(ContentType.JSON)
+                .body("""
+                        {"name": "Wizard Test Collection", "type": "FOLDER"}
+                        """)
+                .post("/api/sheet-collections")
+                .then()
+                .statusCode(200)
+                .extract()
+                .path("id");
+
+        // sheet with source and collection link
+        final String sheetId = given().contentType(ContentType.JSON)
+                .body("""
+                        {
+                            "title": "Wizard Piece",
+                            "genre": "POLKA",
+                            "source": "Musikverlag Test",
+                            "collectionId": "%s"
+                        }
+                        """.formatted(collectionId))
+                .post("/api/sheets")
+                .then()
+                .statusCode(200)
+                .body("source", equalTo("Musikverlag Test"))
+                .extract()
+                .path("id");
+
+        // the new sheet was added to the collection
+        given().get("/api/sheet-collections/{collectionId}/items", collectionId)
+                .then()
+                .statusCode(200)
+                .body("data.sheetId", hasItem(sheetId));
+
+        // instrumentation with pages
+        given().contentType(ContentType.JSON)
+                .body("""
+                        {"id": "TEST_WIZARD_FLUTE", "name": "Wizard Flute", "transposition": "C"}
+                        """)
+                .post("/api/instruments")
+                .then()
+                .statusCode(200);
+
+        given().contentType(ContentType.JSON)
+                .body("""
+                        {"instrumentId": "TEST_WIZARD_FLUTE", "partLabel": "1", "pages": "1-2"}
+                        """)
+                .post("/api/sheets/{sheetId}/instrumentations", sheetId)
+                .then()
+                .statusCode(204);
+
+        given().get("/api/sheets/{sheetId}/instrumentations", sheetId)
+                .then()
+                .statusCode(200)
+                .body("pages", hasItem("1-2"));
+
+        // deleting a sheet that is still in a collection must remove the membership, not fail
+        given().delete("/api/sheets/{sheetId}", sheetId).then().statusCode(204);
+
+        given().get("/api/sheet-collections/{collectionId}/items", collectionId)
+                .then()
+                .statusCode(200)
+                .body("data.sheetId", not(hasItem(sheetId)));
+    }
 }

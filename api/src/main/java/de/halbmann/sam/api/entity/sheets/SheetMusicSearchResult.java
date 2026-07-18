@@ -42,6 +42,7 @@ public class SheetMusicSearchResult extends SheetMusic {
                 sheetMusic.getIswc(),
                 sheetMusic.getGemaWorkNumber(),
                 sheetMusic.getAdditionalNotes(),
+                sheetMusic.getSource(),
                 sheetMusic.getTags(),
                 sheetMusic.getInstrumentations(),
                 sheetMusic.getAttachments());

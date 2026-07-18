@@ -18,6 +18,8 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(componentModel = MappingConstants.ComponentModel.CDI, unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface DataMapper {
 
+    // collectionId is a create-only convenience field with no counterpart on an exported sheet
+    @Mapping(target = "collectionId", ignore = true)
     CreateSheetMusic createFromSheet(SheetMusic dto);
 
     @Mapping(target = "instrumentId", source = "instrument.id")

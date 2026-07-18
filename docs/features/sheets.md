@@ -20,6 +20,7 @@ The central entity. Each sheet represents one piece of music in the archive.
 | Publisher IPI | String | Publisher Interested Parties Information code |
 | Edition | String | e.g. "Revised 2010", "Score & Parts" |
 | Copyright | String | |
+| Source | String | Provenance — where the piece came from (e.g. a publisher, a donation) |
 | ISWC | String | International Standard Musical Work Code |
 | GEMA work number | String | German GEMA identifier |
 | Additional notes | Free text | General remarks, performance notes |
@@ -29,7 +30,7 @@ The central entity. Each sheet represents one piece of music in the archive.
 
 ## Actions
 
-- **Create / edit / delete** via a dedicated full-page form.
+- **Create / edit / delete** via a dedicated full-page form. At create time the sheet can optionally be added to an existing [collection](collections.md) directly (`collectionId` on the create request). Deleting a sheet also removes its collection memberships.
 - **Tags** can be added and removed individually without editing the full sheet.
 - **Favorite** can be toggled directly from the list and detail views.
 - **Fingerprint-based deduplication** — creating a sheet with identical core metadata is rejected at the database level (see [Storage & Deduplication](../architecture/concepts/storage-and-deduplication.md)).

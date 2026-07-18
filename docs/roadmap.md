@@ -514,10 +514,10 @@ complete apply request. Full details in `memory/plan_classify_enhancements.md`.
 
 ---
 
-### Sheet create wizard — `planned`
+### Sheet create wizard — `done`
 
-Three fields shown in the `Create Flows (PrimeNG).html` create wizard are missing from
-the data model. Full details in `memory/plan_create_sheet.md`.
+Three fields shown in the `Create Flows (PrimeNG).html` create wizard were missing from
+the data model; all three shipped (migration `V1.1.4__CreateSheetWizardFields.sql`).
 
 - **Pages per part** — free-text string (e.g. "1–2", "6") on `Instrumentation`
 - **Source** — free-text string on `SheetMusic` (where the piece came from)

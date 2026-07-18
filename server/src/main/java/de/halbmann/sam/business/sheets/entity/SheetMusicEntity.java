@@ -139,6 +139,11 @@ public class SheetMusicEntity extends AbstractEntity {
     @Column(columnDefinition = "text")
     String additionalNotes;
 
+    /**
+     * Where the piece came from (free text, e.g. "Musikverlag Tirol" or "donated by Hans M.").
+     */
+    String source;
+
     @ElementCollection
     @CollectionTable(name = "sheet_music_tags")
     @Column(name = "tag")

@@ -271,6 +271,27 @@ public class SheetCollectionService {
         collectionItemRepository.delete(itemEntity);
     }
 
+    /**
+     * Removes every collection item referencing the given sheet, so that collection membership
+     * never blocks deleting the sheet itself.
+     */
+    public void removeSheetFromAllCollections(final UUID sheetId) {
+        final PaginationRequest all = new PaginationRequest();
+        all.setSize(-1);
+        for (final SheetCollectionEntity collection :
+                repository.findBySheetId(sheetId, all).data()) {
+            final List<CollectionItemEntity> toRemove = collection.getItems().stream()
+                    .filter(item -> item instanceof SheetCollectionItemEntity sheetItem
+                            && sheetItem.getSheet() != null
+                            && sheetId.equals(sheetItem.getSheet().getId()))
+                    .toList();
+            for (final CollectionItemEntity item : toRemove) {
+                collection.getItems().remove(item);
+                collectionItemRepository.delete(item);
+            }
+        }
+    }
+
     public record TextItemAttachment(String identifier, AttachmentEntity attachment) {}
 
     public List<TextItemAttachment> getTextItemAttachments(final String collectionId) {

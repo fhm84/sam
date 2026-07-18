@@ -1,5 +1,7 @@
 package de.halbmann.sam.business.sheets.controller;
 
+import de.halbmann.sam.api.entity.collections.CollectionItemType;
+import de.halbmann.sam.api.entity.collections.CreateCollectionItem;
 import de.halbmann.sam.api.entity.ensembles.CoverageSnapshotSummary;
 import de.halbmann.sam.api.entity.musicians.Musician;
 import de.halbmann.sam.api.entity.shared.PaginatedResponse;
@@ -9,6 +11,7 @@ import de.halbmann.sam.api.entity.sheets.CreateSheetMusic;
 import de.halbmann.sam.api.entity.sheets.SheetFilterRequest;
 import de.halbmann.sam.api.entity.sheets.SheetMusic;
 import de.halbmann.sam.api.entity.sheets.SheetMusicSearchResult;
+import de.halbmann.sam.business.collections.controller.SheetCollectionService;
 import de.halbmann.sam.business.documents.controller.AttachmentLinkService;
 import de.halbmann.sam.business.ensembles.controller.CoverageSnapshotService;
 import de.halbmann.sam.business.musicians.boundary.MusicianRepository;
@@ -40,6 +43,9 @@ public class SheetService {
 
     @Inject
     AttachmentLinkService attachmentLinkService;
+
+    @Inject
+    SheetCollectionService sheetCollectionService;
 
     public PaginatedResponse<SheetMusicSearchResult> findSheets(final SheetFilterRequest filterRequest) {
         PaginatedResponse<SheetMusicSearchResult> response;
@@ -135,6 +141,12 @@ public class SheetService {
         entity.setComposer(resolveOrCreateMusician(sheetMusic.getComposer()));
         entity.setArranger(resolveOrCreateMusician(sheetMusic.getArranger()));
         sheetRepository.persistAndFlush(entity);
+        if (sheetMusic.getCollectionId() != null) {
+            final CreateCollectionItem item = new CreateCollectionItem();
+            item.setType(CollectionItemType.SHEET);
+            item.setSheetId(entity.getId());
+            sheetCollectionService.addItem(sheetMusic.getCollectionId().toString(), item);
+        }
         return sheetMusicMapper.toDto(entity);
     }
 
@@ -191,6 +203,8 @@ public class SheetService {
                 attachmentLinkService.unlinkAttachments(new ArrayList<>(instr.getAttachments()));
             }
         }
+        // Drop collection memberships — otherwise the collection_items FK blocks the delete
+        sheetCollectionService.removeSheetFromAllCollections(entity.getId());
         sheetRepository.delete(entity);
     }
 

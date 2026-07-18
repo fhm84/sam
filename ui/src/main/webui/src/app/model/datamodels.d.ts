@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 4.0.0 on 2026-06-03 22:47:58.
+// Generated using typescript-generator version 4.1.1 on 2026-07-18 15:44:30.
 
 export interface SheetEnrichment {
     suggestedAdditionalNotes?: string;
@@ -456,6 +456,7 @@ export interface CreateInstrumentation {
     instrumentId: string;
     notationType?: NotationType;
     notes?: string;
+    pages?: string;
     partLabel?: string;
     physicalCondition?: PhysicalCondition;
     physicalLocation?: string;
@@ -464,6 +465,7 @@ export interface CreateInstrumentation {
 export interface CreateSheetMusic {
     additionalNotes?: string;
     arranger?: Musician;
+    collectionId?: string;
     composer?: Musician;
     copyright?: string;
     difficultyLevel?: short;
@@ -477,6 +479,7 @@ export interface CreateSheetMusic {
     publisher?: string;
     publisherIpi?: string;
     rating?: number;
+    source?: string;
     style?: Style;
     subtitle?: string;
     tags?: string[];
@@ -497,6 +500,7 @@ export interface Instrumentation {
     instrument: Instrument;
     notationType?: NotationType;
     notes?: string;
+    pages?: string;
     partLabel?: string;
     physicalCondition?: PhysicalCondition;
     physicalLocation?: string;
@@ -531,6 +535,7 @@ export interface SheetMusic {
     publisher?: string;
     publisherIpi?: string;
     rating?: number;
+    source?: string;
     style?: Style;
     subtitle?: string;
     tags?: string[];

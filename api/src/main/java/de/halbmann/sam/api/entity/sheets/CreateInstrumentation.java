@@ -34,6 +34,11 @@ public class CreateInstrumentation {
     NotationType notationType;
 
     /**
+     * Number of pages of the printed part (free text, e.g. "1–2" or "6").
+     */
+    String pages;
+
+    /**
      * (Optional) notes for the part
      */
     String notes;

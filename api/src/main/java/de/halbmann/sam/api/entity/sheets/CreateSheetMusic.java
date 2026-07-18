@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import lombok.*;
 
 /**
@@ -151,5 +152,16 @@ public class CreateSheetMusic {
      */
     String additionalNotes;
 
+    /**
+     * Where the piece came from (free text, e.g. "Musikverlag Tirol" or "donated by Hans M.").
+     */
+    String source;
+
     Set<String> tags = new HashSet<>();
+
+    /**
+     * (Optional, create-only) Collection the new sheet is added to right after creation. Not
+     * persisted on the sheet itself.
+     */
+    UUID collectionId;
 }
