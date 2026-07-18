@@ -18,8 +18,11 @@ Regenerates `datamodels.d.ts` from the Java `api` module source classes. The plu
 1. **Run the generator** using the Maven wrapper:
 
    ```
-   .\mvnw.cmd generate-sources -pl ui -am -Pgenerate-ts
+   .\mvnw.cmd process-classes -pl ui -am -Pgenerate-ts
    ```
+
+   The `generate` goal binds to the `process-classes` phase — running only
+   `generate-sources` never reaches it and silently does nothing.
 
    On Linux/Mac use `./mvnw` instead.
 
@@ -44,7 +47,7 @@ Regenerates `datamodels.d.ts` from the Java `api` module source classes. The plu
 
 ## Important notes
 
-- The generator uses the **compiled** api classes, not source. If you just added a field, make sure the api module has been compiled (e.g. by running `.\mvnw.cmd compile -pl ui -am -Pgenerate-ts` which compiles first). The `-am` flag handles this automatically.
+- The generator uses the **compiled** api classes, not source. Running the `process-classes` phase with `-am` compiles the api module first, so the command above never reads stale classes.
 - The `requiredAnnotations` config means only fields annotated with `@NotBlank`, `@NotEmpty`, or `@NotNull` are typed as required (`field: type`); all others are optional (`field?: type`).
 - Custom type mappings in the plugin config: `java.time.Duration` → `long`, `DifficultyLevel` → `short`. Add new mappings in `ui/pom.xml` under `<customTypeMappings>` if needed.
 - The output file is determined by `<outputFile>` in `ui/pom.xml`. Do not change the path without also updating Angular imports.
