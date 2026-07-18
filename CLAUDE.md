@@ -13,7 +13,10 @@ SAM (Sheet music Archiving & Management) is a Quarkus-based application for arch
 ./mvnw package
 
 # Run server in dev mode (live reload, Dev UI at http://localhost:8080/q/dev/)
-./mvnw quarkus:dev -pl server -am
+# Do NOT add -am: the dev goal then runs on every reactor module and fails on `api`
+# ("Failed to locate quarkus-core-deployment"). Upstream modules come from the local
+# repo — after changing them, run `./mvnw install -pl api -DskipTests` (etc.) first.
+./mvnw quarkus:dev -pl server
 
 # Run unit tests (all modules)
 ./mvnw test
@@ -31,8 +34,11 @@ SAM (Sheet music Archiving & Management) is a Quarkus-based application for arch
 ./mvnw spotless:check
 
 # Generate TypeScript types from API entities (opt-in via profile; skipped in normal builds)
-# Profile lives in ui/pom.xml — must be run against the ui module, not api
-./mvnw generate-sources -pl ui -am -Pgenerate-ts
+# Profile lives in ui/pom.xml — must be run against the ui module, not api.
+# The generate goal binds to the process-classes phase (NOT generate-sources — that
+# phase silently does nothing), and process-classes also recompiles the api module
+# so the generator never reads stale classes.
+./mvnw process-classes -pl ui -am -Pgenerate-ts
 # Or use the /sync-datamodels skill which runs this and shows the diff
 
 # Build native executable
