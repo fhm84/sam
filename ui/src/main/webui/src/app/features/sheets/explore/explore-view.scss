@@ -19,18 +19,6 @@
   }
 }
 
-.explore-shelf-row {
-  display: flex;
-  gap: 1rem;
-  overflow-x: auto;
-  padding-bottom: 0.5rem;
-  scroll-snap-type: x proximity;
-
-  > .explore-card {
-    scroll-snap-align: start;
-  }
-}
-
 // ─── Tag cloud chips — font-size weighting cannot be expressed as Tailwind arbitrary values ──
 
 .tag-chip {

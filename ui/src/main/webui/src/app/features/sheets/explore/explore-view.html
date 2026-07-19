@@ -71,7 +71,7 @@
       </div>
       @if (!loadingShelves()) {
         @if ((shelf.items?.length ?? 0) > 0) {
-          <div class="explore-shelf-row">
+          <app-explore-shelf-row>
             @for (sheet of shelf.items; track sheet.id) {
               <div
                 class="explore-card cursor-pointer"
@@ -87,7 +87,7 @@
                 }
               </div>
             }
-          </div>
+          </app-explore-shelf-row>
         } @else {
           <div class="p-4 text-[var(--sam-text-muted)]" [attr.data-testid]="'explore-shelf-empty-' + shelf.key">
             {{ 'sheets.explore.shelves.empty' | translate }}
