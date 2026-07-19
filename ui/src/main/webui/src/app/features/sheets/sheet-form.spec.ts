@@ -6,7 +6,7 @@ import { of } from 'rxjs';
 import { MessageService } from 'primeng/api';
 
 import { SheetForm } from './sheet-form';
-import { SheetsApiService, MusiciansApiService } from '../../core/api';
+import { SheetsApiService, MusiciansApiService, CollectionsApiService } from '../../core/api';
 import { TranslationService } from '../../core/translation.service';
 import { Musician, SheetMusic } from '../../model/datamodels';
 
@@ -25,10 +25,12 @@ function paginatedOf<T>(data: T[]) {
 describe('SheetForm', () => {
   let component: SheetForm;
   let musiciansApi: { find: ReturnType<typeof vi.fn> };
+  let collectionsApi: { find: ReturnType<typeof vi.fn> };
   let sheetsApi: { create: ReturnType<typeof vi.fn>; update: ReturnType<typeof vi.fn> };
 
   beforeEach(async () => {
     musiciansApi = { find: vi.fn().mockReturnValue(paginatedOf([])) };
+    collectionsApi = { find: vi.fn().mockReturnValue(paginatedOf([])) };
     sheetsApi = {
       create: vi.fn().mockReturnValue(of(makeSheet())),
       update: vi.fn().mockReturnValue(of(undefined)),
@@ -48,6 +50,7 @@ describe('SheetForm', () => {
           MessageService,
           { provide: SheetsApiService, useValue: sheetsApi },
           { provide: MusiciansApiService, useValue: musiciansApi },
+          { provide: CollectionsApiService, useValue: collectionsApi },
           {
             provide: TranslationService,
             useValue: { t: (k: string) => k, version: { subscribe: () => {} } },
