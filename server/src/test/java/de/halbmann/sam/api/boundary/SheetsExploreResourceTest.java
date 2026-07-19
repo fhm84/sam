@@ -20,9 +20,12 @@ import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 @QuarkusTest
@@ -40,6 +43,25 @@ class SheetsExploreResourceTest {
     @Inject
     CoverageSnapshotRepository coverageSnapshotRepository;
 
+    private final List<String> createdSheetIds = new ArrayList<>();
+    private final List<String> createdCollectionIds = new ArrayList<>();
+    private final List<String> createdEnsembleIds = new ArrayList<>();
+
+    /**
+     * These tests seed sheets/setlists/ensembles through the API. The test database is shared
+     * across classes, so leaked rows push other tests' data off default result pages — clean up
+     * everything we created. Coverage snapshots cascade on sheet/ensemble deletion.
+     */
+    @AfterEach
+    void deleteCreatedData() {
+        createdCollectionIds.forEach(id -> given().delete("/api/sheet-collections/{id}", id));
+        createdSheetIds.forEach(id -> given().delete("/api/sheets/{id}", id));
+        createdEnsembleIds.forEach(id -> given().delete("/api/ensembles/{id}", id));
+        createdCollectionIds.clear();
+        createdSheetIds.clear();
+        createdEnsembleIds.clear();
+    }
+
     private String createSheet(String title, Duration duration) throws Exception {
         SheetMusic sheet = new SheetMusic();
         sheet.setTitle(title);
@@ -50,13 +72,15 @@ class SheetsExploreResourceTest {
                 // exposed via a fluent builder in this DTO.
                 json = json.substring(0, json.length() - 1) + ",\"duration\":\"" + duration + "\"}";
             }
-            return given().contentType(ContentType.JSON)
+            String id = given().contentType(ContentType.JSON)
                     .body(json)
                     .post("/api/sheets")
                     .then()
                     .statusCode(200)
                     .extract()
                     .path("id");
+            createdSheetIds.add(id);
+            return id;
         }
     }
 
@@ -108,6 +132,7 @@ class SheetsExploreResourceTest {
                 .statusCode(200)
                 .extract()
                 .path("id");
+        createdCollectionIds.add(collectionId);
         for (String sheetId : sheetIds) {
             given().contentType(ContentType.JSON)
                     .body(Map.of("type", "SHEET", "sheetId", sheetId))
@@ -179,6 +204,7 @@ class SheetsExploreResourceTest {
                 .statusCode(200)
                 .extract()
                 .path("id");
+        createdEnsembleIds.add(ensembleId);
 
         // Seed a single INCOMPLETE snapshot directly — computing real coverage would snapshot
         // every sheet in the shared test database and make shelf membership nondeterministic.

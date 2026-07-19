@@ -83,7 +83,10 @@ class SheetsResourceTest {
         assertNotNull(sheetResponse.getComposer());
         assertEquals("Frank Bernaerts", sheetResponse.getComposer().getName());
 
-        given().get("/api/sheets")
+        // Filter by title: the shared test database may hold sheets from other test classes,
+        // so the unfiltered first page is not guaranteed to contain the new sheet.
+        given().queryParam("title", "Kuschelpolka")
+                .get("/api/sheets")
                 .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
