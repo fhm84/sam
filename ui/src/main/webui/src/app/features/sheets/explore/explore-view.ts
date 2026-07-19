@@ -4,13 +4,14 @@ import { Button } from 'primeng/button';
 import { Tag } from 'primeng/tag';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../../core/translation.service';
+import { ExploreShelfRow } from './explore-shelf-row';
 import { SheetsApiService } from '../../../core/api';
 import { ExploreShelves, SheetMusicSearchResult, TagCount } from '../../../model/datamodels';
 import { formatDuration } from '../../../shared/utils/format.utils';
 
 @Component({
   selector: 'app-explore-view',
-  imports: [Button, Tag, TranslatePipe],
+  imports: [Button, Tag, TranslatePipe, ExploreShelfRow],
   templateUrl: './explore-view.html',
   styleUrl: './explore-view.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

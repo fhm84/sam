@@ -1,0 +1,31 @@
+<div class="shelf">
+  <button
+    type="button"
+    class="shelf-arrow shelf-arrow--prev"
+    [class.shelf-arrow--visible]="canScrollPrev()"
+    [attr.aria-label]="t.t('sheets.explore.shelves.scrollPrev')"
+    [attr.aria-hidden]="!canScrollPrev()"
+    [tabindex]="canScrollPrev() ? 0 : -1"
+    data-testid="shelf-arrow-prev"
+    (click)="page(-1)"
+  >
+    <i class="pi pi-chevron-left"></i>
+  </button>
+
+  <div #scroller class="shelf-scroller" (scroll)="updateArrows()">
+    <ng-content />
+  </div>
+
+  <button
+    type="button"
+    class="shelf-arrow shelf-arrow--next"
+    [class.shelf-arrow--visible]="canScrollNext()"
+    [attr.aria-label]="t.t('sheets.explore.shelves.scrollNext')"
+    [attr.aria-hidden]="!canScrollNext()"
+    [tabindex]="canScrollNext() ? 0 : -1"
+    data-testid="shelf-arrow-next"
+    (click)="page(1)"
+  >
+    <i class="pi pi-chevron-right"></i>
+  </button>
+</div>

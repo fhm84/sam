@@ -1,0 +1,79 @@
+// ─── Netflix-style shelf: hidden scrollbar, edge fades, hover-revealed paging arrows ───
+
+.shelf {
+  position: relative;
+}
+
+.shelf-scroller {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding: 0.25rem 0.25rem 0.5rem;
+  scroll-snap-type: x proximity;
+  // Keep the first card's snap position at scrollLeft 0 despite the
+  // horizontal padding — otherwise the shelf rests at a few px offset
+  // and the left arrow reads as actionable on an unscrolled shelf.
+  scroll-padding-inline: 0.25rem;
+  // Arrows are the affordance; the native scrollbar just adds noise.
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+:host ::ng-deep .shelf-scroller > .explore-card {
+  scroll-snap-align: start;
+}
+
+.shelf-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid var(--sam-border);
+  border-radius: 50%;
+  background: var(--sam-surface);
+  color: var(--sam-text);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, background 0.15s;
+
+  &--prev {
+    left: -0.75rem;
+  }
+
+  &--next {
+    right: -0.75rem;
+  }
+
+  &:hover {
+    background: var(--p-surface-100);
+  }
+}
+
+// An actionable arrow is always clickable: any pointer near it also hovers
+// the shelf and reveals it, and hover-gating pointer-events races hit tests.
+.shelf-arrow--visible {
+  pointer-events: auto;
+}
+
+// Reveal on shelf hover or keyboard focus — but only arrows that can act.
+.shelf:hover .shelf-arrow--visible,
+.shelf-arrow--visible:focus-visible {
+  opacity: 1;
+}
+
+// No hover on touch devices: keep actionable arrows always visible.
+@media (hover: none) {
+  .shelf-arrow--visible {
+    opacity: 1;
+  }
+}

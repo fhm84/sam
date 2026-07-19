@@ -369,7 +369,9 @@
           "title": "Recently added",
           "subtitle": "Added in the last 30 days"
         },
-        "empty": "Nothing here yet."
+        "empty": "Nothing here yet.",
+        "scrollPrev": "Scroll shelf left",
+        "scrollNext": "Scroll shelf right"
       }
     }
   },
