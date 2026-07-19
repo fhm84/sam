@@ -3,3 +3,10 @@
 !target/*-runner.jar
 !target/lib/*
 !target/quarkus-app/*
+# Frontend image (Dockerfile at repo root) needs the Angular sources and nginx config;
+# keep dependency/build outputs out of the context — they are rebuilt inside the image.
+!ui/src/main/webui
+!docker/nginx.conf
+ui/src/main/webui/node_modules
+ui/src/main/webui/dist
+ui/src/main/webui/.angular

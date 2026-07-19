@@ -1,7 +1,7 @@
 # Frontend image — builds Angular with Node and serves via nginx.
 # Backend image is built by Jib: ./mvnw package -Dquarkus.container-image.build=true -pl server -am
 
-FROM node:22-alpine AS build
+FROM node:26-alpine AS build
 WORKDIR /app
 COPY ui/src/main/webui/package*.json ./
 RUN npm ci
