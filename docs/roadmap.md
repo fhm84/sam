@@ -855,6 +855,29 @@ unspecified fields untouched on each selected sheet.
 
 ---
 
+### Align UI with the improved Claude Design — `idea`
+
+A visual/interaction redesign of SAM already exists as Claude Design mockups
+(`Hi-Fi Shell (PrimeNG).html`, `Sheets Overview (PrimeNG).html`, `Sheet Detail (PrimeNG).html`
+/ `v2`, `Create Flows (PrimeNG).html`, `Coverage Breakdown (PrimeNG).html`,
+`Classify (PrimeNG).html`). So far these mockups have only been mined for **data model
+and feature gaps** (see Open Question #10 and the resulting `memory/plan_*.md` files) —
+the improved **look & feel itself** (shell layout, page compositions, visual hierarchy,
+component styling) has not been implemented.
+
+Revisit the mockups and align the implemented UI with them where the design is an
+improvement over the current Sakai-based layout. Likely incremental: start with the
+highest-traffic pages (shell/navigation, sheets overview, sheet detail) rather than a
+big-bang restyle.
+
+**Stakeholders:** All (UI-wide)
+**Effort:** Medium–High (scope depends on how much of the design is adopted)
+**Depends on:** The feature-gap plans derived from the same mockups (many are `planned`
+/ `in progress`) — implementing those first avoids restyling screens that are about to
+change structurally.
+
+---
+
 ### Recently viewed — `idea`
 
 A quick-access list of the last N sheets viewed by the current user, shown in the
