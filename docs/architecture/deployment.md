@@ -7,7 +7,7 @@ SAM ships as two Docker images:
 ```
                         :80
   Browser ──── nginx (sam-ui) ──┬── /api/*           ──► sam-server:8080
-                                ├── /q/*              ──► sam-server:8080
+                                ├── /q/*              ──► sam-server:9000 (management)
                                 ├── /oidc-config.json ──► sam-server:8080
                                 └── /*                ──► Angular SPA (static)
 ```
@@ -18,6 +18,8 @@ SAM ships as two Docker images:
 | `de.halbmann/sam-ui:latest` | `docker build .` (multi-stage Dockerfile) | Built Angular SPA served by nginx |
 
 The nginx reverse proxy is the single public entry point (port 80). All Angular API calls use relative `/api/*` paths, which nginx forwards to the backend — no CORS configuration required.
+
+`sam-server` also listens on a separate, unpublished management port (`9000`, [ADR-0007](decisions/adr-0007-management-interface.md)) for `/q/*` ops endpoints (`/q/info` for version/build-id, `/q/metrics` for Prometheus) — kept off the main port so they don't fall under the public API's `@Authenticated` default. nginx proxies `/q/*` to it internally.
 
 ## OIDC Config Endpoint
 
