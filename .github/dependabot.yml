@@ -1,0 +1,44 @@
+version: 2
+
+updates:
+  # Angular frontend
+  - package-ecosystem: "npm"
+    directory: "/ui/src/main/webui"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    groups:
+      npm-minor-patch:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore(deps-dev)"
+      include: "scope"
+
+  # Java/Maven modules (api, core, storage, server, cli, migration) — resolved
+  # from the root reactor pom.xml.
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    groups:
+      maven-minor-patch:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+
+  # GitHub Actions workflow dependencies
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      github-actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: "chore"
+      include: "scope"
