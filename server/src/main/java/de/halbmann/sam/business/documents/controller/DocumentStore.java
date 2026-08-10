@@ -173,7 +173,7 @@ public class DocumentStore {
 
         String sha256Hex = HexFormat.of().formatHex(sha256Digest.digest());
 
-        DocumentEntity document = documentRepository.findBySha256(sha256Hex).orElseGet(() -> {
+        return documentRepository.findBySha256(sha256Hex).orElseGet(() -> {
             try {
                 String extension = MimeTypeUtils.resolveExtension(mimeType, filename);
 
@@ -200,7 +200,5 @@ public class DocumentStore {
                 throw new StorageException("Failed to store file", e);
             }
         });
-
-        return document;
     }
 }

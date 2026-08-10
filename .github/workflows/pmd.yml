@@ -16,6 +16,14 @@ on:
 permissions:
   contents: read
 
+env:
+  PMD_VERSION: '7.26.0'
+  # Modules whose sources are scanned by PMD (kept in sync with the sourcePath below).
+  # storage-sdk/storage-local/storage-s3/core are only built to put their compiled
+  # classes and dependency jars on the aux-classpath for type resolution.
+  REACTOR_MODULES: 'api,core,storage/storage-sdk,storage/storage-local,storage/storage-s3,server,cli'
+  PMD_SOURCE_PATH: 'api/src/main/java core/src/main/java server/src/main/java cli/src/main/java'
+
 jobs:
   pmd-code-scan:
     permissions:
@@ -25,13 +33,49 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - name: Run PMD
-        id: pmd
-        uses: pmd/pmd-github-action@v2
+
+      - uses: actions/setup-java@v5
         with:
-          rulesets: 'rulesets/java/quickstart.xml'
-          sourcePath: 'api/src/main/java,core/src/main/java,server/src/main/java,cli/src/main/java'
-          analyzeModifiedFilesOnly: false
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      # PMD needs the full compile classpath (our own compiled classes + all
+      # dependency jars) to resolve types coming from wildcard imports
+      # (jakarta.*, lombok.*, org.mapstruct.*, ...). Without it, PMD cannot tell
+      # whether such an import is actually used and misreports it as unused
+      # (see UnnecessaryImport false positives from 2026-08).
+      - name: Compile and build aux-classpath for PMD
+        run: |
+          set -euo pipefail
+          ./mvnw -B -q -pl "$REACTOR_MODULES" -am compile
+          ./mvnw -B -q -pl "$REACTOR_MODULES" -am dependency:build-classpath \
+            -Dmdep.outputFile=target/pmd-classpath.txt -Dmdep.includeScope=compile
+
+          {
+            while IFS= read -r f; do cat "$f"; echo; done < <(find . -path '*/target/pmd-classpath.txt') | tr ':' '\n'
+            find . -maxdepth 3 -type d -path '*/target/classes'
+          } | sort -u > pmd-aux-classpath.txt
+
+      - name: Download PMD ${{ env.PMD_VERSION }}
+        run: |
+          set -euo pipefail
+          curl -sSL -o pmd.zip \
+            "https://github.com/pmd/pmd/releases/download/pmd_releases/${PMD_VERSION}/pmd-dist-${PMD_VERSION}-bin.zip"
+          unzip -q pmd.zip
+
+      - name: Run PMD
+        run: |
+          set -euo pipefail
+          ./pmd-bin-"${PMD_VERSION}"/bin/pmd check \
+            -d $PMD_SOURCE_PATH \
+            -R rulesets/java/quickstart.xml \
+            --aux-classpath "file:$PWD/pmd-aux-classpath.txt" \
+            -f sarif \
+            -r pmd-report.sarif \
+            --no-fail-on-violation \
+            --no-fail-on-error
+
       - name: Upload SARIF file
         uses: github/codeql-action/upload-sarif@v4
         with:
