@@ -48,7 +48,10 @@ jobs:
       - name: Compile and build aux-classpath for PMD
         run: |
           set -euo pipefail
-          ./mvnw -B -q -pl "$REACTOR_MODULES" -am compile
+          # Reactor-local (-am) resolution alone isn't enough here (see CLAUDE.md):
+          # upstream modules must be installed to the local repo before dependants
+          # can resolve them, so use install instead of a plain compile.
+          ./mvnw -B -q -pl "$REACTOR_MODULES" -am install -Dmaven.test.skip=true
           ./mvnw -B -q -pl "$REACTOR_MODULES" -am dependency:build-classpath \
             -Dmdep.outputFile=target/pmd-classpath.txt -Dmdep.includeScope=compile
 
