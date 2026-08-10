@@ -33,38 +33,13 @@ SAM (Sheet music Archiving & Management) is a Quarkus-based application for arch
 # Check formatting without fixing
 ./mvnw spotless:check
 
-# Generate TypeScript types from API entities (opt-in via profile; skipped in normal builds)
-# Profile lives in ui/pom.xml — must be run against the ui module, not api.
-# The generate goal binds to the process-classes phase (NOT generate-sources — that
-# phase silently does nothing), and process-classes also recompiles the api module
-# so the generator never reads stale classes.
-./mvnw process-classes -pl ui -am -Pgenerate-ts
-# Or use the /sync-datamodels skill which runs this and shows the diff
+# Generate TypeScript types from API entities — see the /sync-datamodels skill (also shows the diff)
 
 # Build native executable
 ./mvnw package -Dnative
 
-# ── Docker images ────────────────────────────────────────────────────────────
-# Backend image (Jib — output: de.halbmann/sam:latest)
-./mvnw package -Dquarkus.container-image.build=true -pl server -am
-
-# Push to a registry (append registry/group overrides as needed)
-./mvnw package -Dquarkus.container-image.build=true -Dquarkus.container-image.push=true \
-  -Dquarkus.container-image.registry=ghcr.io \
-  -Dquarkus.container-image.group=your-org \
-  -pl server -am
-
-# Frontend image (multi-stage Dockerfile — output: de.halbmann/sam-ui:latest)
-docker build -t de.halbmann/sam-ui:latest .
-
-# Start full production stack (copy .env.example → .env, fill in secrets first)
-docker compose -f docker-compose.prod.yml up
-
-# Scan dependencies for CVEs (OWASP Dependency-Check; first run downloads NVD DB ~200MB)
-./mvnw verify -Pdependency-check
-# With NVD API key for faster DB updates (free key at https://nvd.nist.gov/developers/request-an-api-key)
-./mvnw verify -Pdependency-check -DnvdApiKey=YOUR_KEY
-# Report output: target/dependency-check-report/dependency-check-report.html
+# Build/push Docker images or start the production stack — see the docker-build skill
+# Scan dependencies for CVEs — see the dependency-check skill
 ```
 
 ## Module Architecture
@@ -108,19 +83,7 @@ Seven Maven modules under parent `de.halbmann:sam`:
 
 ## Monitoring
 
-Prometheus + Grafana stack, opt-in via a separate compose file (does not affect the main app):
-
-```bash
-# Start Prometheus (:9090) and Grafana (:3000) — app must be running on :8080
-docker compose -f docker-compose.monitoring.yml up
-
-# Grafana: http://localhost:3000  (admin / admin)
-# Prometheus raw metrics: http://localhost:8080/q/metrics
-```
-
-- Prometheus scrape config: `monitoring/prometheus.yml`
-- Grafana dashboard (auto-provisioned): `monitoring/grafana/dashboards/sam.json`
-- Dashboard covers: HTTP request rate/latency/errors, JVM heap/GC/threads, HikariCP pool, AI classification (text vs vision mode, duration), LLM token usage
+Opt-in Prometheus + Grafana stack — see `monitoring/CLAUDE.md`.
 
 ## Database
 
