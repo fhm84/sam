@@ -14,9 +14,9 @@
     <artifactId>server</artifactId>
 
     <properties>
-        <quarkus-langchain4j.version>1.7.4</quarkus-langchain4j.version>
-        <pdfbox-tools.version>3.0.7</pdfbox-tools.version>
-        <flying-saucer-pdf.version>10.2.0</flying-saucer-pdf.version>
+        <quarkus-langchain4j.version>1.12.2</quarkus-langchain4j.version>
+        <pdfbox-tools.version>3.0.8</pdfbox-tools.version>
+        <flying-saucer-pdf.version>10.4.0</flying-saucer-pdf.version>
         <poi.version>5.5.1</poi.version>
     </properties>
 
