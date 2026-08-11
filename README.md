@@ -171,7 +171,6 @@ Pull requests are also checked by the `commit-lint` CI job (`.github/workflows/c
 - Dashboard/statistics (sheets by composer/arranger/genre)
 - Auto-convert to MusicXML format (for transposition)
 - Advanced file-upload workflows (linking/metadata in upload dialog)
-- System info endpoint (`/api/info`)
 
 ### Technical Debt
 - Extended revision information (Envers metadata beyond current snapshots)

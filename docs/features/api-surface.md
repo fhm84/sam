@@ -1,6 +1,9 @@
 # API Surface Summary
 
-All endpoints are under the `/api` base path.
+Business endpoints are under the `/api` base path. Ops/diagnostic endpoints
+(`/q/*`) live on a separate, unauthenticated management port — see
+[Monitoring](../../monitoring/CLAUDE.md) and
+[ADR-0007](../architecture/decisions/adr-0007-management-interface.md).
 
 | Resource | Base path | Notes |
 |----------|-----------|-------|
@@ -21,10 +24,16 @@ All endpoints are under the `/api` base path.
 | Public share | `/public/share/{token}` | Unauthenticated; token-validated resource access |
 | Event log | `/api/event-logs` | Read-only; requires authentication |
 | My parts | `/api/me/parts` | Authenticated; paginated sheets for the calling user's instruments |
+| App info | `/q/info` | Unauthenticated; management port (`:9000`), not `/api`. Git branch/commit, build timestamp, Quarkus/Java/OS versions |
+| Metrics | `/q/metrics` | Unauthenticated; management port (`:9000`), not `/api`. Prometheus scrape endpoint |
 
 ## Access control
 
-All `/api/*` endpoints require authentication (valid OIDC bearer token). Write operations (POST, PUT, DELETE) additionally require the `music_librarian` or `admin` realm role. Read operations (GET) are accessible to any authenticated user. The `/public/share/{token}` endpoint is explicitly unauthenticated — it validates the share token manually in a separate resource class with no `@Authenticated` class-level annotation. Role enforcement uses `@RolesAllowed` on the JAX-RS implementation classes; the API interface definitions remain role-free to stay usable as a REST client in the CLI module.
+All `/api/*` endpoints require authentication (valid OIDC bearer token). Write operations (POST, PUT, DELETE) additionally require the `music_librarian` or `admin` realm role. Read operations (GET) are accessible to any authenticated user. Role enforcement uses `@RolesAllowed` on the JAX-RS implementation classes; the API interface definitions remain role-free to stay usable as a REST client in the CLI module.
+
+Two endpoints are deliberately unauthenticated outside `/api/*`:
+- `/public/share/{token}` — validates the share token manually in a separate resource class with no `@Authenticated` class-level annotation.
+- `/q/*` (management port `:9000`) — `/q/info` and `/q/metrics`; see [Security concept](../architecture/concepts/security.md) and [ADR-0007](../architecture/decisions/adr-0007-management-interface.md) for the rationale.
 
 ## Related
 

@@ -4,7 +4,9 @@ Prometheus + Grafana stack, opt-in via a separate compose file (does not affect 
 
 ```bash
 # Start Prometheus (:9090) and Grafana (:3000) — app must be running on :8080
-# (management port :9000 must also be reachable — it's the default, no extra config needed)
+# and its management port :9000 must also be reachable. In `quarkus:dev`, the
+# management interface is explicitly bound to 0.0.0.0 (see application.properties)
+# so Prometheus can reach it via host.docker.internal.
 docker compose -f docker-compose.monitoring.yml up
 
 # Grafana: http://localhost:3000  (admin / admin)
@@ -23,7 +25,9 @@ any future health checks) off the main HTTP port (:8080, shared with the public
 endpoints separate from the `@Authenticated`-by-default public API. See
 `docs/architecture/decisions/` for the rationale.
 
-- `GET :9000/q/info` — running version/build-id: git commit SHA + branch + dirty flag,
-  build timestamp, Quarkus/Java/OS versions. Unauthenticated by design (no secrets).
+- `GET :9000/q/info` — running version/build-id: git commit SHA + branch, build
+  timestamp, Quarkus/Java/OS versions. Unauthenticated by design; deliberately
+  configured with `quarkus.info.git.mode=standard` (not `full`) so it does *not*
+  expose commit author/committer name+email or the build machine's hostname.
 - In prod, nginx (`docker/nginx.conf`) reverse-proxies `/q/` to `sam-server:9000`
   internally — the management port itself is not published to the host.

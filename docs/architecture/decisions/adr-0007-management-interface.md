@@ -21,8 +21,15 @@ versions — no secrets or business data.
 
 ## Consequences
 
-- `/api/*` stays uniformly `@Authenticated`; ops/diagnostic endpoints no
-  longer need a carve-out from that rule.
+- Ops/diagnostic endpoints get network-level isolation from `/api/*` onto a
+  separate port, rather than living behind a mix of `@Authenticated` JAX-RS
+  resources and un-annotated Vert.x routes on the same port. Note
+  `@Authenticated` only ever applies to `*ResourceImpl` JAX-RS classes — the
+  management port doesn't "carve out" an existing protection, since
+  `/q/metrics` (a raw Vert.x route registered by `quarkus-micrometer`) was
+  never covered by it and was already unauthenticated on `:8080`. The real
+  benefit is a single, deliberately-isolated unauthenticated surface instead
+  of an implicit one mixed into the main port.
 - `/q/metrics` moved with it — `monitoring/prometheus.yml` and
   `docker/nginx.conf`'s `/q/` proxy target were updated from `:8080` to
   `:9000` accordingly (see [Monitoring](../../../monitoring/CLAUDE.md)).
@@ -31,5 +38,11 @@ versions — no secrets or business data.
   network only, so `/q/*` is still only reachable through the existing
   public entry point (port 80).
 - Minor info disclosure (exact versions aid CVE matching by an attacker) is
-  accepted as low-risk, consistent with running Dependabot/dependency-check
-  already.
+  accepted as low-risk. Dependabot/dependency-check reduce how often a known
+  CVE is *merged*, but deploys are manual (see the `docker-build` skill) so
+  they say nothing about whether the *running* instance is actually patched
+  — this endpoint should not be read as implying that guarantee.
+- `quarkus.info.git.mode` is deliberately `standard`, not `full`: full mode
+  additionally exposes commit author/committer name+email and the build
+  machine's hostname, which is more than this endpoint should leak to
+  anonymous callers.
