@@ -13,7 +13,6 @@ updates:
         update-types: ["minor", "patch"]
     commit-message:
       prefix: "chore"
-      prefix-development: "chore(deps-dev)"
       include: "scope"
 
   # Java/Maven modules (api, core, storage, server, cli, migration) — resolved
