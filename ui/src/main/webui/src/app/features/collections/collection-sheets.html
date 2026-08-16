@@ -29,6 +29,18 @@
         severity="secondary"
         (onClick)="openAddTextBlock()"
       />
+      <p-button
+        data-testid="btn-ai-assistant"
+        icon="pi pi-sparkles"
+        [label]="t.t('collections.items.assistant.open')"
+        size="small"
+        severity="secondary"
+        [outlined]="true"
+        [disabled]="!ensembleId"
+        [pTooltip]="ensembleId ? undefined : t.t('collections.items.assistant.needsEnsembleTooltip')"
+        tooltipPosition="top"
+        (onClick)="openAssistant()"
+      />
     </div>
   </div>
 
@@ -109,6 +121,18 @@
               (onClick)="openEdit(item)"
             />
             @if (item.type === 'TEXT') {
+              <p-button
+                icon="pi pi-sparkles"
+                [rounded]="true"
+                [text]="true"
+                size="small"
+                styleClass="row-action"
+                [attr.data-testid]="'btn-draft-text-' + item.id"
+                [pTooltip]="t.t('collections.items.assistant.draftText')"
+                tooltipPosition="top"
+                [loading]="draftingItemId() === item.id"
+                (onClick)="onDraftText(item)"
+              />
               @if (item.attachment) {
                 <p-button
                   icon="pi pi-paperclip"
@@ -533,6 +557,91 @@
       }
     </div>
   }
+</p-dialog>
+
+<!-- ── AI setlist assistant dialog ──────────────────────── -->
+<p-dialog
+  data-testid="dialog-ai-assistant"
+  [header]="t.t('collections.items.assistant.title')"
+  [(visible)]="assistantDialogVisible"
+  [modal]="true"
+  [style]="{ width: '42rem' }"
+  [breakpoints]="{ '768px': '95vw' }"
+>
+  @if (assistantDialogVisible) {
+    <div class="flex flex-col gap-4">
+      <p-floatlabel variant="on" class="block">
+        <textarea
+          pTextarea
+          id="assistant-goal"
+          data-testid="input-assistant-goal"
+          [formControl]="assistantGoal"
+          rows="3"
+          class="w-full"
+          [placeholder]="t.t('collections.items.assistant.goalPlaceholder')"
+        ></textarea>
+        <label for="assistant-goal">{{ 'collections.items.assistant.goal' | translate }}</label>
+      </p-floatlabel>
+
+      <div class="flex justify-end">
+        <p-button
+          data-testid="btn-request-suggestions"
+          icon="pi pi-sparkles"
+          [label]="t.t('collections.items.assistant.suggest')"
+          [disabled]="assistantGoal.invalid || assistantLoading()"
+          [loading]="assistantLoading()"
+          (onClick)="requestSuggestions()"
+        />
+      </div>
+
+      @if (assistantLoading()) {
+        <div class="flex justify-center p-6 text-2xl text-[var(--sam-text-muted)]">
+          <i class="pi pi-spin pi-spinner"></i>
+        </div>
+      } @else if (assistantRequested() && assistantSuggestions().length === 0) {
+        <p class="text-center text-[var(--sam-text-muted)] !p-4">{{ 'collections.items.assistant.noResults' | translate }}</p>
+      } @else if (assistantSuggestions().length) {
+        <div class="flex flex-col gap-2">
+          @for (suggestion of assistantSuggestions(); track suggestion.sheetId) {
+            <div
+              class="flex items-start justify-between gap-3 px-4 py-3 border border-[var(--sam-border)] rounded-[var(--p-border-radius)]"
+              [attr.data-testid]="'suggestion-' + suggestion.sheetId"
+            >
+              <div class="flex flex-col gap-0.5">
+                <span class="font-medium text-[var(--sam-text)]">{{ suggestion.title }}</span>
+                @if (suggestion.composer) {
+                  <span class="text-[0.82rem] text-[var(--sam-text-muted)]">{{ suggestion.composer }}</span>
+                }
+                @if (suggestion.rationale) {
+                  <span class="text-[0.82rem] text-[var(--sam-text-secondary)] italic mt-1">{{ suggestion.rationale }}</span>
+                }
+              </div>
+              <p-button
+                icon="pi pi-plus"
+                [rounded]="true"
+                size="small"
+                [attr.data-testid]="'btn-add-suggestion-' + suggestion.sheetId"
+                [pTooltip]="t.t('collections.items.addSheet')"
+                tooltipPosition="top"
+                [loading]="addingSuggestionSheetId === suggestion.sheetId"
+                (onClick)="addSuggestion(suggestion)"
+              />
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <ng-template #footer>
+    <p-button
+      data-testid="btn-close-assistant"
+      [label]="t.t('collections.items.cancel')"
+      severity="secondary"
+      [text]="true"
+      (onClick)="assistantDialogVisible = false"
+    />
+  </ng-template>
 </p-dialog>
 
 <p-confirmdialog />

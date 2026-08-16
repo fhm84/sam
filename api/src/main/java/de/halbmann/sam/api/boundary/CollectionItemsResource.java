@@ -1,5 +1,6 @@
 package de.halbmann.sam.api.boundary;
 
+import de.halbmann.sam.api.entity.assistant.DraftTextResult;
 import de.halbmann.sam.api.entity.collections.CollectionItem;
 import de.halbmann.sam.api.entity.collections.CreateCollectionItem;
 import de.halbmann.sam.api.entity.documents.Attachment;
@@ -89,4 +90,17 @@ public interface CollectionItemsResource {
     @PUT
     @Path("order")
     void reorderItems(List<String> orderedIds);
+
+    /**
+     * AI setlist assistant: drafts spoken introduction text for a TEXT item, based on the
+     * neighboring piece's metadata. The Dirigent/announcer reviews and edits before use.
+     *
+     * @param itemId   the TEXT item ID
+     * @param language ISO 639-1 language code to draft the text in (e.g. "en", "de"); defaults to "en"
+     * @return the drafted text
+     */
+    @POST
+    @Path("{itemId}/ai/draft-text")
+    DraftTextResult draftText(
+            @PathParam("itemId") String itemId, @QueryParam("language") @DefaultValue("en") String language);
 }

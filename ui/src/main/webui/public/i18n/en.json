@@ -486,6 +486,19 @@
         "removeConfirm": "Remove the attached file from this text block?",
         "removeHeader": "Remove attachment"
       },
+      "assistant": {
+        "open": "AI Assistant",
+        "needsEnsembleTooltip": "Assign an ensemble to this collection to use the assistant",
+        "title": "AI Setlist Assistant",
+        "goal": "Goal / constraints",
+        "goalPlaceholder": "e.g. 45 min opener, upbeat, avoid two marches in a row…",
+        "suggest": "Suggest pieces",
+        "noResults": "No suggestions — try a different goal",
+        "suggestError": "Failed to get suggestions",
+        "draftText": "Draft intro text with AI",
+        "draftSuccess": "Draft inserted — review and save",
+        "draftError": "Failed to draft text"
+      },
       "myPartsFilter": "My Parts",
       "myPartsFilterTooltip": "Show only sheets where you have a part",
       "empty": "No items in this collection yet",

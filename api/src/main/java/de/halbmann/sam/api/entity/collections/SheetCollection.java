@@ -43,6 +43,11 @@ public class SheetCollection {
     UUID coverImageId;
 
     /**
+     * Which ensemble this setlist/collection belongs to, or null if not tied to one.
+     */
+    UUID ensembleId;
+
+    /**
      * The ordered list of items in the collection (sheet references and/or free-text blocks).
      */
     @Valid

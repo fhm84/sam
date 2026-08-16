@@ -184,6 +184,43 @@ between a collection/setlist and a sheet), which already exists.
 
 ---
 
+### AI setlist assistant — `done`
+
+A tool-grounded AI assistant that helps build a setlist and draft the spoken text between
+songs. Full details in `memory/plan_setlist_assistant.md`.
+
+**Implementation note:** Backend (ensemble FK, candidate-retrieval tool, `SetlistAssistant` /
+`ProgrammeTextDrafter` AI services, both endpoints, event logging with token usage, draft-text
+language passed from the UI's active locale) is done and tested (162 server tests pass). Angular
+UI (assistant drawer + draft-text action) is implemented and browser-verified end-to-end with
+Playwright, including a real round-trip to OpenAI (blocked only by account credits, not a code
+issue). Fixed along the way: a stray open-ended `@babel/core` override in
+`ui/src/main/webui/package.json` that let Babel 8 leak in and broke `ng serve` for the whole app
+(unrelated to this feature, now pinned to exact 7.29.7), and a PrimeNG `p-table` OnPush
+stale-binding bug where the draft-text button's loading state needed to be a signal rather than a
+plain property to render correctly.
+
+- **Program builder** — the Dirigent gives free-text goals/constraints ("45 min opener,
+  upbeat, avoid two marches in a row") for an existing setlist. An AI service with tool
+  access searches the real repertoire (filtered by ensemble coverage status, duration,
+  genre, difficulty, tags) and returns ranked suggestions with rationale — real sheet IDs
+  only, never invented pieces. Reuses the tool-calling pattern already established by
+  `ClassificationAgent`.
+- **Programme text drafting** — for a text item between two pieces in the setlist, draft a
+  short spoken intro from the neighboring piece's metadata, for the Dirigent to review and
+  edit before use.
+
+**Explicitly out of scope:** rehearsal-planning hints for the Dirigent (that's the
+deterministic gap-report/recommendation-solver work under "Coverage breakdown
+enhancements" above, not an LLM task) and free-form new-song-idea suggestions (no
+grounding data source yet — would just be hallucination).
+
+**Stakeholders:** S2 (Dirigent)
+**Effort:** Medium
+**Depends on:** Ensemble FK on `SheetCollection` (see "Sheet metadata enrichment" above)
+
+---
+
 ## 3. Musician-Facing
 
 ### Musician profile enrichment — `planned`

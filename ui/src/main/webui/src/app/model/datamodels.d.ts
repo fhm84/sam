@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 4.1.1 on 2026-07-18 16:36:48.
+// Generated using typescript-generator version 4.1.1 on 2026-08-16 22:32:27.
 
 export interface SheetEnrichment {
     suggestedAdditionalNotes?: string;
@@ -17,6 +17,25 @@ export interface UserInfo {
     id: string;
     lastName?: string;
     username: string;
+}
+
+export interface DraftTextResult {
+    draftText?: string;
+}
+
+export interface SetlistSuggestions {
+    items?: SuggestedSetlistItem[];
+}
+
+export interface SuggestSetlistItemsRequest {
+    goal: string;
+}
+
+export interface SuggestedSetlistItem {
+    composer?: string;
+    rationale?: string;
+    sheetId?: string;
+    title?: string;
 }
 
 export interface ClassificationApplyRequest {
@@ -113,6 +132,7 @@ export interface SheetCollection {
     coverImageId?: string;
     date?: Date;
     description?: string;
+    ensembleId?: string;
     id?: string;
     items?: CollectionItem[];
     name: string;
@@ -590,7 +610,7 @@ export type AttachmentType = "FULL_SCORE" | "PART" | "COVER" | "LYRICS" | "MIDI"
 
 export type CoverageStatus = "COMPLETE" | "PLAYABLE" | "INCOMPLETE";
 
-export type EventType = "DOCUMENT_DOWNLOAD" | "DOCUMENT_BATCH_DOWNLOAD" | "SHEET_EXPORT" | "COLLECTION_EXPORT" | "COLLECTION_TOC_GENERATED" | "GEMA_SETLIST_GENERATED" | "DOCUMENT_CLASSIFIED" | "DOCUMENT_CLASSIFICATION_APPLIED" | "SHARE_CREATED" | "SHARE_ACCESSED" | "SHARE_REVOKED";
+export type EventType = "DOCUMENT_DOWNLOAD" | "DOCUMENT_BATCH_DOWNLOAD" | "SHEET_EXPORT" | "COLLECTION_EXPORT" | "COLLECTION_TOC_GENERATED" | "GEMA_SETLIST_GENERATED" | "DOCUMENT_CLASSIFIED" | "DOCUMENT_CLASSIFICATION_APPLIED" | "SHARE_CREATED" | "SHARE_ACCESSED" | "SHARE_REVOKED" | "SETLIST_AI_SUGGESTION_GENERATED" | "SETLIST_AI_TEXT_DRAFTED";
 
 export type Clef = "TREBLE" | "ALTO" | "TENOR" | "BASS";
 

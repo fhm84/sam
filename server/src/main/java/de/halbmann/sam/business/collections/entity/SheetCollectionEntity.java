@@ -38,6 +38,13 @@ public class SheetCollectionEntity extends AbstractEntity {
 
     UUID coverImageId;
 
+    /**
+     * Which ensemble this setlist/collection belongs to. Used to evaluate coverage against
+     * the correct ensemble (e.g. for the AI setlist assistant); {@code null} for collections
+     * not tied to a specific ensemble.
+     */
+    UUID ensembleId;
+
     @OneToMany
     @JoinTable(
             name = "sheet_collections_items",

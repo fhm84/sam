@@ -38,4 +38,10 @@ public enum EventType {
 
     /** A share token was revoked by its creator, preventing future access. */
     SHARE_REVOKED,
+
+    /** The AI setlist assistant generated program suggestions for a collection. */
+    SETLIST_AI_SUGGESTION_GENERATED,
+
+    /** The AI assistant drafted spoken introduction text for a collection's TEXT item. */
+    SETLIST_AI_TEXT_DRAFTED,
 }

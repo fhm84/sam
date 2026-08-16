@@ -1,5 +1,7 @@
 package de.halbmann.sam.api.boundary;
 
+import de.halbmann.sam.api.entity.assistant.SetlistSuggestions;
+import de.halbmann.sam.api.entity.assistant.SuggestSetlistItemsRequest;
 import de.halbmann.sam.api.entity.collections.SheetCollection;
 import de.halbmann.sam.api.entity.collections.SheetCollectionFilterRequest;
 import de.halbmann.sam.api.entity.shared.PaginatedResponse;
@@ -123,4 +125,17 @@ public interface SheetCollectionsResource {
      */
     @Path("{collectionId}/items")
     CollectionItemsResource items(@PathParam("collectionId") String collectionId);
+
+    /**
+     * AI setlist assistant: suggests real repertoire pieces for this collection based on a
+     * free-text goal. Requires the collection to have an ensemble assigned. Suggestions only ever
+     * reference sheets already in the archive — the assistant never invents pieces.
+     *
+     * @param collectionId the collection ID
+     * @param request      the free-text goal/constraints
+     * @return ranked suggestions with rationale
+     */
+    @POST
+    @Path("{collectionId}/ai/suggest-items")
+    SetlistSuggestions suggestItems(@PathParam("collectionId") String collectionId, SuggestSetlistItemsRequest request);
 }

@@ -486,6 +486,19 @@
         "removeConfirm": "Angehängte Datei von diesem Textblock entfernen?",
         "removeHeader": "Anhang entfernen"
       },
+      "assistant": {
+        "open": "KI-Assistent",
+        "needsEnsembleTooltip": "Ordnen Sie dieser Sammlung ein Ensemble zu, um den Assistenten zu nutzen",
+        "title": "KI-Programmassistent",
+        "goal": "Ziel / Vorgaben",
+        "goalPlaceholder": "z.B. 45 Min. Eröffnung, schwungvoll, nicht zwei Märsche hintereinander…",
+        "suggest": "Stücke vorschlagen",
+        "noResults": "Keine Vorschläge — anderes Ziel versuchen",
+        "suggestError": "Vorschläge konnten nicht abgerufen werden",
+        "draftText": "Ansagetext mit KI entwerfen",
+        "draftSuccess": "Entwurf eingefügt — bitte prüfen und speichern",
+        "draftError": "Text konnte nicht entworfen werden"
+      },
       "myPartsFilter": "Meine Stimmen",
       "myPartsFilterTooltip": "Nur Noten anzeigen, für die ich eine Stimme habe",
       "empty": "Noch keine Einträge in dieser Sammlung",

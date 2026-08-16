@@ -337,6 +337,28 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
         return new PaginatedEntities<>(ordered, count);
     }
 
+    /**
+     * Sheets matching the given optional filters, for the AI setlist assistant's candidate
+     * search. All filters are ANDed; a {@code null} filter is skipped. Coverage filtering happens
+     * separately (via {@code CoverageSnapshotService}) since it depends on the ensemble.
+     */
+    public List<SheetMusicEntity> findAiAssistantCandidates(Genre genre, Duration maxDuration) {
+        StringBuilder jpql = new StringBuilder("SELECT s FROM SheetMusicEntity s WHERE 1=1");
+        Map<String, Object> params = new HashMap<>();
+        if (genre != null) {
+            jpql.append(" AND s.genre = :genre");
+            params.put("genre", genre);
+        }
+        if (maxDuration != null) {
+            jpql.append(" AND s.duration IS NOT NULL AND s.duration <= :maxDuration");
+            params.put("maxDuration", maxDuration);
+        }
+        jpql.append(" ORDER BY s.title");
+        var query = getEntityManager().createQuery(jpql.toString(), SheetMusicEntity.class);
+        params.forEach(query::setParameter);
+        return query.getResultList();
+    }
+
     public void removeAttachment(AttachmentEntity attachment) {
         find("SELECT s FROM SheetMusicEntity s JOIN s.attachments a WHERE a.id = :id", Map.of("id", attachment.getId()))
                 .list()

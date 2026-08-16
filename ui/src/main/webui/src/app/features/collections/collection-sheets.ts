@@ -19,7 +19,13 @@ import { Tag } from 'primeng/tag';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../core/translation.service';
 import { CollectionsApiService, SheetsApiService } from '../../core/api';
-import { CollectionItem, CollectionItemType, SheetMusic, SheetMusicSearchResult } from '../../model/datamodels';
+import {
+  CollectionItem,
+  CollectionItemType,
+  SheetMusic,
+  SheetMusicSearchResult,
+  SuggestedSetlistItem,
+} from '../../model/datamodels';
 import { DIFFICULTY_LEVELS } from '../../shared/constants';
 
 @Component({
@@ -55,6 +61,7 @@ export class CollectionSheets implements OnInit, OnChanges {
   private readonly destroyRef = inject(DestroyRef);
 
   @Input({ required: true }) collectionId!: string;
+  @Input() ensembleId?: string;
 
   // ── Items table ────────────────────────────────────────
   protected readonly items = signal<CollectionItem[]>([]);
@@ -94,6 +101,20 @@ export class CollectionSheets implements OnInit, OnChanges {
   @ViewChild('fileInput') private fileInputRef!: ElementRef<HTMLInputElement>;
   protected uploadingItem: CollectionItem | null = null;
   protected uploadingAttachment = false;
+
+  // ── AI setlist assistant ────────────────────────────────
+  protected assistantDialogVisible = false;
+  protected readonly assistantGoal = new FormControl('', {
+    nonNullable: true,
+    validators: [Validators.required],
+  });
+  protected readonly assistantSuggestions = signal<SuggestedSetlistItem[]>([]);
+  protected readonly assistantLoading = signal(false);
+  protected readonly assistantRequested = signal(false);
+  protected addingSuggestionSheetId: string | null = null;
+
+  // ── AI text drafting ────────────────────────────────────
+  protected readonly draftingItemId = signal<string | null>(null);
 
   // ── Shared identifier form ─────────────────────────────
   protected readonly identifierForm = new FormGroup({
@@ -370,6 +391,80 @@ export class CollectionSheets implements OnInit, OnChanges {
             });
           },
           error: () => {},
+        });
+      },
+    });
+  }
+
+  // ── AI setlist assistant ────────────────────────────────
+  protected openAssistant(): void {
+    this.assistantGoal.reset('');
+    this.assistantSuggestions.set([]);
+    this.assistantRequested.set(false);
+    this.assistantDialogVisible = true;
+  }
+
+  protected requestSuggestions(): void {
+    if (this.assistantGoal.invalid) return;
+    this.assistantLoading.set(true);
+    this.assistantRequested.set(true);
+    this.collectionsApi.suggestItems(this.collectionId, { goal: this.assistantGoal.value }).subscribe({
+      next: (result) => {
+        this.assistantSuggestions.set(result.items ?? []);
+        this.assistantLoading.set(false);
+      },
+      error: () => {
+        this.assistantLoading.set(false);
+        this.messageService.add({
+          severity: 'error',
+          summary: this.t.t('collections.items.assistant.suggestError'),
+        });
+      },
+    });
+  }
+
+  protected addSuggestion(suggestion: SuggestedSetlistItem): void {
+    if (!suggestion.sheetId) return;
+    this.addingSuggestionSheetId = suggestion.sheetId;
+    this.collectionsApi
+      .addItem(this.collectionId, { type: 'SHEET' as CollectionItemType, sheetId: suggestion.sheetId })
+      .subscribe({
+        next: () => {
+          this.addingSuggestionSheetId = null;
+          this.assistantSuggestions.update((list) =>
+            list.filter((s) => s.sheetId !== suggestion.sheetId),
+          );
+          this.messageService.add({
+            severity: 'success',
+            summary: this.t.t('collections.items.messages.sheetAdded'),
+          });
+          this.loadItems();
+        },
+        error: () => {
+          this.addingSuggestionSheetId = null;
+        },
+      });
+  }
+
+  // ── AI text drafting ────────────────────────────────────
+  protected onDraftText(item: CollectionItem): void {
+    this.draftingItemId.set(item.id!);
+    this.collectionsApi.draftText(this.collectionId, item.id!, this.t.locale()).subscribe({
+      next: (result) => {
+        this.draftingItemId.set(null);
+        this.editingItem = item;
+        this.textForm.reset({ identifier: item.identifier, textContent: result.draftText ?? '' });
+        this.editDialogVisible = true;
+        this.messageService.add({
+          severity: 'success',
+          summary: this.t.t('collections.items.assistant.draftSuccess'),
+        });
+      },
+      error: () => {
+        this.draftingItemId.set(null);
+        this.messageService.add({
+          severity: 'error',
+          summary: this.t.t('collections.items.assistant.draftError'),
         });
       },
     });

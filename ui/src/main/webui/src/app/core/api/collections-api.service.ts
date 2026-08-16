@@ -5,10 +5,13 @@ import {
   Attachment,
   CollectionItem,
   CreateCollectionItem,
+  DraftTextResult,
   PaginatedResponse,
   PaginationRequest,
+  SetlistSuggestions,
   SheetCollection,
   SheetCollectionFilterRequest,
+  SuggestSetlistItemsRequest,
 } from '../../model/datamodels';
 
 @Injectable({ providedIn: 'root' })
@@ -125,6 +128,23 @@ export class CollectionsApiService {
       responseType: 'blob',
       observe: 'response',
     });
+  }
+
+  // ── AI setlist assistant ──────────────────────────────
+  suggestItems(collectionId: string, request: SuggestSetlistItemsRequest): Observable<SetlistSuggestions> {
+    return this.http.post<SetlistSuggestions>(
+      `${this.baseUrl}/${collectionId}/ai/suggest-items`,
+      request,
+    );
+  }
+
+  draftText(collectionId: string, itemId: string, language = 'en'): Observable<DraftTextResult> {
+    const params = new HttpParams().set('language', language);
+    return this.http.post<DraftTextResult>(
+      `${this.baseUrl}/${collectionId}/items/${itemId}/ai/draft-text`,
+      {},
+      { params },
+    );
   }
 
   // ── Reverse lookup ────────────────────────────────────
