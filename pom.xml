@@ -30,7 +30,7 @@
         <palantir-java-format.version>2.89.0</palantir-java-format.version>
         <dependency-check-maven.version>13.0.0</dependency-check-maven.version>
 
-        <quarkus.platform.version>3.38.1</quarkus.platform.version>
+        <quarkus.platform.version>3.38.2</quarkus.platform.version>
         <lombok.version>1.18.46</lombok.version>
         <org.mapstruct.version>1.6.3</org.mapstruct.version>
 
