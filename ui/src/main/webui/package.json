@@ -54,7 +54,7 @@
   },
   "devDependencies": {
     "@angular/build": "^21.2.19",
-    "@angular/cli": "^21.2.19",
+    "@angular/cli": "^22.1.4",
     "@angular/compiler-cli": "^21.2.19",
     "@vitest/coverage-v8": "^4.1.9",
     "autoprefixer": "^10.5.0",
