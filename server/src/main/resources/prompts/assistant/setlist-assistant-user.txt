@@ -1,0 +1,5 @@
+Goal / constraints from the Dirigent:
+{{goal}}
+
+Existing setlist items (avoid duplicating these):
+{{existingItems}}

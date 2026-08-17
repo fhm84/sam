@@ -1,0 +1,3 @@
+Extract sheet music metadata from the following text content:
+
+{{text}}

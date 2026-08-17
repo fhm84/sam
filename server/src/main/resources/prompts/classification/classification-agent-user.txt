@@ -1,0 +1,5 @@
+Resolve entity references for the following sheet music metadata:
+
+{{metadata}}
+
+Return a fully populated ClassificationApplyRequest.

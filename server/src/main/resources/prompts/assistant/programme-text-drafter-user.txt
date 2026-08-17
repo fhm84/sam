@@ -1,0 +1,3 @@
+Draft a short spoken introduction, in language "{{language}}", for the following piece:
+
+{{pieceMetadata}}

@@ -1,0 +1,3 @@
+The following text was extracted from a music sheet document. You are analyzing this content to archive the sheet.
+Please keep the fields you cannot find as null. Rely on given enum values.
+If you don't find a match, leave the related field as null or try to match to 'unknown'.
