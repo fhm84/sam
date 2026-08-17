@@ -33,7 +33,7 @@ ensembles ──< ensemble_voices ──< voice_options >── instruments
 | `musician_instruments` | UUID | musician (FK), instrument (FK), isPrimary — instrument assignments driving "My Parts" personalisation |
 | `documents` | UUID | filename, path, sha256, mimeType, size, refCount |
 | `attachments` | UUID | document (FK), type, displayName |
-| `sheet_collections` | UUID | name, description, type (FOLDER/SETLIST), date, **visibility**, **coverColor**, **coverImageId** (FK → documents) |
+| `sheet_collections` | UUID | name, description, type (FOLDER/SETLIST), date, **visibility**, **coverColor**, **coverImageId** (FK → documents), **ensembleId** (FK → ensembles, nullable, ON DELETE SET NULL — scopes coverage-aware AI suggestions) |
 | `collection_items` | UUID | item_type discriminator (SHEET/TEXT, single-table inheritance): SHEET rows carry sheet (FK), TEXT rows carry identifier, textContent, attachment (FK, nullable); ordered per collection via `sheet_collections_items` join table |
 | `ensembles` | UUID | name, description |
 | `ensemble_voices` | UUID | ensemble (FK), label, weight, required |

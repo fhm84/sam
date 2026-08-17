@@ -18,6 +18,7 @@ for planned work see the [roadmap](../roadmap.md).
 
 - [AI Classification](ai-classification.md) — two-step classify/apply workflow for uploads
 - [AI Data Enrichment](ai-enrichment.md) — metadata suggestions for existing sheets
+- [AI Setlist Assistant](ai-setlist-assistant.md) — tool-grounded program suggestions and text drafting
 
 ## Access & Tracking
 

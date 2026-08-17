@@ -187,7 +187,7 @@ between a collection/setlist and a sheet), which already exists.
 ### AI setlist assistant — `done`
 
 A tool-grounded AI assistant that helps build a setlist and draft the spoken text between
-songs. Full details in `memory/plan_setlist_assistant.md`.
+songs. Full details in local planning notes (`plan_setlist_assistant.md`, not in the repo).
 
 **Implementation note:** Backend (ensemble FK, candidate-retrieval tool, `SetlistAssistant` /
 `ProgrammeTextDrafter` AI services, both endpoints, event logging with token usage, draft-text
@@ -226,7 +226,7 @@ grounding data source yet — would just be hallucination).
 ### Musician profile enrichment — `planned`
 
 Add missing fields to the `Musician` entity surfaced in the Claude Design mockup
-(`Create Flows (PrimeNG).html`). Full details in `memory/plan_musician_fields.md`.
+(`Create Flows (PrimeNG).html`). Full details in local planning notes (`plan_musician_fields.md`, not in the repo).
 
 Fields to add:
 - **email** and **mobile** — contact details for self-service folder access and
@@ -315,7 +315,7 @@ Output: a simple printed checklist or PDF.
 ### Home dashboard — `planned`
 
 A home page replacing the current empty landing screen. Two tabs, derived from the
-Claude Design `Hi-Fi Shell (PrimeNG).html`. Full details in `memory/plan_home_dashboard.md`.
+Claude Design `Hi-Fi Shell (PrimeNG).html`. Full details in local planning notes (`plan_home_dashboard.md`, not in the repo).
 
 **Inbox tab:**
 - KPI row: to-classify count, instrumentations missing archive location, stale coverage
@@ -439,7 +439,7 @@ Tokens are resource-scoped (one token = one resource), not broad API keys.
 ### Collection visibility & cover — `planned`
 
 Add two missing fields to `SheetCollection` surfaced in the Claude Design mockup
-(`Create Flows (PrimeNG).html`). Full details in `memory/plan_collection_fields.md`.
+(`Create Flows (PrimeNG).html`). Full details in local planning notes (`plan_collection_fields.md`, not in the repo).
 
 - **visibility** — enum (`WHOLE_ENSEMBLE` / `ADMINS_ONLY` / `PRIVATE`); controls
   who can see the collection. The design shows a "Whole ensemble" dropdown in the
@@ -495,7 +495,7 @@ Can be implemented as an extension of the checkout/lending feature (Section 1) w
 ### Coverage breakdown enhancements — `planned`
 
 Extend the coverage engine to match the `Coverage Breakdown (PrimeNG).html` design.
-Full details in `memory/plan_coverage_breakdown.md`.
+Full details in local planning notes (`plan_coverage_breakdown.md`, not in the repo).
 
 - **Condition/substitute annotations** — surface `conditionPenalty` and
   `substituteFactor` as named fields on `VoiceCoverageDetail` (values already computed)
@@ -514,7 +514,7 @@ Full details in `memory/plan_coverage_breakdown.md`.
 ### Classification queue — `planned`
 
 A batch inbox for working through a queue of unclassified documents. Shown in the
-Claude Design `Classify (PrimeNG).html`. Full details in `memory/plan_classify_queue.md`.
+Claude Design `Classify (PrimeNG).html`. Full details in local planning notes (`plan_classify_queue.md`, not in the repo).
 
 The queue sits on top of the existing 2-step classify/apply workflow and adds:
 - Inbox tabs: Pending / Skipped / Done
@@ -535,7 +535,7 @@ plan file). This is a large standalone feature.
 ### Classification form enhancements — `planned`
 
 Enrich the existing 2-step classify/apply workflow with richer AI output and a more
-complete apply request. Full details in `memory/plan_classify_enhancements.md`.
+complete apply request. Full details in local planning notes (`plan_classify_enhancements.md`, not in the repo).
 
 - **Tags + notes** in `ClassificationApplyRequest` — both shown in the form but absent from the DTO
 - **Document type** (Part / Score / Solo) returned by AI analysis
@@ -584,7 +584,7 @@ Phase 3).
 
 Add missing fields to `SheetMusicEntity` and related entities surfaced in the Claude
 Design mockup (`Sheet Detail (PrimeNG).html` / `Sheet Detail v2 (PrimeNG).html`).
-Full details in `memory/plan_sheet_detail_fields.md`.
+Full details in local planning notes (`plan_sheet_detail_fields.md`, not in the repo).
 
 **Sheet-level fields:**
 - **tempo** (Integer, bpm) — "♩= 116 bpm" shown in Base Data card
@@ -614,7 +614,7 @@ Full details in `memory/plan_sheet_detail_fields.md`.
 ### Instrument catalogue enrichment — `planned`
 
 Add missing fields to the `Instrument` entity surfaced in the Claude Design mockup
-(`Create Flows (PrimeNG).html`). Full details in `memory/plan_instrument_fields.md`.
+(`Create Flows (PrimeNG).html`). Full details in local planning notes (`plan_instrument_fields.md`, not in the repo).
 
 Fields to add:
 - **family** — fixed enum (`BRASS` / `WOODWIND` / `STRING` / `PERCUSSION` /
@@ -806,7 +806,7 @@ Once named user accounts exist, this log constitutes personal data:
 
 Extend the sheet list API and Angular UI to match the filter toolbar and bulk actions
 shown in the Claude Design `Sheets Overview (PrimeNG).html`. Full details in
-`memory/plan_sheets_overview.md`.
+local planning notes (`plan_sheets_overview.md`, not in the repo).
 
 **Missing filter dimensions** (to add to `SheetFilterRequest`):
 - Coverage status filter (COMPLETE / PLAYABLE / INCOMPLETE, per ensemble)
@@ -898,7 +898,7 @@ A visual/interaction redesign of SAM already exists as Claude Design mockups
 (`Hi-Fi Shell (PrimeNG).html`, `Sheets Overview (PrimeNG).html`, `Sheet Detail (PrimeNG).html`
 / `v2`, `Create Flows (PrimeNG).html`, `Coverage Breakdown (PrimeNG).html`,
 `Classify (PrimeNG).html`). So far these mockups have only been mined for **data model
-and feature gaps** (see Open Question #10 and the resulting `memory/plan_*.md` files) —
+and feature gaps** (see Open Question #10 and the resulting `plan_*.md` planning notes, kept outside the repo) —
 the improved **look & feel itself** (shell layout, page compositions, visual hierarchy,
 component styling) has not been implemented.
 
@@ -945,4 +945,4 @@ answered before the relevant implementation work begins.
 | 7 | Which OIDC provider? Self-hosted (Keycloak) or SaaS (Auth0, Google)? | Auth implementation | **Resolved:** Self-hosted Keycloak 26. |
 | 8 | Should IP addresses be stored in the document access log, or omitted/anonymised? Requires GDPR/privacy policy decision. | Document access log | **Resolved: not stored.** `userId` (OIDC sub) + snapshotted `username` give unambiguous attribution; IP adds GDPR obligations without meaningful benefit in an ensemble context. |
 | 9 | What retention period for the document access log? (e.g. 12 months) | Document access log | Open |
-| 10 | All Claude Design files have now been reviewed for data model gaps. Resulting plans saved to `memory/plan_*.md` and added to the roadmap. | Multiple | **Resolved** |
+| 10 | All Claude Design files have now been reviewed for data model gaps. Resulting plans saved to local planning notes (`plan_*.md`, outside the repo) and added to the roadmap. | Multiple | **Resolved** |

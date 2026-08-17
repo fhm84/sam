@@ -14,7 +14,8 @@ Business endpoints are under the `/api` base path. Ops/diagnostic endpoints
 | Global documents | `/api/documents` | Unlinked pool, classify, apply |
 | Musicians | `/api/musicians` | |
 | Instruments | `/api/instruments` | |
-| Sheet collections | `/api/sheet-collections` | Including `/sheets` sub-resource |
+| Sheet collections | `/api/sheet-collections` | Including `/items` sub-resource and `/{id}/ai/suggest-items` (AI setlist assistant) |
+| Collection items | `/api/sheet-collections/{id}/items` | Sub-resource; including `/{itemId}/ai/draft-text` (AI programme-text drafting) |
 | Booklets | `/api/booklets` | Including `/sheets` sub-resource |
 | Ensembles | `/api/ensembles` | Including `/coverage/compute`, `/coverage/status` |
 | Ensemble voices | `/api/ensembles/{id}/voices` | Sub-resource |

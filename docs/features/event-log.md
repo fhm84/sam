@@ -14,6 +14,11 @@ A write-once access and activity log. Captures read events (downloads, exports) 
 | `GEMA_SETLIST_GENERATED` | GEMA setlist xlsx generated |
 | `DOCUMENT_CLASSIFIED` | AI classification run on a document |
 | `DOCUMENT_CLASSIFICATION_APPLIED` | AI classification result applied |
+| `SHARE_CREATED` | Share token created by an authenticated user |
+| `SHARE_ACCESSED` | Shared resource accessed via a share token |
+| `SHARE_REVOKED` | Share token revoked by its creator |
+| `SETLIST_AI_SUGGESTION_GENERATED` | AI setlist assistant generated program suggestions |
+| `SETLIST_AI_TEXT_DRAFTED` | AI assistant drafted programme text for a TEXT item |
 
 ## Log entry fields
 

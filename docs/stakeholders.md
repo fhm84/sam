@@ -374,6 +374,14 @@ accordingly.
 4. Adds suitable pieces to the setlist, assigning position labels.
 5. Reviews the assembled programme.
 
+**Alternative — AI-assisted**
+1. Links the setlist to an ensemble and opens the **AI assistant drawer**.
+2. Describes the concert goal in free text (e.g. "90 minutes of festive music, start strong").
+3. Reviews the ranked, coverage-aware suggestions (real archive pieces only) and adds selected ones.
+4. Optionally inserts TEXT programme items and uses **Draft text** to generate the spoken
+   introductions in the UI language, editing before use.
+   See [AI Setlist Assistant](features/ai-setlist-assistant.md).
+
 **Note:** creating/editing a collection currently requires the `music_librarian` or
 `admin` role — a Conductor without one of those roles cannot perform this use case today.
 See the `CONDUCTOR` composite-role discussion in [Section 6.2.2](#622-target--composite-roles-mapped-to-use-cases).
@@ -718,7 +726,7 @@ yet decided on):
 |---|---|---|---|---|
 | Browse/search/read archive (sheets, collections, instrumentations, coverage) | ✅ | ✅ | ✅ | ➖ (only the one shared resource) |
 | Create/edit/delete sheets, instrumentations, documents; run AI classify/apply/enrich | ✅ | ✅ | ❌ | ❌ |
-| Create/edit/delete collections & setlist items | ✅ | ✅ | ❌ | ❌ |
+| Create/edit/delete collections & setlist items; use the AI setlist assistant (suggest items, draft text) | ✅ | ✅ | ❌ | ❌ |
 | Create/edit/delete musicians & instruments | ✅ | ✅ | ❌ | ❌ |
 | Create/edit/delete ensembles, voices, voice options, members; compute coverage | ✅ | ✅ | ❌ | ❌ |
 | Link/unlink a `Musician` to a login; search Keycloak users | ✅ | ❌ | ❌ | ❌ |

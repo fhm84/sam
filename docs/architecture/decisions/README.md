@@ -15,6 +15,8 @@ previously recorded in the roadmap's open-questions table and plan notes.
 | [0005](adr-0005-single-name-field.md) | Keep single `name` field on Musician (no first/last split) | accepted |
 | [0006](adr-0006-collection-type-enum.md) | Keep `FOLDER`/`SETLIST` collection type enum; UI maps richer labels onto it | accepted |
 | [0007](adr-0007-management-interface.md) | Separate management interface (`:9000`) for `/q/*` ops endpoints | accepted |
+| [0008](adr-0008-assistant-ensemble-scoping.md) | AI assistant tools never receive authorization-relevant arguments | accepted |
+| [0009](adr-0009-version-controlled-prompts.md) | Prompts are version-controlled resources, not runtime config | accepted |
 
 New decisions: add the next number, keep it short (context, decision,
 consequences — a screen or less), and link it from this table.
