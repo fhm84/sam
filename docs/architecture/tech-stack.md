@@ -5,8 +5,8 @@ authoritative; the table below only pins the major lines.
 
 | Concern | Technology | Version |
 |---------|-----------|---------|
-| Runtime | Quarkus | 3.37.x |
-| Language | Java | 21 |
+| Runtime | Quarkus | 3.38.x |
+| Language | Java | 25 |
 | ORM | Hibernate ORM + Panache | (via Quarkus BOM) |
 | Audit | Hibernate Envers | (via Quarkus BOM) |
 | Database | PostgreSQL | (pg_trgm, fuzzystrmatch) |

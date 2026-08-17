@@ -3,8 +3,8 @@
 # SAM — Sheet music Archiving & Management
 
 [![PMD](https://github.com/fhm84/sam/actions/workflows/pmd.yml/badge.svg)](https://github.com/fhm84/sam/actions/workflows/pmd.yml)
-[![Java 21](https://img.shields.io/badge/Java-21-ED8B00?logo=openjdk&logoColor=white)](https://openjdk.org/projects/jdk/21/)
-[![Quarkus 3.32](https://img.shields.io/badge/Quarkus-3.32-4695EB?logo=quarkus&logoColor=white)](https://quarkus.io)
+[![Java 25](https://img.shields.io/badge/Java-25-ED8B00?logo=openjdk&logoColor=white)](https://openjdk.org/projects/jdk/25/)
+[![Quarkus 3.38](https://img.shields.io/badge/Quarkus-3.38-4695EB?logo=quarkus&logoColor=white)](https://quarkus.io)
 [![Angular 21](https://img.shields.io/badge/Angular-21-DD0031?logo=angular&logoColor=white)](https://angular.dev)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-required-336791?logo=postgresql&logoColor=white)](https://www.postgresql.org)
 
@@ -26,7 +26,7 @@ A Quarkus-based application for archiving sheet music, managing instrumentations
 ./mvnw spotless:apply
 ```
 
-**Prerequisites:** Java 21, PostgreSQL (with `pg_trgm` and `fuzzystrmatch` extensions), default connection: `localhost:5432/sam_music`, user `sam`.
+**Prerequisites:** Java 25, PostgreSQL (with `pg_trgm` and `fuzzystrmatch` extensions), default connection: `localhost:5432/sam_music`, user `sam`.
 
 ## Features
 

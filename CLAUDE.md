@@ -93,7 +93,7 @@ Opt-in Prometheus + Grafana stack — see `monitoring/CLAUDE.md`.
 
 ## Code Style
 
-- Java 21, Palantir Java Format (via Spotless plugin)
+- Java 25, Palantir Java Format (via Spotless plugin)
 - Run `./mvnw spotless:apply` before committing
 
 ## Verification Policy
