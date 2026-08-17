@@ -591,8 +591,8 @@ Full details in local planning notes (`plan_sheet_detail_fields.md`, not in the 
   `PERMITTED_ARCHIVE` / `RESTRICTED` / `NO_DIGITALIZATION`); shipped with two more
   values than originally scoped here (`PERMITTED_ARCHIVE`, `NO_DIGITALIZATION`) to
   cover rental/hire-only material. See [Sheet Music — Rights status](features/sheets.md#rights-status).
-- **gemaPflichtig** — 3-state enum (`UNKNOWN` / `YES` / `NO`). See
-  [Sheet Music — GEMA-pflichtig](features/sheets.md#gema-pflichtig).
+- **gemaReportable** — 3-state enum (`UNKNOWN` / `YES` / `NO`); "GEMA-pflichtig" in German. See
+  [Sheet Music — GEMA reportable](features/sheets.md#gema-reportable).
 
 **Sheet-level fields — still planned:**
 - **tempo** (Integer, bpm) — "♩= 116 bpm" shown in Base Data card

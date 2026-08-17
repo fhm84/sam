@@ -128,8 +128,8 @@
       "rightsSection": "Rechte & Kennzeichnungen",
       "rightsStatus": "Rechtestatus",
       "rightsStatusTooltip": "Rechtlicher Status hinsichtlich Archivierung, Digitalisierung und Weitergabe.",
-      "gemaPflichtig": "GEMA-pflichtig",
-      "gemaPflichtigTooltip": "Ob dieses Stück bei Aufführung bei der GEMA gemeldet werden muss.",
+      "gemaReportable": "GEMA-pflichtig",
+      "gemaReportableTooltip": "Ob dieses Stück bei Aufführung bei der GEMA gemeldet werden muss.",
       "originalBy": "Original von",
       "originalByTooltip": "Ursprünglicher Komponist oder Originalwerk, auf dem dieses Stück basiert oder arrangiert wurde.",
       "publisherIpi": "Verlags-IPI",
@@ -169,7 +169,7 @@
       "difficulty": "Schwierigkeitsgrad",
       "copyright": "Urheberrecht",
       "rightsStatus": "Rechtestatus",
-      "gemaPflichtig": "GEMA-pflichtig",
+      "gemaReportable": "GEMA-pflichtig",
       "gemaWorkNumber": "GEMA-Werknummer",
       "iswc": "ISWC",
       "originalBy": "Original von",
@@ -322,7 +322,7 @@
       "RESTRICTED": "Eingeschränkt",
       "NO_DIGITALIZATION": "Keine Digitalisierung"
     },
-    "gemaPflichtigValues": {
+    "gemaReportableValues": {
       "UNKNOWN": "Unbekannt",
       "YES": "Ja",
       "NO": "Nein"

@@ -128,8 +128,8 @@
       "rightsSection": "Rights & Identifiers",
       "rightsStatus": "Rights Status",
       "rightsStatusTooltip": "Legal status with respect to archiving, digitization, and distribution.",
-      "gemaPflichtig": "GEMA-pflichtig",
-      "gemaPflichtigTooltip": "Whether this piece must be reported to GEMA when performed.",
+      "gemaReportable": "GEMA Reportable",
+      "gemaReportableTooltip": "Whether this piece must be reported to GEMA when performed.",
       "originalBy": "Original by",
       "originalByTooltip": "Original composer or work this piece is based on or arranged from.",
       "publisherIpi": "Publisher IPI",
@@ -169,7 +169,7 @@
       "difficulty": "Difficulty",
       "copyright": "Copyright",
       "rightsStatus": "Rights Status",
-      "gemaPflichtig": "GEMA-pflichtig",
+      "gemaReportable": "GEMA Reportable",
       "gemaWorkNumber": "GEMA Work No.",
       "iswc": "ISWC",
       "originalBy": "Original by",
@@ -322,7 +322,7 @@
       "RESTRICTED": "Restricted",
       "NO_DIGITALIZATION": "No Digitization"
     },
-    "gemaPflichtigValues": {
+    "gemaReportableValues": {
       "UNKNOWN": "Unknown",
       "YES": "Yes",
       "NO": "No"

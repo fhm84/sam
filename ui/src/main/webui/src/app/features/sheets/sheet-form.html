@@ -308,7 +308,7 @@
   <!-- Rights & Identifiers -->
   <div class="text-[0.6875rem] font-semibold tracking-[0.07em] uppercase text-[var(--sam-text-muted)] pt-2 border-t border-[var(--sam-border)]">{{ 'sheets.form.rightsSection' | translate }}</div>
 
-  <!-- Rights status / GEMA-pflichtig -->
+  <!-- Rights status / GEMA reportable -->
   <div class="flex gap-4">
     <div class="flex flex-col gap-1.5 flex-1 min-w-0">
       <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
@@ -336,20 +336,20 @@
       <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
         <p-floatlabel variant="on" class="block">
           <p-select
-            inputId="sheet-gema-pflichtig"
-            formControlName="gemaPflichtig"
-            [options]="gemaPflichtigOptions()"
+            inputId="sheet-gema-reportable"
+            formControlName="gemaReportable"
+            [options]="gemaReportableOptions()"
             optionLabel="label"
             optionValue="value"
             [showClear]="true"
             styleClass="w-full"
             inputStyleClass="w-full"
           />
-          <label for="sheet-gema-pflichtig">{{ 'sheets.form.gemaPflichtig' | translate }}</label>
+          <label for="sheet-gema-reportable">{{ 'sheets.form.gemaReportable' | translate }}</label>
         </p-floatlabel>
         <i
           class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
-          [pTooltip]="t.t('sheets.form.gemaPflichtigTooltip')"
+          [pTooltip]="t.t('sheets.form.gemaReportableTooltip')"
           tooltipPosition="right"
         ></i>
       </div>

@@ -21,7 +21,7 @@ The central entity. Each sheet represents one piece of music in the archive.
 | Edition | String | e.g. "Revised 2010", "Score & Parts" |
 | Copyright | String | |
 | Rights status | Enum | Legal status for archiving/digitization/distribution — see [Rights status enum](#rights-status) |
-| GEMA-pflichtig | 3-state enum | Whether the piece is GEMA-reportable when performed — see [GEMA-pflichtig enum](#gema-pflichtig) |
+| GEMA reportable | 3-state enum | Whether the piece is GEMA-reportable when performed ("GEMA-pflichtig" in German) — see [GEMA reportable enum](#gema-reportable) |
 | Source | String | Provenance — where the piece came from (e.g. a publisher, a donation) |
 | ISWC | String | International Standard Musical Work Code |
 | GEMA work number | String | German GEMA identifier |
@@ -79,9 +79,9 @@ colored badge on the sheet detail page.
 | `RESTRICTED` | Explicit permission must be sought before each new use (performance, copying, distribution) |
 | `NO_DIGITALIZATION` | The physical original may be archived and catalogued, but digitizing/scanning it is specifically prohibited (common for rental/hire-only orchestral material) |
 
-### GEMA-pflichtig
+### GEMA reportable
 
-Whether a sheet is subject to GEMA reporting ("GEMA-pflichtig") when performed.
+Whether a sheet is subject to GEMA reporting ("GEMA-pflichtig" in German) when performed.
 
 `UNKNOWN` (default) · `YES` · `NO`
 

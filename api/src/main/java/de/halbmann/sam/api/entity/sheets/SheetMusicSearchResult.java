@@ -39,7 +39,7 @@ public class SheetMusicSearchResult extends SheetMusic {
                 sheetMusic.getEdition(),
                 sheetMusic.getCopyright(),
                 sheetMusic.getRightsStatus(),
-                sheetMusic.getGemaPflichtig(),
+                sheetMusic.getGemaReportable(),
                 sheetMusic.getRating(),
                 sheetMusic.getIswc(),
                 sheetMusic.getGemaWorkNumber(),

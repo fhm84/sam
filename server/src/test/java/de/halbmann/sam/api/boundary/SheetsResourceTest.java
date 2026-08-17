@@ -163,21 +163,21 @@ class SheetsResourceTest {
     }
 
     @Test
-    void testRightsStatusAndGemaPflichtig_roundTripOnCreateAndUpdate() {
+    void testRightsStatusAndGemaReportable_roundTripOnCreateAndUpdate() {
         final String sheetId = given().contentType(ContentType.JSON)
                 .body("""
                         {
                             "title": "Rights Test Piece",
                             "genre": "POLKA",
                             "rightsStatus": "PERMITTED_ARCHIVE",
-                            "gemaPflichtig": "YES"
+                            "gemaReportable": "YES"
                         }
                         """)
                 .post("/api/sheets")
                 .then()
                 .statusCode(200)
                 .body("rightsStatus", equalTo("PERMITTED_ARCHIVE"))
-                .body("gemaPflichtig", equalTo("YES"))
+                .body("gemaReportable", equalTo("YES"))
                 .extract()
                 .path("id");
 
@@ -185,7 +185,7 @@ class SheetsResourceTest {
                 .then()
                 .statusCode(200)
                 .body("rightsStatus", equalTo("PERMITTED_ARCHIVE"))
-                .body("gemaPflichtig", equalTo("YES"));
+                .body("gemaReportable", equalTo("YES"));
 
         given().contentType(ContentType.JSON)
                 .body("""
@@ -193,7 +193,7 @@ class SheetsResourceTest {
                             "title": "Rights Test Piece",
                             "genre": "POLKA",
                             "rightsStatus": "NO_DIGITALIZATION",
-                            "gemaPflichtig": "NO"
+                            "gemaReportable": "NO"
                         }
                         """)
                 .put("/api/sheets/{sheetId}", sheetId)
@@ -204,6 +204,6 @@ class SheetsResourceTest {
                 .then()
                 .statusCode(200)
                 .body("rightsStatus", equalTo("NO_DIGITALIZATION"))
-                .body("gemaPflichtig", equalTo("NO"));
+                .body("gemaReportable", equalTo("NO"));
     }
 }

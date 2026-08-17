@@ -140,7 +140,7 @@ public class CreateSheetMusic {
     /**
      * Whether the piece is subject to GEMA reporting when performed.
      */
-    GemaPflichtig gemaPflichtig;
+    GemaReportable gemaReportable;
 
     /**
      * Rating for the piece/music sheet.

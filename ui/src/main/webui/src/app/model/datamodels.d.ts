@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 4.1.1 on 2026-08-17 16:21:50.
+// Generated using typescript-generator version 4.1.1 on 2026-08-17 17:34:28.
 
 export interface SheetEnrichment {
     suggestedAdditionalNotes?: string;
@@ -492,7 +492,7 @@ export interface CreateSheetMusic {
     duration?: long;
     edition?: string;
     favorite?: boolean;
-    gemaPflichtig?: GemaPflichtig;
+    gemaReportable?: GemaReportable;
     gemaWorkNumber?: string;
     genre?: Genre;
     iswc?: string;
@@ -559,7 +559,7 @@ export interface SheetMusic {
     duration?: long;
     edition?: string;
     favorite?: boolean;
-    gemaPflichtig?: GemaPflichtig;
+    gemaReportable?: GemaReportable;
     gemaWorkNumber?: string;
     genre?: Genre;
     id?: string;
@@ -636,7 +636,7 @@ export type DownloadFormat = "ZIP" | "MERGED_PDF";
 
 export type ExportFormat = "ZIP" | "JSON" | "CSV";
 
-export type GemaPflichtig = "UNKNOWN" | "YES" | "NO";
+export type GemaReportable = "UNKNOWN" | "YES" | "NO";
 
 export type Genre = "MARCH" | "MARCHING_SHOW" | "CONCERT_WORK" | "OVERTURE" | "SUITE" | "SYMPHONY" | "FANTASY" | "VARIATIONS" | "DANCE" | "WALTZ" | "POLKA" | "FOLK_SONG" | "HYMN_CHORALE" | "FILM_MUSIC" | "SHOW_MUSIC" | "POP_ROCK" | "JAZZ" | "LATIN" | "CHRISTMAS" | "SACRED" | "SOLO_WITH_BAND";
 

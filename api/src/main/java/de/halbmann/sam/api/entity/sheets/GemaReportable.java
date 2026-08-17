@@ -1,9 +1,9 @@
 package de.halbmann.sam.api.entity.sheets;
 
 /**
- * Whether a sheet is subject to GEMA reporting ("GEMA-pflichtig") when performed.
+ * Whether a sheet is subject to GEMA reporting ("GEMA-pflichtig" in German) when performed.
  */
-public enum GemaPflichtig {
+public enum GemaReportable {
 
     /**
      * Not yet determined.

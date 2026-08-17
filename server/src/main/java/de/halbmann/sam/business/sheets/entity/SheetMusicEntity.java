@@ -1,7 +1,7 @@
 package de.halbmann.sam.business.sheets.entity;
 
 import de.halbmann.sam.api.entity.sheets.DifficultyLevel;
-import de.halbmann.sam.api.entity.sheets.GemaPflichtig;
+import de.halbmann.sam.api.entity.sheets.GemaReportable;
 import de.halbmann.sam.api.entity.sheets.Genre;
 import de.halbmann.sam.api.entity.sheets.RightsStatus;
 import de.halbmann.sam.api.entity.sheets.Style;
@@ -132,7 +132,7 @@ public class SheetMusicEntity extends AbstractEntity {
      */
     @Enumerated(EnumType.STRING)
     @Column(length = 16)
-    private GemaPflichtig gemaPflichtig;
+    private GemaReportable gemaReportable;
 
     /**
      * Rating for the piece/music sheet.

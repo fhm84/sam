@@ -315,10 +315,10 @@
                     />
                   </div>
                 }
-                @if (s.gemaPflichtig) {
+                @if (s.gemaReportable) {
                   <div class="meta-entry">
-                    <span class="detail-label">{{ 'sheets.detail.gemaPflichtig' | translate }}</span>
-                    <span class="detail-value">{{ 'sheets.gemaPflichtigValues.' + s.gemaPflichtig | translate }}</span>
+                    <span class="detail-label">{{ 'sheets.detail.gemaReportable' | translate }}</span>
+                    <span class="detail-value">{{ 'sheets.gemaReportableValues.' + s.gemaReportable | translate }}</span>
                   </div>
                 }
                 @if (s.gemaWorkNumber) {
@@ -1045,10 +1045,10 @@
               />
             </div>
           }
-          @if (s.gemaPflichtig) {
+          @if (s.gemaReportable) {
             <div class="meta-entry">
-              <span class="detail-label">{{ 'sheets.detail.gemaPflichtig' | translate }}</span>
-              <span class="detail-value">{{ 'sheets.gemaPflichtigValues.' + s.gemaPflichtig | translate }}</span>
+              <span class="detail-label">{{ 'sheets.detail.gemaReportable' | translate }}</span>
+              <span class="detail-value">{{ 'sheets.gemaReportableValues.' + s.gemaReportable | translate }}</span>
             </div>
           }
           @if (s.gemaWorkNumber) {
