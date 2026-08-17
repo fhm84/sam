@@ -20,6 +20,8 @@ The central entity. Each sheet represents one piece of music in the archive.
 | Publisher IPI | String | Publisher Interested Parties Information code |
 | Edition | String | e.g. "Revised 2010", "Score & Parts" |
 | Copyright | String | |
+| Rights status | Enum | Legal status for archiving/digitization/distribution — see [Rights status enum](#rights-status) |
+| GEMA-pflichtig | 3-state enum | Whether the piece is GEMA-reportable when performed — see [GEMA-pflichtig enum](#gema-pflichtig) |
 | Source | String | Provenance — where the piece came from (e.g. a publisher, a donation) |
 | ISWC | String | International Standard Musical Work Code |
 | GEMA work number | String | German GEMA identifier |
@@ -61,6 +63,27 @@ Describes the aesthetic or period character (optional, complementary to genre).
 | 4 | Advanced |
 | 5 | Difficult |
 | 6 | Very Difficult |
+
+### Rights status
+
+Legal status of a sheet with respect to archiving, digitization, and distribution —
+distinct from the free-text `copyright` field or the GEMA work number. Shown as a
+colored badge on the sheet detail page.
+
+| Value | Meaning |
+|-------|---------|
+| `UNKNOWN` | No rights research has been done yet, or the status is genuinely unclear (default) |
+| `PUBLIC_DOMAIN` | No copyright restrictions apply |
+| `LICENSED` | Covered by a license (e.g. purchased performance/print license) that permits normal use |
+| `PERMITTED_ARCHIVE` | Not licensed, but the publisher/arranger gave explicit permission to archive a copy — short of a full license |
+| `RESTRICTED` | Explicit permission must be sought before each new use (performance, copying, distribution) |
+| `NO_DIGITALIZATION` | The physical original may be archived and catalogued, but digitizing/scanning it is specifically prohibited (common for rental/hire-only orchestral material) |
+
+### GEMA-pflichtig
+
+Whether a sheet is subject to GEMA reporting ("GEMA-pflichtig") when performed.
+
+`UNKNOWN` (default) · `YES` · `NO`
 
 ## Related
 

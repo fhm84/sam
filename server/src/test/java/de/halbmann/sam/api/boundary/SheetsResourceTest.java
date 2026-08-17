@@ -161,4 +161,49 @@ class SheetsResourceTest {
                 .statusCode(200)
                 .body("data.sheetId", not(hasItem(sheetId)));
     }
+
+    @Test
+    void testRightsStatusAndGemaPflichtig_roundTripOnCreateAndUpdate() {
+        final String sheetId = given().contentType(ContentType.JSON)
+                .body("""
+                        {
+                            "title": "Rights Test Piece",
+                            "genre": "POLKA",
+                            "rightsStatus": "PERMITTED_ARCHIVE",
+                            "gemaPflichtig": "YES"
+                        }
+                        """)
+                .post("/api/sheets")
+                .then()
+                .statusCode(200)
+                .body("rightsStatus", equalTo("PERMITTED_ARCHIVE"))
+                .body("gemaPflichtig", equalTo("YES"))
+                .extract()
+                .path("id");
+
+        given().get("/api/sheets/{sheetId}", sheetId)
+                .then()
+                .statusCode(200)
+                .body("rightsStatus", equalTo("PERMITTED_ARCHIVE"))
+                .body("gemaPflichtig", equalTo("YES"));
+
+        given().contentType(ContentType.JSON)
+                .body("""
+                        {
+                            "title": "Rights Test Piece",
+                            "genre": "POLKA",
+                            "rightsStatus": "NO_DIGITALIZATION",
+                            "gemaPflichtig": "NO"
+                        }
+                        """)
+                .put("/api/sheets/{sheetId}", sheetId)
+                .then()
+                .statusCode(204);
+
+        given().get("/api/sheets/{sheetId}", sheetId)
+                .then()
+                .statusCode(200)
+                .body("rightsStatus", equalTo("NO_DIGITALIZATION"))
+                .body("gemaPflichtig", equalTo("NO"));
+    }
 }

@@ -306,6 +306,21 @@
                     <span class="detail-value">{{ s.copyright }}</span>
                   </div>
                 }
+                @if (s.rightsStatus) {
+                  <div class="meta-entry">
+                    <span class="detail-label">{{ 'sheets.detail.rightsStatus' | translate }}</span>
+                    <p-tag
+                      [value]="'sheets.rightsStatuses.' + s.rightsStatus | translate"
+                      [severity]="rightsStatusSeverity(s.rightsStatus)"
+                    />
+                  </div>
+                }
+                @if (s.gemaPflichtig) {
+                  <div class="meta-entry">
+                    <span class="detail-label">{{ 'sheets.detail.gemaPflichtig' | translate }}</span>
+                    <span class="detail-value">{{ 'sheets.gemaPflichtigValues.' + s.gemaPflichtig | translate }}</span>
+                  </div>
+                }
                 @if (s.gemaWorkNumber) {
                   <div class="meta-entry">
                     <span class="detail-label">{{ 'sheets.detail.gemaWorkNumber' | translate }}</span>
@@ -1019,6 +1034,21 @@
             <div class="meta-entry">
               <span class="detail-label">{{ 'sheets.detail.copyright' | translate }}</span>
               <span class="detail-value">{{ s.copyright }}</span>
+            </div>
+          }
+          @if (s.rightsStatus) {
+            <div class="meta-entry">
+              <span class="detail-label">{{ 'sheets.detail.rightsStatus' | translate }}</span>
+              <p-tag
+                [value]="'sheets.rightsStatuses.' + s.rightsStatus | translate"
+                [severity]="rightsStatusSeverity(s.rightsStatus)"
+              />
+            </div>
+          }
+          @if (s.gemaPflichtig) {
+            <div class="meta-entry">
+              <span class="detail-label">{{ 'sheets.detail.gemaPflichtig' | translate }}</span>
+              <span class="detail-value">{{ 'sheets.gemaPflichtigValues.' + s.gemaPflichtig | translate }}</span>
             </div>
           }
           @if (s.gemaWorkNumber) {

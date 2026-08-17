@@ -126,6 +126,10 @@
       "tags": "Tags",
       "tagsTooltip": "Frei vergebene Schlagwörter zum schnellen Finden und Gruppieren von Stücken, z.B. 'outdoor', 'weihnachten', 'leicht'. Mit Enter oder Komma trennen.",
       "rightsSection": "Rechte & Kennzeichnungen",
+      "rightsStatus": "Rechtestatus",
+      "rightsStatusTooltip": "Rechtlicher Status hinsichtlich Archivierung, Digitalisierung und Weitergabe.",
+      "gemaPflichtig": "GEMA-pflichtig",
+      "gemaPflichtigTooltip": "Ob dieses Stück bei Aufführung bei der GEMA gemeldet werden muss.",
       "originalBy": "Original von",
       "originalByTooltip": "Ursprünglicher Komponist oder Originalwerk, auf dem dieses Stück basiert oder arrangiert wurde.",
       "publisherIpi": "Verlags-IPI",
@@ -164,6 +168,8 @@
       "edition": "Ausgabe",
       "difficulty": "Schwierigkeitsgrad",
       "copyright": "Urheberrecht",
+      "rightsStatus": "Rechtestatus",
+      "gemaPflichtig": "GEMA-pflichtig",
       "gemaWorkNumber": "GEMA-Werknummer",
       "iswc": "ISWC",
       "originalBy": "Original von",
@@ -307,6 +313,19 @@
       "ADVANCED": "Fortgeschritten",
       "DIFFICULT": "Schwierig",
       "VERY_DIFFICULT": "Sehr schwierig"
+    },
+    "rightsStatuses": {
+      "UNKNOWN": "Unbekannt",
+      "PUBLIC_DOMAIN": "Gemeinfrei",
+      "LICENSED": "Lizenziert",
+      "PERMITTED_ARCHIVE": "Archivierung erlaubt",
+      "RESTRICTED": "Eingeschränkt",
+      "NO_DIGITALIZATION": "Keine Digitalisierung"
+    },
+    "gemaPflichtigValues": {
+      "UNKNOWN": "Unbekannt",
+      "YES": "Ja",
+      "NO": "Nein"
     },
     "filters": {
       "toggle": "Filter",

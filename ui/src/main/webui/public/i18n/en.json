@@ -126,6 +126,10 @@
       "tags": "Tags",
       "tagsTooltip": "Free-form labels to help find and group pieces, e.g. 'outdoor', 'christmas', 'easy'. Separate with Enter or comma.",
       "rightsSection": "Rights & Identifiers",
+      "rightsStatus": "Rights Status",
+      "rightsStatusTooltip": "Legal status with respect to archiving, digitization, and distribution.",
+      "gemaPflichtig": "GEMA-pflichtig",
+      "gemaPflichtigTooltip": "Whether this piece must be reported to GEMA when performed.",
       "originalBy": "Original by",
       "originalByTooltip": "Original composer or work this piece is based on or arranged from.",
       "publisherIpi": "Publisher IPI",
@@ -164,6 +168,8 @@
       "edition": "Edition",
       "difficulty": "Difficulty",
       "copyright": "Copyright",
+      "rightsStatus": "Rights Status",
+      "gemaPflichtig": "GEMA-pflichtig",
       "gemaWorkNumber": "GEMA Work No.",
       "iswc": "ISWC",
       "originalBy": "Original by",
@@ -307,6 +313,19 @@
       "ADVANCED": "Advanced",
       "DIFFICULT": "Difficult",
       "VERY_DIFFICULT": "Very Difficult"
+    },
+    "rightsStatuses": {
+      "UNKNOWN": "Unknown",
+      "PUBLIC_DOMAIN": "Public Domain",
+      "LICENSED": "Licensed",
+      "PERMITTED_ARCHIVE": "Archiving Permitted",
+      "RESTRICTED": "Restricted",
+      "NO_DIGITALIZATION": "No Digitization"
+    },
+    "gemaPflichtigValues": {
+      "UNKNOWN": "Unknown",
+      "YES": "Yes",
+      "NO": "No"
     },
     "filters": {
       "toggle": "Filters",

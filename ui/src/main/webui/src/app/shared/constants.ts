@@ -1,4 +1,4 @@
-import { AttachmentType, Clef, Genre, NotationType, PhysicalCondition, Style } from '../model/datamodels';
+import { AttachmentType, Clef, GemaPflichtig, Genre, NotationType, PhysicalCondition, RightsStatus, Style } from '../model/datamodels';
 
 /** DifficultyLevel enum values in grade order (grade = index + 1). */
 export const DIFFICULTY_LEVELS = [
@@ -23,6 +23,16 @@ export const STYLES = [
   'POP', 'ROCK', 'FUNK', 'SWING', 'LATIN',
   'TRADITIONAL', 'FOLKLORISTIC', 'EXPERIMENTAL',
 ] as const satisfies readonly Style[];
+
+/** All possible RightsStatus enum values, in display order. */
+export const RIGHTS_STATUSES = [
+  'UNKNOWN', 'PUBLIC_DOMAIN', 'LICENSED', 'PERMITTED_ARCHIVE', 'RESTRICTED', 'NO_DIGITALIZATION',
+] as const satisfies readonly RightsStatus[];
+
+/** All possible GemaPflichtig enum values, in display order. */
+export const GEMA_PFLICHTIG_VALUES = [
+  'UNKNOWN', 'YES', 'NO',
+] as const satisfies readonly GemaPflichtig[];
 
 /** All possible Clef enum values. */
 export const CLEFS = ['TREBLE', 'ALTO', 'TENOR', 'BASS'] as const satisfies readonly Clef[];

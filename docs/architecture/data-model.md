@@ -25,7 +25,7 @@ ensembles ──< ensemble_voices ──< voice_options >── instruments
 
 | Entity | PK | Key Fields |
 |--------|----|------------|
-| `sheets` | UUID | title, subtitle, composer, arranger, genre, fingerprint, **source** |
+| `sheets` | UUID | title, subtitle, composer, arranger, genre, fingerprint, **source**, **rightsStatus**, **gemaPflichtig** |
 | `instrumentations` | UUID | sheet (FK), instrument (FK), partLabel, clef, notationType, **pages**, physicalLocation, physicalCondition |
 | `instruments` | String | name, displayName, transposition, **family**, **defaultClef**, **catalogSection**, **catalogPosition** |
 | `instrument_aliases` | (instrument_id, alias_order) | alias strings for OCR matching; ordered list per instrument |

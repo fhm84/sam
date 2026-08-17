@@ -13,10 +13,10 @@ import { Tooltip } from 'primeng/tooltip';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { SheetsApiService, MusiciansApiService, CollectionsApiService } from '../../core/api';
 import { convertEmptyStringsToNull } from '../../shared/utils/object.utils';
-import { CreateSheetMusic, Genre, Musician, SheetCollection, SheetMusic, Style } from '../../model/datamodels';
+import { CreateSheetMusic, GemaPflichtig, Genre, Musician, RightsStatus, SheetCollection, SheetMusic, Style } from '../../model/datamodels';
 import { map, Observable } from 'rxjs';
 import { BaseForm } from '../../shared/base/base-form';
-import { DIFFICULTY_LEVELS, FETCH_ALL_SIZE, GENRES, STYLES } from '../../shared/constants';
+import { DIFFICULTY_LEVELS, FETCH_ALL_SIZE, GEMA_PFLICHTIG_VALUES, GENRES, RIGHTS_STATUSES, STYLES } from '../../shared/constants';
 import { MusicianForm } from '../musicians/musician-form';
 
 @Component({
@@ -49,6 +49,14 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
     DIFFICULTY_LEVELS.map((key, i) => ({ label: this.t.t(`sheets.difficultyLevels.${key}`), value: i + 1 })),
   );
 
+  protected readonly rightsStatusOptions = computed(() =>
+    RIGHTS_STATUSES.map((r) => ({ label: this.t.t(`sheets.rightsStatuses.${r}`), value: r })),
+  );
+
+  protected readonly gemaPflichtigOptions = computed(() =>
+    GEMA_PFLICHTIG_VALUES.map((g) => ({ label: this.t.t(`sheets.gemaPflichtigValues.${g}`), value: g })),
+  );
+
   readonly form = new FormGroup({
     title: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     subtitle: new FormControl('', { nonNullable: true }),
@@ -63,6 +71,8 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
     durationSeconds: new FormControl<number | null>(null),
     edition: new FormControl('', { nonNullable: true }),
     copyright: new FormControl('', { nonNullable: true }),
+    rightsStatus: new FormControl<RightsStatus | null>(null),
+    gemaPflichtig: new FormControl<GemaPflichtig | null>(null),
     originalBy: new FormControl('', { nonNullable: true }),
     publisherIpi: new FormControl('', { nonNullable: true }),
     gemaWorkNumber: new FormControl('', { nonNullable: true }),
@@ -102,6 +112,8 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
       durationSeconds: seconds,
       edition: s.edition ?? '',
       copyright: s.copyright ?? '',
+      rightsStatus: s.rightsStatus ?? null,
+      gemaPflichtig: s.gemaPflichtig ?? null,
       originalBy: s.originalBy ?? '',
       publisherIpi: s.publisherIpi ?? '',
       gemaWorkNumber: s.gemaWorkNumber ?? '',
@@ -151,6 +163,8 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
       duration: buildDuration(raw.durationMinutes, raw.durationSeconds) as unknown as never,
       edition: raw.edition,
       copyright: raw.copyright,
+      rightsStatus: raw.rightsStatus ?? undefined,
+      gemaPflichtig: raw.gemaPflichtig ?? undefined,
       originalBy: raw.originalBy,
       publisherIpi: raw.publisherIpi,
       gemaWorkNumber: raw.gemaWorkNumber,

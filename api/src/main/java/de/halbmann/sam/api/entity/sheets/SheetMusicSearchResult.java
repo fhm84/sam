@@ -38,6 +38,8 @@ public class SheetMusicSearchResult extends SheetMusic {
                 sheetMusic.getYearOfComposition(),
                 sheetMusic.getEdition(),
                 sheetMusic.getCopyright(),
+                sheetMusic.getRightsStatus(),
+                sheetMusic.getGemaPflichtig(),
                 sheetMusic.getRating(),
                 sheetMusic.getIswc(),
                 sheetMusic.getGemaWorkNumber(),

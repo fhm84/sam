@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 4.1.1 on 2026-08-16 22:32:27.
+// Generated using typescript-generator version 4.1.1 on 2026-08-17 16:21:50.
 
 export interface SheetEnrichment {
     suggestedAdditionalNotes?: string;
@@ -492,6 +492,7 @@ export interface CreateSheetMusic {
     duration?: long;
     edition?: string;
     favorite?: boolean;
+    gemaPflichtig?: GemaPflichtig;
     gemaWorkNumber?: string;
     genre?: Genre;
     iswc?: string;
@@ -499,6 +500,7 @@ export interface CreateSheetMusic {
     publisher?: string;
     publisherIpi?: string;
     rating?: number;
+    rightsStatus?: RightsStatus;
     source?: string;
     style?: Style;
     subtitle?: string;
@@ -557,6 +559,7 @@ export interface SheetMusic {
     duration?: long;
     edition?: string;
     favorite?: boolean;
+    gemaPflichtig?: GemaPflichtig;
     gemaWorkNumber?: string;
     genre?: Genre;
     id?: string;
@@ -566,6 +569,7 @@ export interface SheetMusic {
     publisher?: string;
     publisherIpi?: string;
     rating?: number;
+    rightsStatus?: RightsStatus;
     source?: string;
     style?: Style;
     subtitle?: string;
@@ -632,10 +636,14 @@ export type DownloadFormat = "ZIP" | "MERGED_PDF";
 
 export type ExportFormat = "ZIP" | "JSON" | "CSV";
 
+export type GemaPflichtig = "UNKNOWN" | "YES" | "NO";
+
 export type Genre = "MARCH" | "MARCHING_SHOW" | "CONCERT_WORK" | "OVERTURE" | "SUITE" | "SYMPHONY" | "FANTASY" | "VARIATIONS" | "DANCE" | "WALTZ" | "POLKA" | "FOLK_SONG" | "HYMN_CHORALE" | "FILM_MUSIC" | "SHOW_MUSIC" | "POP_ROCK" | "JAZZ" | "LATIN" | "CHRISTMAS" | "SACRED" | "SOLO_WITH_BAND";
 
 export type NotationType = "STANDARD" | "TABLATURE" | "PERCUSSION" | "LEAD_SHEET" | "GRAPHIC";
 
 export type PhysicalCondition = "GOOD" | "WORN" | "DAMAGED" | "LOST";
+
+export type RightsStatus = "UNKNOWN" | "PUBLIC_DOMAIN" | "LICENSED" | "PERMITTED_ARCHIVE" | "RESTRICTED" | "NO_DIGITALIZATION";
 
 export type Style = "CLASSICAL" | "ROMANTIC" | "MODERN" | "CONTEMPORARY" | "POP" | "ROCK" | "FUNK" | "SWING" | "LATIN" | "TRADITIONAL" | "FOLKLORISTIC" | "EXPERIMENTAL";

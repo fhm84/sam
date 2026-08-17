@@ -1,7 +1,9 @@
 package de.halbmann.sam.business.sheets.entity;
 
 import de.halbmann.sam.api.entity.sheets.DifficultyLevel;
+import de.halbmann.sam.api.entity.sheets.GemaPflichtig;
 import de.halbmann.sam.api.entity.sheets.Genre;
+import de.halbmann.sam.api.entity.sheets.RightsStatus;
 import de.halbmann.sam.api.entity.sheets.Style;
 import de.halbmann.sam.business.documents.entity.AttachmentEntity;
 import de.halbmann.sam.business.musicians.entity.MusicianEntity;
@@ -117,6 +119,20 @@ public class SheetMusicEntity extends AbstractEntity {
      * Copyright information.
      */
     String copyright;
+
+    /**
+     * Legal status with respect to archiving, digitization, and distribution.
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(length = 32)
+    private RightsStatus rightsStatus;
+
+    /**
+     * Whether the piece is subject to GEMA reporting when performed.
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(length = 16)
+    private GemaPflichtig gemaPflichtig;
 
     /**
      * Rating for the piece/music sheet.

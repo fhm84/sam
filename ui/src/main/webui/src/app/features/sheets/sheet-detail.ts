@@ -16,7 +16,7 @@ import { Skeleton } from 'primeng/skeleton';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { SheetsApiService, InstrumentationsApiService } from '../../core/api';
-import { Attachment, AttachmentType, CoverageSnapshotSummary, DownloadFormat, Instrumentation, SheetMusic } from '../../model/datamodels';
+import { Attachment, AttachmentType, CoverageSnapshotSummary, DownloadFormat, Instrumentation, RightsStatus, SheetMusic } from '../../model/datamodels';
 import { ATTACHMENT_TYPES, DIFFICULTY_LEVELS } from '../../shared/constants';
 import { DocumentHandler } from '../../shared/base/document-handler';
 import { InstrumentationForm } from './instrumentation-form';
@@ -252,6 +252,21 @@ export class SheetDetail extends DocumentHandler implements OnChanges {
 
   protected difficultyLevelKey(grade: number): string {
     return DIFFICULTY_LEVELS[grade - 1] ?? '';
+  }
+
+  protected rightsStatusSeverity(status: RightsStatus): 'success' | 'info' | 'warn' | 'danger' | 'secondary' {
+    switch (status) {
+      case 'PUBLIC_DOMAIN':
+      case 'PERMITTED_ARCHIVE':
+        return 'success';
+      case 'LICENSED':
+        return 'info';
+      case 'RESTRICTED':
+      case 'NO_DIGITALIZATION':
+        return 'danger';
+      default:
+        return 'secondary';
+    }
   }
 
   protected toggleFavorite(): void {

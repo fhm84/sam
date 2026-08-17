@@ -586,23 +586,30 @@ Add missing fields to `SheetMusicEntity` and related entities surfaced in the Cl
 Design mockup (`Sheet Detail (PrimeNG).html` / `Sheet Detail v2 (PrimeNG).html`).
 Full details in local planning notes (`plan_sheet_detail_fields.md`, not in the repo).
 
-**Sheet-level fields:**
+**Sheet-level fields — done:**
+- **rightsStatus** — enum (`UNKNOWN` / `PUBLIC_DOMAIN` / `LICENSED` /
+  `PERMITTED_ARCHIVE` / `RESTRICTED` / `NO_DIGITALIZATION`); shipped with two more
+  values than originally scoped here (`PERMITTED_ARCHIVE`, `NO_DIGITALIZATION`) to
+  cover rental/hire-only material. See [Sheet Music — Rights status](features/sheets.md#rights-status).
+- **gemaPflichtig** — 3-state enum (`UNKNOWN` / `YES` / `NO`). See
+  [Sheet Music — GEMA-pflichtig](features/sheets.md#gema-pflichtig).
+
+**Sheet-level fields — still planned:**
 - **tempo** (Integer, bpm) — "♩= 116 bpm" shown in Base Data card
 - **tonality** — fixed enum of all major/minor keys (e.g. Bb major, F minor)
-- **rightsStatus** — enum (`PUBLIC_DOMAIN` / `LICENSED` / `RESTRICTED` / `UNKNOWN`)
-- **gemaPflichtig** — 3-state enum (`YES` / `NO` / `UNKNOWN`)
 - **arrangementPublisher** + **arrangementRightsUntil** — simple fields for
   "Musikverlag Tirol · until 2080"-style arranger rights; no separate entity
 
-**Attachment-level fields:**
+**Attachment-level fields — still planned:**
 - **AttachmentKind** — new enum (`CLEAN` / `MARKED_UP` / `PHOTOCOPY` / `FACSIMILE` /
   `SCORE`) as a separate field alongside the existing `AttachmentType`
 - **version** (Integer) + **replacedById** (self-referencing FK) — for v1/v2/v3
   file lineage tracking
 
-**Collection:**
-- **ensemble FK on SheetCollection** — explicit link to which ensemble a setlist
-  belongs to (currently implied; the "Used in setlists" panel shows the ensemble name)
+**Collection — done:**
+- **ensemble FK on SheetCollection** — shipped as part of the AI setlist assistant
+  (V1.1.5); scopes coverage-aware suggestions to the linked ensemble. See
+  [Collections & Setlists](features/collections.md).
 
 **Deferred:** Duplicate / Merge / Split sheet operations (More menu in v2).
 

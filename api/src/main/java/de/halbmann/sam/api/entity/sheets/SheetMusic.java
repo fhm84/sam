@@ -136,6 +136,16 @@ public class SheetMusic {
     String copyright;
 
     /**
+     * Legal status with respect to archiving, digitization, and distribution.
+     */
+    RightsStatus rightsStatus;
+
+    /**
+     * Whether the piece is subject to GEMA reporting when performed.
+     */
+    GemaPflichtig gemaPflichtig;
+
+    /**
      * Rating for the piece/music sheet.
      */
     Integer rating;
