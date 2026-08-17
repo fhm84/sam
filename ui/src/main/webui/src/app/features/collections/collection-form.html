@@ -77,6 +77,28 @@
     ></i>
   </div>
 
+  <!-- Ensemble -->
+  <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+    <p-floatlabel variant="on" class="block">
+      <p-select
+        inputId="collection-ensemble"
+        formControlName="ensembleId"
+        [options]="ensembles()"
+        optionLabel="name"
+        optionValue="id"
+        [showClear]="true"
+        styleClass="w-full"
+        appendTo="body"
+      />
+      <label for="collection-ensemble">{{ 'collections.form.ensemble' | translate }}</label>
+    </p-floatlabel>
+    <i
+      class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
+      [pTooltip]="t.t('collections.form.ensembleTooltip')"
+      tooltipPosition="right"
+    ></i>
+  </div>
+
   <!-- Cover color swatches -->
   <div class="flex flex-col gap-2">
     <span class="text-xs font-semibold tracking-[0.07em] uppercase text-[var(--sam-text-muted)]">

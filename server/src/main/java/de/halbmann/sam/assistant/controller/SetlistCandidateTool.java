@@ -1,7 +1,6 @@
 package de.halbmann.sam.assistant.controller;
 
 import de.halbmann.sam.api.entity.ensembles.CoverageSnapshotSummary;
-import de.halbmann.sam.api.entity.ensembles.CoverageStatus;
 import de.halbmann.sam.api.entity.sheets.Genre;
 import de.halbmann.sam.business.ensembles.controller.CoverageSnapshotService;
 import de.halbmann.sam.business.sheets.boundary.SheetRepository;
@@ -10,7 +9,7 @@ import dev.langchain4j.agent.tool.Tool;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.time.Duration;
-import java.util.Comparator;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -21,7 +20,9 @@ import java.util.stream.Collectors;
  * Tool for the AI setlist assistant to search the real repertoire. Only sheets with {@code
  * COMPLETE} or {@code PLAYABLE} coverage for the request's ensemble are returned — the LLM never
  * sees or picks sheets the ensemble cannot actually perform, and it never chooses which ensemble
- * to search against (see {@link SetlistAssistantContext}).
+ * to search against (see {@link SetlistAssistantContext}). Every served sheet ID is recorded in
+ * the request context so the final suggestions can be validated against what the tool actually
+ * returned.
  */
 @ApplicationScoped
 public class SetlistCandidateTool {
@@ -57,30 +58,17 @@ public class SetlistCandidateTool {
         Duration maxDuration = parseMaxDuration(maxDurationMinutes);
         Set<String> tagFilter = parseTags(tags);
 
-        var candidates = sheetRepository.findAiAssistantCandidates(parsedGenre, maxDuration);
-        if (!tagFilter.isEmpty()) {
-            candidates = candidates.stream()
-                    .filter(s -> !java.util.Collections.disjoint(s.getTags(), tagFilter))
-                    .toList();
-        }
-
-        Map<UUID, CoverageSnapshotSummary> coverage = coverageSnapshotService.findSummaries(
-                ensembleId, candidates.stream().map(SheetMusicEntity::getId).toList());
-
-        var playable = candidates.stream()
-                .filter(s -> {
-                    CoverageSnapshotSummary summary = coverage.get(s.getId());
-                    return summary != null
-                            && (summary.getStatus() == CoverageStatus.COMPLETE
-                                    || summary.getStatus() == CoverageStatus.PLAYABLE);
-                })
-                .sorted(Comparator.comparing(SheetMusicEntity::getTitle))
-                .limit(MAX_RESULTS)
-                .toList();
-
+        var playable =
+                sheetRepository.findAiAssistantCandidates(ensembleId, parsedGenre, maxDuration, tagFilter, MAX_RESULTS);
         if (playable.isEmpty()) {
             return "No playable sheets matched these filters.";
         }
+
+        context.recordServedSheetIds(
+                playable.stream().map(SheetMusicEntity::getId).toList());
+
+        Map<UUID, CoverageSnapshotSummary> coverage = coverageSnapshotService.findSummaries(
+                ensembleId, playable.stream().map(SheetMusicEntity::getId).toList());
 
         return playable.stream()
                 .map(s -> formatCandidate(s, coverage.get(s.getId())))
@@ -96,7 +84,7 @@ public class SetlistCandidateTool {
                 s.getGenre() != null ? s.getGenre() : "unknown",
                 s.getDifficultyLevel() != null ? s.getDifficultyLevel() : "unknown",
                 s.getDuration() != null ? s.getDuration().toMinutes() : "unknown",
-                coverage.getStatus());
+                coverage != null ? coverage.getStatus() : "unknown");
     }
 
     private Genre parseGenre(String genre) {
@@ -125,7 +113,8 @@ public class SetlistCandidateTool {
         if (tags == null || tags.isBlank()) {
             return Set.of();
         }
-        return Set.of(tags.split(",")).stream()
+        // not Set.of(split(...)): the LLM may emit duplicates ("march,march"), which Set.of rejects
+        return Arrays.stream(tags.split(","))
                 .map(String::trim)
                 .filter(t -> !t.isEmpty())
                 .collect(Collectors.toSet());

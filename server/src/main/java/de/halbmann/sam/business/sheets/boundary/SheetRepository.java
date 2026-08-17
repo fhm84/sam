@@ -1,6 +1,7 @@
 package de.halbmann.sam.business.sheets.boundary;
 
 import de.halbmann.sam.api.entity.collections.CollectionType;
+import de.halbmann.sam.api.entity.ensembles.CoverageStatus;
 import de.halbmann.sam.api.entity.shared.PaginationRequest;
 import de.halbmann.sam.api.entity.shared.SortOrder;
 import de.halbmann.sam.api.entity.sheets.Genre;
@@ -339,12 +340,25 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
 
     /**
      * Sheets matching the given optional filters, for the AI setlist assistant's candidate
-     * search. All filters are ANDed; a {@code null} filter is skipped. Coverage filtering happens
-     * separately (via {@code CoverageSnapshotService}) since it depends on the ensemble.
+     * search. All filters are ANDed; a {@code null}/empty filter is skipped. Only sheets with a
+     * {@code COMPLETE} or {@code PLAYABLE} coverage snapshot for the given ensemble are returned,
+     * and the result is capped at {@code limit} rows in SQL — the LLM tool may probe several
+     * times per request, so this must never hydrate the whole sheets table.
      */
-    public List<SheetMusicEntity> findAiAssistantCandidates(Genre genre, Duration maxDuration) {
-        StringBuilder jpql = new StringBuilder("SELECT s FROM SheetMusicEntity s WHERE 1=1");
+    public List<SheetMusicEntity> findAiAssistantCandidates(
+            UUID ensembleId, Genre genre, Duration maxDuration, Set<String> tags, int limit) {
+        StringBuilder jpql = new StringBuilder("SELECT DISTINCT s FROM CoverageSnapshotEntity c JOIN c.sheet s");
         Map<String, Object> params = new HashMap<>();
+        if (tags != null && !tags.isEmpty()) {
+            jpql.append(" JOIN s.tags t");
+        }
+        jpql.append(" WHERE c.ensemble.id = :ensembleId AND c.status IN :playableStatuses");
+        params.put("ensembleId", ensembleId);
+        params.put("playableStatuses", List.of(CoverageStatus.COMPLETE, CoverageStatus.PLAYABLE));
+        if (tags != null && !tags.isEmpty()) {
+            jpql.append(" AND t IN :tags");
+            params.put("tags", tags);
+        }
         if (genre != null) {
             jpql.append(" AND s.genre = :genre");
             params.put("genre", genre);
@@ -356,7 +370,7 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
         jpql.append(" ORDER BY s.title");
         var query = getEntityManager().createQuery(jpql.toString(), SheetMusicEntity.class);
         params.forEach(query::setParameter);
-        return query.getResultList();
+        return query.setMaxResults(limit).getResultList();
     }
 
     public void removeAttachment(AttachmentEntity attachment) {

@@ -12,9 +12,7 @@ import de.halbmann.sam.assistant.controller.SetlistAssistantService;
 import de.halbmann.sam.business.collections.controller.SheetCollectionService;
 import de.halbmann.sam.business.eventlog.controller.EventLogService;
 import de.halbmann.sam.core.exception.ValidationException;
-import de.halbmann.sam.security.CurrentUserService;
 import dev.langchain4j.model.output.TokenUsage;
-import jakarta.ws.rs.ForbiddenException;
 import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -24,18 +22,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
- * Covers the authorization checks in {@link SheetCollectionsResourceImpl#suggestItems}: these are
- * the enforcement points discussed for the AI setlist assistant (no dedicated/service token — the
- * caller's own access to the collection's ensemble gates everything).
+ * Covers the enforcement points in {@link SheetCollectionsResourceImpl#suggestItems}: role gating
+ * lives in {@code @RolesAllowed} (no per-ensemble check — the allowed roles may access every
+ * ensemble), an ensemble must be assigned, and event logging must survive providers that report
+ * no token usage.
  */
 @ExtendWith(MockitoExtension.class)
 class SheetCollectionsResourceImplSuggestItemsTest {
 
     @Mock
     SheetCollectionService service;
-
-    @Mock
-    CurrentUserService currentUserService;
 
     @Mock
     SetlistAssistantService setlistAssistantService;
@@ -60,22 +56,10 @@ class SheetCollectionsResourceImplSuggestItemsTest {
     }
 
     @Test
-    void callerCannotAccessEnsemble_throwsForbidden() {
-        SheetCollection collection = new SheetCollection();
-        collection.setEnsembleId(ensembleId);
-        when(service.load(collectionId)).thenReturn(collection);
-        when(currentUserService.canAccessEnsemble(ensembleId)).thenReturn(false);
-
-        assertThrows(ForbiddenException.class, () -> resource.suggestItems(collectionId, request("goal")));
-        verifyNoInteractions(setlistAssistantService, eventLogService);
-    }
-
-    @Test
     void authorizedCaller_returnsSuggestionsAndLogsTokenUsage() {
         SheetCollection collection = new SheetCollection();
         collection.setEnsembleId(ensembleId);
         when(service.load(collectionId)).thenReturn(collection);
-        when(currentUserService.canAccessEnsemble(ensembleId)).thenReturn(true);
 
         SetlistSuggestions suggestions = new SetlistSuggestions();
         TokenUsage tokenUsage = new TokenUsage(100, 50);
@@ -91,6 +75,29 @@ class SheetCollectionsResourceImplSuggestItemsTest {
                         eq("collection"),
                         eq(UUID.fromString(collectionId)),
                         eq(Map.of("suggestionCount", 0, "inputTokens", 100, "outputTokens", 50)));
+    }
+
+    @Test
+    void nullTokenCounts_areLoggedAsZero_insteadOfFailingTheRequest() {
+        SheetCollection collection = new SheetCollection();
+        collection.setEnsembleId(ensembleId);
+        when(service.load(collectionId)).thenReturn(collection);
+
+        SetlistSuggestions suggestions = new SetlistSuggestions();
+        // providers may return a TokenUsage whose individual counts are null
+        TokenUsage tokenUsage = new TokenUsage(null, null);
+        when(setlistAssistantService.suggestItems(collectionId, ensembleId, "goal"))
+                .thenReturn(new SetlistAssistantService.SuggestionOutcome(suggestions, tokenUsage));
+
+        SetlistSuggestions result = resource.suggestItems(collectionId, request("goal"));
+
+        assertSame(suggestions, result);
+        verify(eventLogService)
+                .log(
+                        eq(EventType.SETLIST_AI_SUGGESTION_GENERATED),
+                        eq("collection"),
+                        eq(UUID.fromString(collectionId)),
+                        eq(Map.of("suggestionCount", 0, "inputTokens", 0, "outputTokens", 0)));
     }
 
     private SuggestSetlistItemsRequest request(String goal) {

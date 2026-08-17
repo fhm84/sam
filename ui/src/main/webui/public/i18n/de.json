@@ -396,7 +396,9 @@
       "visibility": "Sichtbarkeit",
       "visibilityTooltip": "Legt fest, wer diese Sammlung sehen kann.",
       "coverColor": "Deckfarbe",
-      "coverColorClear": "Farbe entfernen"
+      "coverColorClear": "Farbe entfernen",
+      "ensemble": "Ensemble",
+      "ensembleTooltip": "Verknüpft diese Sammlung mit einem Ensemble — Voraussetzung für den KI-Setlist-Assistenten und besetzungsabhängige Vorschläge."
     },
     "types": {
       "FOLDER": "Ordner",
@@ -913,7 +915,9 @@
       "DOCUMENT_CLASSIFICATION_APPLIED": "Klassifikation übernommen",
       "SHARE_CREATED": "Freigabe erstellt",
       "SHARE_ACCESSED": "Freigabe geöffnet",
-      "SHARE_REVOKED": "Freigabe widerrufen"
+      "SHARE_REVOKED": "Freigabe widerrufen",
+      "SETLIST_AI_SUGGESTION_GENERATED": "KI-Setlist-Vorschläge",
+      "SETLIST_AI_TEXT_DRAFTED": "KI-Textentwurf"
     }
   },
   "primeng": {

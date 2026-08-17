@@ -1,6 +1,7 @@
 package de.halbmann.sam.api.entity.assistant;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 /**
@@ -11,5 +12,6 @@ import lombok.Data;
 public class SuggestSetlistItemsRequest {
 
     @NotBlank
+    @Size(max = 2000)
     String goal;
 }

@@ -29,6 +29,8 @@ const ALL_EVENT_TYPES: EventType[] = [
   'SHARE_CREATED',
   'SHARE_ACCESSED',
   'SHARE_REVOKED',
+  'SETLIST_AI_SUGGESTION_GENERATED',
+  'SETLIST_AI_TEXT_DRAFTED',
 ];
 
 @Component({
@@ -106,6 +108,8 @@ export class EventLogs implements OnInit {
         return 'warn';
       case 'DOCUMENT_CLASSIFIED':
       case 'DOCUMENT_CLASSIFICATION_APPLIED':
+      case 'SETLIST_AI_SUGGESTION_GENERATED':
+      case 'SETLIST_AI_TEXT_DRAFTED':
         return 'success';
       case 'SHARE_CREATED':
       case 'SHARE_ACCESSED':

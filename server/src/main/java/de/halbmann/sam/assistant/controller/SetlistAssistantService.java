@@ -10,6 +10,7 @@ import dev.langchain4j.model.output.TokenUsage;
 import dev.langchain4j.service.Result;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import java.util.ArrayList;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -54,7 +55,27 @@ public class SetlistAssistantService {
             throw new RuntimeException("AI setlist suggestion failed: " + e.getMessage(), e);
         }
 
-        return new SuggestionOutcome(result.content(), result.tokenUsage());
+        return new SuggestionOutcome(dropUnservedSuggestions(result.content(), collectionId), result.tokenUsage());
+    }
+
+    /**
+     * The "suggestions only ever reference real archive sheets" guarantee must not rest on prompt
+     * text alone: keep only items whose sheet ID the candidate tool actually served during this
+     * request, and drop anything else as a hallucination.
+     */
+    private SetlistSuggestions dropUnservedSuggestions(SetlistSuggestions suggestions, String collectionId) {
+        var validated = suggestions.getItems().stream()
+                .filter(item -> context.wasServed(item.getSheetId()))
+                .toList();
+        int dropped = suggestions.getItems().size() - validated.size();
+        if (dropped > 0) {
+            log.warn(
+                    "Dropped {} suggestion(s) for collection {} referencing sheets the candidate tool never served",
+                    dropped,
+                    collectionId);
+            suggestions.setItems(new ArrayList<>(validated));
+        }
+        return suggestions;
     }
 
     private String describeExistingItems(SheetCollectionEntity collection) {

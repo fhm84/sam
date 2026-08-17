@@ -6,6 +6,7 @@ import de.halbmann.sam.api.entity.collections.SheetCollection;
 import de.halbmann.sam.api.entity.collections.SheetCollectionFilterRequest;
 import de.halbmann.sam.api.entity.shared.PaginatedResponse;
 import de.halbmann.sam.api.entity.sheets.ExportFormat;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -137,5 +138,6 @@ public interface SheetCollectionsResource {
      */
     @POST
     @Path("{collectionId}/ai/suggest-items")
-    SetlistSuggestions suggestItems(@PathParam("collectionId") String collectionId, SuggestSetlistItemsRequest request);
+    SetlistSuggestions suggestItems(
+            @PathParam("collectionId") String collectionId, @Valid SuggestSetlistItemsRequest request);
 }

@@ -1,4 +1,4 @@
-import { Component, computed, inject, Input, OnInit } from '@angular/core';
+import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FloatLabel } from 'primeng/floatlabel';
 import { InputText } from 'primeng/inputtext';
@@ -8,9 +8,9 @@ import { DatePicker } from 'primeng/datepicker';
 import { Button } from 'primeng/button';
 import { Tooltip } from 'primeng/tooltip';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
-import { CollectionsApiService } from '../../core/api';
+import { CollectionsApiService, EnsemblesApiService } from '../../core/api';
 import { convertEmptyStringsToNull } from '../../shared/utils/object.utils';
-import { CollectionType, CollectionVisibility, SheetCollection } from '../../model/datamodels';
+import { CollectionType, CollectionVisibility, Ensemble, SheetCollection } from '../../model/datamodels';
 import { map, Observable } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { BaseForm } from '../../shared/base/base-form';
@@ -30,7 +30,10 @@ export const COVER_COLORS = [
 })
 export class CollectionForm extends BaseForm<SheetCollection> implements OnInit {
   private readonly api = inject(CollectionsApiService);
+  private readonly ensemblesApi = inject(EnsemblesApiService);
   private readonly i18n = inject(TranslationService);
+
+  protected readonly ensembles = signal<Ensemble[]>([]);
 
   @Input() collection: SheetCollection | null = null;
 
@@ -55,6 +58,7 @@ export class CollectionForm extends BaseForm<SheetCollection> implements OnInit 
     date: new FormControl<Date | null>(null),
     visibility: new FormControl<CollectionVisibility | null>(null),
     coverColor: new FormControl<string | null>(null),
+    ensembleId: new FormControl<string | null>(null),
   });
 
   protected get isSetlist(): boolean {
@@ -62,6 +66,10 @@ export class CollectionForm extends BaseForm<SheetCollection> implements OnInit 
   }
 
   ngOnInit(): void {
+    this.ensemblesApi
+      .find({ size: 200 })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((res) => this.ensembles.set(res.data ?? []));
     this.form.controls.type.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((type) => {
@@ -81,6 +89,7 @@ export class CollectionForm extends BaseForm<SheetCollection> implements OnInit 
       date: c.date ? new Date(c.date) : null,
       visibility: c.visibility ?? null,
       coverColor: c.coverColor ?? null,
+      ensembleId: c.ensembleId ?? null,
     });
   }
 
@@ -105,6 +114,7 @@ export class CollectionForm extends BaseForm<SheetCollection> implements OnInit 
       date: raw.date ? this.toLocalDateString(raw.date) : undefined,
       visibility: raw.visibility ?? undefined,
       coverColor: raw.coverColor ?? undefined,
+      ensembleId: raw.ensembleId ?? undefined,
     }) as SheetCollection;
 
     return this.isEdit

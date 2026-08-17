@@ -442,6 +442,10 @@ export class CollectionSheets implements OnInit, OnChanges {
         },
         error: () => {
           this.addingSuggestionSheetId = null;
+          this.messageService.add({
+            severity: 'error',
+            summary: this.t.t('collections.items.messages.error'),
+          });
         },
       });
   }

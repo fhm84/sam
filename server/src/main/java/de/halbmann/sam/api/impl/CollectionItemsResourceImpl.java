@@ -10,6 +10,7 @@ import de.halbmann.sam.api.entity.eventlog.EventType;
 import de.halbmann.sam.api.entity.shared.PaginatedResponse;
 import de.halbmann.sam.api.entity.shared.PaginationRequest;
 import de.halbmann.sam.assistant.controller.ProgrammeTextDraftService;
+import de.halbmann.sam.assistant.controller.TokenUsages;
 import de.halbmann.sam.business.collections.controller.SheetCollectionService;
 import de.halbmann.sam.business.eventlog.controller.EventLogService;
 import de.halbmann.sam.security.CurrentUserService;
@@ -108,9 +109,9 @@ public class CollectionItemsResourceImpl implements CollectionItemsResource {
                 UUID.fromString(itemId),
                 Map.of(
                         "inputTokens",
-                        outcome.tokenUsage() != null ? outcome.tokenUsage().inputTokenCount() : 0,
+                        TokenUsages.inputTokens(outcome.tokenUsage()),
                         "outputTokens",
-                        outcome.tokenUsage() != null ? outcome.tokenUsage().outputTokenCount() : 0));
+                        TokenUsages.outputTokens(outcome.tokenUsage())));
 
         DraftTextResult result = new DraftTextResult();
         result.setDraftText(outcome.draftText());

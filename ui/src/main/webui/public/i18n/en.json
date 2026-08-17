@@ -396,7 +396,9 @@
       "visibility": "Visibility",
       "visibilityTooltip": "Controls who can see this collection.",
       "coverColor": "Cover Color",
-      "coverColorClear": "Clear color"
+      "coverColorClear": "Clear color",
+      "ensemble": "Ensemble",
+      "ensembleTooltip": "Links this collection to an ensemble — required for the AI setlist assistant and coverage-aware suggestions."
     },
     "types": {
       "FOLDER": "Folder",
@@ -913,7 +915,9 @@
       "DOCUMENT_CLASSIFICATION_APPLIED": "Classification Applied",
       "SHARE_CREATED": "Share Created",
       "SHARE_ACCESSED": "Share Accessed",
-      "SHARE_REVOKED": "Share Revoked"
+      "SHARE_REVOKED": "Share Revoked",
+      "SETLIST_AI_SUGGESTION_GENERATED": "AI Setlist Suggestions",
+      "SETLIST_AI_TEXT_DRAFTED": "AI Text Draft"
     }
   },
   "primeng": {

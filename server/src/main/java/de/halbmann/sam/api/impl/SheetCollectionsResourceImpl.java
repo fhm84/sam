@@ -10,6 +10,7 @@ import de.halbmann.sam.api.entity.eventlog.EventType;
 import de.halbmann.sam.api.entity.shared.PaginatedResponse;
 import de.halbmann.sam.api.entity.sheets.ExportFormat;
 import de.halbmann.sam.assistant.controller.SetlistAssistantService;
+import de.halbmann.sam.assistant.controller.TokenUsages;
 import de.halbmann.sam.business.collections.controller.CollectionTocService;
 import de.halbmann.sam.business.collections.controller.GemaSetlistService;
 import de.halbmann.sam.business.collections.controller.SheetCollectionService;
@@ -17,13 +18,11 @@ import de.halbmann.sam.business.eventlog.controller.EventLogService;
 import de.halbmann.sam.business.sheets.controller.ExportResult;
 import de.halbmann.sam.business.sheets.controller.SheetExportService;
 import de.halbmann.sam.core.exception.ValidationException;
-import de.halbmann.sam.security.CurrentUserService;
 import de.halbmann.sam.security.Roles;
 import io.quarkus.security.Authenticated;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.container.ResourceContext;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
@@ -55,9 +54,6 @@ public class SheetCollectionsResourceImpl implements SheetCollectionsResource {
 
     @Inject
     SetlistAssistantService setlistAssistantService;
-
-    @Inject
-    CurrentUserService currentUserService;
 
     @Override
     public PaginatedResponse<SheetCollection> findSheetCollections(final SheetCollectionFilterRequest filterRequest) {
@@ -148,9 +144,9 @@ public class SheetCollectionsResourceImpl implements SheetCollectionsResource {
             throw new ValidationException(
                     "This collection has no ensemble set; assign one before using the assistant.");
         }
-        if (!currentUserService.canAccessEnsemble(collection.getEnsembleId())) {
-            throw new ForbiddenException();
-        }
+        // No per-ensemble check here: the roles allowed on this method may access every ensemble
+        // (CurrentUserService.canAccessEnsemble is unconditionally true for them). If @RolesAllowed
+        // is ever widened, ensemble scoping must be enforced here.
 
         SetlistAssistantService.SuggestionOutcome outcome =
                 setlistAssistantService.suggestItems(collectionId, collection.getEnsembleId(), request.getGoal());
@@ -163,9 +159,9 @@ public class SheetCollectionsResourceImpl implements SheetCollectionsResource {
                         "suggestionCount",
                         outcome.suggestions().getItems().size(),
                         "inputTokens",
-                        outcome.tokenUsage() != null ? outcome.tokenUsage().inputTokenCount() : 0,
+                        TokenUsages.inputTokens(outcome.tokenUsage()),
                         "outputTokens",
-                        outcome.tokenUsage() != null ? outcome.tokenUsage().outputTokenCount() : 0));
+                        TokenUsages.outputTokens(outcome.tokenUsage())));
 
         return outcome.suggestions();
     }
