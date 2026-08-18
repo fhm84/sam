@@ -32,6 +32,7 @@ public interface CollectionItemMapper {
     @Mapping(target = "duration", source = "sheet.duration")
     @Mapping(target = "textContent", ignore = true)
     @Mapping(target = "attachment", ignore = true)
+    @Mapping(target = "orderNumber", ignore = true)
     CollectionItem toSheetItemDto(SheetCollectionItemEntity entity);
 
     @Mapping(target = "type", constant = "TEXT")
@@ -41,6 +42,7 @@ public interface CollectionItemMapper {
     @Mapping(target = "genre", ignore = true)
     @Mapping(target = "style", ignore = true)
     @Mapping(target = "duration", ignore = true)
+    @Mapping(target = "orderNumber", ignore = true)
     CollectionItem toTextItemDto(TextCollectionItemEntity entity);
 
     @Mapping(target = "id", ignore = true)

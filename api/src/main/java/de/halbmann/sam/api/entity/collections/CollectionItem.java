@@ -27,6 +27,12 @@ public class CollectionItem {
     @NotBlank
     String identifier;
 
+    /**
+     * 0-based position of this item within the collection's item list. Read-only — reorder via
+     * {@code PUT .../items/order}.
+     */
+    Integer orderNumber;
+
     // ── SHEET fields (populated when type = SHEET) ────────────────────────────
 
     UUID sheetId;

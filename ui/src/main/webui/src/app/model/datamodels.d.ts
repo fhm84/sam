@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 4.1.1 on 2026-08-17 17:34:28.
+// Generated using typescript-generator version 4.1.1 on 2026-08-18 12:55:22.
 
 export interface SheetEnrichment {
     suggestedAdditionalNotes?: string;
@@ -96,6 +96,7 @@ export interface CollectionItem {
     genre?: Genre;
     id?: string;
     identifier: string;
+    orderNumber?: number;
     sheetId?: string;
     style?: Style;
     subtitle?: string;

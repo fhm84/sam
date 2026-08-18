@@ -12,6 +12,14 @@ public interface SheetCollectionMapper {
 
     SheetCollection toDto(SheetCollectionEntity entity);
 
+    @AfterMapping
+    default void assignOrderNumbers(@MappingTarget SheetCollection dto) {
+        var items = dto.getItems();
+        for (int i = 0; i < items.size(); i++) {
+            items.get(i).setOrderNumber(i);
+        }
+    }
+
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "created", ignore = true)

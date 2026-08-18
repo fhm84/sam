@@ -35,6 +35,7 @@ import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -124,21 +125,24 @@ public class SheetCollectionService {
                 .orElseThrow(() -> new EntityNotFoundException("SheetCollection", collectionId));
 
         List<CollectionItemEntity> source = collection.getItems();
+        Set<String> myInstrumentIds = myPartsOnly && userId != null ? resolveInstrumentIds(userId) : null;
 
-        if (myPartsOnly && userId != null) {
-            Set<String> myInstrumentIds = resolveInstrumentIds(userId);
-            source = source.stream()
-                    .filter(item -> item instanceof SheetCollectionItemEntity sheetItem
+        List<CollectionItem> items = new ArrayList<>();
+        for (int i = 0; i < source.size(); i++) {
+            CollectionItemEntity entity = source.get(i);
+            boolean matchesFilter = myInstrumentIds == null
+                    || (entity instanceof SheetCollectionItemEntity sheetItem
                             && sheetItem.getSheet() != null
                             && sheetItem.getSheet().getInstrumentations().stream()
-                                    .anyMatch(i -> i.getInstrument() != null
+                                    .anyMatch(inst -> inst.getInstrument() != null
                                             && myInstrumentIds.contains(
-                                                    i.getInstrument().getId())))
-                    .toList();
+                                                    inst.getInstrument().getId())));
+            if (matchesFilter) {
+                CollectionItem dto = collectionItemMapper.toDto(entity);
+                dto.setOrderNumber(i);
+                items.add(dto);
+            }
         }
-
-        List<CollectionItem> items =
-                source.stream().map(collectionItemMapper::toDto).toList();
         PaginatedResponse<CollectionItem> response = new PaginatedResponse<>();
         response.setData(items);
         response.setPage(0);

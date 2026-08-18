@@ -80,14 +80,14 @@ class CollectionItemsReorderTest {
                     .statusCode(204);
         }
 
-        List<String> reorderedTexts = given().get("/api/sheet-collections/{id}/items", collectionId)
+        var response = given().get("/api/sheet-collections/{id}/items", collectionId)
                 .then()
                 .statusCode(200)
                 .extract()
-                .jsonPath()
-                .getList("data.textContent", String.class);
+                .jsonPath();
 
-        assertEquals(List.of("Item C", "Item B", "Item A"), reorderedTexts);
+        assertEquals(List.of("Item C", "Item B", "Item A"), response.getList("data.textContent", String.class));
+        assertEquals(List.of(0, 1, 2), response.getList("data.orderNumber", Integer.class));
     }
 
     @Test
