@@ -10,6 +10,18 @@
 
 A Quarkus-based application for archiving sheet music, managing instrumentations, musicians, and collections for bands and ensembles.
 
+> **Copyright and licensing**
+>
+> SAM is a tool for managing sheet music archives. It does not grant
+> permission to scan, reproduce, store, distribute, or share copyrighted
+> sheet music. Users and operators are responsible for obtaining all
+> required permissions and licenses and for respecting applicable copyright
+> law. This applies in particular to scanned PDFs and other digital copies.
+>
+> Only upload or share material for which the required rights or permissions
+> exist, such as public-domain material, appropriately licensed material,
+> or material covered by a specific permission.
+
 ## Quick Start
 
 ```bash
@@ -145,6 +157,33 @@ Set `quarkus.langchain4j.chat-model.provider` and enable exactly one provider:
 | `openai` (default) | `quarkus.langchain4j.openai.api-key=<key>`; model defaults to `gpt-4o` |
 | `ollama` | `quarkus.langchain4j.ollama.base-url=http://localhost:11434`; `quarkus.langchain4j.ollama.chat-model.model-id=llava` |
 | `vertexai` (Gemini) | `quarkus.langchain4j.vertexai.gemini.project-id=<id>` and `.location=<region>`; model: `gemini-2.0-flash` |
+
+## Copyright and Licensing
+
+SAM is software for cataloguing and managing sheet music. It does not
+provide any rights to the musical works, sheet music editions, lyrics,
+recordings, or other files managed with the application.
+
+The operator of a SAM instance is responsible for:
+
+- verifying the copyright and licensing status of each uploaded work;
+- obtaining permission to scan or otherwise digitise sheet music;
+- restricting access and downloads where required;
+- ensuring that shared collections and public links comply with the
+  applicable licence terms;
+- deleting material when the applicable permission or licence expires.
+
+Do not upload, distribute, or share copyrighted sheet music unless the
+required permission or licence has been obtained.
+
+The software licence of SAM is separate from the rights in any content
+stored in a SAM instance.
+
+For Germany, see for example:
+
+- [MIZ: Noten vervielfältigen, bearbeiten, veröffentlichen und verbreiten](https://miz.org/de/tutorials/noten-vervielfaeltigen-bearbeiten-veroeffentlichen-und-verbreiten)
+- [VG Musikedition: Vervielfältigungen](https://vg-musikedition.de/nutzer/vervielfaeltigungen)
+- [frag-amu.de: Digitale Noten](https://frag-amu.de/digitale-noten/)
 
 ## Contributing
 
