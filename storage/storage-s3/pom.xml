@@ -12,7 +12,7 @@
     <artifactId>storage-s3</artifactId>
 
     <properties>
-        <s3.version>2.53.1</s3.version>
+        <s3.version>2.54.10</s3.version>
     </properties>
 
     <dependencies>
