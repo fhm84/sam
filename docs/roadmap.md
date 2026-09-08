@@ -269,10 +269,10 @@ entity — no separate `User` entity.
 (e.g. Bb Trumpet + Flugelhorn) sees all matching instrumentations. Results are grouped
 per sheet — one row per sheet with all matching parts shown as chips.
 
-**Still needs:** frontend OIDC integration to wire the actual logged-in user's `sub` claim
-into the API call. Until then the endpoint returns an empty list for all authenticated
-users (the security enforcement is in place; the JWT subject plumbing is the missing piece
-— see Full RBAC remaining work).
+**Update (verified 2026-09-08):** frontend OIDC is fully wired (`angular-auth-oidc-client`);
+the "My Parts" view (`/my-parts`) resolves the real logged-in user's `sub` claim end-to-end,
+not a stub. The remaining gap is UI role-awareness, not identity plumbing — see "Full RBAC
+remaining work" below.
 
 **Stakeholders:** S3 (Musiker), S1 (music librarian)
 **Effort:** Medium–High (requires auth foundation)
@@ -340,6 +340,23 @@ Claude Design `Hi-Fi Shell (PrimeNG).html`. Full details in local planning notes
 
 ---
 
+### Business metrics in Grafana — `idea`
+
+The existing Prometheus/Grafana stack (`monitoring/grafana/dashboards/sam.json`) only
+covers ops metrics — HTTP request rate/latency/errors, JVM heap/GC, HikariCP pool, AI
+classification duration, LLM token usage. It has no business-entity counts (total
+sheets, collections, musicians, ensembles, instruments, voices).
+
+Add Micrometer gauges for these counts (e.g. via a scheduled or on-demand repository
+count query) so they're scraped by Prometheus and can be charted in Grafana alongside
+the ops panels — distinct from the in-app "Home dashboard" KPIs below, which are
+read-in-the-UI rather than an ops/trend view.
+
+**Stakeholders:** S4 (Administrator)
+**Effort:** Low (Micrometer gauge registration + a new Grafana panel)
+
+---
+
 ### Archive dashboard — `idea`
 
 A single overview page for the music librarian and Dirigent summarising archive health:
@@ -403,11 +420,26 @@ auth model.
 
 **Roles implemented:** `admin` · `music_librarian` (Keycloak realm roles)
 
-**Remaining (Phase 4+):**
-- Frontend OIDC integration (Angular + Keycloak JS adapter or PKCE flow)
-- Role-aware UI (hide write actions for read-only users, show only accessible ensembles)
-- "My parts" view scoped to the logged-in musician's ensemble memberships
-- Conductor role surfaced in the UI (currently stored in data model, not yet used for access control)
+**Done:** Frontend OIDC integration (`angular-auth-oidc-client`) and the "My parts" view
+scoped to the logged-in musician's ensemble memberships (`/my-parts`, `GET /api/me/parts`)
+— both verified working end-to-end as of 2026-09-08.
+
+**Remaining (Phase 4+) — role-aware UI, verified still missing 2026-09-08:**
+- **Route/menu guarding by role** — `app.routes.ts` only gates on "authenticated or not"
+  (`authGuard`); `app-menu.ts` has no role filtering at all. Any authenticated user
+  currently sees and can navigate to `admin/ensembles`, `admin/instruments`,
+  `admin/configuration`, `admin/event-logs` in the menu regardless of role — the backend's
+  `@RolesAllowed` still blocks writes, but read-only UI exposure is broader than intended
+  for a plain `music_librarian`/musician account.
+- **No frontend ensemble/context service** — "ensemble" only exists as a local filter
+  dropdown inside the sheets list (`sheets.ts`); there is no shared context (selected
+  ensemble/sheet) that other features (menu, dashboards, forms) could read from. This is
+  the natural foundation for both route guarding above and use-case-tailored UI below.
+- **Use-case-tailored UI** — no differentiation in what's shown/available between
+  Musiker, music librarian (Notenwart), Dirigent, and Guest beyond raw role checks; e.g.
+  no simplified/guest-appropriate views distinct from the full librarian UI.
+- Conductor role surfaced in the UI (currently stored in data model, not yet used for
+  access control)
 
 **Stakeholders:** All
 **Effort:** High
@@ -433,6 +465,24 @@ Tokens are resource-scoped (one token = one resource), not broad API keys.
 
 **Stakeholders:** S1 (music librarian), S3b (Guest musician)
 **Effort:** Low–Medium
+
+---
+
+### Instrument-limited setlist sharing — `idea`
+
+A `COLLECTION` share token currently grants access to the full setlist — the TOC plus
+*every* instrument's parts within it. There is no way to share a setlist scoped to
+specific instruments only (e.g. "send the trumpet parts for this concert to the guest
+trumpeter" without exposing every other section's material).
+
+`ShareType.INSTRUMENTATION` already covers the single-sheet, single-part case, but not
+"one instrument, across all pieces in a setlist." Would need either a new share type
+(collection + instrument filter) or an `instrumentIds` filter list stored alongside the
+existing `COLLECTION` share row and enforced in `ShareService`/`PublicShareResourceImpl`.
+
+**Stakeholders:** S1 (music librarian), S3b (Guest musician)
+**Effort:** Low–Medium
+**Depends on:** Shared document links (already done)
 
 ---
 
