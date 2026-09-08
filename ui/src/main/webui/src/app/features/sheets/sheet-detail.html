@@ -393,13 +393,14 @@
               [loading]="instrumentationsLoading()"
               dataKey="id"
               [expandedRowKeys]="expandedRows"
+              [scrollable]="true"
             >
               <ng-template #header>
                 <tr>
                   <th class="expand-col"></th>
                   <th>{{ 'sheets.instrumentations.columns.instrument' | translate }}</th>
                   <th class="docs-col">{{ 'sheets.instrumentations.columns.documents' | translate }}</th>
-                  <th>{{ 'sheets.instrumentations.columns.actions' | translate }}</th>
+                  <th pFrozenColumn alignFrozen="right">{{ 'sheets.instrumentations.columns.actions' | translate }}</th>
                 </tr>
               </ng-template>
               <ng-template #body let-instr let-expanded="expanded">
@@ -437,37 +438,39 @@
                       }
                     </div>
                   </td>
-                  <td class="flex gap-1">
-                    <p-button
-                      icon="pi pi-pencil"
-                      [rounded]="true"
-                      [text]="true"
-                      size="small"
-                      styleClass="row-action"
-                      [pTooltip]="'sheets.instrumentations.edit' | translate"
-                      tooltipPosition="top"
-                      (onClick)="openEditInstrumentation(instr)"
-                    />
-                    <p-button
-                      icon="pi pi-share-alt"
-                      [rounded]="true"
-                      [text]="true"
-                      size="small"
-                      styleClass="row-action"
-                      [pTooltip]="'shares.tooltip' | translate"
-                      tooltipPosition="top"
-                      (onClick)="openShareDialog(instr)"
-                    />
-                    <p-button
-                      icon="pi pi-trash"
-                      [rounded]="true"
-                      [text]="true"
-                      size="small"
-                      styleClass="row-action row-action-danger"
-                      [pTooltip]="'common.delete' | translate"
-                      tooltipPosition="top"
-                      (onClick)="confirmDeleteInstrumentation(instr)"
-                    />
+                  <td pFrozenColumn alignFrozen="right">
+                    <app-row-actions [items]="instrumentationRowMenuItems(instr)" size="small">
+                      <p-button
+                        icon="pi pi-pencil"
+                        [rounded]="true"
+                        [text]="true"
+                        size="small"
+                        styleClass="row-action"
+                        [pTooltip]="'sheets.instrumentations.edit' | translate"
+                        tooltipPosition="top"
+                        (onClick)="openEditInstrumentation(instr)"
+                      />
+                      <p-button
+                        icon="pi pi-share-alt"
+                        [rounded]="true"
+                        [text]="true"
+                        size="small"
+                        styleClass="row-action"
+                        [pTooltip]="'shares.tooltip' | translate"
+                        tooltipPosition="top"
+                        (onClick)="openShareDialog(instr)"
+                      />
+                      <p-button
+                        icon="pi pi-trash"
+                        [rounded]="true"
+                        [text]="true"
+                        size="small"
+                        styleClass="row-action row-action-danger"
+                        [pTooltip]="'common.delete' | translate"
+                        tooltipPosition="top"
+                        (onClick)="confirmDeleteInstrumentation(instr)"
+                      />
+                    </app-row-actions>
                   </td>
                 </tr>
               </ng-template>
@@ -806,6 +809,7 @@
           [loading]="instrumentationsLoading()"
           dataKey="id"
           [expandedRowKeys]="expandedRows"
+          [scrollable]="true"
         >
           <ng-template #header>
             <tr>
@@ -813,7 +817,7 @@
               <th>{{ 'sheets.instrumentations.columns.instrument' | translate }}</th>
               <th>{{ 'sheets.instrumentations.columns.clef' | translate }}</th>
               <th class="docs-col">{{ 'sheets.instrumentations.columns.documents' | translate }}</th>
-              <th>{{ 'sheets.instrumentations.columns.actions' | translate }}</th>
+              <th pFrozenColumn alignFrozen="right">{{ 'sheets.instrumentations.columns.actions' | translate }}</th>
             </tr>
           </ng-template>
           <ng-template #body let-instr let-expanded="expanded">
@@ -852,37 +856,39 @@
                   }
                 </div>
               </td>
-              <td class="flex gap-1">
-                <p-button
-                  icon="pi pi-pencil"
-                  [rounded]="true"
-                  [text]="true"
-                  size="small"
-                  styleClass="row-action"
-                  [pTooltip]="'sheets.instrumentations.edit' | translate"
-                  tooltipPosition="top"
-                  (onClick)="openEditInstrumentation(instr)"
-                />
-                <p-button
-                  icon="pi pi-share-alt"
-                  [rounded]="true"
-                  [text]="true"
-                  size="small"
-                  styleClass="row-action"
-                  [pTooltip]="'shares.tooltip' | translate"
-                  tooltipPosition="top"
-                  (onClick)="openShareDialog(instr)"
-                />
-                <p-button
-                  icon="pi pi-trash"
-                  [rounded]="true"
-                  [text]="true"
-                  size="small"
-                  styleClass="row-action row-action-danger"
-                  [pTooltip]="'common.delete' | translate"
-                  tooltipPosition="top"
-                  (onClick)="confirmDeleteInstrumentation(instr)"
-                />
+              <td pFrozenColumn alignFrozen="right">
+                <app-row-actions [items]="instrumentationRowMenuItems(instr)" size="small">
+                  <p-button
+                    icon="pi pi-pencil"
+                    [rounded]="true"
+                    [text]="true"
+                    size="small"
+                    styleClass="row-action"
+                    [pTooltip]="'sheets.instrumentations.edit' | translate"
+                    tooltipPosition="top"
+                    (onClick)="openEditInstrumentation(instr)"
+                  />
+                  <p-button
+                    icon="pi pi-share-alt"
+                    [rounded]="true"
+                    [text]="true"
+                    size="small"
+                    styleClass="row-action"
+                    [pTooltip]="'shares.tooltip' | translate"
+                    tooltipPosition="top"
+                    (onClick)="openShareDialog(instr)"
+                  />
+                  <p-button
+                    icon="pi pi-trash"
+                    [rounded]="true"
+                    [text]="true"
+                    size="small"
+                    styleClass="row-action row-action-danger"
+                    [pTooltip]="'common.delete' | translate"
+                    tooltipPosition="top"
+                    (onClick)="confirmDeleteInstrumentation(instr)"
+                  />
+                </app-row-actions>
               </td>
             </tr>
           </ng-template>

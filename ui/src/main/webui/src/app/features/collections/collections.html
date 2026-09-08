@@ -72,6 +72,7 @@
       [totalRecords]="totalRecords()"
       [loading]="loading()"
       [rowsPerPageOptions]="[10, 25, 50]"
+      [scrollable]="true"
       (onLazyLoad)="onLazyLoad($event)"
     >
       <ng-template #header>
@@ -80,7 +81,7 @@
           <th>{{ 'collections.columns.type' | translate }}</th>
           <th>{{ 'collections.columns.date' | translate }}</th>
           <th>{{ 'collections.columns.sheets' | translate }}</th>
-          <th>{{ 'collections.columns.actions' | translate }}</th>
+          <th pFrozenColumn alignFrozen="right">{{ 'collections.columns.actions' | translate }}</th>
         </tr>
       </ng-template>
 
@@ -102,25 +103,27 @@
           </td>
           <td>{{ formatDate(collection.date) }}</td>
           <td>{{ collection.sheets?.length ?? 0 }}</td>
-          <td class="flex gap-1">
-            <p-button
-              icon="pi pi-pencil"
-              [rounded]="true"
-              [text]="true"
-              styleClass="row-action"
-              [pTooltip]="'collections.edit' | translate"
-              tooltipPosition="top"
-              (onClick)="openEdit(collection)"
-            />
-            <p-button
-              icon="pi pi-trash"
-              [rounded]="true"
-              [text]="true"
-              styleClass="row-action row-action-danger"
-              [pTooltip]="'common.delete' | translate"
-              tooltipPosition="top"
-              (onClick)="confirmDelete(collection)"
-            />
+          <td pFrozenColumn alignFrozen="right">
+            <app-row-actions [items]="rowMenuItems(collection)">
+              <p-button
+                icon="pi pi-pencil"
+                [rounded]="true"
+                [text]="true"
+                styleClass="row-action"
+                [pTooltip]="'collections.edit' | translate"
+                tooltipPosition="top"
+                (onClick)="openEdit(collection)"
+              />
+              <p-button
+                icon="pi pi-trash"
+                [rounded]="true"
+                [text]="true"
+                styleClass="row-action row-action-danger"
+                [pTooltip]="'common.delete' | translate"
+                tooltipPosition="top"
+                (onClick)="confirmDelete(collection)"
+              />
+            </app-row-actions>
           </td>
         </tr>
       </ng-template>

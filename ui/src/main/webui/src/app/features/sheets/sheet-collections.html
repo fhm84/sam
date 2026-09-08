@@ -4,13 +4,14 @@
     data-testid="sheet-collections-table"
     [value]="collections()"
     [loading]="loading()"
+    [scrollable]="true"
   >
     <ng-template #header>
       <tr>
         <th class="w-20">{{ 'collections.items.columns.identifier' | translate }}</th>
         <th>{{ 'sheets.collections.columnCollection' | translate }}</th>
         <th class="w-36">{{ 'collections.columns.type' | translate }}</th>
-        <th class="w-20">{{ 'collections.columns.actions' | translate }}</th>
+        <th class="w-20" pFrozenColumn alignFrozen="right">{{ 'collections.columns.actions' | translate }}</th>
       </tr>
     </ng-template>
 
@@ -29,20 +30,18 @@
         <td>
           <p-tag [value]="'collections.types.' + col.type | translate" severity="secondary" />
         </td>
-        <td>
-          <div class="flex gap-1 items-center">
-            <p-button
-              icon="pi pi-times"
-              [rounded]="true"
-              [text]="true"
-              size="small"
-              severity="danger"
-              [attr.data-testid]="'btn-remove-from-collection-' + col.id"
-              [pTooltip]="'common.remove' | translate"
-              tooltipPosition="top"
-              (onClick)="confirmRemove(col)"
-            />
-          </div>
+        <td pFrozenColumn alignFrozen="right">
+          <p-button
+            icon="pi pi-times"
+            [rounded]="true"
+            [text]="true"
+            size="small"
+            severity="danger"
+            [attr.data-testid]="'btn-remove-from-collection-' + col.id"
+            [pTooltip]="'common.remove' | translate"
+            tooltipPosition="top"
+            (onClick)="confirmRemove(col)"
+          />
         </td>
       </tr>
     </ng-template>

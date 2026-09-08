@@ -160,6 +160,7 @@
       [totalRecords]="totalRecords()"
       [loading]="loading()"
       [rowsPerPageOptions]="[20, 50, 100]"
+      [scrollable]="true"
       (onLazyLoad)="onLazyLoad($event)"
     >
       <ng-template #header>
@@ -177,7 +178,7 @@
           @if (selectedEnsemble()) {
             <th class="w-20 !text-center">{{ 'sheets.columns.coverage' | translate }}</th>
           }
-          <th>{{ 'sheets.columns.actions' | translate }}</th>
+          <th pFrozenColumn alignFrozen="right">{{ 'sheets.columns.actions' | translate }}</th>
         </tr>
       </ng-template>
 
@@ -246,37 +247,39 @@
               }
             </td>
           }
-          <td class="flex gap-1">
-            <p-button
-              icon="pi pi-folder-plus"
-              [rounded]="true"
-              [text]="true"
-              styleClass="row-action"
-              [attr.data-testid]="'btn-add-to-collection-' + sheet.id"
-              [pTooltip]="'common.addToCollection' | translate"
-              tooltipPosition="top"
-              (onClick)="openCollectionsDialog(sheet, $event)"
-            />
-            <p-button
-              icon="pi pi-pencil"
-              [rounded]="true"
-              [text]="true"
-              styleClass="row-action"
-              [attr.data-testid]="'btn-edit-sheet-' + sheet.id"
-              [pTooltip]="'sheets.edit' | translate"
-              tooltipPosition="top"
-              (onClick)="openEdit(sheet); $event.stopPropagation()"
-            />
-            <p-button
-              icon="pi pi-trash"
-              [rounded]="true"
-              [text]="true"
-              styleClass="row-action row-action-danger"
-              [attr.data-testid]="'btn-delete-sheet-' + sheet.id"
-              [pTooltip]="'common.delete' | translate"
-              tooltipPosition="top"
-              (onClick)="confirmDelete(sheet); $event.stopPropagation()"
-            />
+          <td pFrozenColumn alignFrozen="right">
+            <app-row-actions [items]="rowMenuItems(sheet)">
+              <p-button
+                icon="pi pi-folder-plus"
+                [rounded]="true"
+                [text]="true"
+                styleClass="row-action"
+                [attr.data-testid]="'btn-add-to-collection-' + sheet.id"
+                [pTooltip]="'common.addToCollection' | translate"
+                tooltipPosition="top"
+                (onClick)="openCollectionsDialog(sheet, $event)"
+              />
+              <p-button
+                icon="pi pi-pencil"
+                [rounded]="true"
+                [text]="true"
+                styleClass="row-action"
+                [attr.data-testid]="'btn-edit-sheet-' + sheet.id"
+                [pTooltip]="'sheets.edit' | translate"
+                tooltipPosition="top"
+                (onClick)="openEdit(sheet); $event.stopPropagation()"
+              />
+              <p-button
+                icon="pi pi-trash"
+                [rounded]="true"
+                [text]="true"
+                styleClass="row-action row-action-danger"
+                [attr.data-testid]="'btn-delete-sheet-' + sheet.id"
+                [pTooltip]="'common.delete' | translate"
+                tooltipPosition="top"
+                (onClick)="confirmDelete(sheet); $event.stopPropagation()"
+              />
+            </app-row-actions>
           </td>
         </tr>
       </ng-template>

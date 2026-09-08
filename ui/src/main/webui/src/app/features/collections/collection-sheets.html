@@ -48,6 +48,7 @@
     data-testid="collection-items-table"
     [value]="items()"
     [loading]="loading()"
+    [scrollable]="true"
     (onRowReorder)="onRowReorder($event)"
   >
     <ng-template #header>
@@ -57,7 +58,7 @@
         <th>{{ 'collections.items.columns.title' | translate }}</th>
         <th class="w-28">{{ 'collections.items.columns.type' | translate }}</th>
         <th class="w-32">{{ 'collections.items.columns.genre' | translate }}</th>
-        <th class="w-32">{{ 'collections.items.columns.actions' | translate }}</th>
+        <th class="w-32" pFrozenColumn alignFrozen="right">{{ 'collections.items.columns.actions' | translate }}</th>
       </tr>
     </ng-template>
 
@@ -108,8 +109,8 @@
             —
           }
         </td>
-        <td>
-          <div class="flex gap-1 items-center">
+        <td pFrozenColumn alignFrozen="right">
+          <app-row-actions [items]="rowMenuItems(item)" size="small">
             <p-button
               icon="pi pi-pencil"
               [rounded]="true"
@@ -171,7 +172,7 @@
               [attr.data-testid]="'btn-delete-item-' + item.id"
               (onClick)="confirmRemove(item)"
             />
-          </div>
+          </app-row-actions>
         </td>
       </tr>
     </ng-template>

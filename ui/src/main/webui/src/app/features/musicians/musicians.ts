@@ -15,6 +15,7 @@ import { AuthService } from '../../core/auth/auth.service';
 import { Musician, MusicianFilterRequest } from '../../model/datamodels';
 import { BaseCrudList } from '../../shared/base/base-crud-list';
 import { CrudApi } from '../../shared/base/crud-api.interface';
+import { RowActions } from '../../shared/components/row-actions/row-actions';
 import { MusicianForm } from './musician-form';
 
 @Component({
@@ -23,7 +24,8 @@ import { MusicianForm } from './musician-form';
     TableModule,
     Dialog,
     ConfirmDialog,
-Button,
+    RowActions,
+    Button,
     Tooltip,
     InputText,
     IconField,

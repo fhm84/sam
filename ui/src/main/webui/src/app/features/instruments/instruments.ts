@@ -16,6 +16,7 @@ import { InstrumentsApiService } from '../../core/api';
 import { Instrument, InstrumentFilterRequest, InstrumentTransposing } from '../../model/datamodels';
 import { BaseCrudList } from '../../shared/base/base-crud-list';
 import { CrudApi } from '../../shared/base/crud-api.interface';
+import { RowActions } from '../../shared/components/row-actions/row-actions';
 import { InstrumentForm } from './instrument-form';
 
 @Component({
@@ -24,6 +25,7 @@ import { InstrumentForm } from './instrument-form';
     TableModule,
     Dialog,
     ConfirmDialog,
+    RowActions,
     Button,
     Tooltip,
     InputText,

@@ -3,7 +3,7 @@ import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { Dialog } from 'primeng/dialog';
 import { ConfirmDialog } from 'primeng/confirmdialog';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { Button } from 'primeng/button';
 import { Tag } from 'primeng/tag';
 import { Select } from 'primeng/select';
@@ -19,6 +19,7 @@ import { EnsemblesApiService, InstrumentsApiService, MusiciansApiService } from 
 import { CreateEnsembleMembership, EnsembleMembership, EnsembleVoice, Instrument, Musician } from '../../model/datamodels';
 import { FETCH_ALL_SIZE } from '../../shared/constants';
 import { instrumentLabel } from '../../shared/utils/format.utils';
+import { RowActions } from '../../shared/components/row-actions/row-actions';
 
 @Component({
   selector: 'app-ensemble-memberships',
@@ -27,6 +28,7 @@ import { instrumentLabel } from '../../shared/utils/format.utils';
     TableModule,
     Dialog,
     ConfirmDialog,
+    RowActions,
     Button,
     Tag,
     Select,
@@ -246,6 +248,13 @@ export class EnsembleMemberships implements OnChanges, OnInit {
         });
       },
     });
+  }
+
+  protected rowMenuItems(member: EnsembleMembership): MenuItem[] {
+    return [
+      { label: this.t.t('ensembles.members.edit'), icon: 'pi pi-pencil', command: () => this.openEdit(member) },
+      { label: this.t.t('common.delete'), icon: 'pi pi-trash', styleClass: 'row-menu-danger', command: () => this.confirmDelete(member) },
+    ];
   }
 
   // ── Helpers ───────────────────────────────────────────

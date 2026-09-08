@@ -2,7 +2,7 @@ import { DestroyRef, Directive, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subject, debounceTime } from 'rxjs';
 import { TableLazyLoadEvent } from 'primeng/table';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { TranslationService } from '../../core/translation.service';
 import { PaginationRequest } from '../../model/datamodels';
 import { CrudApi } from './crud-api.interface';
@@ -18,6 +18,14 @@ export abstract class BaseCrudList<T, F extends PaginationRequest> implements On
   protected readonly totalRecords = signal(0);
   protected readonly loading = signal(true);
   protected rows = 10;
+
+  /** Menu items for the mobile row-actions kebab (`<app-row-actions>`); override to add more than edit/delete. */
+  protected rowMenuItems(item: T): MenuItem[] {
+    return [
+      { label: this.t.t(`${this.translationPrefix}.edit`), icon: 'pi pi-pencil', command: () => this.openEdit(item) },
+      { label: this.t.t('common.delete'), icon: 'pi pi-trash', styleClass: 'row-menu-danger', command: () => this.confirmDelete(item) },
+    ];
+  }
 
   protected dialogVisible = false;
   protected editingItem: T | null = null;

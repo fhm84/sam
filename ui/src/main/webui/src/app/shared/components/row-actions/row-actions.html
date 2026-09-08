@@ -1,0 +1,14 @@
+<div class="actions-wide gap-1">
+  <ng-content />
+</div>
+<div class="actions-narrow">
+  <p-button
+    icon="pi pi-ellipsis-v"
+    [rounded]="true"
+    [text]="true"
+    [size]="size()"
+    styleClass="row-action"
+    (onClick)="menu.toggle($event); $event.stopPropagation()"
+  />
+  <p-menu #menu [model]="items()" [popup]="true" appendTo="body" />
+</div>

@@ -3,7 +3,7 @@ import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { Dialog } from 'primeng/dialog';
 import { ConfirmDialog } from 'primeng/confirmdialog';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { Button } from 'primeng/button';
 import { Tag } from 'primeng/tag';
 import { Select } from 'primeng/select';
@@ -19,6 +19,7 @@ import { EnsemblesApiService, InstrumentsApiService } from '../../core/api';
 import { CreateVoiceOption, Instrument, VoiceOption, VoiceOptionType } from '../../model/datamodels';
 import { FETCH_ALL_SIZE } from '../../shared/constants';
 import { convertEmptyStringsToNull } from '../../shared/utils/object.utils';
+import { RowActions } from '../../shared/components/row-actions/row-actions';
 
 @Component({
   selector: 'app-voice-options',
@@ -27,6 +28,7 @@ import { convertEmptyStringsToNull } from '../../shared/utils/object.utils';
     TableModule,
     Dialog,
     ConfirmDialog,
+    RowActions,
     Button,
     Tag,
     Select,
@@ -212,6 +214,13 @@ export class VoiceOptions implements OnChanges, OnInit {
         });
       },
     });
+  }
+
+  protected rowMenuItems(option: VoiceOption): MenuItem[] {
+    return [
+      { label: this.t.t('ensembles.voices.options.edit'), icon: 'pi pi-pencil', command: () => this.openEditOption(option) },
+      { label: this.t.t('common.delete'), icon: 'pi pi-trash', styleClass: 'row-menu-danger', command: () => this.confirmDeleteOption(option) },
+    ];
   }
 
   // ── Helpers ───────────────────────────────────────────

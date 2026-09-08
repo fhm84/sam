@@ -14,6 +14,7 @@
     [value]="shares()"
     [loading]="loading()"
     [rowHover]="true"
+    [scrollable]="true"
     styleClass="p-datatable-sm"
   >
     <ng-template #header>
@@ -23,7 +24,7 @@
         <th>{{ 'shares.page.col.created' | translate }}</th>
         <th>{{ 'shares.page.col.expires' | translate }}</th>
         <th>{{ 'shares.page.col.status' | translate }}</th>
-        <th></th>
+        <th pFrozenColumn alignFrozen="right"></th>
       </tr>
     </ng-template>
 
@@ -56,9 +57,9 @@
             [severity]="statusSeverity(share)"
           />
         </td>
-        <td>
-          <div class="flex items-center gap-1 justify-end">
-            @if (shareStatus(share) === 'active') {
+        <td pFrozenColumn alignFrozen="right">
+          @if (shareStatus(share) === 'active') {
+            <app-row-actions [items]="rowMenuItems(share)" size="small">
               <p-button
                 icon="pi pi-copy"
                 [text]="true"
@@ -78,8 +79,8 @@
                 tooltipPosition="top"
                 (onClick)="confirmRevoke(share)"
               />
-            }
-          </div>
+            </app-row-actions>
+          }
         </td>
       </tr>
     </ng-template>

@@ -32,6 +32,7 @@
     [totalRecords]="totalRecords()"
     [loading]="loading()"
     [rowsPerPageOptions]="[10, 25, 50]"
+    [scrollable]="true"
     (onLazyLoad)="onLazyLoad($event)"
   >
     <ng-template #header>
@@ -40,7 +41,7 @@
         <th>{{ 'musicians.columns.ipi' | translate }}</th>
         <th>{{ 'musicians.columns.birthYear' | translate }}</th>
         <th>{{ 'musicians.columns.deathYear' | translate }}</th>
-        <th>{{ 'musicians.columns.actions' | translate }}</th>
+        <th pFrozenColumn alignFrozen="right">{{ 'musicians.columns.actions' | translate }}</th>
       </tr>
     </ng-template>
 
@@ -61,25 +62,27 @@
         <td>{{ musician.ipi }}</td>
         <td>{{ musician.birthYear }}</td>
         <td>{{ musician.deathYear }}</td>
-        <td class="flex gap-1">
-          <p-button
-            icon="pi pi-pencil"
-            [rounded]="true"
-            [text]="true"
-            styleClass="row-action"
-            [pTooltip]="'musicians.edit' | translate"
-            tooltipPosition="top"
-            (onClick)="openEdit(musician)"
-          />
-          <p-button
-            icon="pi pi-trash"
-            [rounded]="true"
-            [text]="true"
-            styleClass="row-action row-action-danger"
-            [pTooltip]="'common.delete' | translate"
-            tooltipPosition="top"
-            (onClick)="confirmDelete(musician)"
-          />
+        <td pFrozenColumn alignFrozen="right">
+          <app-row-actions [items]="rowMenuItems(musician)">
+            <p-button
+              icon="pi pi-pencil"
+              [rounded]="true"
+              [text]="true"
+              styleClass="row-action"
+              [pTooltip]="'musicians.edit' | translate"
+              tooltipPosition="top"
+              (onClick)="openEdit(musician)"
+            />
+            <p-button
+              icon="pi pi-trash"
+              [rounded]="true"
+              [text]="true"
+              styleClass="row-action row-action-danger"
+              [pTooltip]="'common.delete' | translate"
+              tooltipPosition="top"
+              (onClick)="confirmDelete(musician)"
+            />
+          </app-row-actions>
         </td>
       </tr>
     </ng-template>

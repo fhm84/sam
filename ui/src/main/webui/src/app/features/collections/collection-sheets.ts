@@ -6,7 +6,7 @@ import { Subject, debounceTime } from 'rxjs';
 import { TableLazyLoadEvent, TableModule, TableRowReorderEvent } from 'primeng/table';
 import { Dialog } from 'primeng/dialog';
 import { ConfirmDialog } from 'primeng/confirmdialog';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { Button } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
 import { Textarea } from 'primeng/textarea';
@@ -27,6 +27,7 @@ import {
   SuggestedSetlistItem,
 } from '../../model/datamodels';
 import { DIFFICULTY_LEVELS } from '../../shared/constants';
+import { RowActions } from '../../shared/components/row-actions/row-actions';
 
 @Component({
   selector: 'app-collection-sheets',
@@ -37,6 +38,7 @@ import { DIFFICULTY_LEVELS } from '../../shared/constants';
     TableModule,
     Dialog,
     ConfirmDialog,
+    RowActions,
     Button,
     InputText,
     Textarea,
@@ -342,6 +344,31 @@ export class CollectionSheets implements OnInit, OnChanges {
         });
       },
     });
+  }
+
+  protected rowMenuItems(item: CollectionItem): MenuItem[] {
+    const items: MenuItem[] = [
+      {
+        label: this.t.t(item.type === 'SHEET' ? 'collections.items.editSheet' : 'collections.items.editTextBlock'),
+        icon: 'pi pi-pencil',
+        command: () => this.openEdit(item),
+      },
+    ];
+    if (item.type === 'TEXT') {
+      items.push({
+        label: this.t.t('collections.items.assistant.draftText'),
+        icon: 'pi pi-sparkles',
+        command: () => this.onDraftText(item),
+      });
+      items.push(
+        item.attachment
+          ? { label: this.t.t('collections.items.attachment.remove'), icon: 'pi pi-paperclip', styleClass: 'row-menu-danger', command: () => this.confirmRemoveAttachment(item) }
+          : { label: this.t.t('collections.items.attachment.upload'), icon: 'pi pi-upload', command: () => this.triggerAttachmentUpload(item) },
+      );
+    }
+    items.push({ separator: true });
+    items.push({ label: this.t.t('common.delete'), icon: 'pi pi-trash', styleClass: 'row-menu-danger', command: () => this.confirmRemove(item) });
+    return items;
   }
 
   // ── Attachment ────────────────────────────────────────

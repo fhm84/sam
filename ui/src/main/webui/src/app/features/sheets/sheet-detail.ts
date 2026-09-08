@@ -3,7 +3,7 @@ import { forkJoin } from 'rxjs';
 import { TableModule } from 'primeng/table';
 import { Dialog } from 'primeng/dialog';
 import { ConfirmDialog } from 'primeng/confirmdialog';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { Button } from 'primeng/button';
 import { Panel } from 'primeng/panel';
 import { Select } from 'primeng/select';
@@ -25,6 +25,7 @@ import { EnrichmentDialog } from './enrichment-dialog/enrichment-dialog';
 import { SheetCollections } from './sheet-collections';
 import { ShareDialogComponent } from '../../shared/share-dialog/share-dialog';
 import { formatDuration, instrumentLabel } from '../../shared/utils/format.utils';
+import { RowActions } from '../../shared/components/row-actions/row-actions';
 
 @Component({
   selector: 'app-sheet-detail',
@@ -32,6 +33,7 @@ import { formatDuration, instrumentLabel } from '../../shared/utils/format.utils
     TableModule,
     Dialog,
     ConfirmDialog,
+    RowActions,
     Button,
     Panel,
     Select,
@@ -206,6 +208,14 @@ export class SheetDetail extends DocumentHandler implements OnChanges {
 
   protected openShareSheetDialog(): void {
     this.shareSheetDialogVisible = true;
+  }
+
+  protected instrumentationRowMenuItems(instr: Instrumentation): MenuItem[] {
+    return [
+      { label: this.t.t('sheets.instrumentations.edit'), icon: 'pi pi-pencil', command: () => this.openEditInstrumentation(instr) },
+      { label: this.t.t('shares.tooltip'), icon: 'pi pi-share-alt', command: () => this.openShareDialog(instr) },
+      { label: this.t.t('common.delete'), icon: 'pi pi-trash', styleClass: 'row-menu-danger', command: () => this.confirmDeleteInstrumentation(instr) },
+    ];
   }
 
   protected confirmDeleteInstrumentation(instr: Instrumentation): void {

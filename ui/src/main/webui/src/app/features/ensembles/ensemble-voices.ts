@@ -3,7 +3,7 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { TableModule } from 'primeng/table';
 import { Dialog } from 'primeng/dialog';
 import { ConfirmDialog } from 'primeng/confirmdialog';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { Button } from 'primeng/button';
 import { Tag } from 'primeng/tag';
 import { Tooltip } from 'primeng/tooltip';
@@ -18,6 +18,7 @@ import { EnsemblesApiService } from '../../core/api';
 import { CreateEnsembleVoice, EnsembleVoice } from '../../model/datamodels';
 import { convertEmptyStringsToNull } from '../../shared/utils/object.utils';
 import { VoiceOptions } from './voice-options';
+import { RowActions } from '../../shared/components/row-actions/row-actions';
 
 @Component({
   selector: 'app-ensemble-voices',
@@ -26,6 +27,7 @@ import { VoiceOptions } from './voice-options';
     TableModule,
     Dialog,
     ConfirmDialog,
+    RowActions,
     Button,
     Tag,
     Tooltip,
@@ -178,6 +180,14 @@ export class EnsembleVoices implements OnChanges {
         });
       },
     });
+  }
+
+  protected rowMenuItems(voice: EnsembleVoice): MenuItem[] {
+    return [
+      { label: this.t.t('ensembles.voices.options.title'), icon: 'pi pi-cog', command: () => this.openOptions(voice) },
+      { label: this.t.t('ensembles.voices.edit'), icon: 'pi pi-pencil', command: () => this.openEditVoice(voice) },
+      { label: this.t.t('common.delete'), icon: 'pi pi-trash', styleClass: 'row-menu-danger', command: () => this.confirmDeleteVoice(voice) },
+    ];
   }
 
   private loadVoices(): void {

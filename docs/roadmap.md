@@ -885,6 +885,49 @@ local planning notes (`plan_sheets_overview.md`, not in the repo).
 
 ---
 
+### Server-side musician search (composer/arranger fields) — `idea`
+
+The composer/arranger pickers in the sheet create/edit form (`sheet-form.html`) use a
+PrimeNG `p-select` with `[filter]="true"` — it loads the *entire* musician list up front
+and filters client-side, not a real typeahead against the backend. Fine at today's scale;
+will get slow to load and unwieldy to scroll once the musician table grows.
+
+Replace with `p-autocomplete` backed by a debounced `GET /musicians?search=...` call
+(the search infrastructure — trigram/phonetic matching — already exists for sheets and
+could be reused/extended for musicians).
+
+**Stakeholders:** S1 (music librarian)
+**Effort:** Low (existing search patterns to reuse; swap one form control)
+
+---
+
+### Sticky actions column on scrollable tables — `done`
+
+Applied `[scrollable]="true"` + `pFrozenColumn alignFrozen="right"` on the Actions
+column across all `p-table`s with row actions (sheets, musicians, instruments,
+ensembles, collections, collection items, sheet↔collection membership, ensemble
+voices/members/voice-options, shares, uploads, sheet-detail's instrumentation
+tables) — the actions column now stays pinned to the right edge while a table
+scrolls horizontally on narrow viewports.
+
+Went further than originally scoped: below 640px, multi-button actions collapse
+into a single kebab (`pi-ellipsis-v`) button opening a `p-menu` popup, instead of
+staying as 2–4 separate icon buttons squeezed into a frozen column. Built as a
+reusable `<app-row-actions [items]="rowMenuItems(row)">` component
+(`shared/components/row-actions/`) wrapping projected wide-mode buttons + the
+narrow-mode kebab/menu, backed by global `.actions-wide`/`.actions-narrow` CSS
+classes (`styles.scss`) — originally a one-off pattern in the uploads feature,
+now promoted to a shared component and reused everywhere, including inside
+nested dialogs (verified 3 levels deep: ensemble → voice edit dialog → Options
+tab table). `BaseCrudList` (musicians/instruments/ensembles/collections' shared
+base class) gained a default `rowMenuItems()` (edit + delete) so those four
+features needed zero boilerplate beyond wrapping their existing buttons.
+
+**Stakeholders:** S1 (music librarian), S2 (Dirigent)
+**Effort:** Low (ended up Medium once the mobile kebab pattern was generalized)
+
+---
+
 ### Advanced combined search — `idea`
 
 A filter builder that combines multiple dimensions in a single query. Currently filters

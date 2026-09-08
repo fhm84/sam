@@ -21,6 +21,7 @@ import { CollectionsApiService } from '../../core/api';
 import { CollectionType, SheetCollection, SheetCollectionFilterRequest } from '../../model/datamodels';
 import { BaseCrudList } from '../../shared/base/base-crud-list';
 import { CrudApi } from '../../shared/base/crud-api.interface';
+import { RowActions } from '../../shared/components/row-actions/row-actions';
 import { CollectionForm } from './collection-form';
 
 @Component({
@@ -29,7 +30,8 @@ import { CollectionForm } from './collection-form';
     TableModule,
     Dialog,
     ConfirmDialog,
-Button,
+    RowActions,
+    Button,
     Tooltip,
     InputText,
     IconField,

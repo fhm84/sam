@@ -13,6 +13,7 @@
   <p-table
     [value]="options()"
     [loading]="loading()"
+    [scrollable]="true"
   >
     <ng-template #header>
       <tr>
@@ -20,7 +21,7 @@
         <th class="w-28">{{ 'ensembles.voices.options.columns.transposition' | translate }}</th>
         <th>{{ 'ensembles.voices.options.columns.type' | translate }}</th>
         <th>{{ 'ensembles.voices.options.columns.factor' | translate }}</th>
-        <th>{{ 'ensembles.voices.options.columns.actions' | translate }}</th>
+        <th pFrozenColumn alignFrozen="right">{{ 'ensembles.voices.options.columns.actions' | translate }}</th>
       </tr>
     </ng-template>
 
@@ -34,27 +35,29 @@
           }
         </td>
         <td>{{ option.factor }}</td>
-        <td class="flex gap-1">
-          <p-button
-            icon="pi pi-pencil"
-            [rounded]="true"
-            [text]="true"
-            size="small"
-            styleClass="row-action"
-            [pTooltip]="'ensembles.voices.options.edit' | translate"
-            tooltipPosition="top"
-            (onClick)="openEditOption(option)"
-          />
-          <p-button
-            icon="pi pi-trash"
-            [rounded]="true"
-            [text]="true"
-            size="small"
-            styleClass="row-action row-action-danger"
-            [pTooltip]="'common.delete' | translate"
-            tooltipPosition="top"
-            (onClick)="confirmDeleteOption(option)"
-          />
+        <td pFrozenColumn alignFrozen="right">
+          <app-row-actions [items]="rowMenuItems(option)" size="small">
+            <p-button
+              icon="pi pi-pencil"
+              [rounded]="true"
+              [text]="true"
+              size="small"
+              styleClass="row-action"
+              [pTooltip]="'ensembles.voices.options.edit' | translate"
+              tooltipPosition="top"
+              (onClick)="openEditOption(option)"
+            />
+            <p-button
+              icon="pi pi-trash"
+              [rounded]="true"
+              [text]="true"
+              size="small"
+              styleClass="row-action row-action-danger"
+              [pTooltip]="'common.delete' | translate"
+              tooltipPosition="top"
+              (onClick)="confirmDeleteOption(option)"
+            />
+          </app-row-actions>
         </td>
       </tr>
     </ng-template>

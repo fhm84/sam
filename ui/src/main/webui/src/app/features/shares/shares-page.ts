@@ -6,7 +6,7 @@ import {
   signal,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { Button } from 'primeng/button';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { TableModule } from 'primeng/table';
@@ -16,10 +16,11 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../core/translation.service';
 import { SharesApiService } from '../../core/api/shares-api.service';
 import { ShareResponse } from '../../model/datamodels';
+import { RowActions } from '../../shared/components/row-actions/row-actions';
 
 @Component({
   selector: 'app-shares-page',
-  imports: [TableModule, Tag, Button, Tooltip, ConfirmDialog, TranslatePipe, DatePipe],
+  imports: [TableModule, Tag, Button, Tooltip, ConfirmDialog, RowActions, TranslatePipe, DatePipe],
   providers: [ConfirmationService],
   templateUrl: './shares-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -75,6 +76,13 @@ export class SharesPage implements OnInit {
         life: 2000,
       });
     });
+  }
+
+  protected rowMenuItems(share: ShareResponse): MenuItem[] {
+    return [
+      { label: this.t.t('shares.page.copyLink'), icon: 'pi pi-copy', command: () => this.copyShareUrl(share) },
+      { label: this.t.t('shares.page.revoke'), icon: 'pi pi-ban', styleClass: 'row-menu-danger', command: () => this.confirmRevoke(share) },
+    ];
   }
 
   protected confirmRevoke(share: ShareResponse): void {

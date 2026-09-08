@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { Subject, debounceTime } from 'rxjs';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { ConfirmDialog } from 'primeng/confirmdialog';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { Button } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
 import { IconField } from 'primeng/iconfield';
@@ -36,13 +36,15 @@ import { Dialog } from 'primeng/dialog';
 import { SheetDetail } from './sheet-detail';
 import { SheetCollections } from './sheet-collections';
 import { ExploreView } from './explore/explore-view';
+import { RowActions } from '../../shared/components/row-actions/row-actions';
 
 @Component({
   selector: 'app-sheets',
   imports: [
     TableModule,
     ConfirmDialog,
-Button,
+    RowActions,
+    Button,
     InputText,
     IconField,
     InputIcon,
@@ -315,6 +317,14 @@ export class Sheets implements OnInit {
         });
       },
     });
+  }
+
+  protected rowMenuItems(sheet: SheetMusicSearchResult): MenuItem[] {
+    return [
+      { label: this.t.t('common.addToCollection'), icon: 'pi pi-folder-plus', command: (e) => this.openCollectionsDialog(sheet, e.originalEvent as MouseEvent) },
+      { label: this.t.t('sheets.edit'), icon: 'pi pi-pencil', command: () => this.openEdit(sheet) },
+      { label: this.t.t('common.delete'), icon: 'pi pi-trash', styleClass: 'row-menu-danger', command: () => this.confirmDelete(sheet) },
+    ];
   }
 
   protected openDetail(sheet: SheetMusicSearchResult): void {

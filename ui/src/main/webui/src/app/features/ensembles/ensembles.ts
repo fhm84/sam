@@ -20,6 +20,7 @@ import { EnsemblesApiService } from '../../core/api';
 import { Ensemble, EnsembleFilterRequest } from '../../model/datamodels';
 import { BaseCrudList } from '../../shared/base/base-crud-list';
 import { CrudApi } from '../../shared/base/crud-api.interface';
+import { RowActions } from '../../shared/components/row-actions/row-actions';
 import { EnsembleForm } from './ensemble-form';
 
 @Component({
@@ -28,6 +29,7 @@ import { EnsembleForm } from './ensemble-form';
     TableModule,
     Dialog,
     ConfirmDialog,
+    RowActions,
     Button,
     Tooltip,
     InputText,

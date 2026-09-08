@@ -44,6 +44,7 @@
       [totalRecords]="totalRecords()"
       [loading]="loading()"
       [rowsPerPageOptions]="[10, 25, 50]"
+      [scrollable]="true"
       (onLazyLoad)="onLazyLoad($event)"
     >
       <ng-template #header>
@@ -51,7 +52,7 @@
           <th>{{ 'ensembles.columns.name' | translate }}</th>
           <th>{{ 'ensembles.columns.description' | translate }}</th>
           <th>{{ 'ensembles.columns.voices' | translate }}</th>
-          <th>{{ 'ensembles.columns.actions' | translate }}</th>
+          <th pFrozenColumn alignFrozen="right">{{ 'ensembles.columns.actions' | translate }}</th>
         </tr>
       </ng-template>
 
@@ -60,25 +61,27 @@
           <td class="font-medium">{{ ensemble.name }}</td>
           <td>{{ ensemble.description }}</td>
           <td>{{ ensemble.voices?.length ?? 0 }}</td>
-          <td class="flex gap-1">
-            <p-button
-              icon="pi pi-pencil"
-              [rounded]="true"
-              [text]="true"
-              styleClass="row-action"
-              [pTooltip]="'ensembles.edit' | translate"
-              tooltipPosition="top"
-              (onClick)="openEdit(ensemble); $event.stopPropagation()"
-            />
-            <p-button
-              icon="pi pi-trash"
-              [rounded]="true"
-              [text]="true"
-              styleClass="row-action row-action-danger"
-              [pTooltip]="'common.delete' | translate"
-              tooltipPosition="top"
-              (onClick)="confirmDelete(ensemble); $event.stopPropagation()"
-            />
+          <td pFrozenColumn alignFrozen="right">
+            <app-row-actions [items]="rowMenuItems(ensemble)">
+              <p-button
+                icon="pi pi-pencil"
+                [rounded]="true"
+                [text]="true"
+                styleClass="row-action"
+                [pTooltip]="'ensembles.edit' | translate"
+                tooltipPosition="top"
+                (onClick)="openEdit(ensemble); $event.stopPropagation()"
+              />
+              <p-button
+                icon="pi pi-trash"
+                [rounded]="true"
+                [text]="true"
+                styleClass="row-action row-action-danger"
+                [pTooltip]="'common.delete' | translate"
+                tooltipPosition="top"
+                (onClick)="confirmDelete(ensemble); $event.stopPropagation()"
+              />
+            </app-row-actions>
           </td>
         </tr>
       </ng-template>

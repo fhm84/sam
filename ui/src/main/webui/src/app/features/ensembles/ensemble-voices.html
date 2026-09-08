@@ -13,13 +13,14 @@
   <p-table
     [value]="voices()"
     [loading]="loading()"
+    [scrollable]="true"
   >
     <ng-template #header>
       <tr>
         <th>{{ 'ensembles.voices.columns.label' | translate }}</th>
         <th>{{ 'ensembles.voices.columns.weight' | translate }}</th>
         <th>{{ 'ensembles.voices.columns.required' | translate }}</th>
-        <th>{{ 'ensembles.voices.columns.actions' | translate }}</th>
+        <th pFrozenColumn alignFrozen="right">{{ 'ensembles.voices.columns.actions' | translate }}</th>
       </tr>
     </ng-template>
 
@@ -34,36 +35,38 @@
             <p-tag severity="secondary" [value]="t.t('ensembles.voices.no')" />
           }
         </td>
-        <td class="flex gap-1">
-          <p-button
-            icon="pi pi-cog"
-            [rounded]="true"
-            [text]="true"
-            size="small"
-            styleClass="row-action"
-            (onClick)="openOptions(voice)"
-            [pTooltip]="t.t('ensembles.voices.options.title')"
-          />
-          <p-button
-            icon="pi pi-pencil"
-            [rounded]="true"
-            [text]="true"
-            size="small"
-            styleClass="row-action"
-            [pTooltip]="'ensembles.voices.edit' | translate"
-            tooltipPosition="top"
-            (onClick)="openEditVoice(voice)"
-          />
-          <p-button
-            icon="pi pi-trash"
-            [rounded]="true"
-            [text]="true"
-            size="small"
-            styleClass="row-action row-action-danger"
-            [pTooltip]="'common.delete' | translate"
-            tooltipPosition="top"
-            (onClick)="confirmDeleteVoice(voice)"
-          />
+        <td pFrozenColumn alignFrozen="right">
+          <app-row-actions [items]="rowMenuItems(voice)" size="small">
+            <p-button
+              icon="pi pi-cog"
+              [rounded]="true"
+              [text]="true"
+              size="small"
+              styleClass="row-action"
+              (onClick)="openOptions(voice)"
+              [pTooltip]="t.t('ensembles.voices.options.title')"
+            />
+            <p-button
+              icon="pi pi-pencil"
+              [rounded]="true"
+              [text]="true"
+              size="small"
+              styleClass="row-action"
+              [pTooltip]="'ensembles.voices.edit' | translate"
+              tooltipPosition="top"
+              (onClick)="openEditVoice(voice)"
+            />
+            <p-button
+              icon="pi pi-trash"
+              [rounded]="true"
+              [text]="true"
+              size="small"
+              styleClass="row-action row-action-danger"
+              [pTooltip]="'common.delete' | translate"
+              tooltipPosition="top"
+              (onClick)="confirmDeleteVoice(voice)"
+            />
+          </app-row-actions>
         </td>
       </tr>
     </ng-template>
