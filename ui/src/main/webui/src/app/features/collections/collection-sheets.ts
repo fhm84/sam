@@ -3,19 +3,19 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subject, debounceTime } from 'rxjs';
-import { TableLazyLoadEvent, TableModule, TableRowReorderEvent } from 'primeng/table';
-import { Dialog } from 'primeng/dialog';
-import { ConfirmDialog } from 'primeng/confirmdialog';
-import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
-import { Button } from 'primeng/button';
-import { InputText } from 'primeng/inputtext';
-import { Textarea } from 'primeng/textarea';
-import { IconField } from 'primeng/iconfield';
-import { InputIcon } from 'primeng/inputicon';
-import { FloatLabel } from 'primeng/floatlabel';
-import { Tooltip } from 'primeng/tooltip';
-import { Checkbox } from 'primeng/checkbox';
-import { Tag } from 'primeng/tag';
+import { TableLazyLoadEvent, TableModule, TableRowReorderEvent } from '@openng/optimus-ui/table';
+import { Dialog } from '@openng/optimus-ui/dialog';
+import { ConfirmDialog } from '@openng/optimus-ui/confirmdialog';
+import { ConfirmationService, MenuItem, MessageService } from '@openng/optimus-ui/api';
+import { Button } from '@openng/optimus-ui/button';
+import { InputText } from '@openng/optimus-ui/inputtext';
+import { Textarea } from '@openng/optimus-ui/textarea';
+import { IconField } from '@openng/optimus-ui/iconfield';
+import { InputIcon } from '@openng/optimus-ui/inputicon';
+import { FloatLabel } from '@openng/optimus-ui/floatlabel';
+import { Tooltip } from '@openng/optimus-ui/tooltip';
+import { Checkbox } from '@openng/optimus-ui/checkbox';
+import { Tag } from '@openng/optimus-ui/tag';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../core/translation.service';
 import { CollectionsApiService, SheetsApiService } from '../../core/api';
@@ -509,8 +509,8 @@ export class CollectionSheets implements OnInit, OnChanges {
   }
 
   protected onRowReorder(_event: TableRowReorderEvent): void {
-    // PrimeNG already reordered this.value in-place before emitting this event.
-    // The emitted dragIndex/dropIndex are PrimeNG-internal and must not be used
+    // Optimus UI already reordered this.value in-place before emitting this event.
+    // The emitted dragIndex/dropIndex are Optimus UI-internal and must not be used
     // to re-apply a splice. Just snapshot the already-correct array to trigger
     // signal reactivity, then sync the new order to the backend.
     const reordered = [...this.items()];

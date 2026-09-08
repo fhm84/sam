@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { MenuItem } from 'primeng/api';
-import { Menu } from 'primeng/menu';
-import { Button } from 'primeng/button';
+import { MenuItem } from '@openng/optimus-ui/api';
+import { Menu } from '@openng/optimus-ui/menu';
+import { Button } from '@openng/optimus-ui/button';
 
 /**
  * Row-actions cell for a p-table: renders the given buttons (projected content) on

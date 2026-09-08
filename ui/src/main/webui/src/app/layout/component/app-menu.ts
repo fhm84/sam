@@ -1,5 +1,5 @@
 import { Component, computed, inject, OnInit } from '@angular/core';
-import { MenuItem } from 'primeng/api';
+import { MenuItem } from '@openng/optimus-ui/api';
 import { TranslationService } from '../../core/translation.service';
 import { AppMenuitem } from './app-menuitem';
 

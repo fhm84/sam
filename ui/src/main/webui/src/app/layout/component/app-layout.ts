@@ -1,7 +1,7 @@
 import { Component, computed, effect, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NgClass } from '@angular/common';
-import { Toast } from 'primeng/toast';
+import { Toast } from '@openng/optimus-ui/toast';
 import { LayoutService } from '../service/layout.service';
 import { AppTopbar } from './app-topbar';
 import { AppSidebar } from './app-sidebar';

@@ -1,5 +1,5 @@
 import { Directive, inject, signal } from '@angular/core';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from '@openng/optimus-ui/api';
 import { TranslationService } from '../../core/translation.service';
 import { DocumentsApiService } from '../../core/api/documents-api.service';
 import { Attachment, DocumentDownload } from '../../model/datamodels';

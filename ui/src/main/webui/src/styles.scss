@@ -1,4 +1,4 @@
-@use "primeicons/primeicons.css";
+@use "@openng/icons/openng-icons.css";
 
 // ─── Design tokens ─────────────────────────────────────────
 :root {
@@ -380,7 +380,7 @@ body.blocked-scroll {
   }
 }
 
-// ─── PrimeNG overrides ────────────────────────────────────
+// ─── Optimus UI overrides ────────────────────────────────────
 // Allow InputNumber to shrink in flex layouts
 .p-inputnumber {
   min-width: 0;
@@ -547,7 +547,7 @@ body.blocked-scroll {
 }
 
 // ─── Disabled button state ────────────────────────────────────────
-// PrimeNG Aura preset loses the opacity hint; restore it so disabled
+// Optimus UI's Aura preset loses the opacity hint; restore it so disabled
 // buttons are visually distinct from active ones.
 
 .p-button:disabled,

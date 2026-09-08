@@ -2,7 +2,7 @@
 module.exports = {
   content: ['./src/**/*.{html,ts}'],
   corePlugins: {
-    preflight: false, // Avoid conflicts with PrimeNG and existing styles
+    preflight: false, // Avoid conflicts with Optimus UI and existing styles
   },
   theme: {
     extend: {

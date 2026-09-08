@@ -1,9 +1,9 @@
 import { Component, inject, Input } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { FloatLabel } from 'primeng/floatlabel';
-import { InputText } from 'primeng/inputtext';
-import { Textarea } from 'primeng/textarea';
-import { Button } from 'primeng/button';
+import { FloatLabel } from '@openng/optimus-ui/floatlabel';
+import { InputText } from '@openng/optimus-ui/inputtext';
+import { Textarea } from '@openng/optimus-ui/textarea';
+import { Button } from '@openng/optimus-ui/button';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { EnsemblesApiService } from '../../core/api';
 import { convertEmptyStringsToNull } from '../../shared/utils/object.utils';

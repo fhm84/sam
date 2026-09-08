@@ -7,12 +7,12 @@ import {
 } from '@angular/core';
 import { DatePipe, JsonPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TableModule, TablePageEvent } from 'primeng/table';
-import { Tag } from 'primeng/tag';
-import { MultiSelect } from 'primeng/multiselect';
-import { InputText } from 'primeng/inputtext';
-import { Button } from 'primeng/button';
-import { Toolbar } from 'primeng/toolbar';
+import { TableModule, TablePageEvent } from '@openng/optimus-ui/table';
+import { Tag } from '@openng/optimus-ui/tag';
+import { MultiSelect } from '@openng/optimus-ui/multiselect';
+import { InputText } from '@openng/optimus-ui/inputtext';
+import { Button } from '@openng/optimus-ui/button';
+import { Toolbar } from '@openng/optimus-ui/toolbar';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { EventLogsApiService } from '../../core/api';
 import { EventLogEntry, EventLogFilterRequest, EventType } from '../../model/datamodels';

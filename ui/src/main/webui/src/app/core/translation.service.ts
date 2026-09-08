@@ -1,6 +1,6 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { PrimeNG } from 'primeng/config';
+import { Optimus } from '@openng/optimus-ui/config';
 import { firstValueFrom } from 'rxjs';
 
 export type Locale = 'en' | 'de';
@@ -11,7 +11,7 @@ const SUPPORTED_LOCALES: Locale[] = ['en', 'de'];
 @Injectable({ providedIn: 'root' })
 export class TranslationService {
   private readonly http = inject(HttpClient);
-  private readonly primeng = inject(PrimeNG);
+  private readonly optimus = inject(Optimus);
 
   readonly locale = signal<Locale>(this.detectLocale());
   private readonly translations = signal<Record<string, unknown>>({});
@@ -41,7 +41,7 @@ export class TranslationService {
   }
 
   /**
-   * Switch to a new locale. Loads the JSON, updates PrimeNG, persists preference.
+   * Switch to a new locale. Loads the JSON, updates Optimus UI, persists preference.
    */
   async setLocale(locale: Locale): Promise<void> {
     const data = await firstValueFrom(this.http.get<Record<string, unknown>>(`/i18n/${locale}.json`));
@@ -51,8 +51,8 @@ export class TranslationService {
     localStorage.setItem(STORAGE_KEY, locale);
     document.documentElement.lang = locale;
 
-    if (data['primeng'] && typeof data['primeng'] === 'object') {
-      this.primeng.setTranslation(data['primeng'] as Record<string, unknown>);
+    if (data['optimus'] && typeof data['optimus'] === 'object') {
+      this.optimus.setTranslation(data['optimus'] as Record<string, unknown>);
     }
   }
 

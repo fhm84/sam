@@ -1,9 +1,9 @@
 import { Component, computed, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { Breadcrumb } from 'primeng/breadcrumb';
-import { Menu } from 'primeng/menu';
-import { Tooltip } from 'primeng/tooltip';
-import { MenuItem } from 'primeng/api';
+import { Breadcrumb } from '@openng/optimus-ui/breadcrumb';
+import { Menu } from '@openng/optimus-ui/menu';
+import { Tooltip } from '@openng/optimus-ui/tooltip';
+import { MenuItem } from '@openng/optimus-ui/api';
 import { LayoutService, MenuMode } from '../service/layout.service';
 import { ThemeService } from '../../core/theme.service';
 import { TranslationService } from '../../core/translation.service';

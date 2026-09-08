@@ -1,6 +1,6 @@
 import { effect, inject, Injectable, signal } from '@angular/core';
-import { definePreset, Theme } from '@primeuix/themes';
-import Aura from '@primeuix/themes/aura';
+import { definePreset, Theme } from '@openng/optimus-ui-themes';
+import Aura from '@openng/optimus-ui-themes/aura';
 import { ThemeService } from './theme.service';
 
 export type ColorSchemeKey = 'indigo' | 'blue' | 'emerald' | 'amber' | 'rose' | 'slate';

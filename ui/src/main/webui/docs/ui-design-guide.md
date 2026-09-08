@@ -33,7 +33,7 @@ For code architecture and file conventions, see [`ARCHITECTURE.md`](../ARCHITECT
 ## 1. Design Tokens
 
 All colors, surfaces, and borders are expressed as CSS custom properties defined in
-`src/styles.scss`. **Never use raw hex values or PrimeNG surface tokens in feature SCSS.**
+`src/styles.scss`. **Never use raw hex values or Optimus UI surface tokens in feature SCSS.**
 Always use a `--sam-*` variable so components adapt correctly in both light and dark mode.
 
 ### Color Palette
@@ -50,7 +50,7 @@ Always use a `--sam-*` variable so components adapt correctly in both light and 
 | `--sam-text-secondary` | `#4a4a52` | `#a0a0ac` | Labels, secondary copy |
 | `--sam-text-muted` | `#8a8a96` | `#606068` | Subtitles, placeholders, empty states |
 
-PrimeNG's own `--p-*` tokens are used only for PrimeNG component internals (e.g.
+Optimus UI's own `--p-*` tokens are used only for Optimus UI component internals (e.g.
 `var(--p-border-radius)`, `var(--p-primary-color)`). Do not use `--p-surface-*` in custom
 layouts; use `--sam-surface` and `--sam-border` instead.
 
@@ -241,7 +241,7 @@ always visible (no collapse animation needed — the toolbar filter button toggl
 
 ## 7. Tables
 
-All data tables use PrimeNG `p-table` with server-side lazy loading. The structure is identical
+All data tables use Optimus UI `p-table` with server-side lazy loading. The structure is identical
 across all features — only the columns change.
 
 ### Standard table template
@@ -442,7 +442,7 @@ Cancel always on the left, Save on the right, right-aligned as a block:
 
 ### Confirmation dialogs
 
-Use PrimeNG `ConfirmationService` + `<p-confirmdialog />`. The accept button is always danger:
+Use Optimus UI `ConfirmationService` + `<p-confirmdialog />`. The accept button is always danger:
 
 ```typescript
 this.confirmationService.confirm({
@@ -498,11 +498,11 @@ panels and metadata grids).
 Add `.flex-1` to each `form-field` inside a `form-row` so they share space equally. Use
 different flex values for unequal widths.
 
-### PrimeNG component widths
+### Optimus UI component widths
 
 `p-select`, `p-inputnumber`, `p-datepicker`, and `p-autocomplete` inside a `p-floatlabel` are
 forced to `width: 100%` by the global `_forms.scss` rules — no extra `styleClass` needed.
-For PrimeNG components **outside** a `p-floatlabel`, add `styleClass="w-full"`.
+For Optimus UI components **outside** a `p-floatlabel`, add `styleClass="w-full"`.
 
 ### Checkbox in a form row
 
@@ -735,7 +735,7 @@ Centered, 3 rem padding, 2 rem icon. Replaces the entire content area while data
 
 ### Loading — table
 
-Use PrimeNG's built-in `[loading]="loading()"` on `p-table`. This shows a skeleton overlay
+Use Optimus UI's built-in `[loading]="loading()"` on `p-table`. This shows a skeleton overlay
 automatically — do not add a separate spinner inside table templates.
 
 ### Empty states

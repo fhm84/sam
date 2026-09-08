@@ -2,8 +2,8 @@ import { Component, computed, inject, input, OnInit, signal } from '@angular/cor
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { NgClass } from '@angular/common';
 import { filter } from 'rxjs/operators';
-import { MenuItem } from 'primeng/api';
-import { Tooltip } from 'primeng/tooltip';
+import { MenuItem } from '@openng/optimus-ui/api';
+import { Tooltip } from '@openng/optimus-ui/tooltip';
 import { LayoutService } from '../service/layout.service';
 
 @Component({

@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
-import { PrimeNG } from 'primeng/config';
+import { Optimus } from '@openng/optimus-ui/config';
 import { TranslationService } from './translation.service';
 
 describe('TranslationService', () => {
@@ -14,7 +14,7 @@ describe('TranslationService', () => {
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
-        { provide: PrimeNG, useValue: { setTranslation: vi.fn() } },
+        { provide: Optimus, useValue: { setTranslation: vi.fn() } },
         TranslationService,
       ],
     });

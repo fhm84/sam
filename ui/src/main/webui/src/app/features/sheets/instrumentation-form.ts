@@ -1,12 +1,12 @@
 import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { FloatLabel } from 'primeng/floatlabel';
-import { Select } from 'primeng/select';
-import { InputText } from 'primeng/inputtext';
-import { Textarea } from 'primeng/textarea';
-import { Button } from 'primeng/button';
-import { Tooltip } from 'primeng/tooltip';
+import { FloatLabel } from '@openng/optimus-ui/floatlabel';
+import { Select } from '@openng/optimus-ui/select';
+import { InputText } from '@openng/optimus-ui/inputtext';
+import { Textarea } from '@openng/optimus-ui/textarea';
+import { Button } from '@openng/optimus-ui/button';
+import { Tooltip } from '@openng/optimus-ui/tooltip';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { InstrumentationsApiService, InstrumentsApiService } from '../../core/api';
 import { convertEmptyStringsToNull } from '../../shared/utils/object.utils';

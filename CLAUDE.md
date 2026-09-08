@@ -65,7 +65,7 @@ Seven Maven modules under parent `de.halbmann:sam`:
 - **Sub-resources**: JAX-RS sub-resource pattern — e.g. `SheetsResource.instrumentations(sheetId)` returns `InstrumentationsResource`.
 - **Exports / document generation**: All export endpoints return `ExportResult` (filename + MIME type + `StreamWriter`). The resource layer wraps it in a JAX-RS `Response`; services stay framework-agnostic. Current implementations: `SheetExportService` (JSON/CSV/ZIP), `CollectionTocService` (Qute HTML → PDF via Flying Saucer), `GemaSetlistService` (Apache POI xlsx from template). When adding a new export format, follow the same `ExportResult` pattern and keep POI/PDF rendering in the service, not the resource.
 - **Resource placement for non-Qute files**: Quarkus Qute scans **everything** under `server/src/main/resources/templates/` and crashes on binary files. Place non-template resources (e.g. xlsx files) elsewhere — currently `server/src/main/resources/gema/`. Load them with `getClass().getResourceAsStream("/gema/…")`.
-- **PrimeNG lazy table**: Wire `(onLazyLoad)` only — do **not** also call `load()` from `ngOnInit`. `p-table` with `[lazy]="true"` fires `onLazyLoad` on initialization, so a redundant `ngOnInit` call causes a double request on page load.
+- **Optimus UI lazy table**: Wire `(onLazyLoad)` only — do **not** also call `load()` from `ngOnInit`. `p-table` with `[lazy]="true"` fires `onLazyLoad` on initialization, so a redundant `ngOnInit` call causes a double request on page load.
 - **HTTP subscriptions**: Always pipe through `takeUntilDestroyed(this.destroyRef)` (inject `DestroyRef`) to guard against in-flight responses arriving after component destruction.
 - **Document classification**: Two-step AI workflow triggered after upload. `POST /documents/{id}/classify` runs the LangChain4j analyzer and returns `SheetClassification` with detected metadata and pre-matched entity references. `POST /documents/{id}/apply` accepts a reviewed `ClassificationApplyRequest` and creates/resolves musician, instrument, sheet, and instrumentation entities, then links the document as an attachment. For PDFs, text is extracted with `PDFTextStripper` first (cheaper); only scanned/image-only PDFs fall back to GPT-4o vision. Key classes: `server/src/main/java/de/halbmann/sam/classification/`.
 
@@ -129,9 +129,9 @@ After implementing any Angular UI change:
    cd ui/src/main/webui && rtk npx tsc --noEmit
    ```
 2. **Verify the rendered result in a real browser** using the Playwright MCP skill — do not rely on code inspection alone:
-   - New features / pages → use `/angular-primeng-browser-verify`
+   - New features / pages → use `/angular-optimus-browser-verify`
    - Bug fixes → use `/browser-fix-and-recheck`
-3. Pay special attention to: PrimeNG overlays, dialogs, tables, form validation, routing transitions, and responsive behavior.
+3. Pay special attention to: Optimus UI overlays, dialogs, tables, form validation, routing transitions, and responsive behavior.
 4. Test both the golden path and relevant edge cases (empty state, validation errors, loading state).
 5. **Save Playwright screenshots to `target/playwright/`** — `target/` is gitignored, so screenshots never end up in the working tree or a commit.
 

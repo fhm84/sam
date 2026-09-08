@@ -1,11 +1,11 @@
 import { Component, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Panel } from 'primeng/panel';
-import { Toolbar } from 'primeng/toolbar';
-import { ConfirmDialog } from 'primeng/confirmdialog';
-import { ConfirmationService } from 'primeng/api';
-import { Button } from 'primeng/button';
-import { Tooltip } from 'primeng/tooltip';
+import { Panel } from '@openng/optimus-ui/panel';
+import { Toolbar } from '@openng/optimus-ui/toolbar';
+import { ConfirmDialog } from '@openng/optimus-ui/confirmdialog';
+import { ConfirmationService } from '@openng/optimus-ui/api';
+import { Button } from '@openng/optimus-ui/button';
+import { Tooltip } from '@openng/optimus-ui/tooltip';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { SheetsApiService } from '../../core/api';
 import { SheetMusic } from '../../model/datamodels';

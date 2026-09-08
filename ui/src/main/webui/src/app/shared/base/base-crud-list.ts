@@ -1,8 +1,8 @@
 import { DestroyRef, Directive, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subject, debounceTime } from 'rxjs';
-import { TableLazyLoadEvent } from 'primeng/table';
-import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
+import { TableLazyLoadEvent } from '@openng/optimus-ui/table';
+import { ConfirmationService, MenuItem, MessageService } from '@openng/optimus-ui/api';
 import { TranslationService } from '../../core/translation.service';
 import { PaginationRequest } from '../../model/datamodels';
 import { CrudApi } from './crud-api.interface';

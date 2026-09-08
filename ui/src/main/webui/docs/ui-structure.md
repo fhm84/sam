@@ -409,7 +409,7 @@ that can later be associated with specific sheets.
 
 **Three sections:**
 
-1. **Drop zone / file picker** — PrimeNG advanced file upload; supports multi-file selection and
+1. **Drop zone / file picker** — Optimus UI advanced file upload; supports multi-file selection and
    drag-drop.
 2. **Active uploads** — live progress list while files are transferring (filename, progress bar,
    percentage).

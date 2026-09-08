@@ -2,9 +2,9 @@ import { ApplicationConfig, provideBrowserGlobalErrorListeners, APP_INITIALIZER,
 import { provideRouter } from '@angular/router';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
-import { providePrimeNG } from 'primeng/config';
-import { MessageService } from 'primeng/api';
-import Aura from '@primeuix/themes/aura';
+import { provideOptimus } from '@openng/optimus-ui/config';
+import { MessageService } from '@openng/optimus-ui/api';
+import Aura from '@openng/optimus-ui-themes/aura';
 import { ColorSchemeService } from './core/color-scheme.service';
 import { AbstractSecurityStorage, DefaultLocalStorageService, authInterceptor, provideAuth, StsConfigLoader, withAppInitializerAuthCheck } from 'angular-auth-oidc-client';
 
@@ -20,7 +20,7 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     provideHttpClient(withInterceptors([authInterceptor(), errorInterceptor])),
     MessageService,
-    providePrimeNG({
+    provideOptimus({
       theme: {
         preset: Aura,
         options: {

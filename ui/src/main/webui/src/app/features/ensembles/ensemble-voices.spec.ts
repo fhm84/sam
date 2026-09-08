@@ -3,7 +3,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { of } from 'rxjs';
 
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from '@openng/optimus-ui/api';
 
 import { EnsembleVoices } from './ensemble-voices';
 import { EnsemblesApiService } from '../../core/api';

@@ -1,13 +1,13 @@
 # UI Module Architecture
 
-Angular 21 + PrimeNG 21 frontend for the SAM (Sheet Archive for Music) application.
+Angular 21 + Optimus UI 1 (community MIT-licensed continuation of PrimeNG v21) frontend for the SAM (Sheet Archive for Music) application.
 
 ## Tech Stack
 
 | Concern        | Choice                                  |
 | -------------- | --------------------------------------- |
 | Framework      | Angular 21 (standalone components)      |
-| UI Library     | PrimeNG 21 with Aura theme              |
+| UI Library     | Optimus UI 1 with Aura theme            |
 | Styling        | SCSS + CSS custom properties            |
 | Build          | Angular CLI / `@angular/build`          |
 | Test           | Vitest                                  |
@@ -136,7 +136,7 @@ it at three different locations (top-level, under sheets, under instrumentations
 
 ## Theming
 
-- PrimeNG Aura theme with `darkModeSelector: '.dark'`
+- Optimus UI Aura theme with `darkModeSelector: '.dark'`
 - Custom design tokens via `--sam-*` CSS variables in `styles.scss`
 - Dark mode toggled by `ThemeService` (adds/removes `.dark` on `<html>`)
 - Persisted to `localStorage`, defaults to system preference
@@ -148,7 +148,7 @@ it at three different locations (top-level, under sheets, under instrumentations
 - Use dotted key paths: `"nav.sheets"`, `"nav.admin.ensembles"`, etc.
 - In templates: `{{ 'key.path' | translate }}` or `[attr.aria-label]="'key' | translate"`
 - In TypeScript: `inject(TranslationService).t('key.path')`
-- PrimeNG component labels are auto-configured from the `primeng` section of each locale file
+- Optimus UI component labels are auto-configured from the `optimus` section of each locale file
 - Locale is persisted to `localStorage` (`sam-locale`) and defaults to browser language
 - To add a new locale: create `public/i18n/<locale>.json` and add the code to `SUPPORTED_LOCALES` in `translation.service.ts`
 

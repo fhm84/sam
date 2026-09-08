@@ -1,13 +1,13 @@
 ---
-name: angular-primeng-browser-verify
-description: Strict browser verification for Angular apps using PrimeNG. Use when a rendered Angular UI must be validated in a real browser with Playwright MCP, especially for dialogs, overlays, tables, forms, routing, responsiveness, and browser-visible regressions.
+name: angular-optimus-browser-verify
+description: Strict browser verification for Angular apps using Optimus UI. Use when a rendered Angular UI must be validated in a real browser with Playwright MCP, especially for dialogs, overlays, tables, forms, routing, responsiveness, and browser-visible regressions.
 ---
 
-# Angular PrimeNG Browser Verify
+# Angular Optimus UI Browser Verify
 
-Use this skill for Angular applications that use PrimeNG components.
+Use this skill for Angular applications that use Optimus UI components.
 
-This skill is stricter than a generic browser verification workflow. It assumes the UI may look correct in code while still failing in the browser because of PrimeNG overlays, async rendering, routing state, CSS layering, change detection timing, or viewport-specific issues.
+This skill is stricter than a generic browser verification workflow. It assumes the UI may look correct in code while still failing in the browser because of Optimus UI overlays, async rendering, routing state, CSS layering, change detection timing, or viewport-specific issues.
 
 ## Rule of engagement
 
@@ -42,7 +42,7 @@ Follow this order unless the user asked for a smaller scope:
     - uncaught errors,
     - Angular runtime errors,
     - template/rendering errors,
-    - PrimeNG-related warnings,
+    - Optimus UI-related warnings,
     - missing asset or API errors.
 5. Check network activity for:
     - failed API calls,
@@ -66,9 +66,9 @@ Always check these when relevant:
 - Validation messages appear only when appropriate and disappear when corrected.
 - Disabled states, loading states, and empty states are visible and coherent.
 
-## PrimeNG-specific checks
+## Optimus UI-specific checks
 
-PrimeNG components often fail in browser-visible ways even when code seems correct.
+Optimus UI components often fail in browser-visible ways even when code seems correct.
 
 Always check these when relevant:
 - Dialogs open, close, and trap focus correctly.
@@ -92,7 +92,7 @@ Test at minimum:
 
 At both sizes, verify:
 - No horizontal overflow unless explicitly intended.
-- PrimeNG tables and forms remain usable.
+- Optimus UI tables and forms remain usable.
 - Dialogs and overlays remain reachable and not clipped off-screen.
 - Sticky headers, toolbars, and action bars do not cover critical controls.
 - Primary actions remain visible and operable.
@@ -150,8 +150,8 @@ When interacting:
 
 ## Examples of high-value prompts
 
-- Use Playwright MCP to verify the PrimeNG dialog workflow on /customers and check whether the dialog, confirm popup, and toast stack correctly.
-- Use Playwright MCP to test the editable PrimeNG table on /contracts and report filtering, row expansion, paginator, and mobile overflow issues.
+- Use Playwright MCP to verify the Optimus UI dialog workflow on /customers and check whether the dialog, confirm popup, and toast stack correctly.
+- Use Playwright MCP to test the editable Optimus UI table on /contracts and report filtering, row expansion, paginator, and mobile overflow issues.
 - Use Playwright MCP to verify the form on /settings, including invalid input, valid submission, and post-submit toast behavior.
 
 ## Boundaries
@@ -159,12 +159,12 @@ When interacting:
 Do not:
 - Claim success based only on Angular code inspection.
 - Ignore console errors because the page "looks okay".
-- Skip overlay testing when PrimeNG components are involved.
+- Skip overlay testing when Optimus UI components are involved.
 - Stop after desktop-only verification when responsive layout is relevant.
 - Invent evidence that was not observed in the browser.
 
 ## Completion rule
 
 The task is complete only when you have either:
-- verified the requested Angular/PrimeNG behavior in a real browser with Playwright MCP, or
+- verified the requested Angular/Optimus UI behavior in a real browser with Playwright MCP, or
 - clearly stated why that verification could not be performed.

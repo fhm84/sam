@@ -1,10 +1,10 @@
 import { Component, inject, Input, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { FloatLabel } from 'primeng/floatlabel';
-import { Select } from 'primeng/select';
-import { InputNumber } from 'primeng/inputnumber';
-import { Button } from 'primeng/button';
-import { Tooltip } from 'primeng/tooltip';
+import { FloatLabel } from '@openng/optimus-ui/floatlabel';
+import { Select } from '@openng/optimus-ui/select';
+import { InputNumber } from '@openng/optimus-ui/inputnumber';
+import { Button } from '@openng/optimus-ui/button';
+import { Tooltip } from '@openng/optimus-ui/tooltip';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { EnsemblesApiService, InstrumentsApiService } from '../../core/api';
 import { convertEmptyStringsToNull } from '../../shared/utils/object.utils';

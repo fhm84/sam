@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MessageService } from 'primeng/api';
-import { Button } from 'primeng/button';
-import { Dialog } from 'primeng/dialog';
-import { Toolbar } from 'primeng/toolbar';
+import { MessageService } from '@openng/optimus-ui/api';
+import { Button } from '@openng/optimus-ui/button';
+import { Dialog } from '@openng/optimus-ui/dialog';
+import { Toolbar } from '@openng/optimus-ui/toolbar';
 import { TranslationService } from '../../core/translation.service';
 import { EnsemblesApiService } from '../../core/api';
 import { Ensemble } from '../../model/datamodels';

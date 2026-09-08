@@ -1,7 +1,7 @@
 import { Component, Input, OnChanges, Output, EventEmitter, SimpleChanges } from '@angular/core';
-import { Button } from 'primeng/button';
-import { Tooltip } from 'primeng/tooltip';
-import { Checkbox } from 'primeng/checkbox';
+import { Button } from '@openng/optimus-ui/button';
+import { Tooltip } from '@openng/optimus-ui/tooltip';
+import { Checkbox } from '@openng/optimus-ui/checkbox';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { DocumentHandler } from '../../shared/base/document-handler';

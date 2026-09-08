@@ -1,10 +1,10 @@
 import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { Button } from 'primeng/button';
-import { SplitButton } from 'primeng/splitbutton';
-import { Toolbar } from 'primeng/toolbar';
+import { ConfirmationService, MessageService } from '@openng/optimus-ui/api';
+import { Button } from '@openng/optimus-ui/button';
+import { SplitButton } from '@openng/optimus-ui/splitbutton';
+import { Toolbar } from '@openng/optimus-ui/toolbar';
 import { TranslationService } from '../../core/translation.service';
 import { SheetsApiService } from '../../core/api';
 import { SheetMusic } from '../../model/datamodels';

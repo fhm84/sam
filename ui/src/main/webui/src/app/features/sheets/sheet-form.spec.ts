@@ -3,7 +3,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { of } from 'rxjs';
 
-import { MessageService } from 'primeng/api';
+import { MessageService } from '@openng/optimus-ui/api';
 
 import { SheetForm } from './sheet-form';
 import { SheetsApiService, MusiciansApiService, CollectionsApiService } from '../../core/api';

@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpResponse } from '@angular/common/http';
-import { MessageService } from 'primeng/api';
-import { Button } from 'primeng/button';
-import { Dialog } from 'primeng/dialog';
-import { SplitButton } from 'primeng/splitbutton';
-import { Tag } from 'primeng/tag';
-import { Toolbar } from 'primeng/toolbar';
+import { MessageService } from '@openng/optimus-ui/api';
+import { Button } from '@openng/optimus-ui/button';
+import { Dialog } from '@openng/optimus-ui/dialog';
+import { SplitButton } from '@openng/optimus-ui/splitbutton';
+import { Tag } from '@openng/optimus-ui/tag';
+import { Toolbar } from '@openng/optimus-ui/toolbar';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../core/translation.service';
 import { CollectionsApiService } from '../../core/api';
