@@ -1,4 +1,4 @@
-import { AttachmentType, Clef, GemaReportable, Genre, NotationType, PhysicalCondition, RightsStatus, Style } from '../model/datamodels';
+import { AttachmentType, Clef, GemaReportable, Genre, NotationType, PhysicalCondition, RightsStatus, Style, Tonality } from '../model/datamodels';
 
 /** DifficultyLevel enum values in grade order (grade = index + 1). */
 export const DIFFICULTY_LEVELS = [
@@ -33,6 +33,15 @@ export const RIGHTS_STATUSES = [
 export const GEMA_REPORTABLE_VALUES = [
   'UNKNOWN', 'YES', 'NO',
 ] as const satisfies readonly GemaReportable[];
+
+/** All possible Tonality enum values, circle of fifths (majors, then minors), ATONAL last. */
+export const TONALITIES = [
+  'C_MAJOR', 'G_MAJOR', 'D_MAJOR', 'A_MAJOR', 'E_MAJOR', 'B_MAJOR', 'F_SHARP_MAJOR', 'C_SHARP_MAJOR',
+  'F_MAJOR', 'B_FLAT_MAJOR', 'E_FLAT_MAJOR', 'A_FLAT_MAJOR', 'D_FLAT_MAJOR', 'G_FLAT_MAJOR', 'C_FLAT_MAJOR',
+  'A_MINOR', 'E_MINOR', 'B_MINOR', 'F_SHARP_MINOR', 'C_SHARP_MINOR', 'G_SHARP_MINOR', 'D_SHARP_MINOR', 'A_SHARP_MINOR',
+  'D_MINOR', 'G_MINOR', 'C_MINOR', 'F_MINOR', 'B_FLAT_MINOR', 'E_FLAT_MINOR', 'A_FLAT_MINOR',
+  'ATONAL',
+] as const satisfies readonly Tonality[];
 
 /** All possible Clef enum values. */
 export const CLEFS = ['TREBLE', 'ALTO', 'TENOR', 'BASS'] as const satisfies readonly Clef[];

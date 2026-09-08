@@ -13,10 +13,10 @@ import { Tooltip } from 'primeng/tooltip';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { SheetsApiService, MusiciansApiService, CollectionsApiService } from '../../core/api';
 import { convertEmptyStringsToNull } from '../../shared/utils/object.utils';
-import { CreateSheetMusic, GemaReportable, Genre, Musician, RightsStatus, SheetCollection, SheetMusic, Style } from '../../model/datamodels';
+import { CreateSheetMusic, GemaReportable, Genre, Musician, RightsStatus, SheetCollection, SheetMusic, Style, Tonality } from '../../model/datamodels';
 import { map, Observable } from 'rxjs';
 import { BaseForm } from '../../shared/base/base-form';
-import { DIFFICULTY_LEVELS, FETCH_ALL_SIZE, GEMA_REPORTABLE_VALUES, GENRES, RIGHTS_STATUSES, STYLES } from '../../shared/constants';
+import { DIFFICULTY_LEVELS, FETCH_ALL_SIZE, GEMA_REPORTABLE_VALUES, GENRES, RIGHTS_STATUSES, STYLES, TONALITIES } from '../../shared/constants';
 import { MusicianForm } from '../musicians/musician-form';
 
 @Component({
@@ -57,6 +57,10 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
     GEMA_REPORTABLE_VALUES.map((g) => ({ label: this.t.t(`sheets.gemaReportableValues.${g}`), value: g })),
   );
 
+  protected readonly tonalityOptions = computed(() =>
+    TONALITIES.map((t) => ({ label: this.t.t(`sheets.tonalities.${t}`), value: t })),
+  );
+
   readonly form = new FormGroup({
     title: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     subtitle: new FormControl('', { nonNullable: true }),
@@ -69,10 +73,14 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
     difficultyLevel: new FormControl<number | null>(null),
     durationMinutes: new FormControl<number | null>(null),
     durationSeconds: new FormControl<number | null>(null),
+    tempo: new FormControl<number | null>(null),
+    tonality: new FormControl<Tonality | null>(null),
     edition: new FormControl('', { nonNullable: true }),
     copyright: new FormControl('', { nonNullable: true }),
     rightsStatus: new FormControl<RightsStatus | null>(null),
     gemaReportable: new FormControl<GemaReportable | null>(null),
+    arrangementPublisher: new FormControl('', { nonNullable: true }),
+    arrangementRightsUntil: new FormControl<number | null>(null),
     originalBy: new FormControl('', { nonNullable: true }),
     publisherIpi: new FormControl('', { nonNullable: true }),
     gemaWorkNumber: new FormControl('', { nonNullable: true }),
@@ -110,10 +118,14 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
       difficultyLevel: s.difficultyLevel ?? null,
       durationMinutes: minutes,
       durationSeconds: seconds,
+      tempo: s.tempo ?? null,
+      tonality: s.tonality ?? null,
       edition: s.edition ?? '',
       copyright: s.copyright ?? '',
       rightsStatus: s.rightsStatus ?? null,
       gemaReportable: s.gemaReportable ?? null,
+      arrangementPublisher: s.arrangementPublisher ?? '',
+      arrangementRightsUntil: s.arrangementRightsUntil ?? null,
       originalBy: s.originalBy ?? '',
       publisherIpi: s.publisherIpi ?? '',
       gemaWorkNumber: s.gemaWorkNumber ?? '',
@@ -161,10 +173,14 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
       publisher: raw.publisher,
       difficultyLevel: raw.difficultyLevel ?? undefined,
       duration: buildDuration(raw.durationMinutes, raw.durationSeconds) as unknown as never,
+      tempo: raw.tempo ?? undefined,
+      tonality: raw.tonality ?? undefined,
       edition: raw.edition,
       copyright: raw.copyright,
       rightsStatus: raw.rightsStatus ?? undefined,
       gemaReportable: raw.gemaReportable ?? undefined,
+      arrangementPublisher: raw.arrangementPublisher,
+      arrangementRightsUntil: raw.arrangementRightsUntil ?? undefined,
       originalBy: raw.originalBy,
       publisherIpi: raw.publisherIpi,
       gemaWorkNumber: raw.gemaWorkNumber,

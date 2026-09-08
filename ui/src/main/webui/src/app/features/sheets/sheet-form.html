@@ -192,6 +192,49 @@
     </div>
   </div>
 
+  <!-- Tempo / Tonality -->
+  <div class="flex gap-4">
+    <div class="flex flex-col gap-1.5 flex-1 min-w-0">
+      <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+        <p-floatlabel variant="on" class="block">
+          <p-inputnumber
+            inputId="sheet-tempo"
+            formControlName="tempo"
+            [min]="1"
+            [max]="400"
+            [useGrouping]="false"
+            styleClass="w-full"
+            inputStyleClass="w-full"
+          />
+          <label for="sheet-tempo">{{ 'sheets.form.tempo' | translate }}</label>
+        </p-floatlabel>
+        <i
+          class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
+          [pTooltip]="t.t('sheets.form.tempoTooltip')"
+          tooltipPosition="right"
+        ></i>
+      </div>
+    </div>
+    <div class="flex flex-col gap-1.5 flex-1 min-w-0">
+      <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+        <p-floatlabel variant="on" class="block">
+          <p-select
+            inputId="sheet-tonality"
+            formControlName="tonality"
+            [options]="tonalityOptions()"
+            optionLabel="label"
+            optionValue="value"
+            [filter]="true"
+            [showClear]="true"
+            styleClass="w-full"
+            inputStyleClass="w-full"
+          />
+          <label for="sheet-tonality">{{ 'sheets.form.tonality' | translate }}</label>
+        </p-floatlabel>
+      </div>
+    </div>
+  </div>
+
   <!-- Copyright / Source -->
   <div class="flex gap-4">
     <div class="flex flex-col gap-1.5 flex-1 min-w-0">
@@ -410,6 +453,43 @@
         <i
           class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
           [pTooltip]="t.t('sheets.form.iswcTooltip')"
+          tooltipPosition="right"
+        ></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Arrangement publisher / Arrangement rights until -->
+  <div class="flex gap-4">
+    <div class="flex flex-col gap-1.5 flex-1 min-w-0">
+      <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+        <p-floatlabel variant="on" class="block">
+          <input pInputText id="sheet-arrangement-publisher" formControlName="arrangementPublisher" class="w-full" />
+          <label for="sheet-arrangement-publisher">{{ 'sheets.form.arrangementPublisher' | translate }}</label>
+        </p-floatlabel>
+        <i
+          class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
+          [pTooltip]="t.t('sheets.form.arrangementPublisherTooltip')"
+          tooltipPosition="right"
+        ></i>
+      </div>
+    </div>
+    <div class="flex flex-col gap-1.5 flex-1 min-w-0">
+      <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
+        <p-floatlabel variant="on" class="block">
+          <p-inputnumber
+            inputId="sheet-arrangement-rights-until"
+            formControlName="arrangementRightsUntil"
+            [useGrouping]="false"
+            [maxlength]="4"
+            styleClass="w-full"
+            inputStyleClass="w-full"
+          />
+          <label for="sheet-arrangement-rights-until">{{ 'sheets.form.arrangementRightsUntil' | translate }}</label>
+        </p-floatlabel>
+        <i
+          class="pi pi-info-circle justify-self-center text-sm text-[var(--sam-text-muted)] cursor-help transition-colors hover:text-[var(--sam-text-secondary)]"
+          [pTooltip]="t.t('sheets.form.arrangementRightsUntilTooltip')"
           tooltipPosition="right"
         ></i>
       </div>

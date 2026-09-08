@@ -118,6 +118,16 @@ public class SheetMusic {
     @JsonbTypeAdapter(DurationJsonbAdapter.class)
     Duration duration;
 
+    /**
+     * Tempo in beats per minute.
+     */
+    Integer tempo;
+
+    /**
+     * Musical key of the piece.
+     */
+    Tonality tonality;
+
     boolean favorite;
 
     /**
@@ -144,6 +154,16 @@ public class SheetMusic {
      * Whether the piece is subject to GEMA reporting when performed.
      */
     GemaReportable gemaReportable;
+
+    /**
+     * Publisher holding the arrangement rights (distinct from the original work's publisher).
+     */
+    String arrangementPublisher;
+
+    /**
+     * Year until which the arrangement rights are held (e.g. a rental/hire term).
+     */
+    Integer arrangementRightsUntil;
 
     /**
      * Rating for the piece/music sheet.

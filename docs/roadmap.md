@@ -580,7 +580,7 @@ Phase 3).
 
 ---
 
-### Sheet metadata enrichment — `planned`
+### Sheet metadata enrichment — `in progress`
 
 Add missing fields to `SheetMusicEntity` and related entities surfaced in the Claude
 Design mockup (`Sheet Detail (PrimeNG).html` / `Sheet Detail v2 (PrimeNG).html`).
@@ -593,12 +593,12 @@ Full details in local planning notes (`plan_sheet_detail_fields.md`, not in the 
   cover rental/hire-only material. See [Sheet Music — Rights status](features/sheets.md#rights-status).
 - **gemaReportable** — 3-state enum (`UNKNOWN` / `YES` / `NO`); "GEMA-pflichtig" in German. See
   [Sheet Music — GEMA reportable](features/sheets.md#gema-reportable).
-
-**Sheet-level fields — still planned:**
-- **tempo** (Integer, bpm) — "♩= 116 bpm" shown in Base Data card
-- **tonality** — fixed enum of all major/minor keys (e.g. Bb major, F minor)
+- **tempo** (Integer, bpm) — shown in Base Data card.
+- **tonality** — fixed enum, full circle of fifths (15 major + 15 minor keys) plus
+  `ATONAL`; shipped as a superset of the originally scoped "major/minor keys" note. See
+  [Sheet Music — Tonality](features/sheets.md#tonality).
 - **arrangementPublisher** + **arrangementRightsUntil** — simple fields for
-  "Musikverlag Tirol · until 2080"-style arranger rights; no separate entity
+  "Musikverlag Tirol · until 2080"-style arranger rights; no separate entity.
 
 **Attachment-level fields — still planned:**
 - **AttachmentKind** — new enum (`CLEAN` / `MARKED_UP` / `PHOTOCOPY` / `FACSIMILE` /

@@ -5,6 +5,7 @@ import de.halbmann.sam.api.entity.sheets.GemaReportable;
 import de.halbmann.sam.api.entity.sheets.Genre;
 import de.halbmann.sam.api.entity.sheets.RightsStatus;
 import de.halbmann.sam.api.entity.sheets.Style;
+import de.halbmann.sam.api.entity.sheets.Tonality;
 import de.halbmann.sam.business.documents.entity.AttachmentEntity;
 import de.halbmann.sam.business.musicians.entity.MusicianEntity;
 import de.halbmann.sam.business.shared.entity.AbstractEntity;
@@ -103,6 +104,18 @@ public class SheetMusicEntity extends AbstractEntity {
      */
     Duration duration;
 
+    /**
+     * Tempo in beats per minute.
+     */
+    Integer tempo;
+
+    /**
+     * Musical key of the piece.
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(length = 24)
+    private Tonality tonality;
+
     boolean favorite;
 
     /**
@@ -133,6 +146,16 @@ public class SheetMusicEntity extends AbstractEntity {
     @Enumerated(EnumType.STRING)
     @Column(length = 16)
     private GemaReportable gemaReportable;
+
+    /**
+     * Publisher holding the arrangement rights (distinct from the original work's publisher).
+     */
+    String arrangementPublisher;
+
+    /**
+     * Year until which the arrangement rights are held (e.g. a rental/hire term).
+     */
+    Integer arrangementRightsUntil;
 
     /**
      * Rating for the piece/music sheet.

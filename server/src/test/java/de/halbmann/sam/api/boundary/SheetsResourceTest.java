@@ -206,4 +206,59 @@ class SheetsResourceTest {
                 .body("rightsStatus", equalTo("NO_DIGITALIZATION"))
                 .body("gemaReportable", equalTo("NO"));
     }
+
+    @Test
+    void testMusicalAndArrangerFields_roundTripOnCreateAndUpdate() {
+        final String sheetId = given().contentType(ContentType.JSON)
+                .body("""
+                        {
+                            "title": "Musical Fields Test Piece",
+                            "genre": "POLKA",
+                            "tempo": 120,
+                            "tonality": "B_FLAT_MAJOR",
+                            "arrangementPublisher": "Musikverlag Tirol",
+                            "arrangementRightsUntil": 2080
+                        }
+                        """)
+                .post("/api/sheets")
+                .then()
+                .statusCode(200)
+                .body("tempo", equalTo(120))
+                .body("tonality", equalTo("B_FLAT_MAJOR"))
+                .body("arrangementPublisher", equalTo("Musikverlag Tirol"))
+                .body("arrangementRightsUntil", equalTo(2080))
+                .extract()
+                .path("id");
+
+        given().get("/api/sheets/{sheetId}", sheetId)
+                .then()
+                .statusCode(200)
+                .body("tempo", equalTo(120))
+                .body("tonality", equalTo("B_FLAT_MAJOR"))
+                .body("arrangementPublisher", equalTo("Musikverlag Tirol"))
+                .body("arrangementRightsUntil", equalTo(2080));
+
+        given().contentType(ContentType.JSON)
+                .body("""
+                        {
+                            "title": "Musical Fields Test Piece",
+                            "genre": "POLKA",
+                            "tempo": 96,
+                            "tonality": "G_MINOR",
+                            "arrangementPublisher": "Edition Nordklang",
+                            "arrangementRightsUntil": 2050
+                        }
+                        """)
+                .put("/api/sheets/{sheetId}", sheetId)
+                .then()
+                .statusCode(204);
+
+        given().get("/api/sheets/{sheetId}", sheetId)
+                .then()
+                .statusCode(200)
+                .body("tempo", equalTo(96))
+                .body("tonality", equalTo("G_MINOR"))
+                .body("arrangementPublisher", equalTo("Edition Nordklang"))
+                .body("arrangementRightsUntil", equalTo(2050));
+    }
 }

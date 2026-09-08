@@ -15,6 +15,8 @@ The central entity. Each sheet represents one piece of music in the archive.
 | Style | Enum | Stylistic character: Classical, Swing, Pop, etc. — see [Style enum](#style) |
 | Difficulty level | 1–6 scale | Wind-band grading: 1 = very easy … 6 = very difficult |
 | Duration | hh:mm:ss | Approximate playtime |
+| Tempo | Integer (bpm) | |
+| Tonality | Enum | Musical key — see [Tonality enum](#tonality) |
 | Year of composition | Integer | |
 | Publisher | String | |
 | Publisher IPI | String | Publisher Interested Parties Information code |
@@ -22,6 +24,8 @@ The central entity. Each sheet represents one piece of music in the archive.
 | Copyright | String | |
 | Rights status | Enum | Legal status for archiving/digitization/distribution — see [Rights status enum](#rights-status) |
 | GEMA reportable | 3-state enum | Whether the piece is GEMA-reportable when performed ("GEMA-pflichtig" in German) — see [GEMA reportable enum](#gema-reportable) |
+| Arrangement publisher | String | Publisher holding rights to this specific arrangement, if different from the original publisher |
+| Arrangement rights until | Integer (year) | Year until which arrangement rights are held, e.g. for rental/hire-only material |
 | Source | String | Provenance — where the piece came from (e.g. a publisher, a donation) |
 | ISWC | String | International Standard Musical Work Code |
 | GEMA work number | String | German GEMA identifier |
@@ -84,6 +88,19 @@ colored badge on the sheet detail page.
 Whether a sheet is subject to GEMA reporting ("GEMA-pflichtig" in German) when performed.
 
 `UNKNOWN` (default) · `YES` · `NO`
+
+### Tonality
+
+Musical key of the piece. Fixed enum (not free text) covering the full circle of fifths —
+15 major keys, 15 minor keys (with enharmonic spellings), plus `ATONAL` for pieces with no
+tonal center.
+
+`C_MAJOR` · `G_MAJOR` · `D_MAJOR` · `A_MAJOR` · `E_MAJOR` · `B_MAJOR` · `F_SHARP_MAJOR` ·
+`C_SHARP_MAJOR` · `F_MAJOR` · `B_FLAT_MAJOR` · `E_FLAT_MAJOR` · `A_FLAT_MAJOR` ·
+`D_FLAT_MAJOR` · `G_FLAT_MAJOR` · `C_FLAT_MAJOR` · `A_MINOR` · `E_MINOR` · `B_MINOR` ·
+`F_SHARP_MINOR` · `C_SHARP_MINOR` · `G_SHARP_MINOR` · `D_SHARP_MINOR` · `A_SHARP_MINOR` ·
+`D_MINOR` · `G_MINOR` · `C_MINOR` · `F_MINOR` · `B_FLAT_MINOR` · `E_FLAT_MINOR` ·
+`A_FLAT_MINOR` · `ATONAL`
 
 ## Related
 

@@ -198,6 +198,18 @@
                     <span class="detail-value">{{ formatDuration(s.duration) }}</span>
                   </div>
                 }
+                @if (s.tempo) {
+                  <div class="meta-entry">
+                    <span class="detail-label">{{ 'sheets.detail.tempo' | translate }}</span>
+                    <span class="detail-value">{{ s.tempo }}</span>
+                  </div>
+                }
+                @if (s.tonality) {
+                  <div class="meta-entry">
+                    <span class="detail-label">{{ 'sheets.detail.tonality' | translate }}</span>
+                    <span class="detail-value">{{ 'sheets.tonalities.' + s.tonality | translate }}</span>
+                  </div>
+                }
                 @if (s.tags && s.tags.length > 0) {
                   <div class="meta-entry full-width">
                     <span class="detail-label">{{ 'sheets.detail.tags' | translate }}</span>
@@ -337,6 +349,18 @@
                   <div class="meta-entry">
                     <span class="detail-label">{{ 'sheets.detail.originalBy' | translate }}</span>
                     <span class="detail-value">{{ s.originalBy }}</span>
+                  </div>
+                }
+                @if (s.arrangementPublisher) {
+                  <div class="meta-entry">
+                    <span class="detail-label">{{ 'sheets.detail.arrangementPublisher' | translate }}</span>
+                    <span class="detail-value">{{ s.arrangementPublisher }}</span>
+                  </div>
+                }
+                @if (s.arrangementRightsUntil) {
+                  <div class="meta-entry">
+                    <span class="detail-label">{{ 'sheets.detail.arrangementRightsUntil' | translate }}</span>
+                    <span class="detail-value">{{ s.arrangementRightsUntil }}</span>
                   </div>
                 }
                 @if (s.rating != null) {
@@ -661,6 +685,18 @@
               <div class="meta-entry">
                 <span class="detail-label">{{ 'sheets.detail.duration' | translate }}</span>
                 <span class="detail-value">{{ formatDuration(s.duration) }}</span>
+              </div>
+            }
+            @if (s.tempo) {
+              <div class="meta-entry">
+                <span class="detail-label">{{ 'sheets.detail.tempo' | translate }}</span>
+                <span class="detail-value">{{ s.tempo }}</span>
+              </div>
+            }
+            @if (s.tonality) {
+              <div class="meta-entry">
+                <span class="detail-label">{{ 'sheets.detail.tonality' | translate }}</span>
+                <span class="detail-value">{{ 'sheets.tonalities.' + s.tonality | translate }}</span>
               </div>
             }
             @if (s.tags && s.tags.length > 0) {
@@ -1067,6 +1103,18 @@
             <div class="meta-entry">
               <span class="detail-label">{{ 'sheets.detail.originalBy' | translate }}</span>
               <span class="detail-value">{{ s.originalBy }}</span>
+            </div>
+          }
+          @if (s.arrangementPublisher) {
+            <div class="meta-entry">
+              <span class="detail-label">{{ 'sheets.detail.arrangementPublisher' | translate }}</span>
+              <span class="detail-value">{{ s.arrangementPublisher }}</span>
+            </div>
+          }
+          @if (s.arrangementRightsUntil) {
+            <div class="meta-entry">
+              <span class="detail-label">{{ 'sheets.detail.arrangementRightsUntil' | translate }}</span>
+              <span class="detail-value">{{ s.arrangementRightsUntil }}</span>
             </div>
           }
           @if (s.rating != null) {
