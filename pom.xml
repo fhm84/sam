@@ -34,7 +34,7 @@
         <lombok.version>1.18.48</lombok.version>
         <org.mapstruct.version>1.6.3</org.mapstruct.version>
 
-        <tika-core.version>3.3.2</tika-core.version>
+        <tika-core.version>4.0.0</tika-core.version>
 
         <archunit-junit5.version>1.5.0</archunit-junit5.version>
 
