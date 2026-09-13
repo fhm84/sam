@@ -21,6 +21,7 @@ import de.halbmann.sam.business.musicians.boundary.MusicianRepository;
 import de.halbmann.sam.business.musicians.entity.MusicianEntity;
 import de.halbmann.sam.business.shared.event.ResourcesDeleted;
 import de.halbmann.sam.business.sheets.boundary.SheetRepository;
+import de.halbmann.sam.business.sheets.entity.InstrumentationCountCriterion;
 import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
 import de.halbmann.sam.core.entity.PaginatedEntities;
 import de.halbmann.sam.core.exception.EntityNotFoundException;
@@ -107,8 +108,17 @@ public class SheetService {
                 parameters.put("favorite", filterRequest.getFavorite());
             }
 
-            PaginatedResponse<SheetMusic> sheets =
-                    getAllSheets(filterRequest, parameters, filterRequest.getTitleStartsWith(), filterRequest.getTag());
+            List<InstrumentationCountCriterion> instrumentCriteria =
+                    parseInstrumentCriteria(filterRequest.getInstrumentCriteria());
+            PaginatedResponse<SheetMusic> sheets = instrumentCriteria.isEmpty()
+                    ? getAllSheets(
+                            filterRequest, parameters, filterRequest.getTitleStartsWith(), filterRequest.getTag())
+                    : getAllSheetsWithInstrumentCriteria(
+                            filterRequest,
+                            parameters,
+                            filterRequest.getTitleStartsWith(),
+                            filterRequest.getTag(),
+                            instrumentCriteria);
             response = new PaginatedResponse<>();
             response.setPage(filterRequest.getPage());
             response.setSize(sheets.getSize());
@@ -207,6 +217,30 @@ public class SheetService {
             final String tag) {
         PaginatedEntities<SheetMusicEntity> result =
                 sheetRepository.findSheetEntities(paginationRequest, parameters, titleStartsWith, tag);
+
+        PaginatedResponse<SheetMusic> response = new PaginatedResponse<>();
+        response.setData(result.data().stream().map(sheetMusicMapper::toDto).toList());
+        response.setPage(paginationRequest.getPage());
+        response.setSize(response.getData().size());
+        response.setTotalCount(result.totalCount());
+        return response;
+    }
+
+    private List<InstrumentationCountCriterion> parseInstrumentCriteria(List<String> rawCriteria) {
+        if (rawCriteria == null || rawCriteria.isEmpty()) {
+            return List.of();
+        }
+        return rawCriteria.stream().map(InstrumentationCountCriterion::parse).toList();
+    }
+
+    private PaginatedResponse<SheetMusic> getAllSheetsWithInstrumentCriteria(
+            final PaginationRequest paginationRequest,
+            final Map<String, Object> parameters,
+            final String titleStartsWith,
+            final String tag,
+            final List<InstrumentationCountCriterion> instrumentCriteria) {
+        PaginatedEntities<SheetMusicEntity> result = sheetRepository.findSheetEntitiesWithInstrumentCriteria(
+                paginationRequest, parameters, titleStartsWith, tag, instrumentCriteria);
 
         PaginatedResponse<SheetMusic> response = new PaginatedResponse<>();
         response.setData(result.data().stream().map(sheetMusicMapper::toDto).toList());

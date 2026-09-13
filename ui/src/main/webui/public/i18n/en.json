@@ -375,7 +375,15 @@
       "toggle": "Filters",
       "genre": "Genre",
       "genrePlaceholder": "All genres",
-      "clear": "Clear filters"
+      "clear": "Clear filters",
+      "instrumentation": "Instrumentation",
+      "instrumentPlaceholder": "Select instrument",
+      "addInstrumentCriterion": "Add instrument filter",
+      "not": "NOT",
+      "notTooltip": "Negate this condition",
+      "operatorEQ": "=",
+      "operatorLTE": "≤",
+      "operatorGTE": "≥"
     },
     "collections": {
       "title": "Collections",

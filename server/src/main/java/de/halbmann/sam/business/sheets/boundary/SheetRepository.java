@@ -7,6 +7,7 @@ import de.halbmann.sam.api.entity.shared.SortOrder;
 import de.halbmann.sam.api.entity.sheets.Genre;
 import de.halbmann.sam.api.entity.sheets.TagCount;
 import de.halbmann.sam.business.documents.entity.AttachmentEntity;
+import de.halbmann.sam.business.sheets.entity.InstrumentationCountCriterion;
 import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
 import de.halbmann.sam.core.controller.SortFieldValidator;
 import de.halbmann.sam.core.entity.PaginatedEntities;
@@ -235,6 +236,93 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
                 .list();
 
         return new PaginatedEntities<>(sheets, totalItems);
+    }
+
+    /**
+     * Same filters as {@link #findSheetEntities}, plus a set of instrumentation-count criteria
+     * (e.g. "exactly 4 horns", "no oboes") ANDed together. Each criterion is evaluated as a
+     * correlated {@code COUNT} subquery against {@code InstrumentationEntity} for the sheet,
+     * which requires an explicit root alias — Panache's {@code find}/{@code count} convenience
+     * methods used by {@link #findSheetEntities} don't provide one, so this builds the JPQL by
+     * hand instead.
+     */
+    public PaginatedEntities<SheetMusicEntity> findSheetEntitiesWithInstrumentCriteria(
+            final PaginationRequest paginationRequest,
+            final Map<String, Object> parameters,
+            final String titleStartsWith,
+            final String tag,
+            final List<InstrumentationCountCriterion> instrumentCriteria) {
+
+        final List<String> conditions = new ArrayList<>();
+        final Map<String, Object> queryParams = new HashMap<>();
+
+        if (parameters.get("title") != null) {
+            conditions.add("s.title = :title");
+            queryParams.put("title", parameters.get("title"));
+        }
+        if (parameters.get("composer.name") != null) {
+            conditions.add("s.composer.name = :composerName");
+            queryParams.put("composerName", parameters.get("composer.name"));
+        }
+        if (parameters.get("genre") != null) {
+            conditions.add("s.genre = :genre");
+            queryParams.put("genre", Genre.valueOf((String) parameters.get("genre")));
+        }
+        if (parameters.get("favorite") != null) {
+            conditions.add("s.favorite = :favorite");
+            queryParams.put("favorite", parameters.get("favorite"));
+        }
+        if (titleStartsWith != null && !titleStartsWith.isBlank()) {
+            conditions.add("lower(s.title) like :titlePrefix");
+            queryParams.put("titlePrefix", titleStartsWith.toLowerCase(Locale.ROOT) + "%");
+        }
+        if (tag != null && !tag.isBlank()) {
+            conditions.add(":tag member of s.tags");
+            queryParams.put("tag", tag);
+        }
+
+        for (int idx = 0; idx < instrumentCriteria.size(); idx++) {
+            InstrumentationCountCriterion criterion = instrumentCriteria.get(idx);
+            String instrumentParam = "instrId" + idx;
+            String countParam = "instrCount" + idx;
+            String comparison =
+                    "(SELECT COUNT(ic) FROM InstrumentationEntity ic WHERE ic.sheet = s AND ic.instrument.id = :"
+                            + instrumentParam + ") " + criterion.operator().sql() + " :" + countParam;
+            conditions.add(criterion.negate() ? "NOT (" + comparison + ")" : comparison);
+            queryParams.put(instrumentParam, criterion.instrumentId());
+            queryParams.put(countParam, criterion.count());
+        }
+
+        final String whereClause = conditions.isEmpty() ? "" : " WHERE " + String.join(" AND ", conditions);
+        final String orderByClause = " ORDER BY " + buildOrderByClause(paginationRequest);
+
+        var countQuery =
+                getEntityManager().createQuery("SELECT COUNT(s) FROM SheetMusicEntity s" + whereClause, Long.class);
+        var dataQuery = getEntityManager()
+                .createQuery("SELECT s FROM SheetMusicEntity s" + whereClause + orderByClause, SheetMusicEntity.class);
+        queryParams.forEach((key, value) -> {
+            countQuery.setParameter(key, value);
+            dataQuery.setParameter(key, value);
+        });
+
+        long totalItems = countQuery.getSingleResult();
+        List<SheetMusicEntity> sheets = dataQuery
+                .setFirstResult(paginationRequest.getPage() * paginationRequest.getSize())
+                .setMaxResults(paginationRequest.getSize())
+                .getResultList();
+
+        return new PaginatedEntities<>(sheets, totalItems);
+    }
+
+    private String buildOrderByClause(PaginationRequest paginationRequest) {
+        if (paginationRequest.getSortBy() != null && paginationRequest.getSortBy().length > 0) {
+            SortFieldValidator.validate(paginationRequest.getSortBy(), ALLOWED_SORT_FIELDS);
+            String direction = SortOrder.DESC == paginationRequest.getSortOrder() ? "DESC" : "ASC";
+            return Arrays.stream(paginationRequest.getSortBy())
+                    .map(field -> "s." + field + " " + direction)
+                    .collect(Collectors.joining(", "));
+        }
+        return "s.title ASC";
     }
 
     /**
