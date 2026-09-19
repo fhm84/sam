@@ -34,7 +34,7 @@ services:
   # Keycloak: OIDC provider. Imports keycloak/prod/sam-realm.json on first boot only
   # (no dev users or dev secrets; ${...} placeholders are filled from the env below).
   keycloak:
-    image: quay.io/keycloak/keycloak:26.2
+    image: quay.io/keycloak/keycloak:26.7.4
     command: start --import-realm
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USER:-admin}
@@ -62,7 +62,7 @@ services:
     healthcheck:
       test:
         - CMD-SHELL
-        - 'exec 3<>/dev/tcp/127.0.0.1/9000; echo -e ''GET /health/ready HTTP/1.1\r\nhost: localhost\r\nConnection: close\r\n\r\n'' >&3; grep -q ''"status": "UP"'' <&3'
+        - 'exec 3<>/dev/tcp/127.0.0.1/8080; echo -e ''GET /realms/sam/.well-known/openid-configuration HTTP/1.1\r\nhost: localhost\r\nConnection: close\r\n\r\n'' >&3; grep -q ''"issuer"'' <&3'
       interval: 10s
       timeout: 5s
       retries: 30
