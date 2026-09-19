@@ -9,6 +9,7 @@ import de.halbmann.sam.api.entity.shared.PaginationRequest;
 import de.halbmann.sam.api.entity.shared.SearchResultMetrics;
 import de.halbmann.sam.api.entity.sheets.CreateSheetMusic;
 import de.halbmann.sam.api.entity.sheets.ExploreShelves;
+import de.halbmann.sam.api.entity.sheets.Genre;
 import de.halbmann.sam.api.entity.sheets.SheetFilterRequest;
 import de.halbmann.sam.api.entity.sheets.SheetMusic;
 import de.halbmann.sam.api.entity.sheets.SheetMusicSearchResult;
@@ -22,6 +23,7 @@ import de.halbmann.sam.business.sheets.boundary.SheetRepository;
 import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
 import de.halbmann.sam.core.entity.PaginatedEntities;
 import de.halbmann.sam.core.exception.EntityNotFoundException;
+import de.halbmann.sam.core.exception.ValidationException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -86,7 +88,7 @@ public class SheetService {
                 parameters.put("composer.name", filterRequest.getComposer());
             }
             if (filterRequest.getGenre() != null) {
-                parameters.put("genre", filterRequest.getGenre());
+                parameters.put("genre", parseGenre(filterRequest.getGenre()));
             }
             if (filterRequest.getFavorite() != null) {
                 parameters.put("favorite", filterRequest.getFavorite());
@@ -257,8 +259,19 @@ public class SheetService {
         return sheetRepository.listDistinctGenres();
     }
 
+    private static Genre parseGenre(final String genre) {
+        if (genre == null || genre.isBlank()) {
+            return null;
+        }
+        try {
+            return Genre.valueOf(genre.trim().toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException e) {
+            throw new ValidationException("Unknown genre: " + genre);
+        }
+    }
+
     public List<String> getAvailableLetters(String genre) {
-        return sheetRepository.listAvailableFirstLetters(genre);
+        return sheetRepository.listAvailableFirstLetters(parseGenre(genre));
     }
 
     public void deleteSheet(final String sheetId) {

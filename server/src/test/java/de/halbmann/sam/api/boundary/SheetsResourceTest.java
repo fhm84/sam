@@ -261,4 +261,45 @@ class SheetsResourceTest {
                 .body("arrangementPublisher", equalTo("Edition Nordklang"))
                 .body("arrangementRightsUntil", equalTo(2050));
     }
+
+    @Test
+    void testFilterByGenreAndLetters() {
+        // unique title: the Dev Services test DB may be reused across runs
+        final String title = "Qzgenre Overture " + java.util.UUID.randomUUID();
+        given().contentType(ContentType.JSON)
+                .body("{\"title\": \"%s\", \"genre\": \"OVERTURE\"}".formatted(title))
+                .post("/api/sheets")
+                .then()
+                .statusCode(200);
+
+        given().queryParam("genre", "OVERTURE")
+                .queryParam("title", title)
+                .get("/api/sheets")
+                .then()
+                .statusCode(200)
+                .body("data.title", hasItem(title))
+                .body("data.genre", everyItem(equalTo("OVERTURE")));
+
+        // case-insensitive, and no match for another genre
+        given().queryParam("genre", "overture")
+                .get("/api/sheets/letters")
+                .then()
+                .statusCode(200)
+                .body("$", hasItem("Q"));
+        given().queryParam("genre", "POLKA")
+                .queryParam("title", title)
+                .get("/api/sheets")
+                .then()
+                .statusCode(200)
+                .body("data", empty());
+    }
+
+    @Test
+    void testUnknownGenreFilterIsBadRequest() {
+        given().queryParam("genre", "NOT_A_GENRE").get("/api/sheets").then().statusCode(400);
+        given().queryParam("genre", "NOT_A_GENRE")
+                .get("/api/sheets/letters")
+                .then()
+                .statusCode(400);
+    }
 }

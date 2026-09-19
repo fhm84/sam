@@ -126,9 +126,9 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
                 .getResultList();
     }
 
-    public List<String> listAvailableFirstLetters(String genre) {
+    public List<String> listAvailableFirstLetters(Genre genre) {
         String jpql = genre != null
-                ? "SELECT DISTINCT UPPER(SUBSTRING(s.title, 1, 1)) FROM SheetMusicEntity s WHERE s.genre.name = :genre"
+                ? "SELECT DISTINCT UPPER(SUBSTRING(s.title, 1, 1)) FROM SheetMusicEntity s WHERE s.genre = :genre"
                 : "SELECT DISTINCT UPPER(SUBSTRING(s.title, 1, 1)) FROM SheetMusicEntity s";
         var query = getEntityManager().createQuery(jpql, String.class);
         if (genre != null) {
