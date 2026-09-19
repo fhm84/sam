@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, Input, OnChanges, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, Input, OnChanges, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -38,6 +38,7 @@ import { SheetCollection } from '../../model/datamodels';
   ],
   providers: [ConfirmationService],
   templateUrl: './sheet-collections.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './sheet-collections.scss',
 })
 export class SheetCollections implements OnInit, OnChanges {

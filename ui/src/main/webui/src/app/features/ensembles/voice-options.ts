@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnChanges, OnInit, signal } from '@angular/core';
+import { Component, inject, Input, OnChanges, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { TableModule } from '@openng/optimus-ui/table';
 import { Dialog } from '@openng/optimus-ui/dialog';
@@ -42,6 +42,7 @@ import { RowActions } from '../../shared/components/row-actions/row-actions';
   ],
   providers: [ConfirmationService],
   templateUrl: './voice-options.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './voice-options.scss',
 })
 export class VoiceOptions implements OnChanges, OnInit {

@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnChanges, OnInit, signal } from '@angular/core';
+import { Component, inject, Input, OnChanges, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { TableModule } from '@openng/optimus-ui/table';
 import { Dialog } from '@openng/optimus-ui/dialog';
@@ -41,6 +41,7 @@ import { RowActions } from '../../shared/components/row-actions/row-actions';
     TranslatePipe,
   ],
   providers: [ConfirmationService],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './ensemble-memberships.html',
 })
 export class EnsembleMemberships implements OnChanges, OnInit {

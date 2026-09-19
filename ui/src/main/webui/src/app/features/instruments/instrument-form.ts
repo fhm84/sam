@@ -1,4 +1,4 @@
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject, Input, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FloatLabel } from '@openng/optimus-ui/floatlabel';
 import { InputText } from '@openng/optimus-ui/inputtext';
@@ -27,6 +27,7 @@ const CLEFS: Clef[] = ['TREBLE', 'ALTO', 'TENOR', 'BASS'];
 @Component({
   selector: 'app-instrument-form',
   imports: [ReactiveFormsModule, FloatLabel, InputText, InputNumber, Select, AutoComplete, Button, Tooltip, TranslatePipe],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './instrument-form.html',
 })
 export class InstrumentForm extends BaseForm<Instrument> {

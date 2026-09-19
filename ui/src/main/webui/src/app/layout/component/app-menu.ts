@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { MenuItem } from '@openng/optimus-ui/api';
 import { TranslationService } from '../../core/translation.service';
 import { AppMenuitem } from './app-menuitem';
@@ -6,6 +6,7 @@ import { AppMenuitem } from './app-menuitem';
 @Component({
   selector: 'app-menu',
   imports: [AppMenuitem],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <ul class="layout-menu">
       @for (item of model(); track item.label) {

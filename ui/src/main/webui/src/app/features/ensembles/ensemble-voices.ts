@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnChanges, signal } from '@angular/core';
+import { Component, inject, Input, OnChanges, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TableModule } from '@openng/optimus-ui/table';
 import { Dialog } from '@openng/optimus-ui/dialog';
@@ -45,6 +45,7 @@ import { RowActions } from '../../shared/components/row-actions/row-actions';
   ],
   providers: [ConfirmationService],
   templateUrl: './ensemble-voices.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './ensemble-voices.scss',
 })
 export class EnsembleVoices implements OnChanges {

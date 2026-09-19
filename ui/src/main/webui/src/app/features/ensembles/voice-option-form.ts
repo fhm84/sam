@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnInit, signal } from '@angular/core';
+import { Component, inject, Input, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FloatLabel } from '@openng/optimus-ui/floatlabel';
 import { Select } from '@openng/optimus-ui/select';
@@ -22,6 +22,7 @@ interface InstrumentOption {
 @Component({
   selector: 'app-voice-option-form',
   imports: [ReactiveFormsModule, FloatLabel, Select, InputNumber, Button, Tooltip, TranslatePipe],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './voice-option-form.html',
 })
 export class VoiceOptionForm extends BaseForm<VoiceOption> implements OnInit {

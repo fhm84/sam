@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject } from '@angular/core';
+import { Component, computed, effect, inject, ChangeDetectionStrategy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NgClass } from '@angular/common';
 import { Toast } from '@openng/optimus-ui/toast';
@@ -10,6 +10,7 @@ import { AppSidebar } from './app-sidebar';
   selector: 'app-layout',
   imports: [NgClass, RouterOutlet, Toast, AppTopbar, AppSidebar],
   templateUrl: './app-layout.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './app-layout.scss',
 })
 export class AppLayout {

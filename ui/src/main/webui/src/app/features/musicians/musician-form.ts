@@ -1,4 +1,4 @@
-import { Component, computed, inject, Input, OnChanges, signal } from '@angular/core';
+import { Component, computed, inject, Input, OnChanges, signal, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FloatLabel } from '@openng/optimus-ui/floatlabel';
@@ -25,6 +25,7 @@ const ROLES: MusicianRole[] = ['MEMBER', 'GUEST', 'SUBSTITUTE', 'CONDUCTOR'];
   selector: 'app-musician-form',
   imports: [ReactiveFormsModule, FormsModule, FloatLabel, InputText, InputNumber, Select, AutoComplete, Textarea, Button, Tooltip, TranslatePipe],
   providers: [MessageService],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './musician-form.html',
 })
 export class MusicianForm extends BaseForm<Musician, Musician> implements OnChanges {

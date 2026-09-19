@@ -1,4 +1,4 @@
-import { Component, computed, EventEmitter, HostBinding, inject, Input, OnChanges, Output, signal } from '@angular/core';
+import { Component, computed, EventEmitter, HostBinding, inject, Input, OnChanges, Output, signal, ChangeDetectionStrategy } from '@angular/core';
 import { forkJoin } from 'rxjs';
 import { TableModule } from '@openng/optimus-ui/table';
 import { Dialog } from '@openng/optimus-ui/dialog';
@@ -57,6 +57,7 @@ import { RowActions } from '../../shared/components/row-actions/row-actions';
   ],
   providers: [ConfirmationService],
   templateUrl: './sheet-detail.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './sheet-detail.scss',
 })
 export class SheetDetail extends DocumentHandler implements OnChanges {

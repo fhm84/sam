@@ -1,4 +1,4 @@
-import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, Input, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FloatLabel } from '@openng/optimus-ui/floatlabel';
@@ -24,6 +24,7 @@ interface InstrumentOption {
 @Component({
   selector: 'app-instrumentation-form',
   imports: [ReactiveFormsModule, FloatLabel, Select, InputText, Textarea, Button, Tooltip, TranslatePipe],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './instrumentation-form.html',
 })
 export class InstrumentationForm extends BaseForm<Instrumentation> implements OnInit {

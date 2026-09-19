@@ -471,7 +471,7 @@
     <app-sheet-detail
       [sheetId]="selectedSheetId"
       [coverage]="selectedSheetCoverage()"
-      [ensembleName]="selectedEnsemble()?.name"
+      [ensembleName]="$safeNavigationMigration(selectedEnsemble()?.name)"
       (edit)="onDetailEdit($event)"
       (deleted)="onDetailDeleted()"
     />

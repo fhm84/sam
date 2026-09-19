@@ -1,4 +1,4 @@
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject, Input, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FloatLabel } from '@openng/optimus-ui/floatlabel';
 import { InputText } from '@openng/optimus-ui/inputtext';
@@ -16,6 +16,7 @@ import { BaseForm } from '../../shared/base/base-form';
 @Component({
   selector: 'app-voice-form',
   imports: [ReactiveFormsModule, FloatLabel, InputText, InputNumber, Checkbox, Button, Tooltip, TranslatePipe],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './voice-form.html',
 })
 export class VoiceForm extends BaseForm<EnsembleVoice> {

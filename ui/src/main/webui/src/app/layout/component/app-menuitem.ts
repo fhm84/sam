@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, input, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { NgClass } from '@angular/common';
 import { filter } from 'rxjs/operators';
@@ -10,6 +10,7 @@ import { LayoutService } from '../service/layout.service';
   selector: '[app-menuitem]',
   imports: [NgClass, RouterLink, RouterLinkActive, Tooltip],
   templateUrl: './app-menuitem.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   host: {
     '[class.active-menuitem]': 'isActive()',
     '[class.layout-root-menuitem]': 'root()',

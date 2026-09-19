@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { Breadcrumb } from '@openng/optimus-ui/breadcrumb';
 import { Menu } from '@openng/optimus-ui/menu';
@@ -14,6 +14,7 @@ import { AuthService } from '../../core/auth/auth.service';
   selector: 'app-topbar',
   imports: [RouterLink, Breadcrumb, Menu, Tooltip, TranslatePipe],
   templateUrl: './app-topbar.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './app-topbar.scss',
 })
 export class AppTopbar {

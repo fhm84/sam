@@ -1,6 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { of } from 'rxjs';
 
 import { CollectionForm } from './collection-form';
@@ -33,6 +35,8 @@ describe('CollectionForm', () => {
         imports: [CollectionForm],
         providers: [
           provideNoopAnimations(),
+          provideHttpClient(),
+          provideHttpClientTesting(),
           { provide: CollectionsApiService, useValue: collectionsApi },
           {
             provide: TranslationService,

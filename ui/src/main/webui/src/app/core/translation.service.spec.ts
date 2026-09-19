@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { Optimus } from '@openng/optimus-ui/config';
 import { TranslationService } from './translation.service';
 
@@ -12,7 +12,7 @@ describe('TranslationService', () => {
 
     TestBed.configureTestingModule({
       providers: [
-        provideHttpClient(),
+        provideHttpClient(withXhr()),
         provideHttpClientTesting(),
         { provide: Optimus, useValue: { setTranslation: vi.fn() } },
         TranslationService,

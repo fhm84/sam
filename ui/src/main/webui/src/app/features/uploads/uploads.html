@@ -211,7 +211,7 @@
               ></iframe>
             } @else {
               <div class="picker-preview-image-wrap">
-                <img class="picker-preview-image" [src]="pickerPreviewUrl()!" [alt]="pickerDoc()?.filename" />
+                <img class="picker-preview-image" [src]="pickerPreviewUrl()!" [alt]="$safeNavigationMigration(pickerDoc()?.filename)" />
               </div>
             }
           } @else {

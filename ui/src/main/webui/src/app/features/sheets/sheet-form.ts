@@ -1,4 +1,4 @@
-import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, Input, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FloatLabel } from '@openng/optimus-ui/floatlabel';
 import { InputText } from '@openng/optimus-ui/inputtext';
@@ -22,6 +22,7 @@ import { MusicianForm } from '../musicians/musician-form';
 @Component({
   selector: 'app-sheet-form',
   imports: [ReactiveFormsModule, FloatLabel, InputText, InputNumber, Textarea, Select, AutoComplete, Button, Dialog, Tooltip, TranslatePipe, MusicianForm],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './sheet-form.html',
 })
 export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnInit {

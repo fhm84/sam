@@ -1,4 +1,4 @@
-import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, Input, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FloatLabel } from '@openng/optimus-ui/floatlabel';
 import { InputText } from '@openng/optimus-ui/inputtext';
@@ -26,6 +26,7 @@ export const COVER_COLORS = [
 @Component({
   selector: 'app-collection-form',
   imports: [ReactiveFormsModule, FloatLabel, InputText, Textarea, Select, DatePicker, Button, Tooltip, TranslatePipe],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './collection-form.html',
 })
 export class CollectionForm extends BaseForm<SheetCollection> implements OnInit {

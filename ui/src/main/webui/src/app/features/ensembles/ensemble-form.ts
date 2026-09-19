@@ -1,4 +1,4 @@
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject, Input, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FloatLabel } from '@openng/optimus-ui/floatlabel';
 import { InputText } from '@openng/optimus-ui/inputtext';
@@ -14,6 +14,7 @@ import { BaseForm } from '../../shared/base/base-form';
 @Component({
   selector: 'app-ensemble-form',
   imports: [ReactiveFormsModule, FloatLabel, InputText, Textarea, Button, TranslatePipe],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './ensemble-form.html',
 })
 export class EnsembleForm extends BaseForm<Ensemble> {

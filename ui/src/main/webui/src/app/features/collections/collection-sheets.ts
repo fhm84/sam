@@ -1,4 +1,4 @@
-import { Component, DestroyRef, ElementRef, inject, Input, OnChanges, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, DestroyRef, ElementRef, inject, Input, OnChanges, OnInit, signal, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -52,6 +52,7 @@ import { RowActions } from '../../shared/components/row-actions/row-actions';
   ],
   providers: [ConfirmationService],
   templateUrl: './collection-sheets.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './collection-sheets.scss',
 })
 export class CollectionSheets implements OnInit, OnChanges {

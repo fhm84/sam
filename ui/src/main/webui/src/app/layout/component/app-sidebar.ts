@@ -1,4 +1,4 @@
-import { Component, effect, ElementRef, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, effect, ElementRef, inject, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter, Subject, takeUntil } from 'rxjs';
 import { LayoutService } from '../service/layout.service';
@@ -7,6 +7,7 @@ import { AppMenu } from './app-menu';
 @Component({
   selector: 'app-sidebar',
   imports: [AppMenu],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div class="layout-sidebar">
       <app-menu />

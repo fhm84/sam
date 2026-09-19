@@ -1,7 +1,7 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners, APP_INITIALIZER, inject } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
+import { HttpClient, provideHttpClient, withInterceptors, withXhr } from '@angular/common/http';
 import { provideOptimus } from '@openng/optimus-ui/config';
 import { MessageService } from '@openng/optimus-ui/api';
 import Aura from '@openng/optimus-ui-themes/aura';
@@ -18,7 +18,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideAnimationsAsync(),
-    provideHttpClient(withInterceptors([authInterceptor(), errorInterceptor])),
+    provideHttpClient(withXhr(), withInterceptors([authInterceptor(), errorInterceptor])),
     MessageService,
     provideOptimus({
       theme: {

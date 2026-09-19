@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, inject, OnInit, signal, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Panel } from '@openng/optimus-ui/panel';
 import { Toolbar } from '@openng/optimus-ui/toolbar';
@@ -17,6 +17,7 @@ import { SheetForm } from './sheet-form';
   imports: [SheetForm, Button, Tooltip, Panel, ConfirmDialog, TranslatePipe, Toolbar],
   providers: [ConfirmationService],
   templateUrl: './sheet-form-page.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './sheet-form-page.scss',
 })
 export class SheetFormPage extends DocumentHandler implements OnInit {

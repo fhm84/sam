@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService, MessageService } from '@openng/optimus-ui/api';
@@ -55,6 +55,7 @@ import { SheetDetail } from './sheet-detail';
       />
     </div>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: `
     .sheet-detail-page {
       max-width: 100%;
