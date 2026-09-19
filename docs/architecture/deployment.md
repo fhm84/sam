@@ -48,5 +48,6 @@ Sheet music files are stored in a named Docker volume (`sam-data`) mounted at `/
 
 ## Related
 
+- [Production Setup](production-setup.md) — server, DNS, backups and go-live checklist
 - [Security](concepts/security.md) — OIDC / Keycloak setup
 - [Storage & Deduplication](concepts/storage-and-deduplication.md) — local vs S3 backend selection

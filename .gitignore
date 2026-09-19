@@ -57,3 +57,6 @@ nb-configuration.xml
 
 # Obsidian vault state (docs/ opened as a vault)
 /docs/.obsidian/
+
+# Deployment-specific notes for our own band (hostnames, provider, backup machine) — local only
+/docs/private/
