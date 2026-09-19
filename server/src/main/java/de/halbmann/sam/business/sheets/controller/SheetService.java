@@ -266,7 +266,7 @@ public class SheetService {
         try {
             return Genre.valueOf(genre.trim().toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {
-            throw new ValidationException("Unknown genre: " + genre);
+            throw new ValidationException("Unknown genre: " + genre, e);
         }
     }
 
