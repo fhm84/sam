@@ -13,7 +13,7 @@ The Sakai-based layout supports three sidebar modes (persisted in `localStorage`
 ## Theme
 
 - **Light** and **dark** mode, toggleable from the topbar.
-- Colours driven by CSS custom properties (PrimeNG Aura preset).
+- Colours driven by CSS custom properties (Optimus UI Aura preset).
 
 ## Language
 

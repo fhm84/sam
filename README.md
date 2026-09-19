@@ -3,10 +3,10 @@
 # SAM — Sheet music Archiving & Management
 
 [![PMD](https://github.com/fhm84/sam/actions/workflows/pmd.yml/badge.svg)](https://github.com/fhm84/sam/actions/workflows/pmd.yml)
-[![Java 25](https://img.shields.io/badge/Java-25-ED8B00?logo=openjdk&logoColor=white)](https://openjdk.org/projects/jdk/25/)
-[![Quarkus 3.38](https://img.shields.io/badge/Quarkus-3.38-4695EB?logo=quarkus&logoColor=white)](https://quarkus.io)
-[![Angular 21](https://img.shields.io/badge/Angular-21-DD0031?logo=angular&logoColor=white)](https://angular.dev)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-required-336791?logo=postgresql&logoColor=white)](https://www.postgresql.org)
+[![Java](https://img.shields.io/badge/dynamic/xml?url=https://raw.githubusercontent.com/fhm84/sam/main/pom.xml&query=//%2A%5Blocal-name%28%29=%27maven.compiler.release%27%5D&label=Java&logo=openjdk&logoColor=white&color=ED8B00)](https://openjdk.org/projects/jdk/25/)
+[![Quarkus](https://img.shields.io/badge/dynamic/xml?url=https://raw.githubusercontent.com/fhm84/sam/main/pom.xml&query=//%2A%5Blocal-name%28%29=%27quarkus.platform.version%27%5D&label=Quarkus&logo=quarkus&logoColor=white&color=4695EB)](https://quarkus.io)
+[![Angular](https://img.shields.io/github/package-json/dependency-version/fhm84/sam/@angular/core?filename=ui/src/main/webui/package.json&label=Angular&logo=angular&logoColor=white&color=DD0031)](https://angular.dev)
+[![PostgreSQL 17](https://img.shields.io/badge/PostgreSQL-17-336791?logo=postgresql&logoColor=white)](https://www.postgresql.org)
 
 A Quarkus-based application for archiving sheet music, managing instrumentations, musicians, and collections for bands and ensembles.
 
@@ -38,7 +38,7 @@ A Quarkus-based application for archiving sheet music, managing instrumentations
 ./mvnw spotless:apply
 ```
 
-**Prerequisites:** Java 25, PostgreSQL (with `pg_trgm` and `fuzzystrmatch` extensions), default connection: `localhost:5432/sam_music`, user `sam`.
+**Prerequisites:** Java 25, Node.js (22.22.3+, 24.15+ or 26+ — Angular 22's requirement; CI and the Docker build use 26), PostgreSQL 17 (with `pg_trgm` and `fuzzystrmatch` extensions), default connection: `localhost:5432/sam_music`, user `sam`.
 
 ## Features
 
