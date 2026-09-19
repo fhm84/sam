@@ -21,7 +21,7 @@ authoritative; the table below only pins the major lines.
 | TS Gen | typescript-generator-maven-plugin | (in ui module, `-Pgenerate-ts`) |
 | Formatting | Palantir Java Format (Spotless) | (see parent pom) |
 | Container (backend) | Jib | (via Quarkus ext.) |
-| Container (frontend) | nginx + multi-stage Dockerfile | alpine |
+| Container (frontend / edge) | Caddy + multi-stage Dockerfile | caddy 2 |
 
 ## Related
 

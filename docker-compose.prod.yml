@@ -1,6 +1,8 @@
 services:
 
-  # nginx reverse proxy: serves Angular SPA and proxies /api/* + /oidc-config.json to sam-server
+  # Edge: Caddy + the Angular SPA (see Dockerfile, docker/Caddyfile). The only service
+  # published to the internet: terminates TLS, serves the SPA, proxies /api/* and
+  # /oidc-config.json to sam-server, and ${KEYCLOAK_DOMAIN} to keycloak.
   sam-ui:
     build:
       context: .
@@ -8,8 +10,75 @@ services:
     image: de.halbmann/sam-ui:latest
     ports:
       - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      SAM_DOMAIN: ${SAM_DOMAIN:?SAM_DOMAIN is required}
+      KEYCLOAK_DOMAIN: ${KEYCLOAK_DOMAIN:?KEYCLOAK_DOMAIN is required}
+      ACME_EMAIL: ${ACME_EMAIL:?ACME_EMAIL is required}
+    volumes:
+      - caddy-data:/data
+      - caddy-config:/config
+    networks:
+      default:
+        # sam-server validates tokens against the public issuer URL; the alias keeps
+        # that request on the internal network instead of leaving via the public IP.
+        aliases:
+          - ${KEYCLOAK_DOMAIN}
     depends_on:
       - sam-server
+      - keycloak
+    restart: unless-stopped
+
+  # Keycloak: OIDC provider. Imports keycloak/prod/sam-realm.json on first boot only
+  # (no dev users or dev secrets; ${...} placeholders are filled from the env below).
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.2
+    command: start --import-realm
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USER:-admin}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?KEYCLOAK_ADMIN_PASSWORD is required}
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASS:?KEYCLOAK_DB_PASS is required}
+      KC_HOSTNAME: https://${KEYCLOAK_DOMAIN:?KEYCLOAK_DOMAIN is required}
+      KC_HTTP_ENABLED: "true" # TLS terminates at Caddy
+      KC_PROXY_HEADERS: xforwarded
+      KC_HEALTH_ENABLED: "true"
+      JAVA_OPTS_KC_HEAP: "-Xms256m -Xmx768m"
+      # Filled into keycloak/prod/sam-realm.json at import
+      SAM_DOMAIN: ${SAM_DOMAIN:?SAM_DOMAIN is required}
+      KEYCLOAK_BACKEND_CLIENT_SECRET: ${KEYCLOAK_BACKEND_CLIENT_SECRET:?KEYCLOAK_BACKEND_CLIENT_SECRET is required}
+      KEYCLOAK_CLI_CLIENT_SECRET: ${KEYCLOAK_CLI_CLIENT_SECRET:?KEYCLOAK_CLI_CLIENT_SECRET is required}
+    volumes:
+      - ./keycloak/prod:/opt/keycloak/data/import:ro
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - 'exec 3<>/dev/tcp/127.0.0.1/9000; echo -e ''GET /health/ready HTTP/1.1\r\nhost: localhost\r\nConnection: close\r\n\r\n'' >&3; grep -q ''"status": "UP"'' <&3'
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 60s
+    restart: unless-stopped
+
+  keycloak-db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: ${KEYCLOAK_DB_PASS:?KEYCLOAK_DB_PASS is required}
+      POSTGRES_DB: keycloak
+    volumes:
+      - keycloak-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak -d keycloak"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
 
   # Quarkus backend: REST API + OIDC config endpoint
@@ -37,6 +106,8 @@ services:
     depends_on:
       database:
         condition: service_healthy
+      keycloak:
+        condition: service_healthy
     restart: unless-stopped
 
   database:
@@ -57,3 +128,6 @@ services:
 volumes:
   postgres-data:
   sam-data:
+  keycloak-db-data:
+  caddy-data:
+  caddy-config:

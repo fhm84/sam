@@ -1,4 +1,5 @@
-# Frontend image — builds Angular with Node and serves via nginx.
+# Frontend/edge image — builds Angular with Node and serves it with Caddy, which also
+# terminates TLS and proxies the API and Keycloak (see docker/Caddyfile).
 # Backend image is built by Jib: ./mvnw package -Dquarkus.container-image.build=true -pl server -am
 
 FROM node:26-alpine AS build
@@ -8,7 +9,7 @@ RUN npm ci
 COPY ui/src/main/webui/ .
 RUN npm run build
 
-FROM nginx:alpine
-COPY --from=build /app/dist/sam/browser /usr/share/nginx/html
-COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
-EXPOSE 80
+FROM caddy:2
+COPY --from=build /app/dist/sam/browser /srv
+COPY docker/Caddyfile /etc/caddy/Caddyfile
+EXPOSE 80 443

@@ -1,0 +1,40 @@
+# Edge proxy, baked into the sam-ui image: serves the Angular SPA, proxies the API to
+# sam-server and the login hostname to Keycloak, and terminates TLS.
+# Certificates are obtained and renewed automatically (Let's Encrypt) once the DNS
+# records resolve to this host and ports 80/443 are reachable.
+{
+	email {$ACME_EMAIL}
+}
+
+{$SAM_DOMAIN} {
+	encode zstd gzip
+
+	# Ops endpoints (ADR-0010): reachable on the internal network only.
+	# Prometheus scrapes sam-server:9000 directly.
+	handle /q/* {
+		respond "Not Found" 404
+	}
+
+	handle /api/* {
+		reverse_proxy sam-server:8080
+	}
+
+	# The JAX-RS application root is /api, so the endpoint lives at /api/oidc-config.json;
+	# the Angular app requests it at the root path.
+	handle /oidc-config.json {
+		rewrite * /api/oidc-config.json
+		reverse_proxy sam-server:8080
+	}
+
+	# Angular SPA — fall back to index.html for client-side routing
+	handle {
+		root * /srv
+		header Cache-Control "no-cache"
+		try_files {path} /index.html
+		file_server
+	}
+}
+
+{$KEYCLOAK_DOMAIN} {
+	reverse_proxy keycloak:8080
+}

@@ -29,5 +29,6 @@ endpoints separate from the `@Authenticated`-by-default public API. See
   timestamp, Quarkus/Java/OS versions. Unauthenticated by design; deliberately
   configured with `quarkus.info.git.mode=standard` (not `full`) so it does *not*
   expose commit author/committer name+email or the build machine's hostname.
-- In prod, nginx (`docker/nginx.conf`) reverse-proxies `/q/` to `sam-server:9000`
-  internally — the management port itself is not published to the host.
+- In prod, the Caddy edge proxy (`docker/Caddyfile`) answers `/q/*` with 404 — the
+  management port is neither published nor proxied ([ADR-0010](../docs/architecture/decisions/adr-0010-caddy-edge-proxy.md)).
+  Prometheus scrapes `sam-server:9000` over the internal network.

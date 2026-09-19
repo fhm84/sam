@@ -30,13 +30,13 @@ versions — no secrets or business data.
   never covered by it and was already unauthenticated on `:8080`. The real
   benefit is a single, deliberately-isolated unauthenticated surface instead
   of an implicit one mixed into the main port.
-- `/q/metrics` moved with it — `monitoring/prometheus.yml` and
-  `docker/nginx.conf`'s `/q/` proxy target were updated from `:8080` to
-  `:9000` accordingly (see [Monitoring](../../../monitoring/CLAUDE.md)).
+- `/q/metrics` moved with it — `monitoring/prometheus.yml` and the
+  edge proxy's `/q/` target were updated from `:8080` to `:9000`
+  accordingly (see [Monitoring](../../../monitoring/CLAUDE.md)).
 - The management port is not published to the host in
-  `docker-compose.prod.yml`; nginx reaches it over the internal Docker
-  network only, so `/q/*` is still only reachable through the existing
-  public entry point (port 80).
+  `docker-compose.prod.yml`. The original nginx setup proxied `/q/*` through
+  the public entry point; [ADR-0010](adr-0010-caddy-edge-proxy.md) supersedes
+  that: `/q/*` is no longer reachable from the internet.
 - Minor info disclosure (exact versions aid CVE matching by an attacker) is
   accepted as low-risk. Dependabot/dependency-check reduce how often a known
   CVE is *merged*, but deploys are manual (see the `docker-build` skill) so

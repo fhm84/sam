@@ -14,7 +14,7 @@ used as a menu, not a form.
 - [Context & Scope](architecture/context.md) — what SAM is, system context, quality goals
 - [Building Blocks](architecture/building-blocks.md) — Maven modules and their dependencies
 - [Data Model](architecture/data-model.md) — entities, relationships, key fields
-- [Deployment](architecture/deployment.md) — container images, nginx, environment variables
+- [Deployment](architecture/deployment.md) — container images, Caddy edge proxy, environment variables
 - [Production Setup](architecture/production-setup.md) — server, DNS, backups and go-live checklist
 - [Technology Stack](architecture/tech-stack.md) — major technology lines
 

@@ -17,6 +17,7 @@ previously recorded in the roadmap's open-questions table and plan notes.
 | [0007](adr-0007-management-interface.md) | Separate management interface (`:9000`) for `/q/*` ops endpoints | accepted |
 | [0008](adr-0008-assistant-ensemble-scoping.md) | AI assistant tools never receive authorization-relevant arguments | accepted |
 | [0009](adr-0009-version-controlled-prompts.md) | Prompts are version-controlled resources, not runtime config | accepted |
+| [0010](adr-0010-caddy-edge-proxy.md) | Caddy replaces nginx as the single edge proxy in the UI image; `/q/*` not exposed publicly | accepted |
 
 New decisions: add the next number, keep it short (context, decision,
 consequences — a screen or less), and link it from this table.
