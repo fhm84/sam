@@ -1,0 +1,11 @@
+[Unit]
+Description=SAM nightly backup
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+# Assumes the repo is checked out at /opt/sam
+ExecStart=/usr/bin/bash /opt/sam/scripts/backup/backup.sh
+Environment=BACKUP_DIR=/var/backups/sam
+Environment=BACKUP_GROUP=sam-backup

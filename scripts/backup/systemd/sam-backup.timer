@@ -1,0 +1,10 @@
+[Unit]
+Description=Run the SAM backup nightly
+
+[Timer]
+OnCalendar=*-*-* 03:00:00
+RandomizedDelaySec=10min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

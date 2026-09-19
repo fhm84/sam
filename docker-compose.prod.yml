@@ -28,6 +28,7 @@ services:
     depends_on:
       - sam-server
       - keycloak
+    mem_limit: 256m
     restart: unless-stopped
 
   # Keycloak: OIDC provider. Imports keycloak/prod/sam-realm.json on first boot only
@@ -41,6 +42,7 @@ services:
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak
       KC_DB_USERNAME: keycloak
+      KC_DB_POOL_MAX_SIZE: "20"
       KC_DB_PASSWORD: ${KEYCLOAK_DB_PASS:?KEYCLOAK_DB_PASS is required}
       KC_HOSTNAME: https://${KEYCLOAK_DOMAIN:?KEYCLOAK_DOMAIN is required}
       KC_HTTP_ENABLED: "true" # TLS terminates at Caddy
@@ -53,6 +55,7 @@ services:
       KEYCLOAK_CLI_CLIENT_SECRET: ${KEYCLOAK_CLI_CLIENT_SECRET:?KEYCLOAK_CLI_CLIENT_SECRET is required}
     volumes:
       - ./keycloak/prod:/opt/keycloak/data/import:ro
+    mem_limit: 1280m
     depends_on:
       keycloak-db:
         condition: service_healthy
@@ -68,6 +71,8 @@ services:
 
   keycloak-db:
     image: postgres:17
+    command: ["postgres", "-c", "shared_buffers=64MB", "-c", "max_connections=50"]
+    mem_limit: 384m
     environment:
       POSTGRES_USER: keycloak
       POSTGRES_PASSWORD: ${KEYCLOAK_DB_PASS:?KEYCLOAK_DB_PASS is required}
@@ -101,6 +106,9 @@ services:
       QUARKUS_LANGCHAIN4J_OPENAI_API_KEY: ${OPENAI_API_KEY:?OPENAI_API_KEY is required}
       # Storage: local filesystem path inside the container
       SAM_FILESYSTEM_BASE_PATH: /data/sam
+      # Heap 1 GB inside a 1.5 GB container (rest: metaspace, threads, PDF rendering buffers).
+      # Exit on OOM so the restart policy brings it back instead of leaving it half-alive.
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx1g -XX:+ExitOnOutOfMemoryError"
     volumes:
       - sam-data:/data/sam
     depends_on:
@@ -108,10 +116,13 @@ services:
         condition: service_healthy
       keycloak:
         condition: service_healthy
+    mem_limit: 1536m
     restart: unless-stopped
 
   database:
     image: postgres:17
+    command: ["postgres", "-c", "shared_buffers=128MB", "-c", "max_connections=50"]
+    mem_limit: 768m
     environment:
       POSTGRES_USER: ${DB_USER:-sam}
       POSTGRES_PASSWORD: ${DB_PASS:?DB_PASS is required}
@@ -124,6 +135,23 @@ services:
       timeout: 5s
       retries: 5
     restart: unless-stopped
+
+  # Helpers for scripts/backup/{backup,restore}.sh — not started with the stack (profile "backup").
+  # BACKUP_DIR is exported by those scripts.
+  backup-files:
+    image: alpine:3
+    profiles: ["backup"]
+    entrypoint: ["tar"]
+    volumes:
+      - sam-data:/data:ro
+      - ${BACKUP_DIR:-./backups}:/out
+
+  restore-files:
+    image: alpine:3
+    profiles: ["backup"]
+    volumes:
+      - sam-data:/data
+      - ${BACKUP_DIR:-./backups}:/in:ro
 
 volumes:
   postgres-data:
