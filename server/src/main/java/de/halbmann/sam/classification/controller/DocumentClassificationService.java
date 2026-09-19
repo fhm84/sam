@@ -268,7 +268,8 @@ public class DocumentClassificationService {
         // Genre — map string to enum best-effort
         if (result.genre() != null) {
             try {
-                req.setGenre(Genre.valueOf(result.genre().toUpperCase().replace(' ', '_')));
+                req.setGenre(
+                        Genre.valueOf(result.genre().toUpperCase(Locale.ROOT).replace(' ', '_')));
             } catch (IllegalArgumentException ignored) {
                 // leave null if no matching enum constant
             }

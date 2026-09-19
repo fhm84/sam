@@ -7,6 +7,7 @@ import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -48,7 +49,7 @@ public class FileTypePolicy implements UploadPolicy {
         // Optionally check extension matches MIME type
         String ext = Optional.ofNullable(context.filename())
                 .filter(f -> f.contains("."))
-                .map(f -> f.substring(f.lastIndexOf('.') + 1).toLowerCase())
+                .map(f -> f.substring(f.lastIndexOf('.') + 1).toLowerCase(Locale.ROOT))
                 .orElse("");
 
         // Example: enforce PDF files end with .pdf

@@ -105,7 +105,7 @@ public class DocumentsResourceImpl implements DocumentsResource {
             zipName = "instrumentation-" + instrumentationId;
         } else if (sheetId != null) {
             entries = documentBundleService.buildMergeEntriesForSheet(sheetId, type, includeInstrumentations);
-            zipName = "sheet-" + sheetId + (type != null ? "-" + type.name().toLowerCase() : "");
+            zipName = "sheet-" + sheetId + (type != null ? "-" + type.name().toLowerCase(Locale.ROOT) : "");
         } else {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }

@@ -21,6 +21,7 @@ import jakarta.transaction.Transactional;
 import java.time.OffsetDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -66,7 +67,7 @@ public class ShareService {
 
         eventLogService.log(
                 EventType.SHARE_CREATED,
-                request.getResourceType().name().toLowerCase(),
+                request.getResourceType().name().toLowerCase(Locale.ROOT),
                 request.getResourceId(),
                 Map.of("shareId", entity.getId().toString()),
                 entity.getId());
@@ -84,7 +85,7 @@ public class ShareService {
 
         eventLogService.log(
                 EventType.SHARE_REVOKED,
-                entity.getResourceType().name().toLowerCase(),
+                entity.getResourceType().name().toLowerCase(Locale.ROOT),
                 entity.getResourceId(),
                 Map.of("shareId", id.toString()),
                 id);

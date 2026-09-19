@@ -3,7 +3,7 @@ package de.halbmann.sam.cli.util;
 import java.util.Set;
 import java.util.UUID;
 
-public class FilenameUtils {
+public final class FilenameUtils {
 
     private FilenameUtils() {}
 
