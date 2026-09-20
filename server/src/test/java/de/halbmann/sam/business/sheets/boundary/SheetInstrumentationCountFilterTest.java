@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import de.halbmann.sam.api.entity.instruments.CreateInstrument;
 import de.halbmann.sam.api.entity.sheets.CreateInstrumentation;
+import de.halbmann.sam.api.entity.sheets.Genre;
 import de.halbmann.sam.api.entity.sheets.SheetMusic;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.security.TestSecurity;
@@ -18,8 +19,8 @@ import org.junit.jupiter.api.Test;
 /**
  * End-to-end coverage for the {@code instrumentCriterion} search filter (
  * {@code GET /api/sheets?instrumentCriterion=[!]<instrumentId>:<operator>:<count>}), covering the
- * four scenarios from the feature request: an exact count, a zero count, two ANDed exact counts,
- * and an ANDed negated count.
+ * four scenarios from the feature request (an exact count, a zero count, two ANDed exact counts,
+ * and an ANDed negated count), plus combining it with the pre-existing {@code genre} filter.
  */
 @QuarkusTest
 @TestSecurity(
@@ -102,8 +103,31 @@ class SheetInstrumentationCountFilterTest {
         assertFalse(ids.contains(withOboe));
     }
 
+    @Test
+    void genreCombinedWithInstrumentCriterion_filtersByBothWithoutError() {
+        String horn = createInstrument("Horn");
+        String marchWithHorns = createSheet("March With Horns " + UUID.randomUUID(), Genre.MARCH);
+        addInstrumentations(marchWithHorns, horn, 4);
+        String waltzWithHorns = createSheet("Waltz With Horns " + UUID.randomUUID(), Genre.WALTZ);
+        addInstrumentations(waltzWithHorns, horn, 4);
+        String marchWithoutHorns = createSheet("March Without Horns " + UUID.randomUUID(), Genre.MARCH);
+
+        List<String> ids = searchIds(Genre.MARCH, criterion(horn, "EQ", 4));
+
+        assertTrue(ids.contains(marchWithHorns));
+        assertFalse(ids.contains(waltzWithHorns));
+        assertFalse(ids.contains(marchWithoutHorns));
+    }
+
     private List<String> searchIds(String... criteria) {
+        return searchIds(null, criteria);
+    }
+
+    private List<String> searchIds(Genre genre, String... criteria) {
         var request = given().queryParam("page", 0).queryParam("size", 50);
+        if (genre != null) {
+            request = request.queryParam("genre", genre.name());
+        }
         for (String criterion : criteria) {
             request = request.queryParam("instrumentCriterion", criterion);
         }
@@ -120,8 +144,13 @@ class SheetInstrumentationCountFilterTest {
     }
 
     private String createSheet(String title) {
+        return createSheet(title, null);
+    }
+
+    private String createSheet(String title, Genre genre) {
         SheetMusic sheet = new SheetMusic();
         sheet.setTitle(title);
+        sheet.setGenre(genre);
         String id = given().contentType(ContentType.JSON)
                 .body(sheet)
                 .post("/api/sheets")
