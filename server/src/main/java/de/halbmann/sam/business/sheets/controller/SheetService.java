@@ -110,15 +110,12 @@ public class SheetService {
 
             List<InstrumentationCountCriterion> instrumentCriteria =
                     parseInstrumentCriteria(filterRequest.getInstrumentCriteria());
-            PaginatedResponse<SheetMusic> sheets = instrumentCriteria.isEmpty()
-                    ? getAllSheets(
-                            filterRequest, parameters, filterRequest.getTitleStartsWith(), filterRequest.getTag())
-                    : getAllSheetsWithInstrumentCriteria(
-                            filterRequest,
-                            parameters,
-                            filterRequest.getTitleStartsWith(),
-                            filterRequest.getTag(),
-                            instrumentCriteria);
+            PaginatedResponse<SheetMusic> sheets = getAllSheets(
+                    filterRequest,
+                    parameters,
+                    filterRequest.getTitleStartsWith(),
+                    filterRequest.getTag(),
+                    instrumentCriteria);
             response = new PaginatedResponse<>();
             response.setPage(filterRequest.getPage());
             response.setSize(sheets.getSize());
@@ -214,9 +211,10 @@ public class SheetService {
             final PaginationRequest paginationRequest,
             final Map<String, Object> parameters,
             final String titleStartsWith,
-            final String tag) {
-        PaginatedEntities<SheetMusicEntity> result =
-                sheetRepository.findSheetEntities(paginationRequest, parameters, titleStartsWith, tag);
+            final String tag,
+            final List<InstrumentationCountCriterion> instrumentCriteria) {
+        PaginatedEntities<SheetMusicEntity> result = sheetRepository.findSheetEntities(
+                paginationRequest, parameters, titleStartsWith, tag, instrumentCriteria);
 
         PaginatedResponse<SheetMusic> response = new PaginatedResponse<>();
         response.setData(result.data().stream().map(sheetMusicMapper::toDto).toList());
@@ -231,23 +229,6 @@ public class SheetService {
             return List.of();
         }
         return rawCriteria.stream().map(InstrumentationCountCriterion::parse).toList();
-    }
-
-    private PaginatedResponse<SheetMusic> getAllSheetsWithInstrumentCriteria(
-            final PaginationRequest paginationRequest,
-            final Map<String, Object> parameters,
-            final String titleStartsWith,
-            final String tag,
-            final List<InstrumentationCountCriterion> instrumentCriteria) {
-        PaginatedEntities<SheetMusicEntity> result = sheetRepository.findSheetEntitiesWithInstrumentCriteria(
-                paginationRequest, parameters, titleStartsWith, tag, instrumentCriteria);
-
-        PaginatedResponse<SheetMusic> response = new PaginatedResponse<>();
-        response.setData(result.data().stream().map(sheetMusicMapper::toDto).toList());
-        response.setPage(paginationRequest.getPage());
-        response.setSize(response.getData().size());
-        response.setTotalCount(result.totalCount());
-        return response;
     }
 
     public SheetMusic getSheet(final String sheetId) {

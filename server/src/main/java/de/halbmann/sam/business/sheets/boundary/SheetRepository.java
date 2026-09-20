@@ -11,9 +11,7 @@ import de.halbmann.sam.business.sheets.entity.InstrumentationCountCriterion;
 import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
 import de.halbmann.sam.core.controller.SortFieldValidator;
 import de.halbmann.sam.core.entity.PaginatedEntities;
-import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
-import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -190,92 +188,38 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
         return Arrays.stream(Genre.values()).map(Genre::name).toList();
     }
 
-    public PaginatedEntities<SheetMusicEntity> findSheetEntities(
-            final PaginationRequest paginationRequest,
-            final Map<String, Object> parameters,
-            final String titleStartsWith,
-            final String tag) {
-        final Map<String, Object> nonNullParams = parameters.entrySet().stream()
-                .filter(entry -> entry.getValue() != null)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-        // Keys are attribute paths (e.g. "composer.name"); a named parameter can't contain a dot,
-        // so the parameter name replaces dots with underscores.
-        final List<String> conditions = new ArrayList<>();
-        final Map<String, Object> queryParams = new HashMap<>();
-        nonNullParams.forEach((path, value) -> {
-            String paramName = path.replace('.', '_');
-            conditions.add(path + " = :" + paramName);
-            queryParams.put(paramName, value);
-        });
-
-        if (titleStartsWith != null && !titleStartsWith.isBlank()) {
-            conditions.add("lower(title) like :titlePrefix");
-            queryParams.put("titlePrefix", titleStartsWith.toLowerCase(Locale.ROOT) + "%");
-        }
-
-        if (tag != null && !tag.isBlank()) {
-            conditions.add(":tag member of tags");
-            queryParams.put("tag", tag);
-        }
-
-        final String filter = String.join(" and ", conditions);
-        final Sort sort = prepareSort(paginationRequest);
-
-        long totalItems;
-        PanacheQuery<SheetMusicEntity> sheetQuery;
-        if (queryParams.isEmpty()) {
-            sheetQuery = findAll(sort);
-            totalItems = count();
-        } else {
-            sheetQuery = find(filter, sort, queryParams);
-            totalItems = count(filter, queryParams);
-        }
-        final List<SheetMusicEntity> sheets = sheetQuery
-                .page(paginationRequest.getPage(), paginationRequest.getSize())
-                .list();
-
-        return new PaginatedEntities<>(sheets, totalItems);
-    }
-
     /**
-     * Same filters as {@link #findSheetEntities}, plus a set of instrumentation-count criteria
-     * (e.g. "exactly 4 horns", "no oboes") ANDed together. Each criterion is evaluated as a
-     * correlated {@code COUNT} subquery against {@code InstrumentationEntity} for the sheet,
-     * which requires an explicit root alias — Panache's {@code find}/{@code count} convenience
-     * methods used by {@link #findSheetEntities} don't provide one, so this builds the JPQL by
-     * hand instead.
+     * Sheets matching the given field filters (each ANDed together), optionally combined with a
+     * set of instrumentation-count criteria (e.g. "exactly 4 horns", "no oboes"), also ANDed in.
+     * Each instrument criterion is evaluated as a correlated {@code COUNT} subquery against
+     * {@code InstrumentationEntity} for the sheet, which requires an explicit root alias, so the
+     * JPQL is built by hand rather than via Panache's {@code find}/{@code count} convenience
+     * methods.
      */
-    public PaginatedEntities<SheetMusicEntity> findSheetEntitiesWithInstrumentCriteria(
+    public PaginatedEntities<SheetMusicEntity> findSheetEntities(
             final PaginationRequest paginationRequest,
             final Map<String, Object> parameters,
             final String titleStartsWith,
             final String tag,
             final List<InstrumentationCountCriterion> instrumentCriteria) {
+        final Map<String, Object> nonNullParams = parameters.entrySet().stream()
+                .filter(entry -> entry.getValue() != null)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         final List<String> conditions = new ArrayList<>();
         final Map<String, Object> queryParams = new HashMap<>();
 
-        if (parameters.get("title") != null) {
-            conditions.add("s.title = :title");
-            queryParams.put("title", parameters.get("title"));
-        }
-        if (parameters.get("composer.name") != null) {
-            conditions.add("s.composer.name = :composerName");
-            queryParams.put("composerName", parameters.get("composer.name"));
-        }
-        if (parameters.get("genre") != null) {
-            conditions.add("s.genre = :genre");
-            queryParams.put("genre", Genre.valueOf((String) parameters.get("genre")));
-        }
-        if (parameters.get("favorite") != null) {
-            conditions.add("s.favorite = :favorite");
-            queryParams.put("favorite", parameters.get("favorite"));
-        }
+        nonNullParams.forEach((field, value) -> {
+            final String paramName = field.replace('.', '_');
+            conditions.add("s." + field + " = :" + paramName);
+            queryParams.put(paramName, value);
+        });
+
         if (titleStartsWith != null && !titleStartsWith.isBlank()) {
             conditions.add("lower(s.title) like :titlePrefix");
             queryParams.put("titlePrefix", titleStartsWith.toLowerCase(Locale.ROOT) + "%");
         }
+
         if (tag != null && !tag.isBlank()) {
             conditions.add(":tag member of s.tags");
             queryParams.put("tag", tag);
@@ -426,18 +370,6 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
                 .createNativeQuery("select id from sheets order by random() limit 1", UUID.class)
                 .getResultList();
         return ids.isEmpty() ? Optional.empty() : findByIdOptional(ids.get(0));
-    }
-
-    private Sort prepareSort(PaginationRequest paginationRequest) {
-        if (paginationRequest.getSortBy() != null) {
-            SortFieldValidator.validate(paginationRequest.getSortBy(), ALLOWED_SORT_FIELDS);
-            if (SortOrder.DESC == paginationRequest.getSortOrder()) {
-                return Sort.descending(paginationRequest.getSortBy());
-            } else {
-                return Sort.ascending(paginationRequest.getSortBy());
-            }
-        }
-        return Sort.ascending("title");
     }
 
     /**
