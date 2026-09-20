@@ -27,14 +27,15 @@ public record InstrumentationCountCriterion(
         try {
             operator = InstrumentationCountOperator.valueOf(parts[1]);
         } catch (IllegalArgumentException e) {
-            throw new ValidationException("Invalid instrument criterion operator '" + parts[1] + "' in '" + raw + "'");
+            throw new ValidationException(
+                    "Invalid instrument criterion operator '" + parts[1] + "' in '" + raw + "'", e);
         }
 
         int count;
         try {
             count = Integer.parseInt(parts[2]);
         } catch (NumberFormatException e) {
-            throw new ValidationException("Invalid instrument criterion count '" + parts[2] + "' in '" + raw + "'");
+            throw new ValidationException("Invalid instrument criterion count '" + parts[2] + "' in '" + raw + "'", e);
         }
         if (count < 0) {
             throw new ValidationException("Invalid instrument criterion count in '" + raw + "': must be >= 0");
