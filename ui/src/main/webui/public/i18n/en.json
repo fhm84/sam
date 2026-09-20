@@ -513,7 +513,7 @@
       "editTextBlock": "Edit Text Block",
       "columns": {
         "nr": "Nr.",
-        "identifier": "Nr.",
+        "identifier": "No.",
         "title": "Title / Text",
         "type": "Type",
         "genre": "Genre",
