@@ -28,9 +28,20 @@ nb-configuration.xml
 # OSX
 .DS_Store
 
+# Windows
+Thumbs.db
+desktop.ini
+
 # Vim
 *.swp
 *.swo
+
+# JVM crash logs and heap dumps
+hs_err_pid*.log
+*.hprof
+
+# Angular CLI cache (also created when ng/ngc is run from the repo root)
+.angular/
 
 # patch
 *.orig
@@ -38,6 +49,8 @@ nb-configuration.xml
 
 # Local environment
 .env
+.env.*
+!.env.example
 
 # Plugin directory
 /.quarkus/cli/plugins/
