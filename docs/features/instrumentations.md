@@ -25,3 +25,4 @@ Each [sheet](sheets.md) can have multiple instrumentations — one per instrumen
 
 - [Ensembles & Coverage](ensembles-coverage.md) — instrumentations are matched against ensemble voices
 - [Shares & Public Access](shares.md) — a single instrumentation can be shared via link
+- [Search & Discovery](search-discovery.md#instrumentation-count-filter) — search sheets by instrumentation counts (e.g. "exactly 4 horns")

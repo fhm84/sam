@@ -147,6 +147,70 @@
           </a>
         }
       </div>
+
+      <div class="flex flex-col gap-2 mt-4" data-testid="instrument-criteria-filter">
+        <label class="text-[0.85rem] font-medium text-[var(--sam-text-secondary)]">{{ 'sheets.filters.instrumentation' | translate }}</label>
+        @for (row of instrumentCriteriaRows(); track $index) {
+          <div class="flex items-center gap-2 flex-wrap" [attr.data-testid]="'instrument-criterion-row-' + $index">
+            <p-checkbox
+              [attr.data-testid]="'instrument-criterion-not-' + $index"
+              [binary]="true"
+              [ngModel]="row.negate"
+              (ngModelChange)="updateInstrumentCriterionRow($index, { negate: $event })"
+              [pTooltip]="'sheets.filters.notTooltip' | translate"
+            />
+            <span class="text-[0.8rem] text-[var(--sam-text-muted)]">{{ 'sheets.filters.not' | translate }}</span>
+            <p-select
+              [attr.data-testid]="'instrument-criterion-instrument-' + $index"
+              [options]="instrumentOptions()"
+              optionLabel="label"
+              optionValue="value"
+              [filter]="true"
+              [ngModel]="row.instrumentId"
+              (ngModelChange)="updateInstrumentCriterionRow($index, { instrumentId: $event })"
+              [placeholder]="t.t('sheets.filters.instrumentPlaceholder')"
+              [style]="{ minWidth: '180px' }"
+            />
+            <p-select
+              [attr.data-testid]="'instrument-criterion-operator-' + $index"
+              [options]="operatorOptions()"
+              optionLabel="label"
+              optionValue="value"
+              [ngModel]="row.operator"
+              (ngModelChange)="updateInstrumentCriterionRow($index, { operator: $event })"
+              [style]="{ minWidth: '80px' }"
+            />
+            <p-inputnumber
+              [attr.data-testid]="'instrument-criterion-count-' + $index"
+              [ngModel]="row.count"
+              (ngModelChange)="updateInstrumentCriterionRow($index, { count: $event })"
+              [min]="0"
+              [showButtons]="true"
+              [useGrouping]="false"
+              [style]="{ width: '110px' }"
+            />
+            <p-button
+              icon="pi pi-trash"
+              [rounded]="true"
+              [text]="true"
+              severity="danger"
+              size="small"
+              [attr.data-testid]="'btn-remove-instrument-criterion-' + $index"
+              [pTooltip]="'common.delete' | translate"
+              (onClick)="removeInstrumentCriterionRow($index)"
+            />
+          </div>
+        }
+        <p-button
+          data-testid="btn-add-instrument-criterion"
+          icon="pi pi-plus"
+          [text]="true"
+          size="small"
+          styleClass="self-start"
+          [label]="'sheets.filters.addInstrumentCriterion' | translate"
+          (onClick)="addInstrumentCriterionRow()"
+        />
+      </div>
     </div>
   }
 

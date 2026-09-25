@@ -2,6 +2,7 @@ package de.halbmann.sam.api.entity.sheets;
 
 import de.halbmann.sam.api.entity.shared.PaginationRequest;
 import jakarta.ws.rs.QueryParam;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -62,4 +63,13 @@ public class SheetFilterRequest extends PaginationRequest {
      */
     @QueryParam("tag")
     private String tag;
+
+    /**
+     * Filter by instrumentation counts. Each entry has the form
+     * {@code [!]<instrumentId>:<operator>:<count>}, e.g. {@code "HORN_F:EQ:4"} (exactly 4 horns)
+     * or {@code "!OBOE:GTE:1"} (NOT at least 1 oboe, i.e. no oboes). {@code operator} is one of
+     * {@code EQ}, {@code LTE}, {@code GTE}. All entries are combined with AND.
+     */
+    @QueryParam("instrumentCriterion")
+    private List<String> instrumentCriteria;
 }
