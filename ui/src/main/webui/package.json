@@ -38,14 +38,14 @@
     "@hono/node-server": ">=2.0.5"
   },
   "dependencies": {
-    "@angular/animations": "^22.1.7",
-    "@angular/cdk": "^22.1.7",
-    "@angular/common": "^22.1.7",
-    "@angular/compiler": "^22.1.7",
-    "@angular/core": "^22.1.7",
-    "@angular/forms": "^22.1.7",
-    "@angular/platform-browser": "^22.1.7",
-    "@angular/router": "^22.1.7",
+    "@angular/animations": "^22.2.0",
+    "@angular/cdk": "^22.2.0",
+    "@angular/common": "^22.2.0",
+    "@angular/compiler": "^22.2.0",
+    "@angular/core": "^22.2.0",
+    "@angular/forms": "^22.2.0",
+    "@angular/platform-browser": "^22.2.0",
+    "@angular/router": "^22.2.0",
     "@openng/icons": "^1.0.0",
     "@openng/optimus-ui": "^2.0.2",
     "@openng/optimus-ui-themes": "^2.0.2",
@@ -54,14 +54,14 @@
     "tslib": "^2.3.0"
   },
   "devDependencies": {
-    "@angular/build": "^22.1.8",
-    "@angular/cli": "^22.1.8",
-    "@angular/compiler-cli": "^22.1.7",
-    "@vitest/coverage-v8": "^4.1.11",
+    "@angular/build": "^22.2.0",
+    "@angular/cli": "^22.2.0",
+    "@angular/compiler-cli": "^22.2.0",
+    "@vitest/coverage-v8": "^5.0.1",
     "autoprefixer": "^10.6.1",
     "jsdom": "^27.1.0",
     "tailwindcss": "^3.4.19",
     "typescript": "~6.0",
-    "vitest": "^4.1.9"
+    "vitest": "^5.0.1"
   }
 }
