@@ -6,7 +6,7 @@ import { of } from 'rxjs';
 import { ConfirmationService, MessageService } from '@openng/optimus-ui/api';
 
 import { Sheets } from './sheets';
-import { SheetsApiService, EnsemblesApiService } from '../../core/api';
+import { SheetsApiService, EnsemblesApiService, InstrumentsApiService } from '../../core/api';
 import { TranslationService } from '../../core/translation.service';
 import { LayoutPreferenceService } from '../../core/layout-preference.service';
 import { SheetMusic, SheetMusicSearchResult } from '../../model/datamodels';
@@ -19,6 +19,7 @@ describe('Sheets', () => {
   let component: Sheets;
   let sheetsApi: { find: ReturnType<typeof vi.fn>; getAvailableLetters: ReturnType<typeof vi.fn> };
   let ensemblesApi: { find: ReturnType<typeof vi.fn>; getCoverageStatus: ReturnType<typeof vi.fn>; computeCoverage: ReturnType<typeof vi.fn> };
+  let instrumentsApi: { find: ReturnType<typeof vi.fn> };
 
   beforeEach(async () => {
     sheetsApi = {
@@ -29,6 +30,9 @@ describe('Sheets', () => {
       find: vi.fn().mockReturnValue(paginatedOf([])),
       getCoverageStatus: vi.fn().mockReturnValue(of({})),
       computeCoverage: vi.fn().mockReturnValue(of({})),
+    };
+    instrumentsApi = {
+      find: vi.fn().mockReturnValue(paginatedOf([])),
     };
 
     await TestBed.overrideComponent(Sheets, {
@@ -46,6 +50,7 @@ describe('Sheets', () => {
           MessageService,
           { provide: SheetsApiService, useValue: sheetsApi },
           { provide: EnsemblesApiService, useValue: ensemblesApi },
+          { provide: InstrumentsApiService, useValue: instrumentsApi },
           {
             provide: TranslationService,
             useValue: { t: (k: string) => k, version: { subscribe: () => {} } },

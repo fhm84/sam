@@ -17,26 +17,39 @@ import { Drawer } from '@openng/optimus-ui/drawer';
 import { Toolbar } from '@openng/optimus-ui/toolbar';
 import { Tag } from '@openng/optimus-ui/tag';
 import { Tooltip } from '@openng/optimus-ui/tooltip';
+import { Checkbox } from '@openng/optimus-ui/checkbox';
+import { InputNumber } from '@openng/optimus-ui/inputnumber';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../core/translation.service';
 import { LayoutPreferenceService } from '../../core/layout-preference.service';
-import { EnsemblesApiService, SheetsApiService } from '../../core/api';
+import { EnsemblesApiService, InstrumentsApiService, SheetsApiService } from '../../core/api';
 import {
   CoverageSnapshotSummary,
   Ensemble,
   EnsembleCoverageStatus,
   Genre,
+  Instrument,
   SearchResultMetrics,
   SheetMusic,
   SheetMusicSearchResult,
 } from '../../model/datamodels';
-import { GENRES, STYLES } from '../../shared/constants';
+import { FETCH_ALL_SIZE, GENRES, STYLES } from '../../shared/constants';
+import { instrumentLabel } from '../../shared/utils/format.utils';
 import { Dialog } from '@openng/optimus-ui/dialog';
 import { SheetDetail } from './sheet-detail';
 import { SheetCollections } from './sheet-collections';
 import { ExploreView } from './explore/explore-view';
 import { RowActions } from '../../shared/components/row-actions/row-actions';
+
+type InstrumentCriterionOperator = 'EQ' | 'LTE' | 'GTE';
+
+interface InstrumentCriterionRow {
+  instrumentId: string | null;
+  operator: InstrumentCriterionOperator;
+  count: number;
+  negate: boolean;
+}
 
 @Component({
   selector: 'app-sheets',
@@ -62,6 +75,8 @@ import { RowActions } from '../../shared/components/row-actions/row-actions';
     Toolbar,
     Tag,
     Tooltip,
+    Checkbox,
+    InputNumber,
   ],
   providers: [ConfirmationService],
   templateUrl: './sheets.html',
@@ -76,6 +91,7 @@ export class Sheets implements OnInit {
   protected readonly t = inject(TranslationService);
   private readonly api = inject(SheetsApiService);
   private readonly ensemblesApi = inject(EnsemblesApiService);
+  private readonly instrumentsApi = inject(InstrumentsApiService);
   private readonly router = inject(Router);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly messageService = inject(MessageService);
@@ -103,8 +119,21 @@ export class Sheets implements OnInit {
   protected readonly hasTextSearch = signal(false);
   protected readonly tagFilter = signal<string | null>(null);
   protected readonly debugMode = signal(false);
+
+  // ── Instrumentation filter ────────────────────────────
+  protected readonly instrumentOptions = signal<{ label: string; value: string }[]>([]);
+  protected readonly operatorOptions = computed(() => [
+    { label: this.t.t('sheets.filters.operatorEQ'), value: 'EQ' as InstrumentCriterionOperator },
+    { label: this.t.t('sheets.filters.operatorLTE'), value: 'LTE' as InstrumentCriterionOperator },
+    { label: this.t.t('sheets.filters.operatorGTE'), value: 'GTE' as InstrumentCriterionOperator },
+  ]);
+  protected readonly instrumentCriteriaRows = signal<InstrumentCriterionRow[]>([]);
+
   protected readonly activeFilterCount = computed(
-    () => (this.selectedGenre() ? 1 : 0) + (this.selectedLetter() ? 1 : 0),
+    () =>
+      (this.selectedGenre() ? 1 : 0) +
+      (this.selectedLetter() ? 1 : 0) +
+      this.instrumentCriteriaRows().filter((r) => r.instrumentId).length,
   );
   protected rows = 20;
 
@@ -149,6 +178,18 @@ export class Sheets implements OnInit {
       this.loadData();
     }
     this.loadEnsembles();
+    this.loadInstrumentOptions();
+  }
+
+  private loadInstrumentOptions(): void {
+    this.instrumentsApi
+      .find({ size: FETCH_ALL_SIZE })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((res) => {
+        this.instrumentOptions.set(
+          (res.data ?? []).map((i: Instrument) => ({ label: instrumentLabel(i), value: i.id! })),
+        );
+      });
   }
 
   protected onLazyLoad(event: TableLazyLoadEvent): void {
@@ -266,9 +307,39 @@ export class Sheets implements OnInit {
   protected clearFilters(): void {
     this.selectedGenre.set(null);
     this.selectedLetter.set(null);
+    this.instrumentCriteriaRows.set([]);
     this.currentPage = 0;
     this.loadAvailableLetters();
     this.loadData();
+  }
+
+  protected addInstrumentCriterionRow(): void {
+    this.instrumentCriteriaRows.update((rows) => [
+      ...rows,
+      { instrumentId: null, operator: 'EQ', count: 1, negate: false },
+    ]);
+  }
+
+  protected removeInstrumentCriterionRow(index: number): void {
+    this.instrumentCriteriaRows.update((rows) => rows.filter((_, i) => i !== index));
+    this.onInstrumentCriteriaChange();
+  }
+
+  protected updateInstrumentCriterionRow(index: number, patch: Partial<InstrumentCriterionRow>): void {
+    this.instrumentCriteriaRows.update((rows) => rows.map((r, i) => (i === index ? { ...r, ...patch } : r)));
+    this.onInstrumentCriteriaChange();
+  }
+
+  private onInstrumentCriteriaChange(): void {
+    this.currentPage = 0;
+    this.loadData();
+  }
+
+  private serializeInstrumentCriteria(): string[] | undefined {
+    const values = this.instrumentCriteriaRows()
+      .filter((r) => r.instrumentId)
+      .map((r) => `${r.negate ? '!' : ''}${r.instrumentId}:${r.operator}:${r.count}`);
+    return values.length ? values : undefined;
   }
 
   protected onLetterSelect(letter: string): void {
@@ -442,6 +513,7 @@ export class Sheets implements OnInit {
         titleStartsWith: this.selectedLetter() || undefined,
         ensemble: this.selectedEnsemble()?.id || undefined,
         tag: this.tagFilter() || undefined,
+        instrumentCriteria: this.serializeInstrumentCriteria(),
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({

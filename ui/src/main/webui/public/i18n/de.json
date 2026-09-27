@@ -375,7 +375,15 @@
       "toggle": "Filter",
       "genre": "Genre",
       "genrePlaceholder": "Alle Genres",
-      "clear": "Filter zurücksetzen"
+      "clear": "Filter zurücksetzen",
+      "instrumentation": "Besetzung",
+      "instrumentPlaceholder": "Instrument wählen",
+      "addInstrumentCriterion": "Instrumentenfilter hinzufügen",
+      "not": "NICHT",
+      "notTooltip": "Bedingung negieren",
+      "operatorEQ": "=",
+      "operatorLTE": "≤",
+      "operatorGTE": "≥"
     },
     "collections": {
       "title": "Sammlungen",
