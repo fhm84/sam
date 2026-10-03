@@ -11,6 +11,46 @@ For **technical architecture** see the [architecture docs](README.md#architectur
 
 Status values: `idea` · `planned` · `in progress` · `done`
 
+Task-level breakdowns for `planned` / `in progress` items live in
+[implementation plans](plans/README.md).
+
+---
+
+## Now / Next / Later
+
+The order of work, reviewed 2026-10-03. Everything else in this document is an
+unprioritised backlog.
+
+**Now: before go-live** (real musicians will log in, and the event log will hold personal data)
+
+1. [Role-aware access](#full-role-based-access-control-rbac--in-progress): menu and route
+   guarding, and scoping read endpoints (event log, musician contact data, share creation)
+   → [plan](plans/rbac-role-aware-access.md)
+2. [Automatic coverage snapshot invalidation](#automatic-coverage-snapshot-invalidation--planned)
+   → [plan](plans/coverage-snapshot-invalidation.md) (needs open question #5)
+3. [Event log retention + own-history view](#document-access-log--partial)
+   → [plan](plans/event-log-retention.md) (needs open question #9)
+4. Instrumentation-count search filter (PR #96, ready to merge)
+
+**Next: everyday use for the music librarian**
+
+1. [Classification form enhancements](#classification-form-enhancements--planned) → [plan](plans/classification-enhancements.md)
+2. [Sheets overview filter & bulk actions](#sheets-overview-filter--bulk-actions--planned) → [plan](plans/sheets-overview.md)
+3. [Home dashboard](#home-dashboard--planned) → [plan](plans/home-dashboard.md),
+   including the gap report from [coverage breakdown enhancements](#coverage-breakdown-enhancements--planned) → [plan](plans/coverage-breakdown.md)
+
+**Later**
+
+- [Performance history](#performance-history--idea), which unblocks the date-range
+  [GEMA reporting export](#gema-reporting-export--in-progress)
+- [Checkout / lending tracking](#checkout--lending-tracking--idea),
+  [QR codes](#qr-codes-on-physical-folders--idea) +
+  [mobile quick-lookup view](#mobile-first-quick-lookup-view--idea),
+  [thumbnail preview](#thumbnail-preview--idea)
+- Attachment kind and versioning → [plan](plans/attachment-metadata.md)
+- [Classification queue](#classification-queue--planned) → [plan](plans/classification-queue.md),
+  then [aligning the UI with the Claude Design](#align-ui-with-the-improved-claude-design--idea)
+
 ---
 
 ## Table of Contents
@@ -187,7 +227,7 @@ between a collection/setlist and a sheet), which already exists.
 ### AI setlist assistant — `done`
 
 A tool-grounded AI assistant that helps build a setlist and draft the spoken text between
-songs. Full details in local planning notes (`plan_setlist_assistant.md`, not in the repo).
+songs. See [AI Setlist Assistant](features/ai-setlist-assistant.md).
 
 **Implementation note:** Backend (ensemble FK, candidate-retrieval tool, `SetlistAssistant` /
 `ProgrammeTextDrafter` AI services, both endpoints, event logging with token usage, draft-text
@@ -223,12 +263,17 @@ grounding data source yet — would just be hallucination).
 
 ## 3. Musician-Facing
 
-### Musician profile enrichment — `planned`
+### Musician profile enrichment — `done`
 
-Add missing fields to the `Musician` entity surfaced in the Claude Design mockup
-(`Create Flows (PrimeNG).html`). Full details in local planning notes (`plan_musician_fields.md`, not in the repo).
+**Done:** all fields shipped (migration `V1.1.2__MusicianFields.sql`, `MusicianStatus`,
+`MusicianRole`, `musician_instruments` junction table) together with the Angular musician
+form. See [Musicians](features/musicians.md). The contact fields are currently readable by
+every authenticated user; restricting that is part of [role-aware access](plans/rbac-role-aware-access.md).
 
-Fields to add:
+Added missing fields to the `Musician` entity surfaced in the Claude Design mockup
+(`Create Flows (PrimeNG).html`).
+
+Fields added:
 - **email** and **mobile** — contact details for self-service folder access and
   part distribution
 - **notes** — free-text textarea, admin-visible only (allergies, vacation patterns,
@@ -315,7 +360,7 @@ Output: a simple printed checklist or PDF.
 ### Home dashboard — `planned`
 
 A home page replacing the current empty landing screen. Two tabs, derived from the
-Claude Design `Hi-Fi Shell (PrimeNG).html`. Full details in local planning notes (`plan_home_dashboard.md`, not in the repo).
+Claude Design `Hi-Fi Shell (PrimeNG).html`. Task breakdown: [plan](plans/home-dashboard.md).
 
 **Inbox tab:**
 - KPI row: to-classify count, instrumentations missing archive location, stale coverage
@@ -486,10 +531,14 @@ existing `COLLECTION` share row and enforced in `ShareService`/`PublicShareResou
 
 ---
 
-### Collection visibility & cover — `planned`
+### Collection visibility & cover — `done`
 
-Add two missing fields to `SheetCollection` surfaced in the Claude Design mockup
-(`Create Flows (PrimeNG).html`). Full details in local planning notes (`plan_collection_fields.md`, not in the repo).
+**Done:** shipped in migration `V1.1.3__CollectionFields.sql` with a visibility dropdown and
+a cover colour picker in the collection form. **Leftover:** `coverImageId` exists, but no
+upload control sets it yet (tracked in [attachment metadata](plans/attachment-metadata.md)).
+
+Added missing fields to `SheetCollection` surfaced in the Claude Design mockup
+(`Create Flows (PrimeNG).html`).
 
 - **visibility** — enum (`WHOLE_ENSEMBLE` / `ADMINS_ONLY` / `PRIVATE`); controls
   who can see the collection. The design shows a "Whole ensemble" dropdown in the
@@ -545,7 +594,7 @@ Can be implemented as an extension of the checkout/lending feature (Section 1) w
 ### Coverage breakdown enhancements — `planned`
 
 Extend the coverage engine to match the `Coverage Breakdown (PrimeNG).html` design.
-Full details in local planning notes (`plan_coverage_breakdown.md`, not in the repo).
+Task breakdown: [plan](plans/coverage-breakdown.md).
 
 - **Condition/substitute annotations** — surface `conditionPenalty` and
   `substituteFactor` as named fields on `VoiceCoverageDetail` (values already computed)
@@ -564,7 +613,7 @@ Full details in local planning notes (`plan_coverage_breakdown.md`, not in the r
 ### Classification queue — `planned`
 
 A batch inbox for working through a queue of unclassified documents. Shown in the
-Claude Design `Classify (PrimeNG).html`. Full details in local planning notes (`plan_classify_queue.md`, not in the repo).
+Claude Design `Classify (PrimeNG).html`. Scope and open questions: [plan](plans/classification-queue.md).
 
 The queue sits on top of the existing 2-step classify/apply workflow and adds:
 - Inbox tabs: Pending / Skipped / Done
@@ -585,7 +634,7 @@ plan file). This is a large standalone feature.
 ### Classification form enhancements — `planned`
 
 Enrich the existing 2-step classify/apply workflow with richer AI output and a more
-complete apply request. Full details in local planning notes (`plan_classify_enhancements.md`, not in the repo).
+complete apply request. Task breakdown: [plan](plans/classification-enhancements.md).
 
 - **Tags + notes** in `ClassificationApplyRequest` — both shown in the form but absent from the DTO
 - **Document type** (Part / Score / Solo) returned by AI analysis
@@ -634,7 +683,7 @@ Phase 3).
 
 Add missing fields to `SheetMusicEntity` and related entities surfaced in the Claude
 Design mockup (`Sheet Detail (PrimeNG).html` / `Sheet Detail v2 (PrimeNG).html`).
-Full details in local planning notes (`plan_sheet_detail_fields.md`, not in the repo).
+Remaining attachment work: [plan](plans/attachment-metadata.md).
 
 **Sheet-level fields — done:**
 - **rightsStatus** — enum (`UNKNOWN` / `PUBLIC_DOMAIN` / `LICENSED` /
@@ -668,12 +717,15 @@ Full details in local planning notes (`plan_sheet_detail_fields.md`, not in the 
 
 ---
 
-### Instrument catalogue enrichment — `planned`
+### Instrument catalogue enrichment — `done`
 
-Add missing fields to the `Instrument` entity surfaced in the Claude Design mockup
-(`Create Flows (PrimeNG).html`). Full details in local planning notes (`plan_instrument_fields.md`, not in the repo).
+**Done:** all fields shipped in migration `V1.1.1__InstrumentFields.sql` (`InstrumentFamily`,
+default clef, `instrument_aliases`, catalogue section/position). See [Instruments](features/instruments.md).
 
-Fields to add:
+Added missing fields to the `Instrument` entity surfaced in the Claude Design mockup
+(`Create Flows (PrimeNG).html`).
+
+Fields added:
 - **family** — fixed enum (`BRASS` / `WOODWIND` / `STRING` / `PERCUSSION` /
   `KEYBOARD` / `VOICE` / `OTHER`). The `family` field was already anticipated
   (commented-out stub in `Instrument.java` / `CreateInstrument.java`) but never
@@ -862,8 +914,7 @@ Once named user accounts exist, this log constitutes personal data:
 ### Sheets overview filter & bulk actions — `planned`
 
 Extend the sheet list API and Angular UI to match the filter toolbar and bulk actions
-shown in the Claude Design `Sheets Overview (PrimeNG).html`. Full details in
-local planning notes (`plan_sheets_overview.md`, not in the repo).
+shown in the Claude Design `Sheets Overview (PrimeNG).html`. Task breakdown: [plan](plans/sheets-overview.md).
 
 **Missing filter dimensions** (to add to `SheetFilterRequest`):
 - Coverage status filter (COMPLETE / PLAYABLE / INCOMPLETE, per ensemble)
@@ -998,7 +1049,7 @@ A visual/interaction redesign of SAM already exists as Claude Design mockups
 (`Hi-Fi Shell (PrimeNG).html`, `Sheets Overview (PrimeNG).html`, `Sheet Detail (PrimeNG).html`
 / `v2`, `Create Flows (PrimeNG).html`, `Coverage Breakdown (PrimeNG).html`,
 `Classify (PrimeNG).html`). So far these mockups have only been mined for **data model
-and feature gaps** (see Open Question #10 and the resulting `plan_*.md` planning notes, kept outside the repo) —
+and feature gaps** (see Open Question #10 and the resulting [implementation plans](plans/README.md)) —
 the improved **look & feel itself** (shell layout, page compositions, visual hierarchy,
 component styling) has not been implemented.
 
@@ -1040,9 +1091,9 @@ answered before the relevant implementation work begins.
 | 2 | How is "selected content" for guests scoped — per-sheet flag, collection-based sharing, or ensemble-based? | Guest access, setlist public page | **Resolved:** Resource-scoped share tokens implemented (one token = one sheet instrumentation or collection). Public setlist/sheet pages live at `/public/share/{token}`. Open-URL anonymous access (no link) intentionally deferred. |
 | 3 | Should document-level visibility be independently configurable, or always inherited from the sheet/instrumentation? | Shared document links, guest access | Open |
 | 4 | Is anonymous guest access (no link, open public URL) ever desirable? | Guest access scope | Open |
-| 5 | Should coverage snapshots be invalidated automatically, or remain manual? | Coverage accuracy, performance | Open |
+| 5 | Should coverage snapshots be invalidated automatically, or remain manual? | Coverage accuracy, performance | Open: **blocks a Now item.** Proposed: automatic per-sheet recompute, async full recompute on voice changes ([plan](plans/coverage-snapshot-invalidation.md)) |
 | 6 | Should lending / checkout be tracked per instrumentation or per physical copy? (Relevant if multiple copies per instrumentation are ever supported) | Lending, physical archive | Open |
 | 7 | Which OIDC provider? Self-hosted (Keycloak) or SaaS (Auth0, Google)? | Auth implementation | **Resolved:** Self-hosted Keycloak 26. |
 | 8 | Should IP addresses be stored in the document access log, or omitted/anonymised? Requires GDPR/privacy policy decision. | Document access log | **Resolved: not stored.** `userId` (OIDC sub) + snapshotted `username` give unambiguous attribution; IP adds GDPR obligations without meaningful benefit in an ensemble context. |
-| 9 | What retention period for the document access log? (e.g. 12 months) | Document access log | Open |
-| 10 | All Claude Design files have now been reviewed for data model gaps. Resulting plans saved to local planning notes (`plan_*.md`, outside the repo) and added to the roadmap. | Multiple | **Resolved** |
+| 9 | What retention period for the document access log? (e.g. 12 months) | Document access log | Open: **blocks a Now item.** Proposed: 12 months, configurable ([plan](plans/event-log-retention.md)) |
+| 10 | All Claude Design files have now been reviewed for data model gaps. Resulting plans are in [implementation plans](plans/README.md) (open ones) and the roadmap. | Multiple | **Resolved** |
