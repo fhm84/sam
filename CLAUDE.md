@@ -88,6 +88,7 @@ Opt-in Prometheus + Grafana stack — see `monitoring/CLAUDE.md`.
 ## Database
 
 - PostgreSQL with Flyway migrations in `server/src/main/resources/db/migration/`
+- Flyway owns the schema: every entity/column change needs a migration. Hibernate auto-update runs in `%dev` only (so a local DB can hide a missing migration); tests run on the Flyway-only schema and `FlywaySchemaValidationTest` boots with `validate`, as does prod (`%prod...schema-management.strategy=validate` refuses to start on drift).
 - Dev services are disabled; a running PostgreSQL instance is expected (default: `localhost:5432/sam_music`, user `sam`)
 - Extensions required: `pg_trgm`, `fuzzystrmatch`
 
