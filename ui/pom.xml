@@ -14,7 +14,7 @@
     <artifactId>ui</artifactId>
 
     <properties>
-        <quarkus-quinoa.version>2.9.0</quarkus-quinoa.version>
+        <quarkus-quinoa.version>2.9.2</quarkus-quinoa.version>
     </properties>
 
     <dependencies>
