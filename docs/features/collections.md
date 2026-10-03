@@ -19,7 +19,7 @@ The two-value enum is a deliberate decision — see [ADR-0006](../architecture/d
 | Description | String | |
 | Type | `FOLDER` or `SETLIST` | |
 | Date | Date | For setlists (performance date) |
-| Visibility | `WHOLE_ENSEMBLE` / `ADMINS_ONLY` / `PRIVATE` | Who can see the collection |
+| Visibility | `WHOLE_ENSEMBLE` / `ADMINS_ONLY` / `PRIVATE` | Intended audience; stored but **not enforced yet** (every authenticated user can read every collection — see the [role-aware access plan](../plans/rbac-role-aware-access.md)) |
 | Cover color | Hex string | Cover background in the collections overview |
 | Cover image | FK → documents | Optional cover image |
 | Ensemble | FK → ensembles (nullable) | Which ensemble the setlist belongs to; scopes coverage evaluation and the [AI setlist assistant](ai-setlist-assistant.md) |
