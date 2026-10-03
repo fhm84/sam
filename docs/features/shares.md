@@ -19,6 +19,10 @@ A share token links one authenticated creator to one target resource (a sheet in
 
 `GET /api/shares` · `POST /api/shares` · `DELETE /api/shares/{id}`
 
+Creating a share requires the `music_librarian` or `admin` role (403 otherwise), and the
+target resource must exist (404 otherwise). Listing and revoking are open to every
+authenticated user and only ever touch the caller's own shares.
+
 The Angular **shares** page lists all tokens created by the current user, showing resource label, creation date, expiry, and status. Actions: **copy link** (copies the public URL to clipboard), **revoke** (immediately invalidates the token).
 
 ## Public access (unauthenticated)

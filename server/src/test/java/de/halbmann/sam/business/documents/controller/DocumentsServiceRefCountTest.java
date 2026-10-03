@@ -76,13 +76,13 @@ class DocumentsServiceRefCountTest {
 
     /**
      * Stubs the filesystem and virus-scanner so upload() can run without real I/O.
-     * Tika MIME detection reads from the resolved path, so we point it at a real temp file.
+     * Tika MIME detection reads the temp file back via openForRead, so we back it with a real file.
      */
     private void stubUploadInfrastructure() throws IOException {
         Path tempFile = tempDir.resolve("upload.tmp");
         when(virusScanner.scan(any())).thenAnswer(inv -> inv.<InputStream>getArgument(0));
         when(filesystem.openForWrite(anyString())).thenReturn(Files.newOutputStream(tempFile));
-        when(filesystem.resolve(anyString())).thenReturn(tempFile);
+        when(filesystem.openForRead(anyString())).thenAnswer(inv -> Files.newInputStream(tempFile));
         when(policies.iterator()).thenReturn(Collections.emptyIterator());
     }
 
