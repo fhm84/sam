@@ -29,7 +29,9 @@ public class LocalFileSystemWrapper implements FileSystemWrapper {
     public OutputStream openForWrite(String relativePath) throws IOException {
         Path p = resolve(relativePath);
         Files.createDirectories(p.getParent());
-        return Files.newOutputStream(p, StandardOpenOption.CREATE);
+        // TRUNCATE_EXISTING: without it, overwriting a longer existing file keeps its trailing bytes
+        return Files.newOutputStream(
+                p, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
     }
 
     @Override

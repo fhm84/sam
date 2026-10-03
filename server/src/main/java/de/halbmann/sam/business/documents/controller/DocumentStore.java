@@ -18,6 +18,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -26,14 +27,20 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
+import java.util.Optional;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
 
+@Slf4j
 @ApplicationScoped
 @Transactional
 public class DocumentStore {
 
     private static final Tika TIKA = new Tika();
+
+    /** Storage-relative directory for in-flight uploads; files here never outlive {@link #upload}. */
+    static final String TEMP_DIR = ".upload-tmp";
 
     @Inject
     FileSystemWrapper filesystem;
@@ -152,53 +159,74 @@ public class DocumentStore {
 
     DocumentEntity upload(String filename, InputStream uploadStream) throws IOException, NoSuchAlgorithmException {
         MessageDigest sha256Digest = MessageDigest.getInstance("SHA-256");
-        Path tempPath = Path.of(filename + ".tmp");
-        long fileSize;
+        // Unique per upload: a name derived from the user's filename let concurrent or repeated
+        // uploads of e.g. "scan0001.pdf" share (and corrupt) the same temp file.
+        String tempKey = TEMP_DIR + "/" + UUID.randomUUID() + ".tmp";
+        boolean moved = false;
 
-        try (InputStream scanned = virusScanner.scan(uploadStream);
-                DigestInputStream digestIn = new DigestInputStream(scanned, sha256Digest);
-                OutputStream rawOut = filesystem.openForWrite(tempPath.toString());
-                CountingOutputStream countingOut = new CountingOutputStream(rawOut)) {
-            digestIn.transferTo(countingOut);
-            fileSize = countingOut.getBytesWritten();
-        }
-
-        String mimeType = TIKA.detect(filesystem.resolve(tempPath.toString()).toFile());
-
-        UploadContext context = new UploadContext(uploadStream, filename, fileSize, tempPath, mimeType);
-
-        for (UploadPolicy policy : policies) {
-            policy.verify(context);
-        }
-
-        String sha256Hex = HexFormat.of().formatHex(sha256Digest.digest());
-
-        return documentRepository.findBySha256(sha256Hex).orElseGet(() -> {
-            try {
-                String extension = MimeTypeUtils.resolveExtension(mimeType, filename);
-
-                String finalPath = String.format(
-                        "%s/%s/%s/%s.%s",
-                        sha256Hex.substring(0, 2),
-                        sha256Hex.substring(2, 4),
-                        sha256Hex.substring(4, 6),
-                        sha256Hex,
-                        extension);
-
-                filesystem.move(tempPath.toString(), finalPath);
-
-                DocumentEntity doc = new DocumentEntity();
-                doc.setFilename(filename);
-                doc.setPath(finalPath);
-                doc.setSize(fileSize);
-                doc.setMimeType(mimeType);
-                doc.setSha256(sha256Hex);
-                doc.setRefCount(0);
-                documentRepository.persist(doc);
-                return doc;
-            } catch (IOException e) {
-                throw new StorageException("Failed to store file", e);
+        try {
+            long fileSize;
+            try (InputStream scanned = virusScanner.scan(uploadStream);
+                    DigestInputStream digestIn = new DigestInputStream(scanned, sha256Digest);
+                    OutputStream rawOut = filesystem.openForWrite(tempKey);
+                    CountingOutputStream countingOut = new CountingOutputStream(rawOut)) {
+                digestIn.transferTo(countingOut);
+                fileSize = countingOut.getBytesWritten();
             }
-        });
+
+            // Read back through the wrapper (not resolve().toFile()) so this also works for S3
+            String mimeType;
+            try (InputStream in = new BufferedInputStream(filesystem.openForRead(tempKey))) {
+                mimeType = TIKA.detect(in, filename);
+            }
+
+            UploadContext context = new UploadContext(uploadStream, filename, fileSize, Path.of(tempKey), mimeType);
+
+            for (UploadPolicy policy : policies) {
+                policy.verify(context);
+            }
+
+            String sha256Hex = HexFormat.of().formatHex(sha256Digest.digest());
+
+            Optional<DocumentEntity> existing = documentRepository.findBySha256(sha256Hex);
+            if (existing.isPresent()) {
+                return existing.get();
+            }
+
+            String extension = MimeTypeUtils.resolveExtension(mimeType, filename);
+
+            String finalPath = String.format(
+                    "%s/%s/%s/%s.%s",
+                    sha256Hex.substring(0, 2),
+                    sha256Hex.substring(2, 4),
+                    sha256Hex.substring(4, 6),
+                    sha256Hex,
+                    extension);
+
+            filesystem.move(tempKey, finalPath);
+            moved = true;
+
+            DocumentEntity doc = new DocumentEntity();
+            doc.setFilename(filename);
+            doc.setPath(finalPath);
+            doc.setSize(fileSize);
+            doc.setMimeType(mimeType);
+            doc.setSha256(sha256Hex);
+            doc.setRefCount(0);
+            documentRepository.persist(doc);
+            return doc;
+        } finally {
+            if (!moved) {
+                deleteTempQuietly(tempKey);
+            }
+        }
+    }
+
+    private void deleteTempQuietly(String tempKey) {
+        try {
+            filesystem.delete(tempKey);
+        } catch (IOException | RuntimeException e) {
+            log.warn("Failed to delete temporary upload file {}", tempKey, e);
+        }
     }
 }

@@ -524,7 +524,8 @@ shows a distinct empty state with a hint to contact the Music librarian.
 
 #### UC-N6: Create a share link
 
-**Actor:** Any authenticated user (commonly S1 Music librarian or S2 Conductor)
+**Actor:** S1 Music librarian or S4 Administrator (`music_librarian` / `admin` role; a
+Conductor needs `music_librarian` to share)
 **Goal:** Give someone without a SAM account access to one specific sheet instrumentation
 or collection
 
@@ -537,10 +538,11 @@ or collection
    clipboard for sharing via WhatsApp, email, etc.
 5. Can *revoke* the link at any time from the *Shares* list, immediately invalidating it.
 
-**Note:** share creation is not role-gated — any authenticated user can create and manage
-their own share tokens (`SharesResourceImpl` is scoped by creator, not by
-`music_librarian`/`admin`). Every link is resource-scoped to exactly one sheet
-instrumentation or collection, never the whole archive.
+**Note:** a share link publishes the resource to anyone who has the URL, so creating one
+requires `music_librarian` or `admin` (changed 2026-10; previously any authenticated user
+could create links). The target must exist. Listing and revoking stay available to every
+authenticated user, scoped to the tokens they created. Every link is resource-scoped to
+exactly one instrumentation, sheet or collection, never the whole archive.
 
 ---
 
@@ -730,7 +732,8 @@ yet decided on):
 | Create/edit/delete musicians & instruments | ✅ | ✅ | ❌ | ❌ |
 | Create/edit/delete ensembles, voices, voice options, members; compute coverage | ✅ | ✅ | ❌ | ❌ |
 | Link/unlink a `Musician` to a login; search Keycloak users | ✅ | ❌ | ❌ | ❌ |
-| Create/list/revoke **own** share tokens | ✅ | ✅ | ✅ | ❌ |
+| Create share tokens | ✅ | ✅ | ❌ | ❌ |
+| List/revoke **own** share tokens | ✅ | ✅ | ✅ | ❌ |
 | View My Parts (own personalised view, if linked) | ✅ | ✅ | ✅ | ❌ |
 | View event log (`GET /api/event-logs`) | ✅ | ✅ | ✅ *(see finding above)* | ❌ |
 | Access exactly the resource named by a share token | n/a | n/a | n/a | ✅ |
@@ -750,7 +753,7 @@ additive on top of 6.2.1.
 | `ARCHIVE_ADMIN` | S4 Administrator | Everything `music_librarian` has, plus user/account linking | None — already `admin` today |
 | `ARCHIVE_MANAGER` | S1 Music librarian | Write: sheets, instrumentations, documents, classification, musicians, instruments, ensembles/voices/members. Read: everything | None — already `music_librarian` today |
 | `CONDUCTOR` | S2 Conductor | Read: everything. Write: collections/setlist items + trigger coverage compute only | New 3rd Keycloak role; narrow `@RolesAllowed` on `SheetCollectionsResourceImpl`, `CollectionItemsResourceImpl`, and the ensemble coverage-compute endpoint to accept it alongside `music_librarian`/`admin` |
-| `MUSICIAN` | S3a Authenticated musician | Read: everything (unchanged). Own: My Parts, own share tokens | Formalizing this as an explicit role buys nothing functionally yet (it's already the default for any login) — only worth adding once read access needs to be *restricted* (e.g. per-ensemble), per Option C below |
+| `MUSICIAN` | S3a Authenticated musician | Read: everything (unchanged). Own: My Parts | Formalizing this as an explicit role buys nothing functionally yet (it's already the default for any login) — only worth adding once read access needs to be *restricted* (e.g. per-ensemble), per Option C below |
 | `GUEST` | S5 / S3b | Read: exactly one resource per token, until expiry/revocation | None — already implemented as token-based access, deliberately not a Keycloak role |
 
 **Recommendation:** don't add `CONDUCTOR` speculatively. Add it only when a real Conductor

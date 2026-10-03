@@ -15,6 +15,7 @@ import de.halbmann.sam.business.sheets.boundary.SheetRepository;
 import de.halbmann.sam.business.sheets.entity.InstrumentationEntity;
 import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
 import de.halbmann.sam.core.exception.EntityNotFoundException;
+import de.halbmann.sam.core.exception.ValidationException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -58,6 +59,11 @@ public class ShareService {
 
     @Transactional
     public ShareResponse create(CreateShareRequest request, String creatorUserId) {
+        if (request == null || request.getResourceType() == null || request.getResourceId() == null) {
+            throw new ValidationException("resourceType and resourceId are required");
+        }
+        requireResourceExists(request.getResourceType(), request.getResourceId());
+
         ShareEntity entity = new ShareEntity();
         entity.setCreatorUserId(creatorUserId);
         entity.setResourceType(request.getResourceType());
@@ -73,6 +79,19 @@ public class ShareService {
                 entity.getId());
 
         return shareMapper.toDto(entity);
+    }
+
+    private void requireResourceExists(ShareType type, UUID id) {
+        boolean exists =
+                switch (type) {
+                    case INSTRUMENTATION ->
+                        instrumentationRepository.findByIdOptional(id).isPresent();
+                    case SHEET -> sheetRepository.findByIdOptional(id).isPresent();
+                    case COLLECTION -> collectionRepository.findByIdOptional(id).isPresent();
+                };
+        if (!exists) {
+            throw new EntityNotFoundException(type.name().toLowerCase(Locale.ROOT), id);
+        }
     }
 
     @Transactional
