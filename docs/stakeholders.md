@@ -157,8 +157,8 @@ ensemble member.
 - Keycloak user lookup (`AdminUsersResource`, admin-only) and linking a `Musician` record
   to a login (`linkUser` / `unlinkUser`, admin-only) — the only two genuinely
   admin-exclusive actions in the system today
-- Content visibility / sharing settings — share links are implemented (see S5); persistent
-  per-sheet/collection visibility flags are still *(planned)*
+- Content visibility / sharing settings — share links are implemented (see S5); a per-collection
+  visibility field exists but is not enforced yet *(planned)*, see 6.3
 - *(stub)* `/admin/configuration` route exists but currently renders only a page title —
   no settings are implemented yet
 
@@ -185,7 +185,7 @@ a partner ensemble checking what the band plays, or a musician who has not yet r
 - May be further restricted to specific collections, sheets, or even individual documents
 
 **SAM features most relevant**
-- Public share link for a collection (`/public/share/{token}`) — renders programme order, titles, composers, durations
+- Public share link for a collection (`/share/{token}`) — renders programme order, titles, composers, durations
 - Public share link for a single sheet instrumentation — renders instrument, part label, archive location, condition
 - Document download via the shared link, where attachments exist on the shared resource
 
@@ -459,7 +459,7 @@ see UC-M5 for the one personalised view that does exist (My Parts, scoped by ins
 **Main flow**
 1. Receives a URL from the Music librarian (e.g. via WhatsApp group) — created via
    *Shares → New share* for the relevant sheet instrumentation (see UC-N6).
-2. Opens the link (`/public/share/{token}`) — SAM shows the instrumentation detail
+2. Opens the link (`/share/{token}`) — SAM shows the instrumentation detail
    (instrument, part label, archive location, condition) in read-only mode, no login
    required.
 3. Downloads their part directly.
@@ -502,7 +502,7 @@ shows a distinct empty state with a hint to contact the Music librarian.
 **Main flow**
 1. Receives a public link to a setlist collection, created via *Shares → New share*
    (resource type `COLLECTION`) by the Music librarian or Conductor.
-2. Opens the link (`/public/share/{token}`) — SAM shows the ordered programme in
+2. Opens the link (`/share/{token}`) — SAM shows the ordered programme in
    read-only mode: position, title, composer, duration.
 3. Can download attached documents for entries that have them.
 
@@ -516,7 +516,7 @@ shows a distinct empty state with a hint to contact the Music librarian.
 **Main flow**
 1. Navigates to a public share URL for a sheet instrumentation
    (resource type `SHEET_INSTRUMENTATION`).
-2. SAM validates the token (`GET /public/share/{token}`) — confirms it is active
+2. SAM validates the token (`GET /api/public/shares/{token}`) — confirms it is active
    (not expired or revoked) — and returns the resource.
 3. Downloads the attached file.
 
@@ -676,7 +676,7 @@ the part.
 
 Music librarian creates a resource-scoped share token (`POST /api/shares`) for one
 instrumentation or collection, copies the public URL, and distributes it. The guest opens
-`/public/share/{token}` with no login; the server validates the token isn't expired or
+`/share/{token}` with no login; the server validates the token isn't expired or
 revoked, renders the resource, and logs the access with `shareTokenId` set instead of a
 `userId`.
 
@@ -766,9 +766,13 @@ since it changes nothing observable today.
 Three options were considered for how "selected content" is defined for guests and
 musicians. Status, updated against what shipped:
 
-**Option A — Per-sheet visibility flag** — *(still planned)*. Tracked as
-`SheetCollection.visibility` in the [roadmap](roadmap.md#5-access-control--sharing) ("Collection visibility & cover");
-no equivalent field exists on `SheetMusicEntity` itself yet.
+**Option A — Per-collection visibility flag** — *(field shipped, enforcement still
+planned)*. `SheetCollection.visibility` (`WHOLE_ENSEMBLE` / `ADMINS_ONLY` / `PRIVATE`) is
+stored and editable in the collection form (see the
+[roadmap](roadmap.md#5-access-control--sharing), "Collection visibility & cover"), but no read
+endpoint checks it yet; enforcing it is part of the
+[role-aware access plan](plans/rbac-role-aware-access.md). No equivalent field exists on
+`SheetMusicEntity`.
 
 **Option B — Collection-based / resource-scoped sharing** — *(implemented, in a
 different shape than proposed)*. Rather than a persistent "shared" flag on a collection,
