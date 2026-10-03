@@ -108,13 +108,16 @@ public class MusicianRepository implements PanacheRepositoryBase<MusicianEntity,
         return find("userId = :userId", Map.of("userId", userId)).firstResultOptional();
     }
 
+    /**
+     * Exact (trimmed) name lookup. {@code name} isn't unique, so when duplicates exist the oldest
+     * record wins — deterministically, instead of failing with a non-unique-result error.
+     */
     public Optional<MusicianEntity> findMusicianByName(final String name) {
-        try {
-            return Optional.ofNullable(
-                    find("name = :name", Map.of("name", name)).singleResult());
-        } catch (final NoResultException e) {
+        if (name == null || name.isBlank()) {
             return Optional.empty();
         }
+        return find("name = :name order by created, id", Map.of("name", name.trim()))
+                .firstResultOptional();
     }
 
     public MusicianEntity resolveMusician(final Musician dto) {

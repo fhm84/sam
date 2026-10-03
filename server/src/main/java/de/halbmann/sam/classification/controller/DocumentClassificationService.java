@@ -387,7 +387,7 @@ public class DocumentClassificationService {
         if (name != null && !name.isBlank()) {
             return musicianRepository.findMusicianByName(name).orElseGet(() -> {
                 MusicianEntity m = new MusicianEntity();
-                m.setName(name);
+                m.setName(name.trim());
                 musicianRepository.persist(m);
                 return m;
             });
