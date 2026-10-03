@@ -53,56 +53,99 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
 
     private static final int CROWD_PLEASER_WINDOW_MONTHS = 12;
 
+    /**
+     * Optional filters that narrow a full-text search, mirroring the non-search list filters.
+     * A {@code null} / blank value means "no restriction".
+     */
+    public record SearchFilters(Genre genre, String titleStartsWith, String tag, Boolean favorite) {}
+
+    private static final String SEARCH_CTE = """
+            WITH q AS (
+                SELECT
+                    plainto_tsquery('simple', :query) AS tsq,
+                    :query AS raw,
+                    dmetaphone(:query) AS phonetic
+            )
+            """;
+
+    private static final String SEARCH_MATCH = """
+            (
+                  s.search_vector @@ q.tsq
+               OR s.title % q.raw
+               OR s.composer_name % q.raw
+               OR s.composer_phonetic = q.phonetic
+            )""";
+
+    private static final String SEARCH_RANK = """
+            (
+                ts_rank(s.search_vector, q.tsq) * 0.70
+              + similarity(s.title, q.raw) * 0.20
+              + similarity(s.composer_name, q.raw) * 0.10
+              + CASE
+                    WHEN s.composer_phonetic = q.phonetic THEN 0.05
+                    ELSE 0
+                END
+            )""";
+
     @SuppressWarnings("unchecked")
-    public List<Object[]> searchSheets(final String query, final int page, final int size) {
-        String sql = """
-                WITH q AS (
-                    SELECT
-                        plainto_tsquery('simple', :query) AS tsq,
-                        :query AS raw,
-                        dmetaphone(:query) AS phonetic
-                )
+    public List<Object[]> searchSheets(
+            final String query, final SearchFilters filters, final int page, final int size) {
+        Map<String, Object> params = new HashMap<>();
+        String sql = SEARCH_CTE
+                + """
                 SELECT s.*,
                        -- metrics
                        ts_rank(s.search_vector, q.tsq)    AS fts_rank,
                        similarity(s.title, q.raw)         AS title_similarity,
                        similarity(s.composer_name, q.raw) AS composer_similarity,
                        (s.composer_phonetic = q.phonetic) AS phonetic_match,
-
                        -- final score
-                       (
-                           ts_rank(s.search_vector, q.tsq) * 0.70
-                         + similarity(s.title, q.raw) * 0.20
-                         + similarity(s.composer_name, q.raw) * 0.10
-                         + CASE
-                               WHEN s.composer_phonetic = q.phonetic THEN 0.05
-                               ELSE 0
-                           END
-                       ) AS final_rank
-                FROM sheets s, q
-                WHERE
-                      s.search_vector @@ q.tsq
-                   OR s.title % q.raw
-                   OR s.composer_name % q.raw
-                   OR s.composer_phonetic = q.phonetic
-                ORDER BY
-                    (
-                        ts_rank(s.search_vector, q.tsq) * 0.70
-                      + similarity(s.title, q.raw) * 0.20
-                      + similarity(s.composer_name, q.raw) * 0.10
-                      + CASE
-                            WHEN s.composer_phonetic = q.phonetic THEN 0.05
-                            ELSE 0
-                        END
-                    ) DESC
-                """;
+                """
+                + SEARCH_RANK + " AS final_rank\n"
+                + "FROM sheets s, q\n"
+                + searchWhere(filters, params)
+                + "\nORDER BY " + SEARCH_RANK + " DESC, s.title, s.id";
 
-        return getEntityManager()
+        var nativeQuery = getEntityManager()
                 .createNativeQuery(sql, "SheetWithMetrics")
                 .setParameter("query", query)
                 .setFirstResult(page * size)
-                .setMaxResults(size)
-                .getResultList();
+                .setMaxResults(size);
+        params.forEach(nativeQuery::setParameter);
+        return nativeQuery.getResultList();
+    }
+
+    /** Total number of matches for {@link #searchSheets} with the same query and filters. */
+    public long countSearchResults(final String query, final SearchFilters filters) {
+        Map<String, Object> params = new HashMap<>();
+        String sql = SEARCH_CTE + "SELECT count(*) FROM sheets s, q\n" + searchWhere(filters, params);
+        var nativeQuery = getEntityManager().createNativeQuery(sql).setParameter("query", query);
+        params.forEach(nativeQuery::setParameter);
+        return ((Number) nativeQuery.getSingleResult()).longValue();
+    }
+
+    /** Builds the WHERE clause from fixed SQL fragments; every value goes in as a bound parameter. */
+    private static String searchWhere(final SearchFilters filters, final Map<String, Object> params) {
+        List<String> conditions = new ArrayList<>();
+        conditions.add(SEARCH_MATCH);
+        if (filters.genre() != null) {
+            conditions.add("s.genre = :genre");
+            params.put("genre", filters.genre().name());
+        }
+        if (filters.titleStartsWith() != null && !filters.titleStartsWith().isBlank()) {
+            conditions.add("lower(s.title) LIKE :titlePrefix");
+            params.put("titlePrefix", filters.titleStartsWith().toLowerCase(Locale.ROOT) + "%");
+        }
+        if (filters.tag() != null && !filters.tag().isBlank()) {
+            conditions.add(
+                    "EXISTS (SELECT 1 FROM sheet_music_tags t WHERE t.sheetMusicEntity_id = s.id AND t.tag = :tag)");
+            params.put("tag", filters.tag());
+        }
+        if (filters.favorite() != null) {
+            conditions.add("s.favorite = :favorite");
+            params.put("favorite", filters.favorite());
+        }
+        return "WHERE " + String.join("\n  AND ", conditions);
     }
 
     public Optional<SheetMusicEntity> findByTitle(String title) {
