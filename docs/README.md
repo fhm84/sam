@@ -55,4 +55,5 @@ Point-in-time review backlogs; tick items off as they're resolved.
 
 - [Architecture review 2026-07](reviews/architecture-review-findings.md)
 - Code review 2026-06 (`reviews/code-review-findings.md` — local-only, gitignored)
+- Code review 2026-10 (`reviews/code-review-findings-2026-10.md` — local-only, gitignored)
 - Security review 2026-06 (`reviews/security-review-findings.md` — local-only, gitignored)
