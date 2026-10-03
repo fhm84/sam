@@ -477,7 +477,8 @@ share link containing only the parts they would play.
 
 ### Home dashboard — `planned`
 
-A home page replacing the current empty landing screen. Two tabs, derived from the
+A data-driven home page replacing the current static landing page (greeting + navigation
+cards, no data). Two tabs, derived from the
 Claude Design `Hi-Fi Shell (PrimeNG).html`. Task breakdown: [plan](plans/home-dashboard.md).
 
 **Inbox tab:**
@@ -570,7 +571,7 @@ Use rights data SAM already stores to give hints, not legal verdicts:
 
 **Implementation note:** Implemented as part of the Share Links feature (see below). The
 music librarian creates a resource-scoped share token for a collection via
-`POST /api/shares`. The resulting public URL (`/public/share/{token}`) renders the
+`POST /api/shares`. The resulting public URL (`/share/{token}`) renders the
 collection's programme — title, composer, duration — without requiring login. Download
 links for attached documents are also included (a superset of the original spec).
 
@@ -630,7 +631,7 @@ scoped to the logged-in musician's ensemble memberships (`/my-parts`, `GET /api/
 
 **Implementation note:** Fully implemented. The `shares` table stores resource-scoped
 tokens (one token = one resource: a sheet instrumentation or a collection).
-`POST /api/shares` creates a token; `GET /public/share/{token}` is the unauthenticated
+`POST /api/shares` creates a token; `GET /api/public/shares/{token}` is the unauthenticated
 endpoint. The Angular `shares` page lists all tokens for the current user with copy-link
 and revoke actions. The `public-share` page renders the resource for unauthenticated
 visitors with download links. All share-link access is logged in `event_log` with the
@@ -668,14 +669,16 @@ existing `COLLECTION` share row and enforced in `ShareService`/`PublicShareResou
 ### Collection visibility & cover — `done`
 
 **Done:** shipped in migration `V1.1.3__CollectionFields.sql` with a visibility dropdown and
-a cover colour picker in the collection form. **Leftover:** `coverImageId` exists, but no
-upload control sets it yet (tracked in [attachment metadata](plans/attachment-metadata.md)).
+a cover colour picker in the collection form. **Leftovers:** `visibility` is stored but no read
+endpoint enforces it yet (part of [role-aware access](plans/rbac-role-aware-access.md));
+`coverImageId` exists, but no upload control sets it yet (tracked in
+[attachment metadata](plans/attachment-metadata.md)).
 
 Added missing fields to `SheetCollection` surfaced in the Claude Design mockup
 (`Create Flows (PrimeNG).html`).
 
-- **visibility** — enum (`WHOLE_ENSEMBLE` / `ADMINS_ONLY` / `PRIVATE`); controls
-  who can see the collection. The design shows a "Whole ensemble" dropdown in the
+- **visibility** — enum (`WHOLE_ENSEMBLE` / `ADMINS_ONLY` / `PRIVATE`); meant to control
+  who can see the collection (not enforced yet, see above). The design shows a "Whole ensemble" dropdown in the
   create dialog. Will interact with `CurrentUserService.getAccessibleEnsembleIds()`.
 - **coverColor** — string (hex or named swatch); displayed as an initial-based
   gradient tile in the collection list.
@@ -805,8 +808,7 @@ Currently, coverage snapshots must be manually recomputed after changes. Impleme
 automatic invalidation (and optional recomputation) when a sheet or instrumentation is
 created, updated, or deleted.
 
-This is already noted as a known gap in the architecture (`instruments_and_ensembles.md`,
-Phase 3).
+This is already noted as a known gap in the [coverage concept](architecture/concepts/coverage.md).
 
 **Stakeholders:** S2 (Dirigent), S4 (Administrator)
 **Effort:** Medium
@@ -1013,6 +1015,11 @@ events are currently recorded:
 | `GEMA_SETLIST_GENERATED` | GEMA setlist xlsx generated |
 | `DOCUMENT_CLASSIFIED` | AI classification run on a document |
 | `DOCUMENT_CLASSIFICATION_APPLIED` | AI classification result applied to create entities |
+| `SHARE_CREATED` / `SHARE_REVOKED` | Share token created / revoked |
+| `SHARE_ACCESSED` | Shared resource accessed via a share token |
+| `SETLIST_AI_SUGGESTION_GENERATED` / `SETLIST_AI_TEXT_DRAFTED` | AI setlist assistant used (with token usage) |
+
+The [event log feature page](features/event-log.md) is the authoritative list.
 
 Each event captures: `occurredAt`, `userId` (OIDC subject), `username` (snapshotted
 `preferred_username` at event time), `eventType`, `entityType`, `entityId`, and a
@@ -1127,7 +1134,7 @@ shown in the Claude Design `Sheets Overview (PrimeNG).html`. Task breakdown: [pl
 - Coverage status filter (COMPLETE / PLAYABLE / INCOMPLETE, per ensemble)
 - Difficulty level filter (multi-select)
 - Duration range filter (min/max)
-- Tags filter (multi-select, AND or OR)
+- Tags filter: multi-select, AND or OR (a single-tag `tag` filter already exists)
 - "Has issues" flag (sheets with DAMAGED/LOST parts or INCOMPLETE coverage)
 
 **Missing sort:**
@@ -1188,8 +1195,10 @@ features needed zero boilerplate beyond wrapping their existing buttons.
 
 ### Advanced combined search — `idea`
 
-A filter builder that combines multiple dimensions in a single query. Currently filters
-(genre, letter, coverage status) are independent and cannot be composed.
+A filter builder that combines multiple dimensions in a single query. Today genre, first
+letter, tag and favourite combine (AND), but only without a search term: as soon as the
+full-text query `q` is set, the other filters are ignored. Coverage status is shown per
+ensemble but can't be filtered on.
 
 Example query: *"All marches, difficulty 3–4, COMPLETE for Ensemble A, not performed
 in the last 2 years."*
@@ -1312,7 +1321,7 @@ answered before the relevant implementation work begins.
 | # | Question | Affects | Status |
 |---|----------|---------|--------|
 | 1 | Should a `Musician` user account link to the existing `Musician` entity, or be a separate `User` entity? | Auth, musician–instrument assignment, "my parts" view | **Resolved:** `userId` (OIDC subject) added to `Musician` — no separate User entity. External/historical musicians have `userId = null`. |
-| 2 | How is "selected content" for guests scoped — per-sheet flag, collection-based sharing, or ensemble-based? | Guest access, setlist public page | **Resolved:** Resource-scoped share tokens implemented (one token = one sheet instrumentation or collection). Public setlist/sheet pages live at `/public/share/{token}`. Open-URL anonymous access (no link) intentionally deferred. |
+| 2 | How is "selected content" for guests scoped — per-sheet flag, collection-based sharing, or ensemble-based? | Guest access, setlist public page | **Resolved:** Resource-scoped share tokens implemented (one token = one sheet instrumentation or collection). Public setlist/sheet pages live at `/share/{token}`. Open-URL anonymous access (no link) intentionally deferred. |
 | 3 | Should document-level visibility be independently configurable, or always inherited from the sheet/instrumentation? | Shared document links, guest access | Open |
 | 4 | Is anonymous guest access (no link, open public URL) ever desirable? | Guest access scope | Open |
 | 5 | Should coverage snapshots be invalidated automatically, or remain manual? | Coverage accuracy, performance | Open: **blocks a Now item.** Proposed: automatic per-sheet recompute, async full recompute on voice changes ([plan](plans/coverage-snapshot-invalidation.md)) |
