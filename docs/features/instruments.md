@@ -10,6 +10,10 @@ A canonical instrument catalogue used across instrumentations and ensemble voice
 | Name | String (required) | Canonical name, e.g. "Bb Trumpet" |
 | Display name | String | Short name shown in UI |
 | Transposition | Enum | Concert pitch key: `C` · `Bb` · `Eb` · `F` · `Ab` · `D` · `A` · `G` |
+| Family | Enum | `BRASS` · `WOODWIND` · `STRING` · `PERCUSSION` · `KEYBOARD` · `VOICE` · `OTHER` |
+| Default clef | Enum | Instrument-level default (`Clef`). Instrumentations can still override it |
+| Aliases | List of strings | Alternative spellings / abbreviations (e.g. "Flh.", "Flügelhorn"). Ordered and audited. Not yet used by classification matching (see [plan](../plans/classification-enhancements.md)) |
+| Catalogue section / position | String / Integer | Drives catalogue ordering, e.g. "Brass · High" / #7 |
 
 ## Actions
 

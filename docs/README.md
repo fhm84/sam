@@ -46,7 +46,8 @@ Living reference of the current feature set — one page per domain area.
 ## People & Planning
 
 - [Stakeholders, Use Cases & Flows](stakeholders.md) — who uses SAM and how; access-control model
-- [Roadmap & Ideas](roadmap.md) — planned features, ideas, open questions
+- [Roadmap & Ideas](roadmap.md) — Now/Next/Later priorities, backlog of ideas, open questions
+- [Implementation Plans](plans/README.md) — task breakdowns for planned / in-progress roadmap items
 
 ## Reviews
 
