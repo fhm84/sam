@@ -11,6 +11,7 @@ import { SheetsApiService } from '../../core/api';
 import { SheetMusic } from '../../model/datamodels';
 import { DocumentHandler } from '../../shared/base/document-handler';
 import { SheetForm } from './sheet-form';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-sheet-form-page',
@@ -44,7 +45,7 @@ export class SheetFormPage extends DocumentHandler implements OnInit {
     if (id) {
       this.sheetId = id;
       this.loading.set(true);
-      this.api.load(id).subscribe({
+      this.api.load(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: (sheet) => {
           this.sheet.set(sheet);
           this.loading.set(false);

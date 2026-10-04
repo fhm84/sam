@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  OnInit,
+  signal,
+  DestroyRef,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpResponse } from '@angular/common/http';
 import { MessageService } from '@openng/optimus-ui/api';
@@ -14,6 +21,7 @@ import { SheetCollection } from '../../model/datamodels';
 import { CollectionForm } from './collection-form';
 import { CollectionSheets } from './collection-sheets';
 import { ShareDialogComponent } from '../../shared/share-dialog/share-dialog';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-collection-detail-page',
@@ -22,6 +30,8 @@ import { ShareDialogComponent } from '../../shared/share-dialog/share-dialog';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CollectionDetailPage implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+
   protected readonly t = inject(TranslationService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -84,19 +94,21 @@ export class CollectionDetailPage implements OnInit {
   }
 
   protected generateGemaSetlist(): void {
-    this.api.downloadGemaSetlist(this.collectionId()).subscribe({
-      next: (response) => triggerDownload(response),
-      error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: this.t.t('collections.detail.actions.gemaSetlistError'),
-        });
-      },
-    });
+    this.api.downloadGemaSetlist(this.collectionId())
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => triggerDownload(response),
+        error: () => {
+          this.messageService.add({
+            severity: 'error',
+            summary: this.t.t('collections.detail.actions.gemaSetlistError'),
+          });
+        },
+      });
   }
 
   protected generateToc(): void {
-    this.api.downloadToc(this.collectionId()).subscribe({
+    this.api.downloadToc(this.collectionId()).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response) => {
         const disposition = response.headers.get('Content-Disposition');
         const serverFilename = disposition?.match(/filename="?([^";]+)"?/i)?.[1];
@@ -123,19 +135,21 @@ export class CollectionDetailPage implements OnInit {
   }
 
   protected exportCollection(format: 'ZIP' | 'JSON' | 'CSV', includeTextAttachments = false): void {
-    this.api.export(this.collectionId(), format, true, includeTextAttachments).subscribe({
-      next: (response) => triggerDownload(response),
-      error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: this.t.t('collections.export.error'),
-        });
-      },
-    });
+    this.api.export(this.collectionId(), format, true, includeTextAttachments)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => triggerDownload(response),
+        error: () => {
+          this.messageService.add({
+            severity: 'error',
+            summary: this.t.t('collections.export.error'),
+          });
+        },
+      });
   }
 
   private loadCollection(id: string): void {
-    this.api.load(id).subscribe({
+    this.api.load(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (c) => this.collection.set(c),
       error: () => {},
     });

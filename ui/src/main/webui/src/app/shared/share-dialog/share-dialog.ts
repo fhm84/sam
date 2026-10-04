@@ -5,6 +5,7 @@ import {
   input,
   output,
   signal,
+  DestroyRef,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Button } from '@openng/optimus-ui/button';
@@ -15,6 +16,7 @@ import { TranslatePipe } from '../pipes/translate.pipe';
 import { TranslationService } from '../../core/translation.service';
 import { SharesApiService } from '../../core/api/shares-api.service';
 import { ShareResponse, ShareType } from '../../model/datamodels';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 interface ExpiryOption {
   labelKey: string;
@@ -35,6 +37,8 @@ const EXPIRY_OPTIONS: ExpiryOption[] = [
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ShareDialogComponent {
+  private readonly destroyRef = inject(DestroyRef);
+
   protected readonly t = inject(TranslationService);
   private readonly sharesApi = inject(SharesApiService);
 
@@ -70,6 +74,7 @@ export class ShareDialogComponent {
     const expiresAt = this.selectedExpiry.days != null ? this.computeExpiresAt(this.selectedExpiry.days) : undefined;
     this.sharesApi
       .create({ resourceType: this.resourceType(), resourceId: this.resourceId(), expiresAt })
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (s) => {
           this.share.set(s);

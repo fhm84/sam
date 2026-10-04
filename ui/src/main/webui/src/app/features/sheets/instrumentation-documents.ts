@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { DocumentHandler } from '../../shared/base/document-handler';
 import { Attachment, Instrumentation } from '../../model/datamodels';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 export interface DocToggleEvent {
   instrId: string;
@@ -52,7 +53,7 @@ export class InstrumentationDocuments extends DocumentHandler implements OnChang
     const basePath = this.getDocumentBasePath();
     if (!basePath) return;
     this.documentsLoading.set(true);
-    this.documentsApi.list(basePath).subscribe({
+    this.documentsApi.list(basePath).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         const docs = res.data ?? [];
         this.documents.set(docs);
@@ -78,16 +79,18 @@ export class InstrumentationDocuments extends DocumentHandler implements OnChang
   }
 
   protected downloadAttachment(doc: Attachment): void {
-    this.documentsApi.download(this.getDocumentBasePath(), doc.id!).subscribe({
-      next: (response) => {
-        const blob = response.body!;
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = doc.displayName ?? 'download';
-        a.click();
-        URL.revokeObjectURL(url);
-      },
-    });
+    this.documentsApi.download(this.getDocumentBasePath(), doc.id!)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          const blob = response.body!;
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = doc.displayName ?? 'download';
+          a.click();
+          URL.revokeObjectURL(url);
+        },
+      });
   }
 }

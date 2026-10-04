@@ -80,7 +80,7 @@ export abstract class BaseCrudList<T, F extends PaginationRequest> implements On
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        this.api.delete(this.getItemId(item)).subscribe({
+        this.api.delete(this.getItemId(item)).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
           next: () => {
             this.messageService.add({
               severity: 'success',
@@ -105,7 +105,7 @@ export abstract class BaseCrudList<T, F extends PaginationRequest> implements On
 
   protected loadData(): void {
     this.loading.set(true);
-    this.api.find(this.buildFilter()).subscribe({
+    this.api.find(this.buildFilter()).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         this.items.set(res.data ?? []);
         this.totalRecords.set(res.totalCount ?? 0);

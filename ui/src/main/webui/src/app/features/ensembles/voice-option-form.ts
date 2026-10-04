@@ -13,6 +13,7 @@ import { CreateVoiceOption, Instrument, VoiceOption, VoiceOptionType } from '../
 import { map, Observable } from 'rxjs';
 import { BaseForm } from '../../shared/base/base-form';
 import { FETCH_ALL_SIZE } from '../../shared/constants';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 interface InstrumentOption {
   label: string;
@@ -45,11 +46,13 @@ export class VoiceOptionForm extends BaseForm<VoiceOption> implements OnInit {
   getEntity = () => this.option;
 
   ngOnInit(): void {
-    this.instrumentsApi.find({ size: FETCH_ALL_SIZE }).subscribe((res) => {
-      this.instrumentOptions.set(
-        (res.data ?? []).map((i: Instrument) => ({ label: instrumentLabel(i), value: i.id! })),
-      );
-    });
+    this.instrumentsApi.find({ size: FETCH_ALL_SIZE })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((res) => {
+        this.instrumentOptions.set(
+          (res.data ?? []).map((i: Instrument) => ({ label: instrumentLabel(i), value: i.id! })),
+        );
+      });
   }
 
   patchFormValues(o: VoiceOption): void {

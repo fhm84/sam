@@ -1,10 +1,20 @@
-import { Component, computed, inject, input, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  input,
+  OnInit,
+  signal,
+  ChangeDetectionStrategy,
+  DestroyRef,
+} from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { NgClass } from '@angular/common';
 import { filter } from 'rxjs/operators';
 import { MenuItem } from '@openng/optimus-ui/api';
 import { Tooltip } from '@openng/optimus-ui/tooltip';
 import { LayoutService } from '../service/layout.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: '[app-menuitem]',
@@ -17,6 +27,8 @@ import { LayoutService } from '../service/layout.service';
   },
 })
 export class AppMenuitem implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+
   protected readonly layoutService = inject(LayoutService);
   private readonly router = inject(Router);
 
@@ -58,6 +70,7 @@ export class AppMenuitem implements OnInit {
   ngOnInit(): void {
     this.router.events
       .pipe(filter((e) => e instanceof NavigationEnd))
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.updateActiveState());
     this.updateActiveState();
   }

@@ -18,6 +18,7 @@ import { map, Observable } from 'rxjs';
 import { BaseForm } from '../../shared/base/base-form';
 import { DIFFICULTY_LEVELS, FETCH_ALL_SIZE, GEMA_REPORTABLE_VALUES, GENRES, RIGHTS_STATUSES, STYLES, TONALITIES } from '../../shared/constants';
 import { MusicianForm } from '../musicians/musician-form';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-sheet-form',
@@ -95,13 +96,17 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
   getEntity = () => this.sheet;
 
   ngOnInit(): void {
-    this.musiciansApi.find({ size: FETCH_ALL_SIZE }).subscribe((res) => {
-      this.musicians.set(res.data ?? []);
-    });
-    if (!this.isEdit) {
-      this.collectionsApi.find({ size: FETCH_ALL_SIZE }).subscribe((res) => {
-        this.collections.set(res.data ?? []);
+    this.musiciansApi.find({ size: FETCH_ALL_SIZE })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((res) => {
+        this.musicians.set(res.data ?? []);
       });
+    if (!this.isEdit) {
+      this.collectionsApi.find({ size: FETCH_ALL_SIZE })
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe((res) => {
+          this.collections.set(res.data ?? []);
+        });
     }
   }
 

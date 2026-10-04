@@ -1,4 +1,13 @@
-import { Component, inject, Input, OnChanges, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  inject,
+  Input,
+  OnChanges,
+  OnInit,
+  signal,
+  ChangeDetectionStrategy,
+  DestroyRef,
+} from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { TableModule } from '@openng/optimus-ui/table';
 import { Dialog } from '@openng/optimus-ui/dialog';
@@ -20,6 +29,7 @@ import { CreateEnsembleMembership, EnsembleMembership, EnsembleVoice, Instrument
 import { FETCH_ALL_SIZE } from '../../shared/constants';
 import { instrumentLabel } from '../../shared/utils/format.utils';
 import { RowActions } from '../../shared/components/row-actions/row-actions';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-ensemble-memberships',
@@ -45,6 +55,8 @@ import { RowActions } from '../../shared/components/row-actions/row-actions';
   templateUrl: './ensemble-memberships.html',
 })
 export class EnsembleMemberships implements OnChanges, OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+
   protected readonly t = inject(TranslationService);
   private readonly api = inject(EnsemblesApiService);
   private readonly musiciansApi = inject(MusiciansApiService);
@@ -89,16 +101,20 @@ export class EnsembleMemberships implements OnChanges, OnInit {
   });
 
   ngOnInit(): void {
-    this.musiciansApi.find({ size: FETCH_ALL_SIZE }).subscribe((res) => {
-      const musicians = res.data ?? [];
-      this.allMusicians.set(musicians);
-      this.filteredMusicians.set(musicians);
-    });
-    this.instrumentsApi.find({ size: FETCH_ALL_SIZE }).subscribe((res) => {
-      this.instrumentOptions.set(
-        (res.data ?? []).map((i: Instrument) => ({ label: instrumentLabel(i), value: i.id! })),
-      );
-    });
+    this.musiciansApi.find({ size: FETCH_ALL_SIZE })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((res) => {
+        const musicians = res.data ?? [];
+        this.allMusicians.set(musicians);
+        this.filteredMusicians.set(musicians);
+      });
+    this.instrumentsApi.find({ size: FETCH_ALL_SIZE })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((res) => {
+        this.instrumentOptions.set(
+          (res.data ?? []).map((i: Instrument) => ({ label: instrumentLabel(i), value: i.id! })),
+        );
+      });
   }
 
   ngOnChanges(): void {
@@ -125,23 +141,25 @@ export class EnsembleMemberships implements OnChanges, OnInit {
     const name = this.musicianFilterQuery().trim();
     if (!name) return;
     this.creatingMusician = true;
-    this.musiciansApi.create({ name } as Musician).subscribe({
-      next: (created) => {
-        this.creatingMusician = false;
-        this.allMusicians.update((list) => [...list, created]);
-        this.filteredMusicians.update((list) => [...list, created]);
-        this.selectedMusician = created;
-        this.messageService.add({
-          severity: 'success',
-          summary: this.t
-            .t('ensembles.members.musician.createWithName')
-            .replace('{name}', created.name),
-        });
-      },
-      error: () => {
-        this.creatingMusician = false;
-      },
-    });
+    this.musiciansApi.create({ name } as Musician)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (created) => {
+          this.creatingMusician = false;
+          this.allMusicians.update((list) => [...list, created]);
+          this.filteredMusicians.update((list) => [...list, created]);
+          this.selectedMusician = created;
+          this.messageService.add({
+            severity: 'success',
+            summary: this.t
+              .t('ensembles.members.musician.createWithName')
+              .replace('{name}', created.name),
+          });
+        },
+        error: () => {
+          this.creatingMusician = false;
+        },
+      });
   }
 
   protected selectMusician(musician: Musician): void {
@@ -174,20 +192,22 @@ export class EnsembleMemberships implements OnChanges, OnInit {
       conductor: raw.conductor,
     };
     this.saving = true;
-    this.api.addMember(this.ensembleId, payload).subscribe({
-      next: () => {
-        this.saving = false;
-        this.addDialogVisible = false;
-        this.messageService.add({
-          severity: 'success',
-          summary: this.t.t('ensembles.members.messages.created'),
-        });
-        this.loadMembers();
-      },
-      error: () => {
-        this.saving = false;
-      },
-    });
+    this.api.addMember(this.ensembleId, payload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.saving = false;
+          this.addDialogVisible = false;
+          this.messageService.add({
+            severity: 'success',
+            summary: this.t.t('ensembles.members.messages.created'),
+          });
+          this.loadMembers();
+        },
+        error: () => {
+          this.saving = false;
+        },
+      });
   }
 
   // ── Edit ──────────────────────────────────────────────
@@ -211,20 +231,22 @@ export class EnsembleMemberships implements OnChanges, OnInit {
       conductor: raw.conductor,
     };
     this.saving = true;
-    this.api.updateMember(this.ensembleId, this.editingMember.id!, payload).subscribe({
-      next: () => {
-        this.saving = false;
-        this.editDialogVisible = false;
-        this.messageService.add({
-          severity: 'success',
-          summary: this.t.t('ensembles.members.messages.updated'),
-        });
-        this.loadMembers();
-      },
-      error: () => {
-        this.saving = false;
-      },
-    });
+    this.api.updateMember(this.ensembleId, this.editingMember.id!, payload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.saving = false;
+          this.editDialogVisible = false;
+          this.messageService.add({
+            severity: 'success',
+            summary: this.t.t('ensembles.members.messages.updated'),
+          });
+          this.loadMembers();
+        },
+        error: () => {
+          this.saving = false;
+        },
+      });
   }
 
   // ── Delete ────────────────────────────────────────────
@@ -237,16 +259,18 @@ export class EnsembleMemberships implements OnChanges, OnInit {
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        this.api.deleteMember(this.ensembleId, member.id!).subscribe({
-          next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: this.t.t('ensembles.members.messages.deleted'),
-            });
-            this.loadMembers();
-          },
-          error: () => {},
-        });
+        this.api.deleteMember(this.ensembleId, member.id!)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: () => {
+              this.messageService.add({
+                severity: 'success',
+                summary: this.t.t('ensembles.members.messages.deleted'),
+              });
+              this.loadMembers();
+            },
+            error: () => {},
+          });
       },
     });
   }
@@ -266,7 +290,7 @@ export class EnsembleMemberships implements OnChanges, OnInit {
 
   private loadMembers(): void {
     this.loading.set(true);
-    this.api.listMembers(this.ensembleId).subscribe({
+    this.api.listMembers(this.ensembleId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (list) => {
         this.members.set(list);
         this.loading.set(false);
@@ -278,7 +302,7 @@ export class EnsembleMemberships implements OnChanges, OnInit {
   }
 
   private loadVoices(): void {
-    this.api.listVoices(this.ensembleId).subscribe({
+    this.api.listVoices(this.ensembleId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (list) => {
         this.voices.set(list);
         this.voiceOptions = [
