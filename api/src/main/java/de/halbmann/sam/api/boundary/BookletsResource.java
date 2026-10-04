@@ -10,6 +10,9 @@ import jakarta.ws.rs.core.MediaType;
  * REST API for managing booklets. A booklet is a physical binder or printed compilation that
  * groups sheet music entries by position. Sheet entries within a booklet are managed via the
  * {@code sheets} sub-resource ({@link CollectionSheetsResource}).
+ *
+ * <p><b>Planned, not implemented:</b> no server class implements this interface yet, so these
+ * endpoints return 404. Kept as the API contract for the planned booklets feature.
  */
 @Path("booklets")
 @Produces(MediaType.APPLICATION_JSON)

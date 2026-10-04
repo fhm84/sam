@@ -63,8 +63,8 @@ A Quarkus-based application for archiving sheet music, managing instrumentations
 
 ### Collections & Booklets
 - **Sheet Collections** — group sheets into folders or setlists, with optional date (e.g. for gig programs)
-- **Booklets** — named groupings of sheets (e.g. "27 Weihnachtslieder", "Gotteslob")
-- Both support adding/removing/reordering sheets with per-collection identifiers
+- **Booklets** *(planned — API interfaces exist, no server implementation yet)* — named groupings of sheets (e.g. "27 Weihnachtslieder", "Gotteslob")
+- Collections support adding/removing/reordering sheets and text items with per-collection identifiers
 
 ### Ensembles & Coverage Evaluation
 - **Ensemble definitions** — define named ensembles with weighted, prioritized voice requirements

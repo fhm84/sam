@@ -31,6 +31,7 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.Normalizer;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -423,12 +424,8 @@ public class DocumentClassificationService {
         }
         if (name != null && !name.isBlank()) {
             return instrumentRepository.findByName(name).orElseGet(() -> {
-                String slug = name.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]+", "-");
-                while (slug.endsWith("-")) {
-                    slug = slug.substring(0, slug.length() - 1);
-                }
                 InstrumentEntity inst = new InstrumentEntity();
-                inst.setId(slug);
+                inst.setId(uniqueInstrumentId(name));
                 inst.setName(name);
                 inst.setDisplayName(name);
                 instrumentRepository.persist(inst);
@@ -436,5 +433,39 @@ public class DocumentClassificationService {
             });
         }
         return null;
+    }
+
+    /** {@link #instrumentSlug} plus a numeric suffix if an instrument already uses that ID. */
+    private String uniqueInstrumentId(String name) {
+        String base = instrumentSlug(name);
+        String id = base;
+        for (int n = 2; instrumentRepository.findByIdOptional(id).isPresent(); n++) {
+            id = base + "-" + n;
+        }
+        return id;
+    }
+
+    /**
+     * Readable ASCII ID for a new instrument: "Flügelhorn" → {@code flugelhorn}, "Horn in F (1)" →
+     * {@code horn-in-f-1}. Diacritics are stripped rather than dropped (they used to produce
+     * {@code fl-gelhorn}), and a name without any ASCII letters/digits yields {@code instrument}
+     * instead of an empty primary key.
+     */
+    static String instrumentSlug(String name) {
+        String ascii = Normalizer.normalize(name.replace("ß", "ss"), Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "");
+        String slug = ascii.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]+", "-");
+        // Trim the (at most one) leading/trailing hyphen without a regex: "^-+|-+$" on the
+        // user-provided name is a polynomial-time pattern (ReDoS on long runs of '-')
+        int start = 0;
+        int end = slug.length();
+        while (start < end && slug.charAt(start) == '-') {
+            start++;
+        }
+        while (end > start && slug.charAt(end - 1) == '-') {
+            end--;
+        }
+        slug = slug.substring(start, end);
+        return slug.isEmpty() ? "instrument" : slug;
     }
 }

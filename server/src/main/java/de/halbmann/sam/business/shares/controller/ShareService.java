@@ -8,6 +8,7 @@ import de.halbmann.sam.business.collections.entity.SheetCollectionEntity;
 import de.halbmann.sam.business.collections.entity.SheetCollectionItemEntity;
 import de.halbmann.sam.business.documents.controller.AttachmentLinkService;
 import de.halbmann.sam.business.eventlog.controller.EventLogService;
+import de.halbmann.sam.business.shared.event.ResourcesDeleted;
 import de.halbmann.sam.business.shares.boundary.ShareRepository;
 import de.halbmann.sam.business.shares.entity.ShareEntity;
 import de.halbmann.sam.business.sheets.boundary.InstrumentationRepository;
@@ -16,6 +17,7 @@ import de.halbmann.sam.business.sheets.entity.InstrumentationEntity;
 import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
 import de.halbmann.sam.core.exception.EntityNotFoundException;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import java.time.OffsetDateTime;
@@ -89,6 +91,26 @@ public class ShareService {
                 entity.getResourceId(),
                 Map.of("shareId", id.toString()),
                 id);
+    }
+
+    /**
+     * Revokes every share pointing at a deleted sheet, instrumentation or collection, so a link
+     * doesn't outlive its resource (shares reference resources by ID, without a foreign key).
+     */
+    @Transactional
+    void onResourcesDeleted(@Observes ResourcesDeleted event) {
+        if (event.resourceIds().isEmpty()) {
+            return;
+        }
+        for (ShareEntity share : shareRepository.findUnrevokedByResourceIds(event.resourceIds())) {
+            share.setRevokedAt(OffsetDateTime.now());
+            eventLogService.log(
+                    EventType.SHARE_REVOKED,
+                    share.getResourceType().name().toLowerCase(Locale.ROOT),
+                    share.getResourceId(),
+                    Map.of("shareId", share.getId().toString(), "reason", "resource deleted"),
+                    share.getId());
+        }
     }
 
     public PaginatedResponse<ShareResponse> listByCreator(String userId) {

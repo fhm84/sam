@@ -1,6 +1,7 @@
 package de.halbmann.storage.spi;
 
 import java.net.URI;
+import java.nio.file.Path;
 
 public final class StorageLocation {
 
@@ -11,9 +12,11 @@ public final class StorageLocation {
     }
 
     public static StorageLocation parse(String raw) {
-        // No scheme → assume local filesystem
+        // No scheme → a local filesystem path, absolute or relative to the working directory.
+        // Build the URI from the path, not as "file://" + raw: "file://target/uploads" would make
+        // "target" the URI host and leave "/uploads" (the filesystem root) as the path.
         if (!raw.contains("://")) {
-            return new StorageLocation(URI.create("file://" + raw.replace("\\", "/")));
+            return new StorageLocation(Path.of(raw).toAbsolutePath().normalize().toUri());
         }
         return new StorageLocation(URI.create(raw));
     }

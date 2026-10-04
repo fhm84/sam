@@ -24,18 +24,21 @@ import de.halbmann.sam.business.ensembles.boundary.EnsembleMembershipRepository;
 import de.halbmann.sam.business.ensembles.entity.EnsembleMembershipEntity;
 import de.halbmann.sam.business.instruments.entity.InstrumentEntity;
 import de.halbmann.sam.business.musicians.boundary.MusicianRepository;
+import de.halbmann.sam.business.shared.event.ResourcesDeleted;
 import de.halbmann.sam.business.sheets.boundary.SheetRepository;
 import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
 import de.halbmann.sam.core.entity.PaginatedEntities;
 import de.halbmann.sam.core.exception.EntityNotFoundException;
 import de.halbmann.sam.core.exception.ValidationException;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Event;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -77,6 +80,9 @@ public class SheetCollectionService {
     @Inject
     EnsembleMembershipRepository membershipRepository;
 
+    @Inject
+    Event<ResourcesDeleted> resourcesDeleted;
+
     public PaginatedResponse<SheetCollection> findCollections(final SheetCollectionFilterRequest filter) {
         PaginatedEntities<SheetCollectionEntity> result =
                 repository.findCollections(filter, filter.getName(), filter.getType());
@@ -112,6 +118,16 @@ public class SheetCollectionService {
         SheetCollectionEntity entity = repository
                 .findByIdOptional(UUID.fromString(id))
                 .orElseThrow(() -> new EntityNotFoundException("SheetCollection", id));
+        // Items aren't cascaded from the collection: delete them (and text items' attachments, so
+        // their documents' ref counts drop) instead of leaving orphaned rows behind
+        for (CollectionItemEntity item : new ArrayList<>(entity.getItems())) {
+            if (item instanceof TextCollectionItemEntity textItem && textItem.getAttachment() != null) {
+                cleanUpAttachment(textItem);
+            }
+            entity.getItems().remove(item);
+            collectionItemRepository.delete(item);
+        }
+        resourcesDeleted.fire(new ResourcesDeleted(Set.of(entity.getId())));
         repository.delete(entity);
     }
 
@@ -233,6 +249,12 @@ public class SheetCollectionService {
                 .filter(item -> item.getId().toString().equals(id))
                 .findFirst()
                 .orElseThrow(() -> new EntityNotFoundException("CollectionItem", id)));
+        // ... and every item exactly once: with a subset or duplicates, the untouched rows keep their
+        // old positions, which collide with the new 0..N-1 on the (collection, items_order) key.
+        if (orderedIds.size() != currentItems.size() || new HashSet<>(orderedIds).size() != orderedIds.size()) {
+            throw new ValidationException("The new order must list every item of the collection exactly once ("
+                    + currentItems.size() + " items, got " + orderedIds.size() + " IDs)");
+        }
         // Update items_order directly via native SQL to avoid Envers inserting both a DEL
         // and an ADD record for the same (rev, collection_id, item_id) within one transaction,
         // which would violate the audit table PK.

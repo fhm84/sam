@@ -11,6 +11,9 @@ import jakarta.ws.rs.core.MediaType;
  * Sub-resource for managing the sheet entries within a booklet. This is the legacy sheet-only
  * variant; new collection types use {@link CollectionItemsResource} which supports both sheet
  * references and free-text blocks.
+ *
+ * <p><b>Planned, not implemented:</b> part of the booklets API skeleton (see
+ * {@link BookletsResource}); no server class implements it yet.
  */
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
