@@ -3,6 +3,7 @@ package de.halbmann.sam.business.shares.boundary;
 import de.halbmann.sam.business.shares.entity.ShareEntity;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -14,6 +15,11 @@ public class ShareRepository implements PanacheRepositoryBase<ShareEntity, UUID>
     /** Returns all shares created by the given user, newest first. */
     public List<ShareEntity> findByCreator(String userId) {
         return find("creatorUserId = ?1 order by createdAt desc", userId).list();
+    }
+
+    /** Not-yet-revoked shares pointing at any of the given resources. */
+    public List<ShareEntity> findUnrevokedByResourceIds(Collection<UUID> resourceIds) {
+        return list("resourceId in ?1 and revokedAt is null", resourceIds);
     }
 
     /**

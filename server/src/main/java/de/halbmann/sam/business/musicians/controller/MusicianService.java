@@ -5,12 +5,15 @@ import de.halbmann.sam.api.entity.musicians.MusicianFilterRequest;
 import de.halbmann.sam.api.entity.musicians.MusicianInstrument;
 import de.halbmann.sam.api.entity.shared.PaginatedResponse;
 import de.halbmann.sam.api.entity.shared.PaginationRequest;
+import de.halbmann.sam.business.ensembles.boundary.EnsembleMembershipRepository;
 import de.halbmann.sam.business.instruments.boundary.InstrumentRepository;
 import de.halbmann.sam.business.instruments.entity.InstrumentEntity;
 import de.halbmann.sam.business.musicians.boundary.MusicianRepository;
 import de.halbmann.sam.business.musicians.entity.MusicianEntity;
 import de.halbmann.sam.business.musicians.entity.MusicianInstrumentEntity;
+import de.halbmann.sam.business.sheets.boundary.SheetRepository;
 import de.halbmann.sam.core.entity.PaginatedEntities;
+import de.halbmann.sam.core.exception.ConflictException;
 import de.halbmann.sam.core.exception.EntityNotFoundException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -31,6 +34,12 @@ public class MusicianService {
 
     @Inject
     MusicianMapper musicianMapper;
+
+    @Inject
+    SheetRepository sheetRepository;
+
+    @Inject
+    EnsembleMembershipRepository membershipRepository;
 
     public PaginatedResponse<Musician> findMusicians(final MusicianFilterRequest filterRequest) {
         if (filterRequest.getName() != null && !filterRequest.getName().isBlank()) {
@@ -102,7 +111,13 @@ public class MusicianService {
         final MusicianEntity entity = musicianRepository
                 .findByIdOptional(UUID.fromString(musicianId))
                 .orElseThrow(() -> new EntityNotFoundException("Musician", musicianId));
-        // TODO: check for links -> if the musician is still in use -> do NOT delete!
+        // Refuse with a clear 409 instead of letting the foreign keys fail with a 500
+        long sheets = sheetRepository.count("composer = ?1 or arranger = ?1", entity);
+        long memberships = membershipRepository.count("musician = ?1", entity);
+        if (sheets > 0 || memberships > 0) {
+            throw new ConflictException("Musician '" + entity.getName() + "' is still in use (" + sheets
+                    + " sheet(s) as composer/arranger, " + memberships + " ensemble membership(s))");
+        }
         musicianRepository.delete(entity);
     }
 

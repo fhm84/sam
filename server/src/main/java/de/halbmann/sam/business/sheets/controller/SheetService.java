@@ -19,12 +19,14 @@ import de.halbmann.sam.business.documents.controller.AttachmentLinkService;
 import de.halbmann.sam.business.ensembles.controller.CoverageSnapshotService;
 import de.halbmann.sam.business.musicians.boundary.MusicianRepository;
 import de.halbmann.sam.business.musicians.entity.MusicianEntity;
+import de.halbmann.sam.business.shared.event.ResourcesDeleted;
 import de.halbmann.sam.business.sheets.boundary.SheetRepository;
 import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
 import de.halbmann.sam.core.entity.PaginatedEntities;
 import de.halbmann.sam.core.exception.EntityNotFoundException;
 import de.halbmann.sam.core.exception.ValidationException;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Event;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import java.util.*;
@@ -50,6 +52,9 @@ public class SheetService {
 
     @Inject
     SheetCollectionService sheetCollectionService;
+
+    @Inject
+    Event<ResourcesDeleted> resourcesDeleted;
 
     public PaginatedResponse<SheetMusicSearchResult> findSheets(final SheetFilterRequest filterRequest) {
         PaginatedResponse<SheetMusicSearchResult> response;
@@ -290,6 +295,11 @@ public class SheetService {
         }
         // Drop collection memberships — otherwise the collection_items FK blocks the delete
         sheetCollectionService.removeSheetFromAllCollections(entity.getId());
+        // Share links to the sheet or one of its parts would otherwise outlive it
+        Set<UUID> deletedIds = new HashSet<>();
+        deletedIds.add(entity.getId());
+        entity.getInstrumentations().forEach(instr -> deletedIds.add(instr.getId()));
+        resourcesDeleted.fire(new ResourcesDeleted(deletedIds));
         sheetRepository.delete(entity);
     }
 
