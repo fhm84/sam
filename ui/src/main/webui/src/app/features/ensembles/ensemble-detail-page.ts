@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  OnInit,
+  signal,
+  DestroyRef,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from '@openng/optimus-ui/api';
 import { Button } from '@openng/optimus-ui/button';
@@ -10,6 +17,7 @@ import { Ensemble } from '../../model/datamodels';
 import { EnsembleVoices } from './ensemble-voices';
 import { EnsembleMemberships } from './ensemble-memberships';
 import { EnsembleForm } from './ensemble-form';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-ensemble-detail-page',
@@ -18,6 +26,8 @@ import { EnsembleForm } from './ensemble-form';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EnsembleDetailPage implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+
   protected readonly t = inject(TranslationService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -52,7 +62,7 @@ export class EnsembleDetailPage implements OnInit {
   }
 
   private loadEnsemble(id: string): void {
-    this.api.load(id).subscribe({
+    this.api.load(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (e) => this.ensemble.set(e),
       error: () => {},
     });

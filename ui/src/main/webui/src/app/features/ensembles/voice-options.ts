@@ -1,4 +1,13 @@
-import { Component, inject, Input, OnChanges, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  inject,
+  Input,
+  OnChanges,
+  OnInit,
+  signal,
+  ChangeDetectionStrategy,
+  DestroyRef,
+} from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { TableModule } from '@openng/optimus-ui/table';
 import { Dialog } from '@openng/optimus-ui/dialog';
@@ -20,6 +29,7 @@ import { CreateVoiceOption, Instrument, VoiceOption, VoiceOptionType } from '../
 import { FETCH_ALL_SIZE } from '../../shared/constants';
 import { convertEmptyStringsToNull } from '../../shared/utils/object.utils';
 import { RowActions } from '../../shared/components/row-actions/row-actions';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-voice-options',
@@ -46,6 +56,8 @@ import { RowActions } from '../../shared/components/row-actions/row-actions';
   styleUrl: './voice-options.scss',
 })
 export class VoiceOptions implements OnChanges, OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+
   protected readonly t = inject(TranslationService);
   private readonly api = inject(EnsemblesApiService);
   private readonly instrumentsApi = inject(InstrumentsApiService);
@@ -84,11 +96,13 @@ export class VoiceOptions implements OnChanges, OnInit {
   });
 
   ngOnInit(): void {
-    this.instrumentsApi.find({ size: FETCH_ALL_SIZE }).subscribe((res) => {
-      const instruments = res.data ?? [];
-      this.allInstruments.set(instruments);
-      this.filteredInstruments.set(instruments);
-    });
+    this.instrumentsApi.find({ size: FETCH_ALL_SIZE })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((res) => {
+        const instruments = res.data ?? [];
+        this.allInstruments.set(instruments);
+        this.filteredInstruments.set(instruments);
+      });
   }
 
   ngOnChanges(): void {
@@ -144,20 +158,22 @@ export class VoiceOptions implements OnChanges, OnInit {
       factor: raw.factor ?? undefined,
     };
     this.saving = true;
-    this.api.createVoiceOption(this.ensembleId, this.voiceId, payload).subscribe({
-      next: () => {
-        this.saving = false;
-        this.addDialogVisible = false;
-        this.messageService.add({
-          severity: 'success',
-          summary: this.t.t('ensembles.voices.options.messages.created'),
-        });
-        this.loadOptions();
-      },
-      error: () => {
-        this.saving = false;
-      },
-    });
+    this.api.createVoiceOption(this.ensembleId, this.voiceId, payload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.saving = false;
+          this.addDialogVisible = false;
+          this.messageService.add({
+            severity: 'success',
+            summary: this.t.t('ensembles.voices.options.messages.created'),
+          });
+          this.loadOptions();
+        },
+        error: () => {
+          this.saving = false;
+        },
+      });
   }
 
   // ── Edit ──────────────────────────────────────────────
@@ -179,20 +195,22 @@ export class VoiceOptions implements OnChanges, OnInit {
       factor: raw.factor ?? undefined,
     };
     this.saving = true;
-    this.api.updateVoiceOption(this.ensembleId, this.voiceId, this.editingOption.id!, payload).subscribe({
-      next: () => {
-        this.saving = false;
-        this.editDialogVisible = false;
-        this.messageService.add({
-          severity: 'success',
-          summary: this.t.t('ensembles.voices.options.messages.updated'),
-        });
-        this.loadOptions();
-      },
-      error: () => {
-        this.saving = false;
-      },
-    });
+    this.api.updateVoiceOption(this.ensembleId, this.voiceId, this.editingOption.id!, payload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.saving = false;
+          this.editDialogVisible = false;
+          this.messageService.add({
+            severity: 'success',
+            summary: this.t.t('ensembles.voices.options.messages.updated'),
+          });
+          this.loadOptions();
+        },
+        error: () => {
+          this.saving = false;
+        },
+      });
   }
 
   // ── Delete ────────────────────────────────────────────
@@ -203,16 +221,18 @@ export class VoiceOptions implements OnChanges, OnInit {
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        this.api.deleteVoiceOption(this.ensembleId, this.voiceId, option.id!).subscribe({
-          next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: this.t.t('ensembles.voices.options.messages.deleted'),
-            });
-            this.loadOptions();
-          },
-          error: () => {},
-        });
+        this.api.deleteVoiceOption(this.ensembleId, this.voiceId, option.id!)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: () => {
+              this.messageService.add({
+                severity: 'success',
+                summary: this.t.t('ensembles.voices.options.messages.deleted'),
+              });
+              this.loadOptions();
+            },
+            error: () => {},
+          });
       },
     });
   }
@@ -238,14 +258,16 @@ export class VoiceOptions implements OnChanges, OnInit {
 
   private loadOptions(): void {
     this.loading.set(true);
-    this.api.listVoiceOptions(this.ensembleId, this.voiceId).subscribe({
-      next: (opts) => {
-        this.options.set(opts);
-        this.loading.set(false);
-      },
-      error: () => {
-        this.loading.set(false);
-      },
-    });
+    this.api.listVoiceOptions(this.ensembleId, this.voiceId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (opts) => {
+          this.options.set(opts);
+          this.loading.set(false);
+        },
+        error: () => {
+          this.loading.set(false);
+        },
+      });
   }
 }

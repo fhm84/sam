@@ -1,4 +1,14 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+  DestroyRef,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Button } from '@openng/optimus-ui/button';
 import { Checkbox } from '@openng/optimus-ui/checkbox';
@@ -11,6 +21,7 @@ import { TranslationService } from '../../../core/translation.service';
 import { SheetsApiService } from '../../../core/api';
 import { DifficultyLevelKey, DIFFICULTY_LEVELS } from '../../../shared/constants';
 import { SheetEnrichment, SheetMusic, Style } from '../../../model/datamodels';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-enrichment-dialog',
@@ -20,6 +31,8 @@ import { SheetEnrichment, SheetMusic, Style } from '../../../model/datamodels';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EnrichmentDialog {
+  private readonly destroyRef = inject(DestroyRef);
+
   protected readonly t = inject(TranslationService);
   private readonly sheetsApi = inject(SheetsApiService);
   private readonly messageService = inject(MessageService);
@@ -78,7 +91,7 @@ export class EnrichmentDialog {
     this.applying.set(false);
     this.resetAcceptState();
     const sheetId = this.sheet().id!;
-    this.sheetsApi.enrich(sheetId).subscribe({
+    this.sheetsApi.enrich(sheetId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (result) => {
         this.enrichment.set(result);
         this.prefill(result);
@@ -157,24 +170,26 @@ export class EnrichmentDialog {
     }
 
     this.applying.set(true);
-    this.sheetsApi.update(current.id!, updated).subscribe({
-      next: () => {
-        this.applying.set(false);
-        this.messageService.add({
-          severity: 'success',
-          summary: this.t.t('enrichment.messages.applied'),
-        });
-        this.enriched.emit();
-        this.close();
-      },
-      error: () => {
-        this.applying.set(false);
-        this.messageService.add({
-          severity: 'error',
-          summary: this.t.t('enrichment.messages.error'),
-        });
-      },
-    });
+    this.sheetsApi.update(current.id!, updated)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.applying.set(false);
+          this.messageService.add({
+            severity: 'success',
+            summary: this.t.t('enrichment.messages.applied'),
+          });
+          this.enriched.emit();
+          this.close();
+        },
+        error: () => {
+          this.applying.set(false);
+          this.messageService.add({
+            severity: 'error',
+            summary: this.t.t('enrichment.messages.error'),
+          });
+        },
+      });
   }
 
   protected retry(): void {

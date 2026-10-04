@@ -1,4 +1,12 @@
-import { Component, inject, Input, OnChanges, signal, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  inject,
+  Input,
+  OnChanges,
+  signal,
+  ChangeDetectionStrategy,
+  DestroyRef,
+} from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TableModule } from '@openng/optimus-ui/table';
 import { Dialog } from '@openng/optimus-ui/dialog';
@@ -19,6 +27,7 @@ import { CreateEnsembleVoice, EnsembleVoice } from '../../model/datamodels';
 import { convertEmptyStringsToNull } from '../../shared/utils/object.utils';
 import { VoiceOptions } from './voice-options';
 import { RowActions } from '../../shared/components/row-actions/row-actions';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-ensemble-voices',
@@ -49,6 +58,8 @@ import { RowActions } from '../../shared/components/row-actions/row-actions';
   styleUrl: './ensemble-voices.scss',
 })
 export class EnsembleVoices implements OnChanges {
+  private readonly destroyRef = inject(DestroyRef);
+
   protected readonly t = inject(TranslationService);
   private readonly api = inject(EnsemblesApiService);
   private readonly confirmationService = inject(ConfirmationService);
@@ -96,7 +107,7 @@ export class EnsembleVoices implements OnChanges {
     if (this.addForm.invalid) return;
     const raw = convertEmptyStringsToNull(this.addForm.getRawValue()) as CreateEnsembleVoice;
     this.saving = true;
-    this.api.createVoice(this.ensembleId, raw).subscribe({
+    this.api.createVoice(this.ensembleId, raw).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (created) => {
         this.saving = false;
         this.addDialogVisible = false;
@@ -145,20 +156,22 @@ export class EnsembleVoices implements OnChanges {
       required: raw.required,
     };
     this.saving = true;
-    this.api.updateVoice(this.ensembleId, this.editingVoice.id!, payload).subscribe({
-      next: () => {
-        this.saving = false;
-        this.editDialogVisible = false;
-        this.messageService.add({
-          severity: 'success',
-          summary: this.t.t('ensembles.voices.messages.updated'),
-        });
-        this.loadVoices();
-      },
-      error: () => {
-        this.saving = false;
-      },
-    });
+    this.api.updateVoice(this.ensembleId, this.editingVoice.id!, payload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.saving = false;
+          this.editDialogVisible = false;
+          this.messageService.add({
+            severity: 'success',
+            summary: this.t.t('ensembles.voices.messages.updated'),
+          });
+          this.loadVoices();
+        },
+        error: () => {
+          this.saving = false;
+        },
+      });
   }
 
   // ── Delete ────────────────────────────────────────────
@@ -169,16 +182,18 @@ export class EnsembleVoices implements OnChanges {
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        this.api.deleteVoice(this.ensembleId, voice.id!).subscribe({
-          next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: this.t.t('ensembles.voices.messages.deleted'),
-            });
-            this.loadVoices();
-          },
-          error: () => {},
-        });
+        this.api.deleteVoice(this.ensembleId, voice.id!)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: () => {
+              this.messageService.add({
+                severity: 'success',
+                summary: this.t.t('ensembles.voices.messages.deleted'),
+              });
+              this.loadVoices();
+            },
+            error: () => {},
+          });
       },
     });
   }
@@ -193,7 +208,7 @@ export class EnsembleVoices implements OnChanges {
 
   private loadVoices(): void {
     this.loading.set(true);
-    this.api.listVoices(this.ensembleId).subscribe({
+    this.api.listVoices(this.ensembleId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (voices) => {
         this.voices.set(voices);
         this.loading.set(false);

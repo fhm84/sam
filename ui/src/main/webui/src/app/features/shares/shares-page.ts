@@ -4,6 +4,7 @@ import {
   inject,
   OnInit,
   signal,
+  DestroyRef,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { ConfirmationService, MenuItem, MessageService } from '@openng/optimus-ui/api';
@@ -17,6 +18,7 @@ import { TranslationService } from '../../core/translation.service';
 import { SharesApiService } from '../../core/api/shares-api.service';
 import { ShareResponse } from '../../model/datamodels';
 import { RowActions } from '../../shared/components/row-actions/row-actions';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-shares-page',
@@ -26,6 +28,8 @@ import { RowActions } from '../../shared/components/row-actions/row-actions';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SharesPage implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+
   protected readonly t = inject(TranslationService);
   private readonly sharesApi = inject(SharesApiService);
   private readonly confirmationService = inject(ConfirmationService);
@@ -40,7 +44,7 @@ export class SharesPage implements OnInit {
 
   private loadShares(): void {
     this.loading.set(true);
-    this.sharesApi.list().subscribe({
+    this.sharesApi.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         this.shares.set(res.data ?? []);
         this.loading.set(false);
@@ -92,7 +96,7 @@ export class SharesPage implements OnInit {
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        this.sharesApi.revoke(share.id!).subscribe({
+        this.sharesApi.revoke(share.id!).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
           next: () => {
             this.messageService.add({
               severity: 'success',

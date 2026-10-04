@@ -51,6 +51,7 @@ export interface ClassificationAppliedEvent {
 }
 import { ATTACHMENT_TYPES, CLEFS, GENRES, NOTATION_TYPES } from '../../../shared/constants';
 import { instrumentLabel } from '../../../shared/utils/format.utils';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 type SheetMode = 'existing' | 'new';
 type PersonMode = 'none' | 'existing' | 'new';
@@ -228,7 +229,7 @@ export class ClassificationDialog implements OnDestroy {
     this.revokeBlobUrl();
     this.previewLoading.set(true);
 
-    this.previewService.load(this.doc().id!).subscribe({
+    this.previewService.load(this.doc().id!).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: ({ safeUrl, rawUrl }) => {
         this.currentBlobUrl = rawUrl;
         this.previewUrl.set(safeUrl);
@@ -242,7 +243,7 @@ export class ClassificationDialog implements OnDestroy {
   }
 
   private runClassify(): void {
-    this.documentsApi.classify(this.doc().id!).subscribe({
+    this.documentsApi.classify(this.doc().id!).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (result) => {
         this.classification.set(result);
         this.prefillFromSuggested(result);
@@ -391,6 +392,7 @@ export class ClassificationDialog implements OnDestroy {
           return forkJoin(links).pipe(map(() => result));
         }),
       )
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (result) => {
           this.applying.set(false);
@@ -434,10 +436,12 @@ export class ClassificationDialog implements OnDestroy {
   }
 
   protected onSheetSearch(event: AutoCompleteCompleteEvent): void {
-    this.sheetsApi.find({ query: event.query || undefined, size: 10 }).subscribe({
-      next: (res) => this.sheetSuggestions.set(res.data ?? []),
-      error: () => this.sheetSuggestions.set([]),
-    });
+    this.sheetsApi.find({ query: event.query || undefined, size: 10 })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => this.sheetSuggestions.set(res.data ?? []),
+        error: () => this.sheetSuggestions.set([]),
+      });
   }
 
   protected onSheetSelect(event: AutoCompleteSelectEvent): void {
@@ -474,7 +478,7 @@ export class ClassificationDialog implements OnDestroy {
     this.additionalInstrs.set([]);
     this.additionalInstrIds.set(new Set());
     this.additionalInstrsLoading.set(true);
-    this.instrumentationsApi.list(sheetId).subscribe({
+    this.instrumentationsApi.list(sheetId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (list) => {
         this.additionalInstrs.set(list);
         this.additionalInstrsLoading.set(false);
@@ -484,16 +488,18 @@ export class ClassificationDialog implements OnDestroy {
   }
 
   protected onMusicianSearch(event: AutoCompleteCompleteEvent, role: 'composer' | 'arranger'): void {
-    this.musiciansApi.find({ name: event.query || undefined, size: 10 }).subscribe({
-      next: (res) => {
-        if (role === 'composer') this.composerSuggestions.set(res.data ?? []);
-        else this.arrangerSuggestions.set(res.data ?? []);
-      },
-      error: () => {
-        if (role === 'composer') this.composerSuggestions.set([]);
-        else this.arrangerSuggestions.set([]);
-      },
-    });
+    this.musiciansApi.find({ name: event.query || undefined, size: 10 })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => {
+          if (role === 'composer') this.composerSuggestions.set(res.data ?? []);
+          else this.arrangerSuggestions.set(res.data ?? []);
+        },
+        error: () => {
+          if (role === 'composer') this.composerSuggestions.set([]);
+          else this.arrangerSuggestions.set([]);
+        },
+      });
   }
 
   protected close(): void {

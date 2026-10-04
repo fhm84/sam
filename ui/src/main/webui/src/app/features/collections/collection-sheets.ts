@@ -197,31 +197,34 @@ export class CollectionSheets implements OnInit, OnChanges {
       sheetId: this.selectedSheet!.id!,
     };
     this.saving = true;
-    this.collectionsApi.addItem(this.collectionId, payload).subscribe({
-      next: () => {
-        this.saving = false;
-        this.messageService.add({
-          severity: 'success',
-          summary: this.t.t('collections.items.messages.sheetAdded'),
-        });
-        this.loadItems();
-        if (this.createAnother) {
-          this.selectedSheet = null;
-          this.identifierForm.reset();
-        } else {
-          this.addSheetDialogVisible = false;
-        }
-      },
-      error: () => {
-        this.saving = false;
-      },
-    });
+    this.collectionsApi.addItem(this.collectionId, payload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.saving = false;
+          this.messageService.add({
+            severity: 'success',
+            summary: this.t.t('collections.items.messages.sheetAdded'),
+          });
+          this.loadItems();
+          if (this.createAnother) {
+            this.selectedSheet = null;
+            this.identifierForm.reset();
+          } else {
+            this.addSheetDialogVisible = false;
+          }
+        },
+        error: () => {
+          this.saving = false;
+        },
+      });
   }
 
   private doSearch(): void {
     this.searchLoading.set(true);
     this.sheetsApi
       .find({ query: this.currentQuery || undefined, page: this.searchPage, size: this.searchRows })
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {
           this.searchResults.set(res.data ?? []);
@@ -248,20 +251,22 @@ export class CollectionSheets implements OnInit, OnChanges {
       textContent: this.textForm.controls.textContent.value,
     };
     this.saving = true;
-    this.collectionsApi.addItem(this.collectionId, payload).subscribe({
-      next: () => {
-        this.saving = false;
-        this.addTextDialogVisible = false;
-        this.messageService.add({
-          severity: 'success',
-          summary: this.t.t('collections.items.messages.textBlockAdded'),
-        });
-        this.loadItems();
-      },
-      error: () => {
-        this.saving = false;
-      },
-    });
+    this.collectionsApi.addItem(this.collectionId, payload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.saving = false;
+          this.addTextDialogVisible = false;
+          this.messageService.add({
+            severity: 'success',
+            summary: this.t.t('collections.items.messages.textBlockAdded'),
+          });
+          this.loadItems();
+        },
+        error: () => {
+          this.saving = false;
+        },
+      });
   }
 
   // ── Preview ───────────────────────────────────────────
@@ -270,7 +275,7 @@ export class CollectionSheets implements OnInit, OnChanges {
     this.previewSheet.set(null);
     this.previewLoading.set(true);
     this.previewDialogVisible = true;
-    this.sheetsApi.load(sheet.id!).subscribe({
+    this.sheetsApi.load(sheet.id!).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (s) => {
         this.previewSheet.set(s);
         this.previewLoading.set(false);
@@ -306,20 +311,22 @@ export class CollectionSheets implements OnInit, OnChanges {
         };
 
     this.saving = true;
-    this.collectionsApi.updateItem(this.collectionId, this.editingItem.id!, payload).subscribe({
-      next: () => {
-        this.saving = false;
-        this.editDialogVisible = false;
-        this.messageService.add({
-          severity: 'success',
-          summary: this.t.t('collections.items.messages.updated'),
-        });
-        this.loadItems();
-      },
-      error: () => {
-        this.saving = false;
-      },
-    });
+    this.collectionsApi.updateItem(this.collectionId, this.editingItem.id!, payload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.saving = false;
+          this.editDialogVisible = false;
+          this.messageService.add({
+            severity: 'success',
+            summary: this.t.t('collections.items.messages.updated'),
+          });
+          this.loadItems();
+        },
+        error: () => {
+          this.saving = false;
+        },
+      });
   }
 
   // ── Remove ────────────────────────────────────────────
@@ -333,16 +340,18 @@ export class CollectionSheets implements OnInit, OnChanges {
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        this.collectionsApi.removeItem(this.collectionId, item.id!).subscribe({
-          next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: this.t.t('collections.items.messages.removed'),
-            });
-            this.loadItems();
-          },
-          error: () => {},
-        });
+        this.collectionsApi.removeItem(this.collectionId, item.id!)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: () => {
+              this.messageService.add({
+                severity: 'success',
+                summary: this.t.t('collections.items.messages.removed'),
+              });
+              this.loadItems();
+            },
+            error: () => {},
+          });
       },
     });
   }
@@ -384,21 +393,23 @@ export class CollectionSheets implements OnInit, OnChanges {
     if (!file || !this.uploadingItem) return;
     const item = this.uploadingItem;
     this.uploadingAttachment = true;
-    this.collectionsApi.uploadAttachment(this.collectionId, item.id!, file).subscribe({
-      next: (attachment) => {
-        this.uploadingAttachment = false;
-        this.items.update((list) =>
-          list.map((i) => (i.id === item.id ? { ...i, attachment } : i)),
-        );
-        this.messageService.add({
-          severity: 'success',
-          summary: this.t.t('collections.items.messages.attachmentUploaded'),
-        });
-      },
-      error: () => {
-        this.uploadingAttachment = false;
-      },
-    });
+    this.collectionsApi.uploadAttachment(this.collectionId, item.id!, file)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (attachment) => {
+          this.uploadingAttachment = false;
+          this.items.update((list) =>
+            list.map((i) => (i.id === item.id ? { ...i, attachment } : i)),
+          );
+          this.messageService.add({
+            severity: 'success',
+            summary: this.t.t('collections.items.messages.attachmentUploaded'),
+          });
+        },
+        error: () => {
+          this.uploadingAttachment = false;
+        },
+      });
   }
 
   protected confirmRemoveAttachment(item: CollectionItem): void {
@@ -408,18 +419,20 @@ export class CollectionSheets implements OnInit, OnChanges {
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        this.collectionsApi.removeAttachment(this.collectionId, item.id!).subscribe({
-          next: () => {
-            this.items.update((list) =>
-              list.map((i) => (i.id === item.id ? { ...i, attachment: undefined } : i)),
-            );
-            this.messageService.add({
-              severity: 'success',
-              summary: this.t.t('collections.items.messages.attachmentRemoved'),
-            });
-          },
-          error: () => {},
-        });
+        this.collectionsApi.removeAttachment(this.collectionId, item.id!)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: () => {
+              this.items.update((list) =>
+                list.map((i) => (i.id === item.id ? { ...i, attachment: undefined } : i)),
+              );
+              this.messageService.add({
+                severity: 'success',
+                summary: this.t.t('collections.items.messages.attachmentRemoved'),
+              });
+            },
+            error: () => {},
+          });
       },
     });
   }
@@ -436,19 +449,21 @@ export class CollectionSheets implements OnInit, OnChanges {
     if (this.assistantGoal.invalid) return;
     this.assistantLoading.set(true);
     this.assistantRequested.set(true);
-    this.collectionsApi.suggestItems(this.collectionId, { goal: this.assistantGoal.value }).subscribe({
-      next: (result) => {
-        this.assistantSuggestions.set(result.items ?? []);
-        this.assistantLoading.set(false);
-      },
-      error: () => {
-        this.assistantLoading.set(false);
-        this.messageService.add({
-          severity: 'error',
-          summary: this.t.t('collections.items.assistant.suggestError'),
-        });
-      },
-    });
+    this.collectionsApi.suggestItems(this.collectionId, { goal: this.assistantGoal.value })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (result) => {
+          this.assistantSuggestions.set(result.items ?? []);
+          this.assistantLoading.set(false);
+        },
+        error: () => {
+          this.assistantLoading.set(false);
+          this.messageService.add({
+            severity: 'error',
+            summary: this.t.t('collections.items.assistant.suggestError'),
+          });
+        },
+      });
   }
 
   protected addSuggestion(suggestion: SuggestedSetlistItem): void {
@@ -456,6 +471,7 @@ export class CollectionSheets implements OnInit, OnChanges {
     this.addingSuggestionSheetId = suggestion.sheetId;
     this.collectionsApi
       .addItem(this.collectionId, { type: 'SHEET' as CollectionItemType, sheetId: suggestion.sheetId })
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.addingSuggestionSheetId = null;
@@ -481,25 +497,27 @@ export class CollectionSheets implements OnInit, OnChanges {
   // ── AI text drafting ────────────────────────────────────
   protected onDraftText(item: CollectionItem): void {
     this.draftingItemId.set(item.id!);
-    this.collectionsApi.draftText(this.collectionId, item.id!, this.t.locale()).subscribe({
-      next: (result) => {
-        this.draftingItemId.set(null);
-        this.editingItem = item;
-        this.textForm.reset({ identifier: item.identifier, textContent: result.draftText ?? '' });
-        this.editDialogVisible = true;
-        this.messageService.add({
-          severity: 'success',
-          summary: this.t.t('collections.items.assistant.draftSuccess'),
-        });
-      },
-      error: () => {
-        this.draftingItemId.set(null);
-        this.messageService.add({
-          severity: 'error',
-          summary: this.t.t('collections.items.assistant.draftError'),
-        });
-      },
-    });
+    this.collectionsApi.draftText(this.collectionId, item.id!, this.t.locale())
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (result) => {
+          this.draftingItemId.set(null);
+          this.editingItem = item;
+          this.textForm.reset({ identifier: item.identifier, textContent: result.draftText ?? '' });
+          this.editDialogVisible = true;
+          this.messageService.add({
+            severity: 'success',
+            summary: this.t.t('collections.items.assistant.draftSuccess'),
+          });
+        },
+        error: () => {
+          this.draftingItemId.set(null);
+          this.messageService.add({
+            severity: 'error',
+            summary: this.t.t('collections.items.assistant.draftError'),
+          });
+        },
+      });
   }
 
   // ── Items table ───────────────────────────────────────
@@ -517,15 +535,17 @@ export class CollectionSheets implements OnInit, OnChanges {
     const reordered = [...this.items()];
     this.items.set(reordered);
     const orderedIds = reordered.map((i) => i.id!);
-    this.collectionsApi.reorderItems(this.collectionId, orderedIds).subscribe({
-      error: () => {
-        this.loadItems();
-        this.messageService.add({
-          severity: 'error',
-          summary: this.t.t('collections.items.messages.reorderFailed'),
-        });
-      },
-    });
+    this.collectionsApi.reorderItems(this.collectionId, orderedIds)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        error: () => {
+          this.loadItems();
+          this.messageService.add({
+            severity: 'error',
+            summary: this.t.t('collections.items.messages.reorderFailed'),
+          });
+        },
+      });
   }
 
   protected toggleMyPartsOnly(): void {
@@ -538,6 +558,7 @@ export class CollectionSheets implements OnInit, OnChanges {
     this.loading.set(true);
     this.collectionsApi
       .listItems(this.collectionId, { page: this.currentPage, size: this.rows }, this.myPartsOnly())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {
           this.items.set(res.data ?? []);

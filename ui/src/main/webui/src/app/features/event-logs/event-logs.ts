@@ -4,6 +4,7 @@ import {
   inject,
   OnInit,
   signal,
+  DestroyRef,
 } from '@angular/core';
 import { DatePipe, JsonPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -16,6 +17,7 @@ import { Toolbar } from '@openng/optimus-ui/toolbar';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { EventLogsApiService } from '../../core/api';
 import { EventLogEntry, EventLogFilterRequest, EventType } from '../../model/datamodels';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const ALL_EVENT_TYPES: EventType[] = [
   'DOCUMENT_DOWNLOAD',
@@ -40,6 +42,8 @@ const ALL_EVENT_TYPES: EventType[] = [
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EventLogs implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+
   private readonly api = inject(EventLogsApiService);
 
   protected readonly entries = signal<EventLogEntry[]>([]);
@@ -84,7 +88,7 @@ export class EventLogs implements OnInit {
       ...(this.filterUserId.trim() ? { userId: this.filterUserId.trim() } : {}),
       ...(this.filterEntityType.trim() ? { entityType: this.filterEntityType.trim() } : {}),
     };
-    this.api.find(filter).subscribe({
+    this.api.find(filter).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         this.entries.set(res.data ?? []);
         this.totalCount.set(res.totalCount ?? 0);

@@ -229,7 +229,7 @@ export class Uploads implements OnInit, OnDestroy {
     if (context === 'assign' && doc) {
       this.pickerPreviewLoading.set(true);
       this.pickerPreviewIsPdf.set(doc.mimeType === 'application/pdf');
-      this.previewService.load(doc.id!).subscribe({
+      this.previewService.load(doc.id!).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: ({ safeUrl, rawUrl }) => {
           this.pickerBlobUrl = rawUrl;
           this.pickerPreviewUrl.set(safeUrl);
@@ -280,7 +280,7 @@ export class Uploads implements OnInit, OnDestroy {
     this.pickerSelectedInstrIds.set(new Set());
     this.pickerInstrs.set([]);
     this.pickerInstrsLoading.set(true);
-    this.instrumentationsApi.list(sheet.id!).subscribe({
+    this.instrumentationsApi.list(sheet.id!).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (list) => {
         this.pickerInstrs.set(list);
         this.pickerInstrsLoading.set(false);
@@ -349,7 +349,7 @@ export class Uploads implements OnInit, OnDestroy {
         : this.documentsApi.linkToSheet(doc.id!, sheet.id!, id, type),
     );
 
-    forkJoin(calls).subscribe({
+    forkJoin(calls).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.assigning.set(false);
         this.pickerVisible.set(false);
@@ -381,6 +381,7 @@ export class Uploads implements OnInit, OnDestroy {
     this.pickerLoading.set(true);
     this.sheetsApi
       .find({ query: this.pickerQuery || undefined, page: this.pickerPage, size: this.pickerRows })
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {
           this.pickerResults.set(res.data ?? []);
@@ -417,42 +418,46 @@ export class Uploads implements OnInit, OnDestroy {
     const upload: ActiveUpload = { filename: file.name, progress: 0 };
     this.activeUploads.update((list) => [...list, upload]);
 
-    this.documentsApi.upload(basePath, file, type).subscribe({
-      next: (event: UploadProgress) => {
-        if (event.type === 'progress') {
-          upload.progress = event.progress ?? 0;
-          this.activeUploads.update((list) => [...list]);
-        }
-        if (event.type === 'complete') {
+    this.documentsApi.upload(basePath, file, type)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (event: UploadProgress) => {
+          if (event.type === 'progress') {
+            upload.progress = event.progress ?? 0;
+            this.activeUploads.update((list) => [...list]);
+          }
+          if (event.type === 'complete') {
+            this.activeUploads.update((list) => list.filter((u) => u !== upload));
+            this.messageService.add({
+              severity: 'success',
+              summary: this.t.t('uploads.messages.uploaded'),
+            });
+            this.loadDocuments();
+          }
+        },
+        error: () => {
           this.activeUploads.update((list) => list.filter((u) => u !== upload));
-          this.messageService.add({
-            severity: 'success',
-            summary: this.t.t('uploads.messages.uploaded'),
-          });
-          this.loadDocuments();
-        }
-      },
-      error: () => {
-        this.activeUploads.update((list) => list.filter((u) => u !== upload));
-        this.messageService.add({ severity: 'error', summary: this.t.t('uploads.messages.error') });
-      },
-    });
+          this.messageService.add({ severity: 'error', summary: this.t.t('uploads.messages.error') });
+        },
+      });
   }
 
   // ── Table actions ─────────────────────────────────────────────────
 
   protected onDownload(doc: DocumentDownload): void {
-    this.documentsApi.download(this.topLevelPath, doc.id!).subscribe({
-      next: (response) => {
-        const blob = response.body!;
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = doc.filename ?? 'download';
-        a.click();
-        URL.revokeObjectURL(url);
-      },
-    });
+    this.documentsApi.download(this.topLevelPath, doc.id!)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          const blob = response.body!;
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = doc.filename ?? 'download';
+          a.click();
+          URL.revokeObjectURL(url);
+        },
+      });
   }
 
   protected confirmDelete(doc: DocumentDownload): void {
@@ -462,15 +467,17 @@ export class Uploads implements OnInit, OnDestroy {
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        this.documentsApi.delete(this.topLevelPath, doc.id!).subscribe({
-          next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: this.t.t('uploads.messages.deleted'),
-            });
-            this.loadDocuments();
-          },
-        });
+        this.documentsApi.delete(this.topLevelPath, doc.id!)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: () => {
+              this.messageService.add({
+                severity: 'success',
+                summary: this.t.t('uploads.messages.deleted'),
+              });
+              this.loadDocuments();
+            },
+          });
       },
     });
   }
@@ -508,13 +515,15 @@ export class Uploads implements OnInit, OnDestroy {
 
   private loadDocuments(): void {
     this.loading.set(true);
-    this.documentsApi.listUnlinked({ page: this.docsPage, size: this.docsRows }).subscribe({
-      next: (res) => {
-        this.documents.set(res.data ?? []);
-        this.totalRecords.set(res.totalCount ?? 0);
-        this.loading.set(false);
-      },
-      error: () => this.loading.set(false),
-    });
+    this.documentsApi.listUnlinked({ page: this.docsPage, size: this.docsRows })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => {
+          this.documents.set(res.data ?? []);
+          this.totalRecords.set(res.totalCount ?? 0);
+          this.loading.set(false);
+        },
+        error: () => this.loading.set(false),
+      });
   }
 }
