@@ -26,6 +26,7 @@ import { SheetCollections } from './sheet-collections';
 import { ShareDialogComponent } from '../../shared/share-dialog/share-dialog';
 import { formatDuration, instrumentLabel } from '../../shared/utils/format.utils';
 import { RowActions } from '../../shared/components/row-actions/row-actions';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-sheet-detail',
@@ -227,16 +228,18 @@ export class SheetDetail extends DocumentHandler implements OnChanges {
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        this.instrumentationsApi.delete(this.sheetId, instr.id!).subscribe({
-          next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: this.t.t('sheets.instrumentations.messages.deleted'),
-            });
-            this.loadInstrumentations();
-          },
-          error: () => {},
-        });
+        this.instrumentationsApi.delete(this.sheetId, instr.id!)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: () => {
+              this.messageService.add({
+                severity: 'success',
+                summary: this.t.t('sheets.instrumentations.messages.deleted'),
+              });
+              this.loadInstrumentations();
+            },
+            error: () => {},
+          });
       },
     });
   }
@@ -286,7 +289,7 @@ export class SheetDetail extends DocumentHandler implements OnChanges {
     const wasFavorite = s.favorite;
     this.sheet.update((current) => (current ? { ...current, favorite: !wasFavorite } : current));
     const req = wasFavorite ? this.sheetsApi.unfavorite(s.id) : this.sheetsApi.favorite(s.id);
-    req.subscribe({
+    req.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       error: () => this.sheet.update((current) => (current ? { ...current, favorite: wasFavorite } : current)),
     });
   }
@@ -312,6 +315,7 @@ export class SheetDetail extends DocumentHandler implements OnChanges {
       this.relinkTargetType === 'instrumentation' ? (this.relinkInstrumentationId ?? undefined) : undefined;
     this.documentsApi
       .linkToSheet(this.relinkingDoc.id, this.sheetId, instrId, this.relinkAttachmentType ?? undefined)
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.relinkDialogVisible = false;
@@ -361,7 +365,7 @@ export class SheetDetail extends DocumentHandler implements OnChanges {
       this.documentsApi.linkToSheet(doc.id!, this.sheetId, id === 'sheet' ? undefined : id)
     );
     this.alsoLinkApplying = true;
-    forkJoin(calls).subscribe({
+    forkJoin(calls).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.alsoLinkDialogVisible = false;
         this.alsoLinkApplying = false;
@@ -486,19 +490,21 @@ export class SheetDetail extends DocumentHandler implements OnChanges {
     const ids = this.allSelectedDocs().map(({ doc }) => doc.id!);
     const baseName = this.sanitizeFilename(this.sheet()?.title ?? 'documents');
     const filename = format === 'MERGED_PDF' ? `${baseName}.pdf` : `${baseName}.zip`;
-    this.documentsApi.downloadBatchByIds(ids, format, baseName).subscribe({
-      next: (response) => {
-        const blob = response.body!;
-        const disposition = response.headers.get('Content-Disposition');
-        const serverFilename = disposition?.match(/filename\*?=(?:utf-8'')?([^;]+)/i)?.[1];
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = serverFilename ? decodeURIComponent(serverFilename) : filename;
-        a.click();
-        URL.revokeObjectURL(url);
-      },
-    });
+    this.documentsApi.downloadBatchByIds(ids, format, baseName)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          const blob = response.body!;
+          const disposition = response.headers.get('Content-Disposition');
+          const serverFilename = disposition?.match(/filename\*?=(?:utf-8'')?([^;]+)/i)?.[1];
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = serverFilename ? decodeURIComponent(serverFilename) : filename;
+          a.click();
+          URL.revokeObjectURL(url);
+        },
+      });
   }
 
   reloadSheet(): void {
@@ -507,7 +513,7 @@ export class SheetDetail extends DocumentHandler implements OnChanges {
 
   private loadSheet(): void {
     this.loading.set(true);
-    this.sheetsApi.load(this.sheetId).subscribe({
+    this.sheetsApi.load(this.sheetId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (sheet) => {
         this.sheet.set(sheet);
         this.loading.set(false);
@@ -527,19 +533,21 @@ export class SheetDetail extends DocumentHandler implements OnChanges {
     this.expandedRows = {};
     this.instrDocsCache.set(new Map());
     this.selectedDocMap.set(new Map());
-    this.instrumentationsApi.list(this.sheetId).subscribe({
-      next: (items) => {
-        this.instrumentations.set(items);
-        const cache = new Map<string, Attachment[]>();
-        for (const instr of items) {
-          if (instr.id) cache.set(instr.id, instr.attachments ?? []);
-        }
-        this.instrDocsCache.set(cache);
-        this.instrumentationsLoading.set(false);
-      },
-      error: () => {
-        this.instrumentationsLoading.set(false);
-      },
-    });
+    this.instrumentationsApi.list(this.sheetId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (items) => {
+          this.instrumentations.set(items);
+          const cache = new Map<string, Attachment[]>();
+          for (const instr of items) {
+            if (instr.id) cache.set(instr.id, instr.attachments ?? []);
+          }
+          this.instrDocsCache.set(cache);
+          this.instrumentationsLoading.set(false);
+        },
+        error: () => {
+          this.instrumentationsLoading.set(false);
+        },
+      });
   }
 }

@@ -1,12 +1,15 @@
-import { Directive, inject, signal } from '@angular/core';
+import { Directive, inject, signal, DestroyRef } from '@angular/core';
 import { ConfirmationService, MessageService } from '@openng/optimus-ui/api';
 import { TranslationService } from '../../core/translation.service';
 import { DocumentsApiService } from '../../core/api/documents-api.service';
 import { Attachment, DocumentDownload } from '../../model/datamodels';
 import { formatSize } from '../utils/format.utils';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Directive()
 export abstract class DocumentHandler {
+  protected readonly destroyRef = inject(DestroyRef);
+
   protected readonly t = inject(TranslationService);
   protected readonly documentsApi = inject(DocumentsApiService);
   protected readonly confirmationService = inject(ConfirmationService);
@@ -21,17 +24,19 @@ export abstract class DocumentHandler {
   protected abstract getDocumentBasePath(): string;
 
   protected downloadDocument(doc: DocumentDownload): void {
-    this.documentsApi.download(this.getDocumentBasePath(), doc.id!).subscribe({
-      next: (response) => {
-        const blob = response.body!;
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = doc.filename ?? 'download';
-        a.click();
-        URL.revokeObjectURL(url);
-      },
-    });
+    this.documentsApi.download(this.getDocumentBasePath(), doc.id!)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          const blob = response.body!;
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = doc.filename ?? 'download';
+          a.click();
+          URL.revokeObjectURL(url);
+        },
+      });
   }
 
   protected confirmDeleteDocument(doc: DocumentDownload): void {
@@ -41,16 +46,18 @@ export abstract class DocumentHandler {
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        this.documentsApi.delete(this.getDocumentBasePath(), doc.id!).subscribe({
-          next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: this.t.t('sheets.detail.documentDeleted'),
-            });
-            this.loadDocuments();
-          },
-          error: () => {},
-        });
+        this.documentsApi.delete(this.getDocumentBasePath(), doc.id!)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: () => {
+              this.messageService.add({
+                severity: 'success',
+                summary: this.t.t('sheets.detail.documentDeleted'),
+              });
+              this.loadDocuments();
+            },
+            error: () => {},
+          });
       },
     });
   }
@@ -89,7 +96,7 @@ export abstract class DocumentHandler {
     const basePath = this.getDocumentBasePath();
     if (!basePath) return;
     this.documentsLoading.set(true);
-    this.documentsApi.list(basePath).subscribe({
+    this.documentsApi.list(basePath).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         this.documents.set(res.data ?? []);
         this.documentsLoading.set(false);
@@ -101,16 +108,18 @@ export abstract class DocumentHandler {
   }
 
   private doUpload(file: File): void {
-    this.documentsApi.upload(this.getDocumentBasePath(), file).subscribe({
-      next: (ev) => {
-        if (ev.type === 'complete') {
-          this.messageService.add({
-            severity: 'success',
-            summary: this.t.t('sheets.detail.uploadComplete'),
-          });
-          this.loadDocuments();
-        }
-      },
-    });
+    this.documentsApi.upload(this.getDocumentBasePath(), file)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (ev) => {
+          if (ev.type === 'complete') {
+            this.messageService.add({
+              severity: 'success',
+              summary: this.t.t('sheets.detail.uploadComplete'),
+            });
+            this.loadDocuments();
+          }
+        },
+      });
   }
 }

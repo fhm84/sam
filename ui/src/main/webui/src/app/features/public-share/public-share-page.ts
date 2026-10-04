@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  OnInit,
+  signal,
+  DestroyRef,
+} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Button } from '@openng/optimus-ui/button';
 import { Tag } from '@openng/optimus-ui/tag';
@@ -6,6 +13,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../core/translation.service';
 import { SharesApiService } from '../../core/api/shares-api.service';
 import { PublicShareInfo } from '../../model/datamodels';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-public-share-page',
@@ -14,6 +22,8 @@ import { PublicShareInfo } from '../../model/datamodels';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PublicSharePage implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+
   protected readonly t = inject(TranslationService);
   private readonly route = inject(ActivatedRoute);
   private readonly sharesApi = inject(SharesApiService);
@@ -28,7 +38,7 @@ export class PublicSharePage implements OnInit {
       this.phase.set('error');
       return;
     }
-    this.sharesApi.getPublicInfo(this.token).subscribe({
+    this.sharesApi.getPublicInfo(this.token).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => {
         this.info.set(data);
         this.phase.set(data.expired ? 'expired' : 'ready');
