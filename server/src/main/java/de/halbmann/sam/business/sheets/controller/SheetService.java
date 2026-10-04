@@ -55,12 +55,13 @@ public class SheetService {
         PaginatedResponse<SheetMusicSearchResult> response;
 
         if (filterRequest.getQuery() != null) {
-            // Same narrowing filters as the list path below, so search + genre/letter/tag combine
+            // Same narrowing filters as the list path below, so search + genre/letter/tag/composer combine
             SheetRepository.SearchFilters filters = new SheetRepository.SearchFilters(
                     parseGenre(filterRequest.getGenre()),
                     filterRequest.getTitleStartsWith(),
                     filterRequest.getTag(),
-                    filterRequest.getFavorite());
+                    filterRequest.getFavorite(),
+                    filterRequest.getComposer());
             List<Object[]> results = sheetRepository.searchSheets(
                     filterRequest.getQuery(), filters, filterRequest.getPage(), filterRequest.getSize());
 

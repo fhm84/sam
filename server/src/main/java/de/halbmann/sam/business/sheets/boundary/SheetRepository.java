@@ -57,7 +57,7 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
      * Optional filters that narrow a full-text search, mirroring the non-search list filters.
      * A {@code null} / blank value means "no restriction".
      */
-    public record SearchFilters(Genre genre, String titleStartsWith, String tag, Boolean favorite) {}
+    public record SearchFilters(Genre genre, String titleStartsWith, String tag, Boolean favorite, String composer) {}
 
     private static final String SEARCH_CTE = """
             WITH q AS (
@@ -145,6 +145,11 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
             conditions.add("s.favorite = :favorite");
             params.put("favorite", filters.favorite());
         }
+        if (filters.composer() != null && !filters.composer().isBlank()) {
+            // composer_name is kept in sync with musicians.name by a trigger (V1.0.1)
+            conditions.add("s.composer_name = :composer");
+            params.put("composer", filters.composer());
+        }
         return "WHERE " + String.join("\n  AND ", conditions);
     }
 
@@ -193,9 +198,15 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
                 .filter(entry -> entry.getValue() != null)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        final List<String> conditions = new ArrayList<>(
-                nonNullParams.keySet().stream().map(o -> o + "=:" + o).toList());
-        final Map<String, Object> queryParams = new HashMap<>(nonNullParams);
+        // Keys are attribute paths (e.g. "composer.name"); a named parameter can't contain a dot,
+        // so the parameter name replaces dots with underscores.
+        final List<String> conditions = new ArrayList<>();
+        final Map<String, Object> queryParams = new HashMap<>();
+        nonNullParams.forEach((path, value) -> {
+            String paramName = path.replace('.', '_');
+            conditions.add(path + " = :" + paramName);
+            queryParams.put(paramName, value);
+        });
 
         if (titleStartsWith != null && !titleStartsWith.isBlank()) {
             conditions.add("lower(title) like :titlePrefix");
