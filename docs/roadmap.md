@@ -165,6 +165,25 @@ Unlocks downstream features:
 
 ---
 
+### Booklets — `planned`
+
+Named, ordered compilations of sheets that exist as a physical binder or printed book (e.g.
+"27 Weihnachtslieder", "Gotteslob"), each sheet with its position/number in the booklet.
+Distinct from collections: a booklet mirrors a fixed physical object, while a setlist or folder
+is a working selection.
+
+The API contract already exists in the `api` module (`BookletsResource` with the
+`CollectionSheetsResource` sheets sub-resource, `Booklet` DTO) and the UI has an unused
+`BookletsApiService`, but there is no server implementation, entity or migration yet — requests
+to `/api/booklets` return 404. Kept deliberately as the starting point (decision 2026-10-04).
+Open question before implementing: reuse the collection item model (`CollectionItemsResource`)
+instead of the older sheet-only sub-resource?
+
+**Stakeholders:** S1 (music librarian), S3 (Musiker)
+**Effort:** Medium (entity + migration + service + UI)
+
+---
+
 ### Concert programme export — `done`
 
 **Implementation note:** TOC export via `CollectionTocService` is complete; per-entry programme notes (future enhancement).
