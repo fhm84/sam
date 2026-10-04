@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 
 public class LocalFileSystemWrapper implements FileSystemWrapper {
@@ -47,7 +48,9 @@ public class LocalFileSystemWrapper implements FileSystemWrapper {
         Path source = resolve(sourceRelativePath);
         Path target = resolve(targetRelativePath);
         Files.createDirectories(target.getParent());
-        Files.move(source, target);
+        // Replace, as S3's copyObject does: targets are content-addressed, so a file already at the
+        // target (e.g. left behind without a DB row) has identical content.
+        Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
     }
 
     @Override
