@@ -129,7 +129,7 @@ The `core/api/` services cover the full backend API:
 | `InstrumentsApiService`     | `/api/instruments`                                     | CRUD              |
 | `EnsemblesApiService`       | `/api/ensembles`                                       | CRUD + voices + voice options |
 | `CollectionsApiService`     | `/api/sheet-collections`                               | CRUD + sheets     |
-| `BookletsApiService`        | `/api/booklets`                                        | CRUD + sheets     |
+| `BookletsApiService`        | `/api/booklets`                                        | CRUD + sheets — planned, no backend yet (unused) |
 
 `DocumentsApiService` is parameterized by base path since the backend mounts
 it at three different locations (top-level, under sheets, under instrumentations).

@@ -11,7 +11,10 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 @RegisterRestClient(configKey = "sam-api")
 public interface SamResources {
 
-    /** @return sub-resource for managing booklets (physical binders / printed compilations). */
+    /**
+     * @return sub-resource for managing booklets (physical binders / printed compilations). Planned
+     *     feature: not implemented on the server yet.
+     */
     @Path("booklets")
     BookletsResource booklets();
 
