@@ -113,4 +113,31 @@ class CollectionItemsReorderTest {
 
         assertEquals(List.of("Item B", "Item A", "Item C"), texts);
     }
+
+    /**
+     * A subset (or duplicates) used to leave the other rows at their old positions, colliding with
+     * the new ones on the (collection, items_order) key → 500. Now rejected with 400, order kept.
+     */
+    @Test
+    void reorderItems_partialOrDuplicateList_returns400AndKeepsOrder() throws Exception {
+        try (Jsonb jsonb = JsonbBuilder.newBuilder().build()) {
+            for (List<String> invalid : List.of(
+                    List.of(itemIds.get(2), itemIds.get(1)), List.of(itemIds.get(2), itemIds.get(2), itemIds.get(1)))) {
+                given().contentType(ContentType.JSON)
+                        .body(jsonb.toJson(invalid))
+                        .put("/api/sheet-collections/{id}/items/order", collectionId)
+                        .then()
+                        .statusCode(400);
+            }
+        }
+
+        List<String> texts = given().get("/api/sheet-collections/{id}/items", collectionId)
+                .then()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getList("data.textContent", String.class);
+
+        assertEquals(List.of("Item A", "Item B", "Item C"), texts);
+    }
 }
