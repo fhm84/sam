@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -248,6 +249,12 @@ public class SheetCollectionService {
                 .filter(item -> item.getId().toString().equals(id))
                 .findFirst()
                 .orElseThrow(() -> new EntityNotFoundException("CollectionItem", id)));
+        // ... and every item exactly once: with a subset or duplicates, the untouched rows keep their
+        // old positions, which collide with the new 0..N-1 on the (collection, items_order) key.
+        if (orderedIds.size() != currentItems.size() || new HashSet<>(orderedIds).size() != orderedIds.size()) {
+            throw new ValidationException("The new order must list every item of the collection exactly once ("
+                    + currentItems.size() + " items, got " + orderedIds.size() + " IDs)");
+        }
         // Update items_order directly via native SQL to avoid Envers inserting both a DEL
         // and an ADD record for the same (rev, collection_id, item_id) within one transaction,
         // which would violate the audit table PK.
