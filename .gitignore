@@ -62,6 +62,8 @@ hs_err_pid*.log
 .claude/settings.local.json
 /server/uploads/
 /migration/src/migration-data/
+# Local dev document storage (%dev sam.filesystem.base.path=./data/sam, relative to server/)
+/server/data/
 /.playwright-mcp/
 
 # Generated review/analysis artifacts

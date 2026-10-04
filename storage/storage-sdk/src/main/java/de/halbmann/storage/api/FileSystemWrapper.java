@@ -21,6 +21,7 @@ public interface FileSystemWrapper {
         }
     }
 
+    /** Moves a file, replacing the target if it already exists. */
     void move(String sourceRelativePath, String targetRelativePath) throws IOException;
 
     void delete(String relativePath) throws IOException;
