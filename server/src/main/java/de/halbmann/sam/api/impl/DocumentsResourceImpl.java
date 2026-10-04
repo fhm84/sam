@@ -185,8 +185,10 @@ public class DocumentsResourceImpl implements DocumentsResource {
         } else if (sheetId != null) {
             attachment = attachmentLinkService.loadAttachmentBySheet(sheetId, docIdentifier);
         } else {
+            // orElseGet, not orElse: the document lookup must only run when no attachment matched
+            // (orElse evaluated it eagerly — a 404 for every attachment ID, plus a leaked stream)
             attachment = Optional.ofNullable(documentStore.loadAttachment(docIdentifier))
-                    .orElse(documentStore.load(UUID.fromString(docIdentifier)));
+                    .orElseGet(() -> documentStore.load(UUID.fromString(docIdentifier)));
         }
         if (attachment == null) {
             log.info("Document ({}) not found", docIdentifier);
