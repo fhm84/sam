@@ -9,7 +9,9 @@ LangChain4j with `@RegisterAiService` provides AI-based classification of upload
 3. **Structured metadata extraction** — A `SheetAnalyzerResult` is returned containing title, composer, arranger, genre, year, instrumentation details, etc.
 4. **Entity pre-matching** — Composer and arranger names are matched against existing musicians; existing sheets are matched by exact title; instruments are matched via pg_trgm trigram similarity (threshold 0.3, up to 5 candidates with scores).
 5. **Pre-filled suggestion (Option A)** — A `ClassificationApplyRequest` is built automatically from the AI result and best-match candidates. This is returned to the frontend for user review.
-6. **Agentic resolution (Option B, opt-in)** — When `sam.classification.agentic=true`, a second AI pass using `ClassificationAgent` autonomously resolves entity references via tool calls (`searchSheets`, `searchMusicians`, `searchInstruments`) before returning the suggestion. Falls back to Option A on error.
+6. **Agentic resolution (Option B, opt-in)** — When `sam.classification.agentic=true` (default `false`; set per environment via the `SAM_CLASSIFICATION_AGENTIC` env var, wired through `docker-compose.prod.yml`), a second AI pass using `ClassificationAgent` autonomously resolves entity references via tool calls (`searchSheets`, `searchMusicians`, `searchInstruments`) before returning the suggestion. Falls back to Option A on error; any sheet/musician/instrument ID in the agent's answer that doesn't exist is replaced by Option A's value for that field.
+
+`classify` runs without a database transaction (it only reads, and mostly waits for the LLM); only `apply` is transactional.
 
 ## Step 2 — Apply (`POST /documents/{id}/apply`)
 

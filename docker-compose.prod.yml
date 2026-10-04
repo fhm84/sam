@@ -104,6 +104,8 @@ services:
       KEYCLOAK_BACKEND_CLIENT_SECRET: ${KEYCLOAK_BACKEND_CLIENT_SECRET:?KEYCLOAK_BACKEND_CLIENT_SECRET is required}
       # AI — OpenAI for document classification
       QUARKUS_LANGCHAIN4J_OPENAI_API_KEY: ${OPENAI_API_KEY:?OPENAI_API_KEY is required}
+      # Agentic classification (extra LLM pass with tool calls); opt-in, off unless set to true
+      SAM_CLASSIFICATION_AGENTIC: ${SAM_CLASSIFICATION_AGENTIC:-false}
       # Storage: local filesystem path inside the container
       SAM_FILESYSTEM_BASE_PATH: /data/sam
       # Heap 1 GB inside a 1.5 GB container (rest: metaspace, threads, PDF rendering buffers).
