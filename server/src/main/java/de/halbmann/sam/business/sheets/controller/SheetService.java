@@ -55,8 +55,15 @@ public class SheetService {
         PaginatedResponse<SheetMusicSearchResult> response;
 
         if (filterRequest.getQuery() != null) {
+            // Same narrowing filters as the list path below, so search + genre/letter/tag/composer combine
+            SheetRepository.SearchFilters filters = new SheetRepository.SearchFilters(
+                    parseGenre(filterRequest.getGenre()),
+                    filterRequest.getTitleStartsWith(),
+                    filterRequest.getTag(),
+                    filterRequest.getFavorite(),
+                    filterRequest.getComposer());
             List<Object[]> results = sheetRepository.searchSheets(
-                    filterRequest.getQuery(), filterRequest.getPage(), filterRequest.getSize());
+                    filterRequest.getQuery(), filters, filterRequest.getPage(), filterRequest.getSize());
 
             response = new PaginatedResponse<>();
             response.setData(results.stream()
@@ -79,6 +86,7 @@ public class SheetService {
                     .toList());
             response.setPage(filterRequest.getPage());
             response.setSize(response.getData().size());
+            response.setTotalCount(sheetRepository.countSearchResults(filterRequest.getQuery(), filters));
         } else {
             final Map<String, Object> parameters = new HashMap<>();
             if (filterRequest.getTitle() != null) {

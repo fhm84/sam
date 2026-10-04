@@ -50,3 +50,4 @@ All domain entities carry `version` (optimistic locking), `created`, `lastUpdate
 - [Audit & Event Log](concepts/audit.md) — `_AUD` tables and the `event_log`
 - [Coverage Evaluation](concepts/coverage.md) — how ensemble/voice entities are used
 - Flyway migrations: `server/src/main/resources/db/migration/`
+- Flyway is the only source of the schema. Hibernate validates the mapping against it in prod (`validate`) and in `FlywaySchemaValidationTest`; its `update` mode is enabled for the local `%dev` profile only.
