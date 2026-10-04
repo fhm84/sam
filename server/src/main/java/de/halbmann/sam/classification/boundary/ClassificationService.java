@@ -8,7 +8,6 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -18,9 +17,10 @@ import java.util.Base64;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
+// Deliberately not @Transactional: it only calls the LLM and touches no database, and a
+// transaction would hold a DB connection open for the whole (possibly long) model call.
 @Slf4j
 @ApplicationScoped
-@Transactional
 public class ClassificationService {
 
     private final SheetAnalyzer analyzer;

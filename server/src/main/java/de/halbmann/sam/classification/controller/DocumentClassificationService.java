@@ -51,10 +51,13 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
  *       entities via tool calls (Option B).
  *   <li>{@link #apply} — creates/resolves entities and links the document as an attachment.
  * </ol>
+ *
+ * <p>Only {@link #apply} runs in a transaction. {@link #classify} is read-only and spends most of
+ * its time waiting for the LLM, so it deliberately runs without one: a transaction would hold a
+ * database connection for the whole model call and could hit the transaction timeout.
  */
 @Slf4j
 @ApplicationScoped
-@Transactional
 public class DocumentClassificationService {
 
     @Inject
@@ -175,6 +178,7 @@ public class DocumentClassificationService {
      * Resolves or creates entities based on the reviewed classification request and links the
      * document as an attachment to the resulting sheet or instrumentation.
      */
+    @Transactional
     public ClassificationApplyResult apply(UUID documentId, ClassificationApplyRequest request) {
         DocumentEntity document = documentRepository
                 .findByIdOptional(documentId)
@@ -320,12 +324,61 @@ public class DocumentClassificationService {
             String metadata = toDescription(result);
             log.debug("Running agentic classification with metadata:\n{}", metadata);
             ClassificationApplyRequest resolved = classificationAgent.resolve(metadata);
+            if (resolved == null) {
+                log.warn("Agentic classification returned nothing, falling back to pre-filled suggestion");
+                return fallback;
+            }
             log.info("Agentic classification resolved successfully");
-            return resolved;
+            return dropUnknownIds(resolved, fallback);
         } catch (Exception e) {
             log.warn("Agentic classification failed, falling back to pre-filled suggestion: {}", e.getMessage());
             return fallback;
         }
+    }
+
+    /**
+     * The agent may return IDs it never got from a tool (hallucinated or garbled). Every ID that
+     * doesn't exist is replaced by the pre-filled suggestion's value for that field, so apply
+     * neither fails on an unknown sheet nor silently drops a composer, arranger or instrument.
+     */
+    ClassificationApplyRequest dropUnknownIds(
+            ClassificationApplyRequest resolved, ClassificationApplyRequest fallback) {
+        if (resolved.getSheetId() != null
+                && sheetRepository.findByIdOptional(resolved.getSheetId()).isEmpty()) {
+            warnUnknownId("sheet", resolved.getSheetId());
+            resolved.setSheetId(fallback.getSheetId());
+        }
+        if (resolved.getComposerId() != null
+                && musicianRepository.findByIdOptional(resolved.getComposerId()).isEmpty()) {
+            warnUnknownId("composer", resolved.getComposerId());
+            resolved.setComposerId(fallback.getComposerId());
+            if (resolved.getComposerName() == null) {
+                resolved.setComposerName(fallback.getComposerName());
+            }
+        }
+        if (resolved.getArrangerId() != null
+                && musicianRepository.findByIdOptional(resolved.getArrangerId()).isEmpty()) {
+            warnUnknownId("arranger", resolved.getArrangerId());
+            resolved.setArrangerId(fallback.getArrangerId());
+            if (resolved.getArrangerName() == null) {
+                resolved.setArrangerName(fallback.getArrangerName());
+            }
+        }
+        if (resolved.getInstrumentId() != null
+                && instrumentRepository
+                        .findByIdOptional(resolved.getInstrumentId())
+                        .isEmpty()) {
+            warnUnknownId("instrument", resolved.getInstrumentId());
+            resolved.setInstrumentId(fallback.getInstrumentId());
+            if (resolved.getInstrumentName() == null) {
+                resolved.setInstrumentName(fallback.getInstrumentName());
+            }
+        }
+        return resolved;
+    }
+
+    private static void warnUnknownId(String field, Object id) {
+        log.atWarn().log(() -> "Agent returned unknown " + field + " " + id + ", using pre-filled suggestion");
     }
 
     /**
