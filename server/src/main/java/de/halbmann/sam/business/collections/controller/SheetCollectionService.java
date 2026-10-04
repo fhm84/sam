@@ -24,12 +24,14 @@ import de.halbmann.sam.business.ensembles.boundary.EnsembleMembershipRepository;
 import de.halbmann.sam.business.ensembles.entity.EnsembleMembershipEntity;
 import de.halbmann.sam.business.instruments.entity.InstrumentEntity;
 import de.halbmann.sam.business.musicians.boundary.MusicianRepository;
+import de.halbmann.sam.business.shared.event.ResourcesDeleted;
 import de.halbmann.sam.business.sheets.boundary.SheetRepository;
 import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
 import de.halbmann.sam.core.entity.PaginatedEntities;
 import de.halbmann.sam.core.exception.EntityNotFoundException;
 import de.halbmann.sam.core.exception.ValidationException;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Event;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
@@ -77,6 +79,9 @@ public class SheetCollectionService {
     @Inject
     EnsembleMembershipRepository membershipRepository;
 
+    @Inject
+    Event<ResourcesDeleted> resourcesDeleted;
+
     public PaginatedResponse<SheetCollection> findCollections(final SheetCollectionFilterRequest filter) {
         PaginatedEntities<SheetCollectionEntity> result =
                 repository.findCollections(filter, filter.getName(), filter.getType());
@@ -112,6 +117,16 @@ public class SheetCollectionService {
         SheetCollectionEntity entity = repository
                 .findByIdOptional(UUID.fromString(id))
                 .orElseThrow(() -> new EntityNotFoundException("SheetCollection", id));
+        // Items aren't cascaded from the collection: delete them (and text items' attachments, so
+        // their documents' ref counts drop) instead of leaving orphaned rows behind
+        for (CollectionItemEntity item : new ArrayList<>(entity.getItems())) {
+            if (item instanceof TextCollectionItemEntity textItem && textItem.getAttachment() != null) {
+                cleanUpAttachment(textItem);
+            }
+            entity.getItems().remove(item);
+            collectionItemRepository.delete(item);
+        }
+        resourcesDeleted.fire(new ResourcesDeleted(Set.of(entity.getId())));
         repository.delete(entity);
     }
 

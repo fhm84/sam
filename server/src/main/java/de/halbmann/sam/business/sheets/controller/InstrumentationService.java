@@ -5,6 +5,7 @@ import de.halbmann.sam.api.entity.sheets.Instrumentation;
 import de.halbmann.sam.business.documents.controller.AttachmentLinkService;
 import de.halbmann.sam.business.instruments.boundary.InstrumentRepository;
 import de.halbmann.sam.business.instruments.entity.InstrumentEntity;
+import de.halbmann.sam.business.shared.event.ResourcesDeleted;
 import de.halbmann.sam.business.sheets.boundary.InstrumentationRepository;
 import de.halbmann.sam.business.sheets.boundary.SheetRepository;
 import de.halbmann.sam.business.sheets.entity.InstrumentationEntity;
@@ -12,11 +13,13 @@ import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
 import de.halbmann.sam.core.exception.EntityNotFoundException;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Event;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @ApplicationScoped
@@ -37,6 +40,9 @@ public class InstrumentationService {
 
     @Inject
     AttachmentLinkService attachmentLinkService;
+
+    @Inject
+    Event<ResourcesDeleted> resourcesDeleted;
 
     public List<Instrumentation> getInstrumentations(final String sheetId) {
         Sort sort = Sort.ascending("instrument.name", "partLabel");
@@ -101,6 +107,7 @@ public class InstrumentationService {
         if (entity.getAttachments() != null) {
             attachmentLinkService.unlinkAttachments(new ArrayList<>(entity.getAttachments()));
         }
+        resourcesDeleted.fire(new ResourcesDeleted(Set.of(entity.getId())));
         instrumentationRepository.delete(entity);
     }
 }
