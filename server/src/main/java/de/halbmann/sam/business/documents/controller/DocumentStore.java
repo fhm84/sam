@@ -6,6 +6,7 @@ import de.halbmann.sam.business.documents.boundary.DocumentRepository;
 import de.halbmann.sam.business.documents.entity.AttachmentEntity;
 import de.halbmann.sam.business.documents.entity.DocumentEntity;
 import de.halbmann.sam.core.entity.PaginatedEntities;
+import de.halbmann.sam.core.exception.ConflictException;
 import de.halbmann.sam.core.exception.EntityNotFoundException;
 import de.halbmann.sam.core.exception.StorageException;
 import de.halbmann.sam.core.storage.MimeTypeUtils;
@@ -124,7 +125,7 @@ public class DocumentStore {
                 .orElseThrow(() -> new EntityNotFoundException("Document", documentId));
 
         if (doc.getRefCount() > 0) {
-            throw new IllegalStateException("Document is still linked");
+            throw new ConflictException("Document is still linked to " + doc.getRefCount() + " attachment(s)");
         }
 
         try {

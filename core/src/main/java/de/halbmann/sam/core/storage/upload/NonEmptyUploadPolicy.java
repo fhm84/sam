@@ -1,5 +1,6 @@
 package de.halbmann.sam.core.storage.upload;
 
+import de.halbmann.sam.core.exception.ValidationException;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.io.IOException;
@@ -13,7 +14,8 @@ public class NonEmptyUploadPolicy implements UploadPolicy {
     @Override
     public void verify(UploadContext context) throws IOException {
         if (context.size() < MIN_SIZE) {
-            throw new IOException("Uploaded file is too small");
+            // A rejected upload is a client error (400), not an I/O failure (500)
+            throw new ValidationException("Uploaded file is empty");
         }
     }
 }
