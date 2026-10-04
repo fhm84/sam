@@ -5,9 +5,9 @@ Quarkus OIDC with self-hosted **Keycloak 26** (`docker-compose.keycloak.yml`; re
 | Concern | Mechanism |
 |---|---|
 | Identity | `Musician.userId` = OIDC `sub` claim. No separate User entity — a musician either has a login or doesn't. See [ADR-0001](../decisions/adr-0001-musician-user-linking.md). |
-| Ensemble access | Keycloak group `ensemble:{UUID}` in the JWT `groups` claim; read by `CurrentUserService.getAccessibleEnsembleIds()` |
+| Ensemble access | Keycloak group `ensemble:{UUID}` in the JWT `groups` claim, parsed by `CurrentUserService.getAccessibleEnsembleIds()` / `canAccessEnsemble()`. **Not yet enforced:** no endpoint calls these yet, and `SheetCollection.visibility` is stored but not checked — reads are open to every authenticated user. See the [role-aware access plan](../../plans/rbac-role-aware-access.md). |
 | Roles | Keycloak realm roles: `music_librarian` (full archive write access), `admin` (system config) |
-| Public access | `/public/share/{token}` endpoints bypass `@Authenticated`; token is validated manually in `PublicShareResourceImpl` |
+| Public access | `/api/public/shares/{token}/…` endpoints are `@PermitAll` (no `@Authenticated`); the token is validated manually in `PublicShareResourceImpl` / `ShareService` |
 | Ops/diagnostic access | `/q/info`, `/q/metrics` are unauthenticated by design, isolated onto a separate management port (`:9000`) rather than `@Authenticated`'s `/api/*` surface. See [ADR-0007](../decisions/adr-0007-management-interface.md) |
 | Machine access | The `cli` module authenticates as the `sam-cli` Keycloak client (confidential client with a service account holding `music_librarian`) via OIDC client-credentials — no user login involved. See `cli/README.md`, "Server URL and authentication". |
 
@@ -27,7 +27,7 @@ Dedicated endpoints (admin-only):
 
 The general `PUT /api/musicians/{id}` (used by the form save) intentionally ignores `userId` via `@Mapping(target = "userId", ignore = true)` in `MusicianMapper`, so a librarian updating a musician's name can never accidentally clear an existing link.
 
-User lookup for the admin search autocomplete is backed by the **Keycloak Admin REST API** via `quarkus-keycloak-admin-rest-client`. The `AdminUsersResource` (`GET /api/admin/users?search=`, `GET /api/admin/users/{id}`) proxies user searches to Keycloak and is restricted to the `admin` role. In dev, the admin client authenticates against the `master` realm using the bootstrap admin credentials (`admin`/`admin`). In production, configure `KEYCLOAK_ADMIN_URL`, `KEYCLOAK_ADMIN_USER`, `KEYCLOAK_ADMIN_PASSWORD`, and `KEYCLOAK_REALM` environment variables.
+User lookup for the admin search autocomplete is backed by the **Keycloak Admin REST API** via `quarkus-keycloak-admin-rest-client`. The `AdminUsersResource` (`GET /api/admin/users?search=`, `GET /api/admin/users/{id}`) proxies user searches to Keycloak and is restricted to the `admin` role. The admin client authenticates with client credentials as the confidential `sam-backend` client in the `sam` realm (dev secret committed in `application.properties`). In production, configure `KEYCLOAK_ADMIN_URL`, `KEYCLOAK_REALM`, `KEYCLOAK_BACKEND_CLIENT_ID` (default `sam-backend`), and `KEYCLOAK_BACKEND_CLIENT_SECRET`.
 
 ## Testing
 

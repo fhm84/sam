@@ -146,14 +146,15 @@ opened as an Obsidian vault). `docs/README.md` is the map of content. Use plain 
 Markdown links between pages — never `[[wikilinks]]` (they don't render on GitHub).
 Layout: `docs/architecture/` (context, building-blocks, data-model, deployment,
 tech-stack + `concepts/`, `runtime/`, `decisions/`), `docs/features/` (one page per
-domain area), `docs/reviews/` (review backlogs), plus `stakeholders.md` and `roadmap.md`.
+domain area), `docs/plans/` (task breakdowns for planned roadmap items), `docs/reviews/`
+(review backlogs), plus `stakeholders.md` and `roadmap.md` (Now/Next/Later section at the top).
 
 After implementing a feature or bugfix:
 1. Update README.md TODOs if the feature is now complete
 2. If architecture changed, verify the matching page under `docs/architecture/` (or `docs/architecture/concepts/`) still holds
 3. If UI patterns changed, check memory files (ui-architecture.md, etc.)
 4. If adding new modules or resources, update `docs/architecture/building-blocks.md` (and `docs/architecture/data-model.md` for new entities)
-5. If a `docs/roadmap.md` item shipped, flip its status (`idea`/`planned`/`in progress` → `done`) instead of leaving it stale
+5. If a `docs/roadmap.md` item shipped, flip its status (`idea`/`planned`/`in progress` → `done`) instead of leaving it stale; flip the task rows in its `docs/plans/` page too, and delete the plan page once every task is done
 6. If the change affects who can do what (new/changed `@RolesAllowed`, new endpoint, new share/visibility behavior, new personalised view), check `docs/stakeholders.md` — its use cases and the Section 6 access-control model drift silently and easily (e.g. RBAC and share links stayed marked "planned" long after they shipped)
 7. If a new feature or endpoint is user-facing, check the matching page in `docs/features/` for a missing or stale entry (and `docs/features/api-surface.md` for new endpoints)
 8. If a significant design decision was made (or reversed), record it as a small ADR in `docs/architecture/decisions/` and link it from the index there

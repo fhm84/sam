@@ -14,7 +14,7 @@ UI --> Lib: public URL shown
 
 Lib -> Guest: copies link,\nsends via WhatsApp
 
-Guest -> Server: GET /public/share/{token}
+Guest -> Server: GET /api/public/shares/{token}
 Server -> Server: validate: not expired/revoked
 Server --> Guest: render resource
 Server -> Server: log event_log\n(shareTokenId set,\nuserId/username null)

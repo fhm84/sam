@@ -11,6 +11,54 @@ For **technical architecture** see the [architecture docs](README.md#architectur
 
 Status values: `idea` · `planned` · `in progress` · `done`
 
+Task-level breakdowns for `planned` / `in progress` items live in
+[implementation plans](plans/README.md).
+
+---
+
+## Now / Next / Later
+
+The order of work, reviewed 2026-10-03. Everything else in this document is an
+unprioritised backlog.
+
+**Now: before go-live** (real musicians will log in, and the event log will hold personal data)
+
+1. [Role-aware access](#full-role-based-access-control-rbac--in-progress): menu and route
+   guarding, and scoping read endpoints (event log, musician contact data, share creation)
+   → [plan](plans/rbac-role-aware-access.md)
+2. [Automatic coverage snapshot invalidation](#automatic-coverage-snapshot-invalidation--planned)
+   → [plan](plans/coverage-snapshot-invalidation.md) (needs open question #5)
+3. [Event log retention + own-history view](#document-access-log--partial)
+   → [plan](plans/event-log-retention.md) (needs open question #9)
+4. Instrumentation-count search filter (PR #96, ready to merge)
+
+**Next: everyday use for the music librarian**
+
+1. [Classification form enhancements](#classification-form-enhancements--planned) → [plan](plans/classification-enhancements.md)
+2. [Sheets overview filter & bulk actions](#sheets-overview-filter--bulk-actions--planned) → [plan](plans/sheets-overview.md)
+3. [Home dashboard](#home-dashboard--planned) → [plan](plans/home-dashboard.md),
+   including the gap report from [coverage breakdown enhancements](#coverage-breakdown-enhancements--planned) → [plan](plans/coverage-breakdown.md)
+
+**Later**
+
+- [Performance history](#performance-history--idea), which unblocks the date-range
+  [GEMA reporting export](#gema-reporting-export--in-progress)
+- [Checkout / lending tracking](#checkout--lending-tracking--idea),
+  [QR codes](#qr-codes-on-physical-folders--idea) +
+  [mobile quick-lookup view](#mobile-first-quick-lookup-view--idea),
+  [thumbnail preview](#thumbnail-preview--idea)
+- Attachment kind and versioning → [plan](plans/attachment-metadata.md)
+- [Classification queue](#classification-queue--planned) → [plan](plans/classification-queue.md),
+  then [aligning the UI with the Claude Design](#align-ui-with-the-improved-claude-design--idea)
+
+**Favourites from the 2026-10 idea round** (not yet scheduled; the other ten ideas from that
+round are in their sections too, as new `idea` entries or as extensions of existing ones)
+
+- [Personal concert folder](#personal-concert-folder--idea): one PDF per musician, in programme order
+- [Metadata lookup from external catalogues](#metadata-lookup-from-external-catalogues--idea)
+- [Mobile part capture](#mobile-part-capture--idea): phone as scanner, straight into classification
+- [Search by mood or description](#search-by-mood-or-description--idea): semantic search and "similar pieces"
+
 ---
 
 ## Table of Contents
@@ -80,6 +128,24 @@ No new data model needed — just a QR generation endpoint (e.g.
 
 ---
 
+### Mobile part capture — `idea`
+
+Turn a phone into a scanner at the archive cabinet: a mobile-friendly capture page (PWA,
+camera access) photographs a part page by page, detects and straightens the page edges,
+improves contrast, combines the pages into one PDF, and hands it straight to the existing
+[AI classification](features/ai-classification.md) workflow.
+
+That makes digitising the physical archive something any member can help with in spare
+minutes, not only whoever sits at the flatbed scanner. Image clean-up can run in the
+browser (e.g. OpenCV.js) or server-side next to the existing PDF rendering in
+`DocumentUtils`. Pairs well with [QR codes on physical folders](#qr-codes-on-physical-folders--idea):
+scan the folder's QR code, then capture its parts.
+
+**Stakeholders:** S1 (music librarian), S3 (Musiker helping with digitisation)
+**Effort:** Medium
+
+---
+
 ## 2. Repertoire Planning
 
 ### Performance history — `idea`
@@ -96,6 +162,25 @@ Unlocks downstream features:
 
 **Stakeholders:** S1 (music librarian), S2 (Dirigent)
 **Effort:** Medium
+
+---
+
+### Booklets — `planned`
+
+Named, ordered compilations of sheets that exist as a physical binder or printed book (e.g.
+"27 Weihnachtslieder", "Gotteslob"), each sheet with its position/number in the booklet.
+Distinct from collections: a booklet mirrors a fixed physical object, while a setlist or folder
+is a working selection.
+
+The API contract already exists in the `api` module (`BookletsResource` with the
+`CollectionSheetsResource` sheets sub-resource, `Booklet` DTO) and the UI has an unused
+`BookletsApiService`, but there is no server implementation, entity or migration yet — requests
+to `/api/booklets` return 404. Kept deliberately as the starting point (decision 2026-10-04).
+Open question before implementing: reuse the collection item model (`CollectionItemsResource`)
+instead of the older sheet-only sub-resource?
+
+**Stakeholders:** S1 (music librarian), S3 (Musiker)
+**Effort:** Medium (entity + migration + service + UI)
 
 ---
 
@@ -160,9 +245,17 @@ list of `COMPLETE` or `PLAYABLE` pieces.
 Requires musician–instrument assignment (Section 3) as a foundation, or alternatively
 a simpler "mark voice as absent" toggle per session.
 
+**Extension: availability-aware coverage for a concert date.** The same question,
+asked ahead of time: "can we play this setlist on 14 June, when two trumpets and the tuba
+are away?" Members record absences (date ranges) themselves, and a setlist with a date
+evaluates coverage against the line-up that will actually be there. Pieces that become
+unplayable are flagged early enough to swap them out or find a substitute (see
+[substitute finder](#substitute-musician-finder--idea)). Needs an absence table on top of
+the existing memberships; the coverage engine is reused unchanged.
+
 **Stakeholders:** S2 (Dirigent)
 **Effort:** Medium
-**Depends on:** Musician–instrument assignment (or a lightweight session-level absence model)
+**Depends on:** Musician–instrument assignment (done); absence model for the concert-date variant
 
 ---
 
@@ -179,15 +272,51 @@ rehearsal and are only relevant while the setlist is active.
 Data model addition: a `notes` field on the `CollectionSheet` join entity (the link
 between a collection/setlist and a sheet), which already exists.
 
+**Extension: conductor markings shared to all parts.** Some notes apply to every
+player: "cut bars 33–48", "repeat only once", "start at letter C". The conductor enters
+them once per setlist entry and they appear as a cover note (or a stamped overlay) on
+every part of that piece: in the [personal concert folder](#personal-concert-folder--idea),
+in My Parts and on shared links. Today this goes round by word of mouth, and someone
+always misses it.
+
 **Stakeholders:** S2 (Dirigent)
-**Effort:** Low (the join entity already exists; add a field + UI textarea)
+**Effort:** Low (the join entity already exists; add a field + UI textarea); the overlay on parts is Medium
+
+---
+
+### Programme flow analysis — `idea`
+
+Show how a setlist flows across its pieces: tempo curve, key sequence, difficulty,
+running time and genre mix, as a small chart on the setlist page. Warn about common
+programme mistakes: "three marches in a row", "same key three times in a row", "the two
+hardest pieces back to back", "8 minutes over the planned length".
+
+The [AI setlist assistant](#ai-setlist-assistant--done) could use the same rules to
+suggest a better running order. Uses the tempo, tonality, duration and difficulty fields
+that already exist; no new data needed.
+
+**Stakeholders:** S2 (Dirigent)
+**Effort:** Low–Medium
+
+---
+
+### Rehearsal planning & readiness — `idea`
+
+Working back from the concert date, spread the remaining rehearsals across the setlist
+by difficulty and how ready each piece is. Musicians mark per piece "comfortable" /
+"needs practice" (optionally per passage), and the conductor sees a readiness heatmap per
+piece and section to decide what to rehearse next.
+
+**Stakeholders:** S2 (Dirigent), S3 (Musiker)
+**Effort:** Medium
+**Depends on:** Role-aware access (musicians writing their own readiness)
 
 ---
 
 ### AI setlist assistant — `done`
 
 A tool-grounded AI assistant that helps build a setlist and draft the spoken text between
-songs. Full details in local planning notes (`plan_setlist_assistant.md`, not in the repo).
+songs. See [AI Setlist Assistant](features/ai-setlist-assistant.md).
 
 **Implementation note:** Backend (ensemble FK, candidate-retrieval tool, `SetlistAssistant` /
 `ProgrammeTextDrafter` AI services, both endpoints, event logging with token usage, draft-text
@@ -223,12 +352,17 @@ grounding data source yet — would just be hallucination).
 
 ## 3. Musician-Facing
 
-### Musician profile enrichment — `planned`
+### Musician profile enrichment — `done`
 
-Add missing fields to the `Musician` entity surfaced in the Claude Design mockup
-(`Create Flows (PrimeNG).html`). Full details in local planning notes (`plan_musician_fields.md`, not in the repo).
+**Done:** all fields shipped (migration `V1.1.2__MusicianFields.sql`, `MusicianStatus`,
+`MusicianRole`, `musician_instruments` junction table) together with the Angular musician
+form. See [Musicians](features/musicians.md). The contact fields are currently readable by
+every authenticated user; restricting that is part of [role-aware access](plans/rbac-role-aware-access.md).
 
-Fields to add:
+Added missing fields to the `Musician` entity surfaced in the Claude Design mockup
+(`Create Flows (PrimeNG).html`).
+
+Fields added:
 - **email** and **mobile** — contact details for self-service folder access and
   part distribution
 - **notes** — free-text textarea, admin-visible only (allergies, vacation patterns,
@@ -310,12 +444,61 @@ Output: a simple printed checklist or PDF.
 
 ---
 
+### Personal concert folder — `idea`
+
+The digital counterpart of the part distribution list above. One click on a setlist
+creates, for each musician, a single PDF of *their* parts in programme order, with a
+table of contents, page numbers and the setlist's
+[conductor markings](#rehearsal-notes-per-setlist-entry--idea). Two layouts: a
+print-ready booklet (duplex, page-turn friendly) and a tablet version. Delivered in My
+Parts, or as a share link for guest players.
+
+Most building blocks exist: My Parts already resolves who plays which instrumentation,
+the batch download already merges PDFs, and setlist items have an order. What's new is
+per-musician assembly, the TOC/page-number stamping, and handling parts that have no
+digital file yet (listed as "physical only" in the TOC).
+
+**Stakeholders:** S1 (music librarian), S3 (Musiker), S3b (Guest musician)
+**Effort:** Medium
+
+---
+
+### Reference recordings & practice mode — `idea`
+
+Link one or more reference recordings to a sheet: a YouTube/Spotify link (found via a
+search helper) or an uploaded audio file, for example the band's own concert recording.
+In My Parts, a musician sees their part next to the recording and can practise along.
+A later step could add slow-down playback and loop sections.
+
+Uploaded recordings use the existing storage layer. Recordings of the band's own
+performances need a rights check before being shared outside the band.
+
+**Stakeholders:** S3 (Musiker), S2 (Dirigent)
+**Effort:** Low (links) to Medium (upload + player)
+
+---
+
+### Substitute musician finder — `idea`
+
+When availability-aware coverage (see
+[minimum viable setlist](#minimum-viable-setlist--idea)) shows a gap for a concert,
+suggest musicians who could fill it: those with role `GUEST` / `SUBSTITUTE` who play the
+missing instrument, from the global `musician_instruments` list. One click sends them a
+share link containing only the parts they would play.
+
+**Stakeholders:** S1 (music librarian), S2 (Dirigent), S3b (Guest musician)
+**Effort:** Low–Medium
+**Depends on:** Availability-aware coverage, [instrument-limited setlist sharing](#instrument-limited-setlist-sharing--idea)
+
+---
+
 ## 4. Statistics & Reporting
 
 ### Home dashboard — `planned`
 
-A home page replacing the current empty landing screen. Two tabs, derived from the
-Claude Design `Hi-Fi Shell (PrimeNG).html`. Full details in local planning notes (`plan_home_dashboard.md`, not in the repo).
+A data-driven home page replacing the current static landing page (greeting + navigation
+cards, no data). Two tabs, derived from the
+Claude Design `Hi-Fi Shell (PrimeNG).html`. Task breakdown: [plan](plans/home-dashboard.md).
 
 **Inbox tab:**
 - KPI row: to-classify count, instrumentations missing archive location, stale coverage
@@ -385,13 +568,29 @@ SAM already stores ISWC and GEMA work numbers per sheet.
 
 ---
 
+### Automatic rights hints — `idea`
+
+Use rights data SAM already stores to give hints, not legal verdicts:
+
+- **Likely public domain:** composer (and arranger) death year + 70 years has passed →
+  suggest `rightsStatus = PUBLIC_DOMAIN` for review.
+- **Expiring arrangement rights:** `arrangementRightsUntil` within the next N months →
+  shown on the home dashboard / in the [notifications digest](#notifications--digest--idea).
+- **GEMA prefill:** once performance history exists, prefill the GEMA report from the
+  concerts that actually took place, using only sheets marked `gemaReportable = YES`.
+
+**Stakeholders:** S1 (music librarian), S4 (Administrator)
+**Effort:** Low (fields exist; a rule service + UI badges)
+
+---
+
 ## 5. Access Control & Sharing
 
 ### Setlist public page (guest access — minimal) — `done`
 
 **Implementation note:** Implemented as part of the Share Links feature (see below). The
 music librarian creates a resource-scoped share token for a collection via
-`POST /api/shares`. The resulting public URL (`/public/share/{token}`) renders the
+`POST /api/shares`. The resulting public URL (`/share/{token}`) renders the
 collection's programme — title, composer, duration — without requiring login. Download
 links for attached documents are also included (a superset of the original spec).
 
@@ -451,7 +650,7 @@ scoped to the logged-in musician's ensemble memberships (`/my-parts`, `GET /api/
 
 **Implementation note:** Fully implemented. The `shares` table stores resource-scoped
 tokens (one token = one resource: a sheet instrumentation or a collection).
-`POST /api/shares` creates a token; `GET /public/share/{token}` is the unauthenticated
+`POST /api/shares` creates a token; `GET /api/public/shares/{token}` is the unauthenticated
 endpoint. The Angular `shares` page lists all tokens for the current user with copy-link
 and revoke actions. The `public-share` page renders the resource for unauthenticated
 visitors with download links. All share-link access is logged in `event_log` with the
@@ -486,13 +685,19 @@ existing `COLLECTION` share row and enforced in `ShareService`/`PublicShareResou
 
 ---
 
-### Collection visibility & cover — `planned`
+### Collection visibility & cover — `done`
 
-Add two missing fields to `SheetCollection` surfaced in the Claude Design mockup
-(`Create Flows (PrimeNG).html`). Full details in local planning notes (`plan_collection_fields.md`, not in the repo).
+**Done:** shipped in migration `V1.1.3__CollectionFields.sql` with a visibility dropdown and
+a cover colour picker in the collection form. **Leftovers:** `visibility` is stored but no read
+endpoint enforces it yet (part of [role-aware access](plans/rbac-role-aware-access.md));
+`coverImageId` exists, but no upload control sets it yet (tracked in
+[attachment metadata](plans/attachment-metadata.md)).
 
-- **visibility** — enum (`WHOLE_ENSEMBLE` / `ADMINS_ONLY` / `PRIVATE`); controls
-  who can see the collection. The design shows a "Whole ensemble" dropdown in the
+Added missing fields to `SheetCollection` surfaced in the Claude Design mockup
+(`Create Flows (PrimeNG).html`).
+
+- **visibility** — enum (`WHOLE_ENSEMBLE` / `ADMINS_ONLY` / `PRIVATE`); meant to control
+  who can see the collection (not enforced yet, see above). The design shows a "Whole ensemble" dropdown in the
   create dialog. Will interact with `CurrentUserService.getAccessibleEnsembleIds()`.
 - **coverColor** — string (hex or named swatch); displayed as an initial-based
   gradient tile in the collection list.
@@ -545,7 +750,7 @@ Can be implemented as an extension of the checkout/lending feature (Section 1) w
 ### Coverage breakdown enhancements — `planned`
 
 Extend the coverage engine to match the `Coverage Breakdown (PrimeNG).html` design.
-Full details in local planning notes (`plan_coverage_breakdown.md`, not in the repo).
+Task breakdown: [plan](plans/coverage-breakdown.md).
 
 - **Condition/substitute annotations** — surface `conditionPenalty` and
   `substituteFactor` as named fields on `VoiceCoverageDetail` (values already computed)
@@ -564,7 +769,7 @@ Full details in local planning notes (`plan_coverage_breakdown.md`, not in the r
 ### Classification queue — `planned`
 
 A batch inbox for working through a queue of unclassified documents. Shown in the
-Claude Design `Classify (PrimeNG).html`. Full details in local planning notes (`plan_classify_queue.md`, not in the repo).
+Claude Design `Classify (PrimeNG).html`. Scope and open questions: [plan](plans/classification-queue.md).
 
 The queue sits on top of the existing 2-step classify/apply workflow and adds:
 - Inbox tabs: Pending / Skipped / Done
@@ -585,7 +790,7 @@ plan file). This is a large standalone feature.
 ### Classification form enhancements — `planned`
 
 Enrich the existing 2-step classify/apply workflow with richer AI output and a more
-complete apply request. Full details in local planning notes (`plan_classify_enhancements.md`, not in the repo).
+complete apply request. Task breakdown: [plan](plans/classification-enhancements.md).
 
 - **Tags + notes** in `ClassificationApplyRequest` — both shown in the form but absent from the DTO
 - **Document type** (Part / Score / Solo) returned by AI analysis
@@ -622,8 +827,7 @@ Currently, coverage snapshots must be manually recomputed after changes. Impleme
 automatic invalidation (and optional recomputation) when a sheet or instrumentation is
 created, updated, or deleted.
 
-This is already noted as a known gap in the architecture (`instruments_and_ensembles.md`,
-Phase 3).
+This is already noted as a known gap in the [coverage concept](architecture/concepts/coverage.md).
 
 **Stakeholders:** S2 (Dirigent), S4 (Administrator)
 **Effort:** Medium
@@ -634,7 +838,7 @@ Phase 3).
 
 Add missing fields to `SheetMusicEntity` and related entities surfaced in the Claude
 Design mockup (`Sheet Detail (PrimeNG).html` / `Sheet Detail v2 (PrimeNG).html`).
-Full details in local planning notes (`plan_sheet_detail_fields.md`, not in the repo).
+Remaining attachment work: [plan](plans/attachment-metadata.md).
 
 **Sheet-level fields — done:**
 - **rightsStatus** — enum (`UNKNOWN` / `PUBLIC_DOMAIN` / `LICENSED` /
@@ -668,12 +872,15 @@ Full details in local planning notes (`plan_sheet_detail_fields.md`, not in the 
 
 ---
 
-### Instrument catalogue enrichment — `planned`
+### Instrument catalogue enrichment — `done`
 
-Add missing fields to the `Instrument` entity surfaced in the Claude Design mockup
-(`Create Flows (PrimeNG).html`). Full details in local planning notes (`plan_instrument_fields.md`, not in the repo).
+**Done:** all fields shipped in migration `V1.1.1__InstrumentFields.sql` (`InstrumentFamily`,
+default clef, `instrument_aliases`, catalogue section/position). See [Instruments](features/instruments.md).
 
-Fields to add:
+Added missing fields to the `Instrument` entity surfaced in the Claude Design mockup
+(`Create Flows (PrimeNG).html`).
+
+Fields added:
 - **family** — fixed enum (`BRASS` / `WOODWIND` / `STRING` / `PERCUSSION` /
   `KEYBOARD` / `VOICE` / `OTHER`). The `family` field was already anticipated
   (commented-out stub in `Instrument.java` / `CreateInstrument.java`) but never
@@ -827,6 +1034,11 @@ events are currently recorded:
 | `GEMA_SETLIST_GENERATED` | GEMA setlist xlsx generated |
 | `DOCUMENT_CLASSIFIED` | AI classification run on a document |
 | `DOCUMENT_CLASSIFICATION_APPLIED` | AI classification result applied to create entities |
+| `SHARE_CREATED` / `SHARE_REVOKED` | Share token created / revoked |
+| `SHARE_ACCESSED` | Shared resource accessed via a share token |
+| `SETLIST_AI_SUGGESTION_GENERATED` / `SETLIST_AI_TEXT_DRAFTED` | AI setlist assistant used (with token usage) |
+
+The [event log feature page](features/event-log.md) is the authoritative list.
 
 Each event captures: `occurredAt`, `userId` (OIDC subject), `username` (snapshotted
 `preferred_username` at event time), `eventType`, `entityType`, `entityId`, and a
@@ -857,19 +1069,91 @@ Once named user accounts exist, this log constitutes personal data:
 
 ---
 
+### Metadata lookup from external catalogues — `idea`
+
+Fill in title, composer, arranger, publisher, duration and difficulty grade from outside
+sources instead of typing them: IMSLP and MusicBrainz/Wikidata for older works and
+composer life dates, and publisher catalogues where an API or structured data exists.
+Results appear as suggestions in the existing [AI enrichment](features/ai-enrichment.md)
+dialog for the librarian to accept field by field, never applied silently.
+
+A lookup tool the AI enrichment can call fits the existing tool-grounded pattern.
+Composer death years from Wikidata also feed the
+[automatic rights hints](#automatic-rights-hints--idea).
+
+**Stakeholders:** S1 (music librarian)
+**Effort:** Medium (per-source adapters; publisher catalogues vary a lot)
+
+---
+
+### Generated parts by transposition (OMR) — `idea`
+
+A common coverage gap is "no Eb horn part, but there is an F horn part", or "no tenor
+horn part, but a baritone treble-clef part exists". Optical music recognition (e.g.
+Audiveris or oemer) can turn a clean scan into MusicXML, which can then be transposed and
+re-engraved (e.g. with Verovio) into the missing part.
+
+The coverage engine already knows substitute relationships; this would turn a
+substitute into a real sheet. The [recommendation solver](plans/coverage-breakdown.md)
+could then suggest "generating this part would move 12 sheets to PLAYABLE". It fits the
+design principle that derivatives (including an OMR tier) are generated on demand from one
+master scan.
+
+**Caveats:** OMR quality on old photocopies is mixed, so a generated part needs a review
+step before it's used. Only offered when the sheet's `rightsStatus` allows it, since
+creating a new part from a copyrighted arrangement is an adaptation.
+
+**Stakeholders:** S1 (music librarian), S2 (Dirigent)
+**Effort:** High (research spike first: OMR accuracy on our own scans)
+
+---
+
+### Sheet-music exchange between bands — `idea`
+
+The bigger version of [lending to partner ensembles](#lending-to-partner-ensembles--idea):
+an opt-in directory where SAM instances show which pieces they *physically* own, so that
+bands in a region can find and borrow sheets from each other instead of buying them
+again. Pieces are matched across instances by the existing content fingerprints, not
+just by title. Only metadata is shared, never files.
+
+Needs a small central directory service (or a federated protocol) and only pays off when
+several bands take part. A long-term vision, not a near-term feature.
+
+**Stakeholders:** S1 (music librarian), partner ensembles
+**Effort:** High
+
+---
+
+### SAM MCP server — `idea`
+
+Expose SAM's API as tools for Claude and other AI assistants via the Model Context
+Protocol, so that the librarian or conductor can ask, from their usual assistant:
+"which marches haven't we played in two years that the current line-up can play?",
+"prepare the GEMA list for last weekend", or "add these three pieces to the summer
+concert".
+
+API-first design and tool-grounded AI (no invented IDs) are already SAM's pattern, so this
+is mostly packaging: a small MCP module reusing the `api` REST client (like the `cli`
+module), with the user's own OIDC token so that access control applies unchanged.
+Write tools should require confirmation.
+
+**Stakeholders:** S1 (music librarian), S2 (Dirigent)
+**Effort:** Low–Medium
+
+---
+
 ## 7. UX & Discovery
 
 ### Sheets overview filter & bulk actions — `planned`
 
 Extend the sheet list API and Angular UI to match the filter toolbar and bulk actions
-shown in the Claude Design `Sheets Overview (PrimeNG).html`. Full details in
-local planning notes (`plan_sheets_overview.md`, not in the repo).
+shown in the Claude Design `Sheets Overview (PrimeNG).html`. Task breakdown: [plan](plans/sheets-overview.md).
 
 **Missing filter dimensions** (to add to `SheetFilterRequest`):
 - Coverage status filter (COMPLETE / PLAYABLE / INCOMPLETE, per ensemble)
 - Difficulty level filter (multi-select)
 - Duration range filter (min/max)
-- Tags filter (multi-select, AND or OR)
+- Tags filter: multi-select, AND or OR (a single-tag `tag` filter already exists)
 - "Has issues" flag (sheets with DAMAGED/LOST parts or INCOMPLETE coverage)
 
 **Missing sort:**
@@ -930,8 +1214,10 @@ features needed zero boilerplate beyond wrapping their existing buttons.
 
 ### Advanced combined search — `idea`
 
-A filter builder that combines multiple dimensions in a single query. Currently filters
-(genre, letter, coverage status) are independent and cannot be composed.
+A filter builder that combines multiple dimensions in a single query. Today genre, first
+letter, tag and favourite combine (AND), but only without a search term: as soon as the
+full-text query `q` is set, the other filters are ignored. Coverage status is shown per
+ensemble but can't be filtered on.
 
 Example query: *"All marches, difficulty 3–4, COMPLETE for Ensemble A, not performed
 in the last 2 years."*
@@ -998,7 +1284,7 @@ A visual/interaction redesign of SAM already exists as Claude Design mockups
 (`Hi-Fi Shell (PrimeNG).html`, `Sheets Overview (PrimeNG).html`, `Sheet Detail (PrimeNG).html`
 / `v2`, `Create Flows (PrimeNG).html`, `Coverage Breakdown (PrimeNG).html`,
 `Classify (PrimeNG).html`). So far these mockups have only been mined for **data model
-and feature gaps** (see Open Question #10 and the resulting `plan_*.md` planning notes, kept outside the repo) —
+and feature gaps** (see Open Question #10 and the resulting [implementation plans](plans/README.md)) —
 the improved **look & feel itself** (shell layout, page compositions, visual hierarchy,
 component styling) has not been implemented.
 
@@ -1029,6 +1315,23 @@ server-side persistence as an optional second step once auth is in place.
 
 ---
 
+### Search by mood or description — `idea`
+
+Semantic search with text embeddings (PostgreSQL `pgvector`, embeddings via the
+configured LangChain4j provider): find sheets with descriptions like "festive opener,
+about 3 minutes, not too hard" or "something calm for a church service", and show
+"similar pieces" on the sheet detail page and in the Explore view.
+
+Each sheet gets an embedding of its title, genre, style, notes, tags and (optionally)
+AI-written description, refreshed when the sheet changes. It complements, rather than
+replaces, the existing full-text, trigram and phonetic search. The AI setlist assistant
+could use it as an extra retrieval tool.
+
+**Stakeholders:** S2 (Dirigent), S1 (music librarian)
+**Effort:** Medium (pgvector extension, embedding job, search endpoint, UI)
+
+---
+
 ## 8. Open Questions
 
 These are unresolved decisions that will affect multiple features. They should be
@@ -1037,12 +1340,12 @@ answered before the relevant implementation work begins.
 | # | Question | Affects | Status |
 |---|----------|---------|--------|
 | 1 | Should a `Musician` user account link to the existing `Musician` entity, or be a separate `User` entity? | Auth, musician–instrument assignment, "my parts" view | **Resolved:** `userId` (OIDC subject) added to `Musician` — no separate User entity. External/historical musicians have `userId = null`. |
-| 2 | How is "selected content" for guests scoped — per-sheet flag, collection-based sharing, or ensemble-based? | Guest access, setlist public page | **Resolved:** Resource-scoped share tokens implemented (one token = one sheet instrumentation or collection). Public setlist/sheet pages live at `/public/share/{token}`. Open-URL anonymous access (no link) intentionally deferred. |
+| 2 | How is "selected content" for guests scoped — per-sheet flag, collection-based sharing, or ensemble-based? | Guest access, setlist public page | **Resolved:** Resource-scoped share tokens implemented (one token = one sheet instrumentation or collection). Public setlist/sheet pages live at `/share/{token}`. Open-URL anonymous access (no link) intentionally deferred. |
 | 3 | Should document-level visibility be independently configurable, or always inherited from the sheet/instrumentation? | Shared document links, guest access | Open |
 | 4 | Is anonymous guest access (no link, open public URL) ever desirable? | Guest access scope | Open |
-| 5 | Should coverage snapshots be invalidated automatically, or remain manual? | Coverage accuracy, performance | Open |
+| 5 | Should coverage snapshots be invalidated automatically, or remain manual? | Coverage accuracy, performance | Open: **blocks a Now item.** Proposed: automatic per-sheet recompute, async full recompute on voice changes ([plan](plans/coverage-snapshot-invalidation.md)) |
 | 6 | Should lending / checkout be tracked per instrumentation or per physical copy? (Relevant if multiple copies per instrumentation are ever supported) | Lending, physical archive | Open |
 | 7 | Which OIDC provider? Self-hosted (Keycloak) or SaaS (Auth0, Google)? | Auth implementation | **Resolved:** Self-hosted Keycloak 26. |
 | 8 | Should IP addresses be stored in the document access log, or omitted/anonymised? Requires GDPR/privacy policy decision. | Document access log | **Resolved: not stored.** `userId` (OIDC sub) + snapshotted `username` give unambiguous attribution; IP adds GDPR obligations without meaningful benefit in an ensemble context. |
-| 9 | What retention period for the document access log? (e.g. 12 months) | Document access log | Open |
-| 10 | All Claude Design files have now been reviewed for data model gaps. Resulting plans saved to local planning notes (`plan_*.md`, outside the repo) and added to the roadmap. | Multiple | **Resolved** |
+| 9 | What retention period for the document access log? (e.g. 12 months) | Document access log | Open: **blocks a Now item.** Proposed: 12 months, configurable ([plan](plans/event-log-retention.md)) |
+| 10 | All Claude Design files have now been reviewed for data model gaps. Resulting plans are in [implementation plans](plans/README.md) (open ones) and the roadmap. | Multiple | **Resolved** |
