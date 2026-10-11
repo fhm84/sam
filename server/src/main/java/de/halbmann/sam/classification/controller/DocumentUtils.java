@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import javax.imageio.ImageIO;
 import lombok.experimental.UtilityClass;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -28,6 +29,9 @@ import org.apache.pdfbox.tools.imageio.ImageIOUtil;
 public class DocumentUtils {
 
     static final int dpi = 90; // DPI for rendering the PDF
+
+    // Upper bound for uploaded images (photos/scans) — roughly what the PDF path produces for A4 at 90 dpi
+    static final int MAX_IMAGE_WIDTH = 1024;
 
     /**
      * Extracts plain text from the first page of a PDF using PDFTextStripper.
@@ -54,6 +58,37 @@ public class DocumentUtils {
 
             ImageIOUtil.writeImage(combined, "png", outputStream, dpi);
         }
+    }
+
+    /**
+     * Prepares an uploaded image (photo/scan) for the vision model the same way {@link #pdfToImage}
+     * does for PDFs: downscales it to at most {@link #MAX_IMAGE_WIDTH} pixels wide and keeps only the
+     * top and bottom strips, so the full page is never sent to the LLM.
+     *
+     * @throws IOException if the image format cannot be decoded
+     */
+    public static void imageToCroppedPng(InputStream imageStream, OutputStream outputStream) throws IOException {
+        BufferedImage image = ImageIO.read(imageStream);
+        if (image == null) {
+            throw new IOException("Unsupported image format");
+        }
+
+        BufferedImage combined = cropImage(downscale(image, MAX_IMAGE_WIDTH));
+
+        ImageIOUtil.writeImage(combined, "png", outputStream, dpi);
+    }
+
+    static BufferedImage downscale(BufferedImage image, int maxWidth) {
+        if (image.getWidth() <= maxWidth) {
+            return image;
+        }
+        int height = Math.max(1, (int) Math.round(image.getHeight() * (double) maxWidth / image.getWidth()));
+        BufferedImage scaled = new BufferedImage(maxWidth, height, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = scaled.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g.drawImage(image, 0, 0, maxWidth, height, null);
+        g.dispose();
+        return scaled;
     }
 
     static BufferedImage cropImage(BufferedImage bim) {

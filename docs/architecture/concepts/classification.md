@@ -4,8 +4,8 @@ LangChain4j with `@RegisterAiService` provides AI-based classification of upload
 
 ## Step 1 — Classify (`POST /documents/{id}/classify`)
 
-1. **Text extraction (PDFBox)** — For native PDFs, text is extracted first (fast, free). If fewer than 50 printable characters are found, the document is treated as scanned/image-only.
-2. **Vision fallback** — Scanned PDFs and images are converted to PNG and sent to an LLM (Ollama, OpenAI, or Vertex AI Gemini — configurable) using the vision API.
+1. **Text extraction (PDFBox)** — For native PDFs, the text of page 1 is extracted first (fast, free). If fewer than 50 printable characters are found, the document is treated as scanned/image-only.
+2. **Vision fallback** — Scanned PDFs and images are converted to a grayscale PNG and sent to an LLM (Ollama, OpenAI, or Vertex AI Gemini — configurable) using the vision API. Only page 1 is used, uploaded images are downscaled to at most 1024 px wide, and only the **top 20 % and bottom 15 %** (where title, composer, arranger and publisher usually sit) are kept — the full page never leaves the server. Images ImageIO cannot decode (e.g. HEIC, WebP) are rejected with 400 rather than sent unprocessed.
 3. **Structured metadata extraction** — A `SheetAnalyzerResult` is returned containing title, composer, arranger, genre, year, instrumentation details, etc.
 4. **Entity pre-matching** — Composer and arranger names are matched against existing musicians; existing sheets are matched by exact title; instruments are matched via pg_trgm trigram similarity (threshold 0.3, up to 5 candidates with scores).
 5. **Pre-filled suggestion (Option A)** — A `ClassificationApplyRequest` is built automatically from the AI result and best-match candidates. This is returned to the frontend for user review.
