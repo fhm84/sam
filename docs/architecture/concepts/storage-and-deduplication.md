@@ -14,6 +14,7 @@ Key classes: `FingerprintService` / `FingerprintFactory`.
 
 ## Related
 
+- [ADR-0011](../decisions/adr-0011-stored-document-encryption.md) — opt-in encryption of stored documents (planned: [hardening](../../plans/document-store-hardening.md), [encryption](../../plans/storage-encryption.md))
 - [Building Blocks](../building-blocks.md) — the `storage-sdk` / `storage-local` / `storage-s3` modules
 - [Data Model](../data-model.md) — `documents` and `attachments` entities
 - [Documents & Attachments feature](../../features/documents.md)

@@ -20,6 +20,8 @@ Conventions:
 | [Role-aware access](rbac-role-aware-access.md) | Full RBAC (Phase 4) | — |
 | [Coverage snapshot invalidation](coverage-snapshot-invalidation.md) | Automatic coverage snapshot invalidation | Open question #5 |
 | [Event log retention](event-log-retention.md) | Document access log (pending part) | Open question #9 |
+| [Document store hardening](document-store-hardening.md) | Document store hardening | — |
+| [Storage encryption](storage-encryption.md), phase A only | Encryption of stored documents (backup encryption) | — |
 
 ## Next: everyday use for the music librarian
 
@@ -36,6 +38,7 @@ Conventions:
 |---|---|
 | [Attachment metadata](attachment-metadata.md) | Sheet metadata enrichment (attachment part) |
 | [Classification queue](classification-queue.md) | Classification queue |
+| [Storage encryption](storage-encryption.md), phase B | Encryption of stored documents (in-app, opt-in) |
 
 Most plans were derived from the Claude Design mockups (`*.html` handoff files, not in
 the repo). They capture the data-model and feature gaps those mockups showed.

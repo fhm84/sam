@@ -31,6 +31,11 @@ unprioritised backlog.
 3. [Event log retention + own-history view](#document-access-log--partial)
    → [plan](plans/event-log-retention.md) (needs open question #9)
 4. Instrumentation-count search filter (PR #96, ready to merge)
+5. [Document store hardening](#document-store-hardening--planned): fixes silent file
+   corruption on uploads with the same file name and broken S3 uploads
+   → [plan](plans/document-store-hardening.md)
+6. Encrypted backups (phase A of [encryption of stored documents](#encryption-of-stored-documents--planned))
+   → [plan](plans/storage-encryption.md)
 
 **Next: everyday use for the music librarian**
 
@@ -48,6 +53,8 @@ unprioritised backlog.
   [mobile quick-lookup view](#mobile-first-quick-lookup-view--idea),
   [thumbnail preview](#thumbnail-preview--idea)
 - Attachment kind and versioning → [plan](plans/attachment-metadata.md)
+- [In-app encryption of stored documents](#encryption-of-stored-documents--planned) (opt-in, phase B)
+  → [plan](plans/storage-encryption.md)
 - [Classification queue](#classification-queue--planned) → [plan](plans/classification-queue.md),
   then [aligning the UI with the Claude Design](#align-ui-with-the-improved-claude-design--idea)
 
@@ -831,6 +838,37 @@ This is already noted as a known gap in the [coverage concept](architecture/conc
 
 **Stakeholders:** S2 (Dirigent), S4 (Administrator)
 **Effort:** Medium
+
+---
+
+### Document store hardening — `planned`
+
+Fix `DocumentStore.upload`: leftover temp files named after the uploaded file can
+silently corrupt later uploads with the same file name, and uploads to S3 fail because MIME
+detection reads a local file. Also: storage paths no longer derived from the content
+hash, file deletion only after commit, and an integrity check that compares stored
+files with their recorded SHA-256. Prerequisite for
+[encryption of stored documents](#encryption-of-stored-documents--planned).
+
+**Stakeholders:** S1 (music librarian), S4 (Administrator)
+**Effort:** Small to medium
+→ [plan](plans/document-store-hardening.md)
+
+---
+
+### Encryption of stored documents — `planned`
+
+Protect the stored sheet music against copies of the volume, the bucket or the
+backups. Phase A encrypts the backup archives (ops only). Phase B adds opt-in in-app
+encryption (`sam.storage.encryption.enabled`): a decorator around the storage provider,
+Tink streaming AEAD, with the key kept outside the database and the backups. It does not
+protect against licence leaks by legitimate users; for that see
+[watermarking](#watermarking-on-shared--downloaded-documents--idea).
+
+**Stakeholders:** S4 (Administrator), S1 (music librarian)
+**Effort:** Medium
+**Depends on:** [Document store hardening](#document-store-hardening--planned)
+→ [plan](plans/storage-encryption.md) · [ADR-0011](architecture/decisions/adr-0011-stored-document-encryption.md)
 
 ---
 
