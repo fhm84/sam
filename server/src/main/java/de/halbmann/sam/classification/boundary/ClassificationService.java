@@ -3,6 +3,7 @@ package de.halbmann.sam.classification.boundary;
 import de.halbmann.sam.EnvConsts;
 import de.halbmann.sam.classification.controller.DocumentUtils;
 import de.halbmann.sam.classification.entity.SheetAnalyzerResult;
+import de.halbmann.sam.core.exception.ValidationException;
 import dev.langchain4j.data.image.Image;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
@@ -71,7 +72,17 @@ public class ClassificationService {
     }
 
     public SheetAnalyzerResult analyzeImage(InputStream fileInputStream) {
-        return time("vision", () -> analyzeImageInternal(fileInputStream));
+        // Crop like the PDF vision path so the full page never leaves the server
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            try {
+                DocumentUtils.imageToCroppedPng(fileInputStream, baos);
+            } catch (IOException e) {
+                throw new ValidationException("Cannot classify document: " + e.getMessage());
+            }
+            return time("vision", () -> analyzeImageInternal(new ByteArrayInputStream(baos.toByteArray())));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private SheetAnalyzerResult analyzeImageInternal(InputStream fileInputStream) {

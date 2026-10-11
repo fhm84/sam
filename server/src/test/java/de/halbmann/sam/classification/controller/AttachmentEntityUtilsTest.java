@@ -3,6 +3,7 @@ package de.halbmann.sam.classification.controller;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -137,5 +138,45 @@ class AttachmentEntityUtilsTest {
         assertThat("bottom region should be dark (from original bottom 15%)", bottomPixel, is(valueBlue));
         int firstBottomPixel = cropped.getRGB(width / 2, 200) & 0xFF;
         assertThat("bottom region should be dark (from original bottom 15%)", firstBottomPixel, is(valueBlue));
+    }
+
+    @Test
+    void shouldDownscaleAndCropLargeImage() throws IOException {
+        // A phone photo of a full page: 3000x4000, larger than MAX_IMAGE_WIDTH
+        BufferedImage photo = new BufferedImage(3000, 4000, BufferedImage.TYPE_INT_RGB);
+        ByteArrayOutputStream jpeg = new ByteArrayOutputStream();
+        ImageIO.write(photo, "jpg", jpeg);
+
+        ByteArrayOutputStream pngOutput = new ByteArrayOutputStream();
+        DocumentUtils.imageToCroppedPng(new ByteArrayInputStream(jpeg.toByteArray()), pngOutput);
+
+        BufferedImage result = ImageIO.read(new ByteArrayInputStream(pngOutput.toByteArray()));
+        assertNotNull(result, "imageToCroppedPng should produce a valid PNG");
+        int scaledHeight = Math.round(4000 * (float) DocumentUtils.MAX_IMAGE_WIDTH / 3000);
+        int expectedHeight = (int) (scaledHeight / 100.0 * 20) + (int) (scaledHeight / 100.0 * 15);
+        assertThat(result.getWidth(), is(DocumentUtils.MAX_IMAGE_WIDTH));
+        assertThat("only top 20% + bottom 15% should remain", result.getHeight(), is(expectedHeight));
+    }
+
+    @Test
+    void shouldNotUpscaleSmallImage() throws IOException {
+        BufferedImage small = new BufferedImage(200, 1000, BufferedImage.TYPE_INT_RGB);
+        ByteArrayOutputStream png = new ByteArrayOutputStream();
+        ImageIO.write(small, "png", png);
+
+        ByteArrayOutputStream pngOutput = new ByteArrayOutputStream();
+        DocumentUtils.imageToCroppedPng(new ByteArrayInputStream(png.toByteArray()), pngOutput);
+
+        BufferedImage result = ImageIO.read(new ByteArrayInputStream(pngOutput.toByteArray()));
+        assertThat(result.getWidth(), is(200));
+        assertThat(result.getHeight(), is(350));
+    }
+
+    @Test
+    void shouldRejectUndecodableImage() {
+        byte[] garbage = "definitely not an image".getBytes();
+        assertThrows(
+                IOException.class,
+                () -> DocumentUtils.imageToCroppedPng(new ByteArrayInputStream(garbage), new ByteArrayOutputStream()));
     }
 }
