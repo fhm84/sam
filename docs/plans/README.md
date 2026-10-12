@@ -39,6 +39,7 @@ Conventions:
 | [Attachment metadata](attachment-metadata.md) | Sheet metadata enrichment (attachment part) |
 | [Classification queue](classification-queue.md) | Classification queue |
 | [Storage encryption](storage-encryption.md), phase B | Encryption of stored documents (in-app, opt-in) |
+| [Tailwind CSS v4 upgrade](tailwind-v4.md) | Tailwind CSS v4 upgrade |
 
 Most plans were derived from the Claude Design mockups (`*.html` handoff files, not in
 the repo). They capture the data-model and feature gaps those mockups showed.

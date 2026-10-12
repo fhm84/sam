@@ -57,6 +57,8 @@ unprioritised backlog.
   → [plan](plans/storage-encryption.md)
 - [Classification queue](#classification-queue--planned) → [plan](plans/classification-queue.md),
   then [aligning the UI with the Claude Design](#align-ui-with-the-improved-claude-design--idea)
+- [Tailwind CSS v4 upgrade](#tailwind-css-v4-upgrade--planned) (maintenance, replaces Dependabot PR #120)
+  → [plan](plans/tailwind-v4.md)
 
 **Favourites from the 2026-10 idea round** (not yet scheduled; the other ten ideas from that
 round are in their sections too, as new `idea` entries or as extensions of existing ones)
@@ -869,6 +871,21 @@ protect against licence leaks by legitimate users; for that see
 **Effort:** Medium
 **Depends on:** [Document store hardening](#document-store-hardening--planned)
 → [plan](plans/storage-encryption.md) · [ADR-0011](architecture/decisions/adr-0011-stored-document-encryption.md)
+
+---
+
+### Tailwind CSS v4 upgrade — `planned`
+
+Move the Angular UI from Tailwind 3.4 to 4.x as one reviewed change. It clears the
+Tailwind 3 build-time advisories (`braces`, `micromatch`, `postcss-selector-parser`),
+fixes the `min-*`/`max-*` breakpoint variants that don't work today, and replaces the
+PostCSS config Angular never read. A trial run showed the official upgrade tool's
+output builds but silently drops most utilities, so the plan adds a build guard and a
+visual before/after check.
+
+**Stakeholders:** S4 (Administrator)
+**Effort:** Small
+→ [plan](plans/tailwind-v4.md)
 
 ---
 
