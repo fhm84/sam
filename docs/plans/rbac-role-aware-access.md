@@ -16,7 +16,8 @@ should see. Writes are already protected by `@RolesAllowed`, but reads are not s
 - `MusiciansResourceImpl.findMusicians` returns `contact.email`, `contact.mobile` and
   `contact.notes` to every authenticated user, although the roadmap describes notes as
   "admin-visible only".
-- `SharesResourceImpl.create` has no role check, so any user can create a public share link.
+- ~~`SharesResourceImpl.create` has no role check, so any user can create a public share link.~~
+  Fixed in d2d1646: creating requires `music_librarian` or `admin`.
 - `AuthService` (`core/auth/auth.service.ts`) already exposes `hasRole()` and `isAdmin`
   from the token's `realm_access.roles`, which is the building block for the UI work.
 
@@ -27,7 +28,7 @@ should see. Writes are already protected by `@RolesAllowed`, but reads are not s
 | 1 | **Backend read audit**: go through every `*ResourceImpl` read method and decide per endpoint: any user / librarian+admin / admin. Record the result in `docs/features/api-surface.md`. | pending |
 | 2 | **Event log**: restrict `EventLogResource.find` to `admin` (librarian too, if wanted). The self-service "my own access history" view is part of [event log retention](event-log-retention.md). | pending |
 | 3 | **Musician contact data**: hide `email` / `mobile` / `notes` from non-librarian callers. Either use a separate DTO or have the mapper null the fields, decided via `CurrentUserService.hasRole()`. | pending |
-| 4 | **Share creation**: restrict `create` / `revoke` to librarian+admin (or allow musicians but only for resources they can access; decide). | pending |
+| 4 | **Share creation**: restrict `create` to librarian+admin. Decided: listing and revoking stay open to every authenticated user, scoped to their own shares (d2d1646). | done |
 | 5 | **Role route guard**: add a `roleGuard(...roles)` in `core/auth/` and put it on `admin/*`, `uploads`, `shares` (as task 1 decides). | pending |
 | 6 | **Menu filtering**: give menu items an optional `roles` list in `app-menu.ts` and filter them through `AuthService.hasRole()`. | pending |
 | 7 | **Action visibility**: hide create/edit/delete buttons for users without write roles (sheets, collections, musicians, instrumentations, documents). | pending |

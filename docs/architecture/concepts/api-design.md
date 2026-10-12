@@ -30,6 +30,23 @@ public InstrumentationsResource instrumentations(String sheetId) {
 @PathParam("sheetId") String sheetId;
 ```
 
+## Error Responses
+
+Errors are returned as an `ErrorResponse` (`status`, `error`, `message`) by the exception
+mappers in `server/.../api/impl/exception/`:
+
+| Exception | Status | When |
+|-----------|--------|------|
+| `ValidationException` | 400 | Invalid request parameters or content (e.g. an image that cannot be decoded for classification) |
+| `IllegalArgumentException` from `UUID.fromString` | 400 | Malformed ID in the path; any other `IllegalArgumentException` is a bug and stays a logged 500 |
+| `EntityNotFoundException` | 404 | Referenced entity does not exist |
+| `ConflictException` | 409 | The request conflicts with existing data (e.g. deleting a document that is still linked, or a musician who is still referenced) |
+| `StorageException` | 500 | The file store failed |
+
+Services throw these exceptions rather than building JAX-RS `Response`s. Some resource methods
+still return a bare status without a body (e.g. 400/404 in `DocumentsResourceImpl` and
+`PublicShareResourceImpl`), and a few throw JAX-RS `NotFoundException` directly.
+
 ## Related
 
 - [Building Blocks](../building-blocks.md) — module dependency graph
