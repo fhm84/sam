@@ -24,7 +24,7 @@ unprioritised backlog.
 **Now: before go-live** (real musicians will log in, and the event log will hold personal data)
 
 1. [Role-aware access](#full-role-based-access-control-rbac--in-progress): menu and route
-   guarding, and scoping read endpoints (event log, musician contact data, share creation)
+   guarding, and scoping read endpoints (event log, musician contact data)
    → [plan](plans/rbac-role-aware-access.md)
 2. [Automatic coverage snapshot invalidation](#automatic-coverage-snapshot-invalidation--planned)
    → [plan](plans/coverage-snapshot-invalidation.md) (needs open question #5)
