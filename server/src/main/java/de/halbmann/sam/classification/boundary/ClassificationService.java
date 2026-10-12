@@ -73,16 +73,13 @@ public class ClassificationService {
 
     public SheetAnalyzerResult analyzeImage(InputStream fileInputStream) {
         // Crop like the PDF vision path so the full page never leaves the server
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            try {
-                DocumentUtils.imageToCroppedPng(fileInputStream, baos);
-            } catch (IOException e) {
-                throw new ValidationException("Cannot classify document: " + e.getMessage());
-            }
-            return time("vision", () -> analyzeImageInternal(new ByteArrayInputStream(baos.toByteArray())));
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            DocumentUtils.imageToCroppedPng(fileInputStream, baos);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ValidationException("Cannot classify document: " + e.getMessage(), e);
         }
+        return time("vision", () -> analyzeImageInternal(new ByteArrayInputStream(baos.toByteArray())));
     }
 
     private SheetAnalyzerResult analyzeImageInternal(InputStream fileInputStream) {
