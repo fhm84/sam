@@ -11,10 +11,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Regression test for the ensemble voices sub-resource: the Angular voice form leaves {@code
- * weight} {@code null} when the user doesn't fill it in (no required validator), and that literal
- * JSON {@code null} used to NPE while Yasson tried to unbox it into what was a primitive {@code
- * double} field on {@link de.halbmann.sam.api.entity.ensembles.CreateEnsembleVoice} /
+ * Regression test for the ensemble voices sub-resource: the Angular voice form leaves
+ * {@code weight} {@code null} when the user doesn't fill it in (no required validator), and that literal
+ * JSON {@code null} used to NPE while Yasson tried to unbox it into what was a primitive
+ * {@code double} field on {@link de.halbmann.sam.api.entity.ensembles.CreateEnsembleVoice} /
  * {@link de.halbmann.sam.api.entity.ensembles.EnsembleVoice}, returning a 500 instead of applying
  * a sensible default.
  */

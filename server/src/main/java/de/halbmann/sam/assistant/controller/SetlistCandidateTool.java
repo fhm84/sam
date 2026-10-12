@@ -17,8 +17,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
- * Tool for the AI setlist assistant to search the real repertoire. Only sheets with {@code
- * COMPLETE} or {@code PLAYABLE} coverage for the request's ensemble are returned — the LLM never
+ * Tool for the AI setlist assistant to search the real repertoire. Only sheets with
+ * {@code COMPLETE} or {@code PLAYABLE} coverage for the request's ensemble are returned — the LLM never
  * sees or picks sheets the ensemble cannot actually perform, and it never chooses which ensemble
  * to search against (see {@link SetlistAssistantContext}). Every served sheet ID is recorded in
  * the request context so the final suggestions can be validated against what the tool actually

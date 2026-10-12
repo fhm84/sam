@@ -12,8 +12,8 @@ import org.junit.jupiter.api.Test;
  *
  * <p>Tests authentication enforcement and the empty-response path when no musician record is
  * linked to the authenticated user. OIDC is disabled in the test profile; {@code @TestSecurity}
- * provides mock identities. Because {@code @TestSecurity} does not inject a real JWT, {@code
- * CurrentUserService.getUserId()} returns {@code null}, which causes {@code MyPartsService} to
+ * provides mock identities. Because {@code @TestSecurity} does not inject a real JWT,
+ * {@code CurrentUserService.getUserId()} returns {@code null}, which causes {@code MyPartsService} to
  * return an empty result immediately without any database access.
  */
 @QuarkusTest

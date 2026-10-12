@@ -22,7 +22,6 @@ package de.halbmann.sam.api.entity.sheets;
  *   <li>{@code Genre.SUITE} + {@code Style.SWING}</li>
  *   <li>{@code Genre.CONCERT_WORK} + {@code Style.CONTEMPORARY}</li>
  * </ul>
- * </p>
  *
  * <p>
  * Contextual information such as target audience, performance occasion, or

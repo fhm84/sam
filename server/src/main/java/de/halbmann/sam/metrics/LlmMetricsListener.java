@@ -9,8 +9,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 /**
- * Captures LLM token usage and request metrics via the standard langchain4j {@link
- * ChatModelListener} interface. quarkus-langchain4j auto-discovers CDI beans implementing this
+ * Captures LLM token usage and request metrics via the standard langchain4j
+ * {@link ChatModelListener} interface. quarkus-langchain4j auto-discovers CDI beans implementing this
  * interface and registers them with every chat model.
  *
  * <p>Metrics published:
