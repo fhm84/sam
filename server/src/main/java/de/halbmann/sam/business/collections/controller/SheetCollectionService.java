@@ -262,6 +262,8 @@ public class SheetCollectionService {
         // 0..N values don't collide with existing ones while rows are being updated one by one
         // (the join table has a PK on (sheet_collections_id, items_order) that enforces
         // uniqueness per statement, so a single-pass update can hit transient duplicates).
+        // Container-managed EntityManager: closing it is the container's job, not ours
+        @SuppressWarnings("PMD.CloseResource")
         var em = collectionItemRepository.getEntityManager();
         UUID collUUID = UUID.fromString(collectionId);
         int offset = orderedIds.size() + 1000;
