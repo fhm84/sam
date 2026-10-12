@@ -14,10 +14,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ExploreShelves {
 
+    /** Short pieces, usable as warm-ups, encores, or to fit one more piece into a program. */
     List<SheetMusicSearchResult> quickFillers = new ArrayList<>();
 
+    /** Long pieces, usable as closers, overtures, or medleys. */
     List<SheetMusicSearchResult> bigFinishes = new ArrayList<>();
 
+    /** Sheets added recently, newest first. */
     List<SheetMusicSearchResult> recentlyAdded = new ArrayList<>();
 
     /** Most setlist appearances within the last 12 months. */

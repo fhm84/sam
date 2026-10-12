@@ -4,6 +4,8 @@ import de.halbmann.sam.api.entity.instruments.Clef;
 import de.halbmann.sam.api.entity.sheets.NotationType;
 
 /**
+ * Sheet metadata detected by the AI analyzer from an uploaded document.
+ *
  * @param title             The title of the music sheet/piece.
  * @param subtitle          (Optional) Subtitle of the piece.
  * @param publisher         The publisher of the music sheet.
@@ -13,6 +15,7 @@ import de.halbmann.sam.api.entity.sheets.NotationType;
  * @param yearOfComposition Year of composition.
  * @param edition           Edition name.
  * @param iswc              International Standard Musical Work Code
+ * @param instrumentation   The instrument part detected on the sheet.
  */
 public record SheetAnalyzerResult(
         String title,
@@ -27,6 +30,8 @@ public record SheetAnalyzerResult(
         InstrumentationAnalyzerResult instrumentation) {
 
     /**
+     * Instrument part detected on the sheet.
+     *
      * @param instrumentName Instrument name (e.g. Trumpet, Violin, Bass)
      * @param partLabel      The part label (for example: '2. Bass in C', or 'Solo Trumpet in Bb')
      * @param partNumber     The part number/label (for example: '2' for 2. Bass, or even '3rd' or 'Solo')

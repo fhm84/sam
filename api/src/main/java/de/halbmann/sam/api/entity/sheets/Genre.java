@@ -22,7 +22,6 @@ package de.halbmann.sam.api.entity.sheets;
  *   <li>A multi-movement jazz suite &rarr; {@code SUITE}</li>
  *   <li>A film music medley &rarr; {@code FILM_MUSIC}</li>
  * </ul>
- * </p>
  *
  * <p>
  * Stylistic characteristics (e.g. traditional, modern, swing) MUST be modeled

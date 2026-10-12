@@ -61,9 +61,9 @@ class AttachmentEntityUtilsTest {
     }
 
     /**
-     * - Programmatically creates an A4 PDF with three colored bands (red top 20%, white middle, blue bottom 15%)
-     * - Runs pdfToImage and reads back the resulting PNG
-     * - Verifies the output dimensions: width matches the full page, height equals top 20% + bottom 15% of the rendered page
+     * Creates an A4 PDF with three colored bands (red top 20%, white middle, blue bottom 15%), runs
+     * {@code pdfToImage} on it and checks the resulting PNG: its width matches the full page and its height equals
+     * the top 20% plus the bottom 15% of the rendered page.
      */
     @Test
     void shouldConvertPdfToImageWithCorrectCroppedDimensions() throws IOException {
@@ -92,9 +92,9 @@ class AttachmentEntityUtilsTest {
     }
 
     /**
-     * - Creates a synthetic 200x1000 grayscale image with black top 20%, white middle, black bottom 15%
-     * - Calls cropImage and verifies the output is 200x350 (20% + 15%)
-     * - Samples pixels to confirm the top region contains the original top band and the bottom region contains the original bottom band
+     * Crops a synthetic 200x1000 grayscale image (black top 20%, white middle, black bottom 15%) with
+     * {@code cropImage}, verifies the output is 200x350 (20% + 15%) and samples pixels to confirm that the top and
+     * bottom regions contain the original top and bottom bands.
      */
     @Test
     void shouldCropImagePreservingTopAndBottomRegions() throws IOException {

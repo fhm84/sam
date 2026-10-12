@@ -76,7 +76,6 @@ public class SheetMusic {
      *   <li>filtering and search</li>
      *   <li>domain validation rules</li>
      * </ul>
-     * </p>
      *
      * <p>
      * Stylistic characteristics MUST be expressed using {@link Style}, and
@@ -100,7 +99,6 @@ public class SheetMusic {
      *   <li>A contemporary concert work &rarr; {@code Style.CONTEMPORARY}</li>
      *   <li>A jazz-influenced suite &rarr; {@code Style.SWING}</li>
      * </ul>
-     * </p>
      *
      * <p>
      * Styles are subject to domain validation rules and may be restricted or

@@ -91,6 +91,8 @@ public class CollectionTocService {
     }
 
     /**
+     * One row of the rendered table of contents.
+     *
      * @param title null signals a TEXT item — rendered full-width in the template
      */
     public record TocRow(String identifier, String title, String subtitle, String genre, String duration) {

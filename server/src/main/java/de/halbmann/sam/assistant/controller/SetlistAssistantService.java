@@ -19,8 +19,8 @@ import lombok.extern.slf4j.Slf4j;
  * Orchestrates the AI program builder. Authorization (whether the caller may access the target
  * ensemble) is the resource layer's responsibility, matching how {@code CurrentUserService} is
  * used elsewhere in the codebase — this service assumes {@code ensembleId} has already been
- * checked and trusts it, but never lets the LLM choose or override it (see {@link
- * SetlistAssistantContext}).
+ * checked and trusts it, but never lets the LLM choose or override it (see
+ * {@link SetlistAssistantContext}).
  */
 @Slf4j
 @ApplicationScoped

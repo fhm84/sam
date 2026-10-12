@@ -7,7 +7,7 @@ import lombok.Data;
  * Generic wrapper for a paginated response (data list) including some metadata like size and
  * totalCount.
  *
- * @param <T>
+ * @param <T> the type of the elements in {@code data}
  */
 @Data
 public class PaginatedResponse<T> {

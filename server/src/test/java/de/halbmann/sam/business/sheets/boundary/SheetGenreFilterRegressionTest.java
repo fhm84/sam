@@ -15,8 +15,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * {@code genre} filters ({@code GET /api/sheets/letters?genre=...} and {@code GET
- * /api/sheets?genre=...}) must compare against the {@link Genre} enum directly, not its raw
+ * {@code genre} filters ({@code GET /api/sheets/letters?genre=...} and
+ * {@code GET /api/sheets?genre=...}) must compare against the {@link Genre} enum directly, not its raw
  * String name — {@code SheetMusicEntity.genre} is a basic-valued enum column, not an
  * association, and Hibernate rejects a String bound where a Genre is expected. Regression test
  * for two related bugs: {@code s.genre.name = :genre} (invalid attribute path) and binding the
