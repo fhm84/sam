@@ -8,11 +8,13 @@ import de.halbmann.sam.business.documents.boundary.DocumentRepository;
 import de.halbmann.sam.business.documents.entity.DocumentEntity;
 import de.halbmann.sam.core.storage.malware.VirusScanner;
 import de.halbmann.sam.core.storage.upload.UploadPolicy;
+import de.halbmann.storage.api.FileSystemWrapper;
 import de.halbmann.storage.local.LocalFileSystemWrapper;
 import jakarta.enterprise.inject.Instance;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -125,5 +127,50 @@ class DocumentStoreTempFileTest {
         fs.save("f.txt", new ByteArrayInputStream("AB".getBytes(StandardCharsets.UTF_8)));
 
         assertEquals("AB", Files.readString(storageRoot.resolve("f.txt")));
+    }
+
+    @Test
+    void upload_worksWithoutLocalFile_likeS3() throws Exception {
+        documentStore.filesystem = new NoResolveFileSystem(new LocalFileSystemWrapper(storageRoot));
+
+        DocumentEntity doc = upload("part.pdf", "%PDF-1.4\n% part\n%%EOF\n");
+
+        assertEquals("application/pdf", doc.getMimeType());
+        assertTrue(doc.getPath().endsWith(".pdf"));
+        assertTrue(tempFiles().isEmpty());
+    }
+
+    /** Delegates everything except {@code resolve}, which S3 cannot back with a real local file. */
+    private record NoResolveFileSystem(FileSystemWrapper delegate) implements FileSystemWrapper {
+
+        @Override
+        public Path resolve(String relativePath) {
+            throw new UnsupportedOperationException("resolve() must not be used to access file content");
+        }
+
+        @Override
+        public OutputStream openForWrite(String relativePath) throws IOException {
+            return delegate.openForWrite(relativePath);
+        }
+
+        @Override
+        public InputStream openForRead(String relativePath) throws IOException {
+            return delegate.openForRead(relativePath);
+        }
+
+        @Override
+        public boolean exists(String relativePath) {
+            return delegate.exists(relativePath);
+        }
+
+        @Override
+        public void move(String sourceRelativePath, String targetRelativePath) throws IOException {
+            delegate.move(sourceRelativePath, targetRelativePath);
+        }
+
+        @Override
+        public void delete(String relativePath) throws IOException {
+            delegate.delete(relativePath);
+        }
     }
 }
