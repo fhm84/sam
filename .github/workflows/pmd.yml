@@ -72,7 +72,7 @@ jobs:
           set -euo pipefail
           ./pmd-bin-"${PMD_VERSION}"/bin/pmd check \
             -d $PMD_SOURCE_PATH \
-            -R rulesets/java/quickstart.xml \
+            -R .github/pmd/ruleset.xml \
             --aux-classpath "file:$PWD/pmd-aux-classpath.txt" \
             -f sarif \
             -r pmd-report.sarif \
