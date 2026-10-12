@@ -12,6 +12,7 @@ import io.quarkus.narayana.jta.QuarkusTransaction;
 import io.quarkus.test.junit.QuarkusMock;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.security.TestSecurity;
+import jakarta.transaction.Status;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.util.concurrent.ThreadLocalRandom;
@@ -44,7 +45,7 @@ class ClassifyWithoutTransactionTest {
     void fakeTheLlm() {
         ClassificationService llm = mock(ClassificationService.class);
         when(llm.analyzeImage(any())).thenAnswer(inv -> {
-            transactionActiveDuringLlmCall.set(QuarkusTransaction.isActive());
+            transactionActiveDuringLlmCall.set(QuarkusTransaction.getStatus() != Status.STATUS_NO_TRANSACTION);
             return new SheetAnalyzerResult("Fake Title", null, null, null, null, null, null, null, null, null);
         });
         QuarkusMock.installMockForType(llm, ClassificationService.class);
