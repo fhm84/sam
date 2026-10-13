@@ -17,6 +17,7 @@ import de.halbmann.sam.api.entity.sheets.TagCount;
 import de.halbmann.sam.business.collections.controller.SheetCollectionService;
 import de.halbmann.sam.business.documents.controller.AttachmentLinkService;
 import de.halbmann.sam.business.ensembles.controller.CoverageSnapshotService;
+import de.halbmann.sam.business.instruments.boundary.InstrumentRepository;
 import de.halbmann.sam.business.musicians.boundary.MusicianRepository;
 import de.halbmann.sam.business.musicians.entity.MusicianEntity;
 import de.halbmann.sam.business.shared.event.ResourcesDeleted;
@@ -31,6 +32,7 @@ import jakarta.enterprise.event.Event;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 @Transactional
@@ -41,6 +43,9 @@ public class SheetService {
 
     @Inject
     MusicianRepository musicianRepository;
+
+    @Inject
+    InstrumentRepository instrumentRepository;
 
     @Inject
     SheetMusicMapper sheetMusicMapper;
@@ -59,6 +64,8 @@ public class SheetService {
 
     public PaginatedResponse<SheetMusicSearchResult> findSheets(final SheetFilterRequest filterRequest) {
         PaginatedResponse<SheetMusicSearchResult> response;
+        List<InstrumentationCountCriterion> instrumentCriteria =
+                parseInstrumentCriteria(filterRequest.getInstrumentCriteria());
 
         if (filterRequest.getQuery() != null) {
             // Same narrowing filters as the list path below, so search + genre/letter/tag/composer combine
@@ -67,7 +74,8 @@ public class SheetService {
                     filterRequest.getTitleStartsWith(),
                     filterRequest.getTag(),
                     filterRequest.getFavorite(),
-                    filterRequest.getComposer());
+                    filterRequest.getComposer(),
+                    instrumentCriteria);
             List<Object[]> results = sheetRepository.searchSheets(
                     filterRequest.getQuery(), filters, filterRequest.getPage(), filterRequest.getSize());
 
@@ -108,8 +116,6 @@ public class SheetService {
                 parameters.put("favorite", filterRequest.getFavorite());
             }
 
-            List<InstrumentationCountCriterion> instrumentCriteria =
-                    parseInstrumentCriteria(filterRequest.getInstrumentCriteria());
             PaginatedResponse<SheetMusic> sheets = getAllSheets(
                     filterRequest,
                     parameters,
@@ -228,7 +234,21 @@ public class SheetService {
         if (rawCriteria == null || rawCriteria.isEmpty()) {
             return List.of();
         }
-        return rawCriteria.stream().map(InstrumentationCountCriterion::parse).toList();
+        List<InstrumentationCountCriterion> criteria =
+                rawCriteria.stream().map(InstrumentationCountCriterion::parse).toList();
+        // An unknown ID would count as 0 parts and silently match (e.g. every sheet for "X:LT:1")
+        Set<String> requestedIds = criteria.stream()
+                .map(InstrumentationCountCriterion::instrumentId)
+                .collect(Collectors.toSet());
+        Set<String> knownIds = instrumentRepository.findExistingIds(requestedIds);
+        List<String> unknownIds = requestedIds.stream()
+                .filter(id -> !knownIds.contains(id))
+                .sorted()
+                .toList();
+        if (!unknownIds.isEmpty()) {
+            throw new ValidationException("Unknown instrument(s) in instrument criteria: " + unknownIds);
+        }
+        return criteria;
     }
 
     public SheetMusic getSheet(final String sheetId) {
