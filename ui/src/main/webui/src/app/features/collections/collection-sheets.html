@@ -249,6 +249,7 @@
         [value]="searchResults()"
         [lazy]="true"
         [paginator]="true"
+        [first]="searchPage * searchRows"
         [rows]="searchRows"
         [totalRecords]="searchTotal()"
         [loading]="searchLoading()"

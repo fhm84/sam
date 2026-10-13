@@ -28,6 +28,7 @@
     [value]="items()"
     [lazy]="true"
     [paginator]="true"
+    [first]="currentPage * rows"
     [rows]="rows"
     [totalRecords]="totalRecords()"
     [loading]="loading()"
