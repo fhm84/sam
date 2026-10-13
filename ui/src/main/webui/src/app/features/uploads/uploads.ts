@@ -134,7 +134,7 @@ export class Uploads implements OnInit, OnDestroy {
 
   // Picker search
   protected pickerQuery = '';
-  private pickerPage = 0;
+  protected pickerPage = 0;
   protected pickerRows = 10;
   private readonly pickerSearch$ = new Subject<string>();
   protected readonly pickerResults = signal<SheetMusicSearchResult[]>([]);

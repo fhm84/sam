@@ -62,6 +62,7 @@
 
   <p-table
     [value]="entries()"
+    [first]="currentPage * rows"
     [rows]="rows"
     [totalRecords]="totalCount()"
     [loading]="loading()"

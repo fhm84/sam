@@ -68,6 +68,7 @@
       [value]="items()"
       [lazy]="true"
       [paginator]="true"
+      [first]="currentPage * rows"
       [rows]="rows"
       [totalRecords]="totalRecords()"
       [loading]="loading()"
@@ -191,6 +192,7 @@
         }
       </div>
       <p-paginator
+        [first]="currentPage * rows"
         [rows]="rows"
         [totalRecords]="totalRecords()"
         [rowsPerPageOptions]="[10, 25, 50]"

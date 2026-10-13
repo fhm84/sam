@@ -40,6 +40,7 @@
       [value]="items()"
       [lazy]="true"
       [paginator]="totalRecords() > rows"
+      [first]="currentPage * rows"
       [rows]="rows"
       [totalRecords]="totalRecords()"
       [loading]="loading()"
@@ -144,6 +145,7 @@
       </div>
       @if (totalRecords() > rows) {
         <p-paginator
+          [first]="currentPage * rows"
           [rows]="rows"
           [totalRecords]="totalRecords()"
           [rowsPerPageOptions]="[10, 25, 50]"

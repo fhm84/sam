@@ -54,6 +54,7 @@
     [value]="items()"
     [lazy]="true"
     [paginator]="totalRecords() > rows"
+    [first]="currentPage * rows"
     [rows]="rows"
     [totalRecords]="totalRecords()"
     [loading]="loading()"
