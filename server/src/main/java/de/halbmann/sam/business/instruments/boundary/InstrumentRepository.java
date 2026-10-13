@@ -11,6 +11,7 @@ import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.NoResultException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -44,6 +45,17 @@ public class InstrumentRepository implements PanacheRepositoryBase<InstrumentEnt
                 .map(r -> new InstrumentMatch(
                         (String) r[0], (String) r[1], (String) r[2], (String) r[3], ((Number) r[4]).doubleValue()))
                 .toList();
+    }
+
+    /** The subset of {@code ids} that belong to an existing instrument. */
+    public Set<String> findExistingIds(Collection<String> ids) {
+        if (ids.isEmpty()) {
+            return Set.of();
+        }
+        return Set.copyOf(getEntityManager()
+                .createQuery("SELECT i.id FROM InstrumentEntity i WHERE i.id IN :ids", String.class)
+                .setParameter("ids", ids)
+                .getResultList());
     }
 
     public Optional<InstrumentEntity> findByName(String name) {

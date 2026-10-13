@@ -11,7 +11,9 @@ import de.halbmann.sam.business.sheets.entity.InstrumentationCountCriterion;
 import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
 import de.halbmann.sam.core.controller.SortFieldValidator;
 import de.halbmann.sam.core.entity.PaginatedEntities;
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
+import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -54,9 +56,15 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
 
     /**
      * Optional filters that narrow a full-text search, mirroring the non-search list filters.
-     * A {@code null} / blank value means "no restriction".
+     * A {@code null} / blank value (or an empty criteria list) means "no restriction".
      */
-    public record SearchFilters(Genre genre, String titleStartsWith, String tag, Boolean favorite, String composer) {}
+    public record SearchFilters(
+            Genre genre,
+            String titleStartsWith,
+            String tag,
+            Boolean favorite,
+            String composer,
+            List<InstrumentationCountCriterion> instrumentCriteria) {}
 
     private static final String SEARCH_CTE = """
             WITH q AS (
@@ -149,6 +157,18 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
             conditions.add("s.composer_name = :composer");
             params.put("composer", filters.composer());
         }
+        List<InstrumentationCountCriterion> instrumentCriteria = filters.instrumentCriteria();
+        for (int idx = 0; idx < instrumentCriteria.size(); idx++) {
+            InstrumentationCountCriterion criterion = instrumentCriteria.get(idx);
+            String instrumentParam = "instrId" + idx;
+            String countParam = "instrCount" + idx;
+            conditions.add(criterion.toCondition(
+                    "(SELECT count(*) FROM instrumentations i WHERE i.sheet_id = s.id AND i.instrument_id = :"
+                            + instrumentParam + ")",
+                    countParam));
+            params.put(instrumentParam, criterion.instrumentId());
+            params.put(countParam, criterion.count());
+        }
         return "WHERE " + String.join("\n  AND ", conditions);
     }
 
@@ -191,10 +211,8 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
     /**
      * Sheets matching the given field filters (each ANDed together), optionally combined with a
      * set of instrumentation-count criteria (e.g. "exactly 4 horns", "no oboes"), also ANDed in.
-     * Each instrument criterion is evaluated as a correlated {@code COUNT} subquery against
-     * {@code InstrumentationEntity} for the sheet, which requires an explicit root alias, so the
-     * JPQL is built by hand rather than via Panache's {@code find}/{@code count} convenience
-     * methods.
+     * Each instrument criterion is a correlated {@code COUNT} subquery against
+     * {@code InstrumentationEntity}, which is why the query names its root alias {@code s}.
      */
     public PaginatedEntities<SheetMusicEntity> findSheetEntities(
             final PaginationRequest paginationRequest,
@@ -229,44 +247,40 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
             InstrumentationCountCriterion criterion = instrumentCriteria.get(idx);
             String instrumentParam = "instrId" + idx;
             String countParam = "instrCount" + idx;
-            String comparison =
+            conditions.add(criterion.toCondition(
                     "(SELECT COUNT(ic) FROM InstrumentationEntity ic WHERE ic.sheet = s AND ic.instrument.id = :"
-                            + instrumentParam + ") " + criterion.operator().sql() + " :" + countParam;
-            conditions.add(criterion.negate() ? "NOT (" + comparison + ")" : comparison);
+                            + instrumentParam + ")",
+                    countParam));
             queryParams.put(instrumentParam, criterion.instrumentId());
             queryParams.put(countParam, criterion.count());
         }
 
-        final String whereClause = conditions.isEmpty() ? "" : " WHERE " + String.join(" AND ", conditions);
-        final String orderByClause = " ORDER BY " + buildOrderByClause(paginationRequest);
-
-        var countQuery =
-                getEntityManager().createQuery("SELECT COUNT(s) FROM SheetMusicEntity s" + whereClause, Long.class);
-        var dataQuery = getEntityManager()
-                .createQuery("SELECT s FROM SheetMusicEntity s" + whereClause + orderByClause, SheetMusicEntity.class);
-        queryParams.forEach((key, value) -> {
-            countQuery.setParameter(key, value);
-            dataQuery.setParameter(key, value);
-        });
-
-        long totalItems = countQuery.getSingleResult();
-        List<SheetMusicEntity> sheets = dataQuery
-                .setFirstResult(paginationRequest.getPage() * paginationRequest.getSize())
-                .setMaxResults(paginationRequest.getSize())
-                .getResultList();
+        final String query =
+                "FROM SheetMusicEntity s" + (conditions.isEmpty() ? "" : " WHERE " + String.join(" AND ", conditions));
+        final PanacheQuery<SheetMusicEntity> sheetQuery = find(query, prepareSort(paginationRequest), queryParams);
+        final long totalItems = sheetQuery.count();
+        final List<SheetMusicEntity> sheets = sheetQuery
+                .page(paginationRequest.getPage(), paginationRequest.getSize())
+                .list();
 
         return new PaginatedEntities<>(sheets, totalItems);
     }
 
-    private String buildOrderByClause(PaginationRequest paginationRequest) {
+    private Sort prepareSort(PaginationRequest paginationRequest) {
+        final Sort sort;
+        // JAX-RS binds an absent sortBy to an empty array, not null
         if (paginationRequest.getSortBy() != null && paginationRequest.getSortBy().length > 0) {
             SortFieldValidator.validate(paginationRequest.getSortBy(), ALLOWED_SORT_FIELDS);
-            String direction = SortOrder.DESC == paginationRequest.getSortOrder() ? "DESC" : "ASC";
-            return Arrays.stream(paginationRequest.getSortBy())
-                    .map(field -> "s." + field + " " + direction)
-                    .collect(Collectors.joining(", "));
+            if (SortOrder.DESC == paginationRequest.getSortOrder()) {
+                sort = Sort.descending(paginationRequest.getSortBy());
+            } else {
+                sort = Sort.ascending(paginationRequest.getSortBy());
+            }
+        } else {
+            sort = Sort.ascending("title");
         }
-        return "s.title ASC";
+        // Unique tiebreaker: otherwise LIMIT/OFFSET paging repeats or skips sheets with equal sort values
+        return sort.and("id");
     }
 
     /**
