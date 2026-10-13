@@ -4,7 +4,8 @@ Roadmap: [Tailwind CSS v4 upgrade](../roadmap.md#tailwind-css-v4-upgrade--planne
 · Stack: [tech stack](../architecture/tech-stack.md)
 
 **Why:** Tailwind 3.4 pulls in build-time dependencies with open advisories
-(`braces`, `micromatch`, `postcss-selector-parser`), and the fixes ship only with v4.
+(`braces`, `micromatch`), and the fixes ship only with v4. (`postcss-selector-parser` is
+bridged by an npm override to `^7.1.6` until then; the generated CSS is byte-identical.)
 Dependabot PR #120 tried the bump on its own and broke the UI build. This plan does the
 upgrade as one reviewed change instead. There is no urgency: the advisories only affect
 the CSS build, which processes our own files.
@@ -57,7 +58,7 @@ A throwaway run of `@tailwindcss/upgrade@4.3.3` on `main` showed:
 | 5 | Build guard: a check after `ng build` (CI and locally) that fails if sentinel utilities (`gap-2`, `text-sm`, `p-4`) are missing from the output CSS, so a silent drop like finding 1 can't recur. | pending |
 | 6 | Verify: `tsc --noEmit`, `ng test`, `ng build`, then before/after screenshots (Playwright, `target/playwright/`) of home, sheets list, sheet detail, sheet form, collections, upload classification dialog and public share page. Check desktop, ~950 px (finding 3), ≤540 px (`xs`) and dark mode, plus hover on Optimus buttons and inputs. | pending |
 | 7 | Browser support: v4 needs Safari 16.4+, Chrome 111+, Firefox 128+. Confirm the band's devices (older iPads in particular) meet it before merging. | pending |
-| 8 | Housekeeping: update the Tailwind row in `docs/architecture/tech-stack.md`, keep the Tailwind-major ignore in `.github/dependabot.yml` (for v5), check that `npm audit` no longer reports the Tailwind 3 advisories. | pending |
+| 8 | Housekeeping: update the Tailwind row in `docs/architecture/tech-stack.md`, keep the Tailwind-major ignore in `.github/dependabot.yml` (for v5), check that `npm audit` no longer reports the Tailwind 3 advisories, and remove the `postcss-selector-parser` override from `package.json` (v4 no longer depends on it). | pending |
 
 ## Key files
 
