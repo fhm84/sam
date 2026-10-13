@@ -45,8 +45,10 @@ parameters, each encoded as:
   horns AND no oboes.
 
 All criteria are combined with AND, and they also narrow a free-text `q` search (like the
-other filters). Malformed criteria and unknown instrument IDs are rejected with `400` —
-an unknown ID would otherwise count as 0 parts and silently match.
+other filters). Malformed criteria, unknown instrument IDs and more than 20 criteria are
+rejected with `400` — an unknown ID would otherwise count as 0 parts and silently match.
+Each criterion is a correlated count subquery per sheet, served by the
+`(sheet_id, instrument_id, …)` unique index on `instrumentations`.
 
 ## Browse
 
