@@ -30,11 +30,10 @@ unprioritised backlog.
    → [plan](plans/coverage-snapshot-invalidation.md) (needs open question #5)
 3. [Event log retention + own-history view](#document-access-log--partial)
    → [plan](plans/event-log-retention.md) (needs open question #9)
-4. Instrumentation-count search filter (PR #96, ready to merge)
-5. [Document store hardening](#document-store-hardening--planned): fixes silent file
+4. [Document store hardening](#document-store-hardening--planned): fixes silent file
    corruption on uploads with the same file name and broken S3 uploads
    → [plan](plans/document-store-hardening.md)
-6. Encrypted backups (phase A of [encryption of stored documents](#encryption-of-stored-documents--planned))
+5. Encrypted backups (phase A of [encryption of stored documents](#encryption-of-stored-documents--planned))
    → [plan](plans/storage-encryption.md)
 
 **Next: everyday use for the music librarian**
