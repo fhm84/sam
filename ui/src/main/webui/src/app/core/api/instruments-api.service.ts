@@ -19,6 +19,7 @@ export class InstrumentsApiService {
     if (filter.page !== undefined) params = params.set('page', filter.page);
     if (filter.size !== undefined) params = params.set('size', filter.size);
     if (filter.name) params = params.set('name', filter.name);
+    if (filter.transposition) params = params.set('transposition', filter.transposition);
     return this.http.get<PaginatedResponse<Instrument>>(this.baseUrl, { params });
   }
 
