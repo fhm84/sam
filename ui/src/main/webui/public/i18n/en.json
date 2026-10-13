@@ -378,7 +378,11 @@
       "clear": "Clear filters",
       "instrumentation": "Instrumentation",
       "instrumentPlaceholder": "Select instrument",
-      "addInstrumentCriterion": "Add instrument filter"
+      "addInstrumentCriterion": "Add instrument filter",
+      "removeInstrumentCriterion": "Remove instrument filter",
+      "instrumentAria": "Instrument",
+      "operatorAria": "Comparison",
+      "countAria": "Number of parts"
     },
     "collections": {
       "title": "Collections",

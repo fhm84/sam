@@ -161,6 +161,7 @@
               [ngModel]="row.instrumentId"
               (ngModelChange)="updateInstrumentCriterionRow($index, { instrumentId: $event })"
               [placeholder]="t.t('sheets.filters.instrumentPlaceholder')"
+              [ariaLabel]="t.t('sheets.filters.instrumentAria')"
               [style]="{ minWidth: '180px' }"
             />
             <p-select
@@ -170,12 +171,14 @@
               optionValue="value"
               [ngModel]="row.operator"
               (ngModelChange)="updateInstrumentCriterionRow($index, { operator: $event })"
+              [ariaLabel]="t.t('sheets.filters.operatorAria')"
               [style]="{ minWidth: '80px' }"
             />
             <p-inputnumber
               [attr.data-testid]="'instrument-criterion-count-' + $index"
               [ngModel]="row.count"
               (ngModelChange)="updateInstrumentCriterionRow($index, { count: $event })"
+              [ariaLabel]="t.t('sheets.filters.countAria')"
               [min]="0"
               [showButtons]="true"
               [useGrouping]="false"
@@ -191,6 +194,7 @@
               size="small"
               [attr.data-testid]="'btn-remove-instrument-criterion-' + $index"
               [pTooltip]="'common.delete' | translate"
+              [ariaLabel]="t.t('sheets.filters.removeInstrumentCriterion')"
               (onClick)="removeInstrumentCriterionRow($index)"
             />
           </div>

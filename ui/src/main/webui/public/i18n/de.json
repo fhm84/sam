@@ -378,7 +378,11 @@
       "clear": "Filter zurücksetzen",
       "instrumentation": "Besetzung",
       "instrumentPlaceholder": "Instrument wählen",
-      "addInstrumentCriterion": "Instrumentenfilter hinzufügen"
+      "addInstrumentCriterion": "Instrumentenfilter hinzufügen",
+      "removeInstrumentCriterion": "Instrumentenfilter entfernen",
+      "instrumentAria": "Instrument",
+      "operatorAria": "Vergleich",
+      "countAria": "Anzahl Stimmen"
     },
     "collections": {
       "title": "Sammlungen",
