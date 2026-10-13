@@ -3,6 +3,7 @@ package de.halbmann.sam.business.collections.boundary;
 import de.halbmann.sam.api.entity.collections.CollectionType;
 import de.halbmann.sam.api.entity.shared.PaginationRequest;
 import de.halbmann.sam.business.collections.entity.SheetCollectionEntity;
+import de.halbmann.sam.core.controller.LikePatterns;
 import de.halbmann.sam.core.entity.PaginatedEntities;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import io.quarkus.panache.common.Sort;
@@ -24,8 +25,8 @@ public class SheetCollectionRepository implements PanacheRepositoryBase<SheetCol
         Map<String, Object> params = new HashMap<>();
 
         if (nameFilter != null && !nameFilter.isEmpty()) {
-            conditions.add("lower(name) like :name");
-            params.put("name", "%" + nameFilter.toLowerCase(Locale.ROOT) + "%");
+            conditions.add("lower(name) like :name" + LikePatterns.ESCAPE_CLAUSE);
+            params.put("name", LikePatterns.contains(nameFilter.toLowerCase(Locale.ROOT)));
         }
         if (typeFilter != null) {
             conditions.add("type = :type");

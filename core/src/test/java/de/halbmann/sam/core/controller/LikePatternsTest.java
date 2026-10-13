@@ -19,6 +19,11 @@ class LikePatternsTest {
     }
 
     @Test
+    void contains_wrapsEscapedValueInWildcards() {
+        assertEquals("%50\\%\\_off%", LikePatterns.contains("50%_off"));
+    }
+
+    @Test
     void escapeClause_usesBackslash() {
         assertEquals(" ESCAPE '\\'", LikePatterns.ESCAPE_CLAUSE);
     }

@@ -21,4 +21,9 @@ public final class LikePatterns {
     public static String startsWith(String prefix) {
         return escape(prefix) + "%";
     }
+
+    /** Pattern matching values that contain {@code part}, taken literally. */
+    public static String contains(String part) {
+        return "%" + escape(part) + "%";
+    }
 }
