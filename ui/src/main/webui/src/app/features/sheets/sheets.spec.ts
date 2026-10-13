@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
 import { ConfirmationService, MessageService } from '@openng/optimus-ui/api';
 
@@ -301,6 +301,31 @@ describe('Sheets', () => {
 
       expect(lastRequestedCriteria()).toEqual(['OBOE:LT:1']);
       expect((component as any).activeFilterCount()).toBe(1);
+    });
+
+    it('reloads unchanged criteria again after a failed request', () => {
+      sheetsApi.find.mockReturnValueOnce(throwError(() => new Error('offline')));
+      (component as any).addInstrumentCriterionRow();
+      (component as any).updateInstrumentCriterionRow(0, { instrumentId: 'HORN' });
+      vi.advanceTimersByTime(300);
+      expect(sheetsApi.find).toHaveBeenCalledTimes(1);
+
+      // Re-applying the same value must retry instead of being skipped as "already requested"
+      (component as any).updateInstrumentCriterionRow(0, { count: 1 });
+      vi.advanceTimersByTime(300);
+
+      expect(sheetsApi.find).toHaveBeenCalledTimes(2);
+      expect(lastRequestedCriteria()).toEqual(['HORN:EQ:1']);
+    });
+
+    it('retries loading instruments on the next panel open after a failure', () => {
+      instrumentsApi.find.mockReturnValueOnce(throwError(() => new Error('offline')));
+
+      (component as any).toggleFilterPanel();
+      (component as any).toggleFilterPanel();
+      (component as any).toggleFilterPanel();
+
+      expect(instrumentsApi.find).toHaveBeenCalledTimes(2);
     });
   });
 });

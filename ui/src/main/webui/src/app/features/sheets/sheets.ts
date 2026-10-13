@@ -164,8 +164,11 @@ export class Sheets implements OnInit {
   private readonly filterSubject = new Subject<string>();
   private readonly instrumentCriteriaChanged = new Subject<void>();
   private readonly loadRequests = new Subject<void>();
-  /** Criteria of the latest data request, to skip reloads for edits that don't change them. */
-  private requestedInstrumentCriteria = '';
+  /**
+   * Criteria of the latest data request, to skip reloads for edits that don't change them.
+   * null after a failed request, so the next edit always reloads.
+   */
+  private requestedInstrumentCriteria: string | null = '';
   private instrumentOptionsRequested = false;
 
   ngOnInit(): void {
@@ -193,7 +196,14 @@ export class Sheets implements OnInit {
     // switchMap: a newer request cancels the in-flight one, so a slow stale response can't overwrite it
     this.loadRequests
       .pipe(
-        switchMap(() => this.fetchSheets().pipe(catchError(() => of(null)))),
+        switchMap(() =>
+          this.fetchSheets().pipe(
+            catchError(() => {
+              this.requestedInstrumentCriteria = null;
+              return of(null);
+            }),
+          ),
+        ),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe((res) => {
@@ -219,10 +229,13 @@ export class Sheets implements OnInit {
     this.instrumentsApi
       .find({ size: FETCH_ALL_SIZE })
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((res) => {
-        this.instrumentOptions.set(
-          (res.data ?? []).map((i: Instrument) => ({ label: instrumentLabel(i), value: i.id! })),
-        );
+      .subscribe({
+        next: (res) =>
+          this.instrumentOptions.set(
+            (res.data ?? []).map((i: Instrument) => ({ label: instrumentLabel(i), value: i.id! })),
+          ),
+        // Allow a retry on the next panel open
+        error: () => (this.instrumentOptionsRequested = false),
       });
   }
 
