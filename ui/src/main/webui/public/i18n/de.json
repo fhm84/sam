@@ -378,12 +378,7 @@
       "clear": "Filter zurücksetzen",
       "instrumentation": "Besetzung",
       "instrumentPlaceholder": "Instrument wählen",
-      "addInstrumentCriterion": "Instrumentenfilter hinzufügen",
-      "not": "NICHT",
-      "notTooltip": "Bedingung negieren",
-      "operatorEQ": "=",
-      "operatorLTE": "≤",
-      "operatorGTE": "≥"
+      "addInstrumentCriterion": "Instrumentenfilter hinzufügen"
     },
     "collections": {
       "title": "Sammlungen",

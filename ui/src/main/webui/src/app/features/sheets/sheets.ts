@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { Subject, debounceTime } from 'rxjs';
+import { Subject, catchError, debounceTime, of, switchMap } from 'rxjs';
 import { TableLazyLoadEvent, TableModule } from '@openng/optimus-ui/table';
 import { ConfirmDialog } from '@openng/optimus-ui/confirmdialog';
 import { ConfirmationService, MenuItem, MessageService } from '@openng/optimus-ui/api';
@@ -17,7 +17,6 @@ import { Drawer } from '@openng/optimus-ui/drawer';
 import { Toolbar } from '@openng/optimus-ui/toolbar';
 import { Tag } from '@openng/optimus-ui/tag';
 import { Tooltip } from '@openng/optimus-ui/tooltip';
-import { Checkbox } from '@openng/optimus-ui/checkbox';
 import { InputNumber } from '@openng/optimus-ui/inputnumber';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
@@ -42,13 +41,12 @@ import { SheetCollections } from './sheet-collections';
 import { ExploreView } from './explore/explore-view';
 import { RowActions } from '../../shared/components/row-actions/row-actions';
 
-type InstrumentCriterionOperator = 'EQ' | 'LTE' | 'GTE';
+type InstrumentCriterionOperator = 'EQ' | 'NEQ' | 'LT' | 'LTE' | 'GT' | 'GTE';
 
 interface InstrumentCriterionRow {
   instrumentId: string | null;
   operator: InstrumentCriterionOperator;
-  count: number;
-  negate: boolean;
+  count: number | null;
 }
 
 @Component({
@@ -75,7 +73,6 @@ interface InstrumentCriterionRow {
     Toolbar,
     Tag,
     Tooltip,
-    Checkbox,
     InputNumber,
   ],
   providers: [ConfirmationService],
@@ -122,18 +119,25 @@ export class Sheets implements OnInit {
 
   // ── Instrumentation filter ────────────────────────────
   protected readonly instrumentOptions = signal<{ label: string; value: string }[]>([]);
-  protected readonly operatorOptions = computed(() => [
-    { label: this.t.t('sheets.filters.operatorEQ'), value: 'EQ' as InstrumentCriterionOperator },
-    { label: this.t.t('sheets.filters.operatorLTE'), value: 'LTE' as InstrumentCriterionOperator },
-    { label: this.t.t('sheets.filters.operatorGTE'), value: 'GTE' as InstrumentCriterionOperator },
-  ]);
+  protected readonly operatorOptions: { label: string; value: InstrumentCriterionOperator }[] = [
+    { label: '=', value: 'EQ' },
+    { label: '≠', value: 'NEQ' },
+    { label: '<', value: 'LT' },
+    { label: '≤', value: 'LTE' },
+    { label: '>', value: 'GT' },
+    { label: '≥', value: 'GTE' },
+  ];
   protected readonly instrumentCriteriaRows = signal<InstrumentCriterionRow[]>([]);
+  /** Wire format of the complete rows; rows still missing an instrument or count are ignored. */
+  private readonly instrumentCriteria = computed(() =>
+    this.instrumentCriteriaRows()
+      .filter((r) => r.instrumentId && r.count != null)
+      .map((r) => `${r.instrumentId}:${r.operator}:${r.count}`),
+  );
 
   protected readonly activeFilterCount = computed(
     () =>
-      (this.selectedGenre() ? 1 : 0) +
-      (this.selectedLetter() ? 1 : 0) +
-      this.instrumentCriteriaRows().filter((r) => r.instrumentId).length,
+      (this.selectedGenre() ? 1 : 0) + (this.selectedLetter() ? 1 : 0) + this.instrumentCriteria().length,
   );
   protected rows = 20;
 
@@ -158,6 +162,11 @@ export class Sheets implements OnInit {
   protected currentPage = 0;
   private searchFilter = '';
   private readonly filterSubject = new Subject<string>();
+  private readonly instrumentCriteriaChanged = new Subject<void>();
+  private readonly loadRequests = new Subject<void>();
+  /** Criteria of the latest data request, to skip reloads for edits that don't change them. */
+  private requestedInstrumentCriteria = '';
+  private instrumentOptionsRequested = false;
 
   ngOnInit(): void {
     this.filterSubject
@@ -172,16 +181,41 @@ export class Sheets implements OnInit {
         this.loadData();
       });
 
+    this.instrumentCriteriaChanged
+      .pipe(debounceTime(300), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.instrumentCriteria().join('|') !== this.requestedInstrumentCriteria) {
+          this.currentPage = 0;
+          this.loadData();
+        }
+      });
+
+    // switchMap: a newer request cancels the in-flight one, so a slow stale response can't overwrite it
+    this.loadRequests
+      .pipe(
+        switchMap(() => this.fetchSheets().pipe(catchError(() => of(null)))),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((res) => {
+        if (res) {
+          this.sheets.set(res.data ?? []);
+          this.totalRecords.set(res.totalCount ?? 0);
+        }
+        this.loading.set(false);
+      });
+
     this.viewMode.set(this.layoutPref.getViewMode('sheets', ['list', 'cards', 'explore'] as const, 'cards'));
     this.loadAvailableLetters();
     if (this.viewMode() !== 'explore') {
       this.loadData();
     }
     this.loadEnsembles();
-    this.loadInstrumentOptions();
   }
 
+  /** Instruments are only needed for the filter panel, so they load when it is first opened. */
   private loadInstrumentOptions(): void {
+    if (this.instrumentOptionsRequested) return;
+    this.instrumentOptionsRequested = true;
     this.instrumentsApi
       .find({ size: FETCH_ALL_SIZE })
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -294,6 +328,9 @@ export class Sheets implements OnInit {
 
   protected toggleFilterPanel(): void {
     this.filterPanelOpen.update((v) => !v);
+    if (this.filterPanelOpen()) {
+      this.loadInstrumentOptions();
+    }
   }
 
   protected onGenreChange(genre: Genre | null): void {
@@ -316,7 +353,7 @@ export class Sheets implements OnInit {
   protected addInstrumentCriterionRow(): void {
     this.instrumentCriteriaRows.update((rows) => [
       ...rows,
-      { instrumentId: null, operator: 'EQ', count: 1, negate: false },
+      { instrumentId: null, operator: 'EQ', count: 1 },
     ]);
   }
 
@@ -331,15 +368,7 @@ export class Sheets implements OnInit {
   }
 
   private onInstrumentCriteriaChange(): void {
-    this.currentPage = 0;
-    this.loadData();
-  }
-
-  private serializeInstrumentCriteria(): string[] | undefined {
-    const values = this.instrumentCriteriaRows()
-      .filter((r) => r.instrumentId)
-      .map((r) => `${r.negate ? '!' : ''}${r.instrumentId}:${r.operator}:${r.count}`);
-    return values.length ? values : undefined;
+    this.instrumentCriteriaChanged.next();
   }
 
   protected onLetterSelect(letter: string): void {
@@ -504,27 +533,21 @@ export class Sheets implements OnInit {
 
   private loadData(): void {
     this.loading.set(true);
-    this.api
-      .find({
-        page: this.currentPage,
-        size: this.rows,
-        query: this.searchFilter || undefined,
-        genre: this.selectedGenre() || undefined,
-        titleStartsWith: this.selectedLetter() || undefined,
-        ensemble: this.selectedEnsemble()?.id || undefined,
-        tag: this.tagFilter() || undefined,
-        instrumentCriteria: this.serializeInstrumentCriteria(),
-      })
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (res) => {
-          this.sheets.set(res.data ?? []);
-          this.totalRecords.set(res.totalCount ?? 0);
-          this.loading.set(false);
-        },
-        error: () => {
-          this.loading.set(false);
-        },
-      });
+    this.loadRequests.next();
+  }
+
+  private fetchSheets() {
+    const instrumentCriteria = this.instrumentCriteria();
+    this.requestedInstrumentCriteria = instrumentCriteria.join('|');
+    return this.api.find({
+      page: this.currentPage,
+      size: this.rows,
+      query: this.searchFilter || undefined,
+      genre: this.selectedGenre() || undefined,
+      titleStartsWith: this.selectedLetter() || undefined,
+      ensemble: this.selectedEnsemble()?.id || undefined,
+      tag: this.tagFilter() || undefined,
+      instrumentCriteria: instrumentCriteria.length ? instrumentCriteria : undefined,
+    });
   }
 }
