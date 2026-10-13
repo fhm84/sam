@@ -1273,9 +1273,9 @@ Added a search filter for concrete instrumentations (e.g. "exactly 4 horns", "no
 oboes", "4 horns and 2 clarinets but no oboes"). Since instrumentation is already
 modeled as one row per part with no count column, each criterion is a correlated
 `COUNT` subquery against `InstrumentationEntity` per instrument, compared with
-`=`/`≤`/`≥` and optionally negated; multiple criteria are ANDed. UI: a dynamic,
-add/remove list of `[NOT] <instrument> [operator] <count>` rows in the sheets
-filter panel. See [Search & Discovery](../features/search-discovery.md#instrumentation-count-filter).
+`=`/`≠`/`<`/`≤`/`>`/`≥`; multiple criteria are ANDed. UI: a dynamic,
+add/remove list of `<instrument> <operator> <count>` rows in the sheets
+filter panel. See [Search & Discovery](features/search-discovery.md#instrumentation-count-filter).
 
 **Stakeholders:** S1 (music librarian), S2 (Dirigent)
 
