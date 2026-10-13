@@ -9,6 +9,7 @@ import de.halbmann.sam.api.entity.sheets.TagCount;
 import de.halbmann.sam.business.documents.entity.AttachmentEntity;
 import de.halbmann.sam.business.sheets.entity.InstrumentationCountCriterion;
 import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
+import de.halbmann.sam.core.controller.LikePatterns;
 import de.halbmann.sam.core.controller.SortFieldValidator;
 import de.halbmann.sam.core.entity.PaginatedEntities;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
@@ -145,8 +146,10 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
             params.put("genre", filters.genre().name());
         }
         if (filters.titleStartsWith() != null && !filters.titleStartsWith().isBlank()) {
-            conditions.add("lower(s.title) LIKE :titlePrefix");
-            params.put("titlePrefix", filters.titleStartsWith().toLowerCase(Locale.ROOT) + "%");
+            conditions.add("lower(s.title) LIKE :titlePrefix" + LikePatterns.ESCAPE_CLAUSE);
+            params.put(
+                    "titlePrefix",
+                    LikePatterns.startsWith(filters.titleStartsWith().toLowerCase(Locale.ROOT)));
         }
         if (filters.tag() != null && !filters.tag().isBlank()) {
             conditions.add(
@@ -252,8 +255,8 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
         });
 
         if (titleStartsWith != null && !titleStartsWith.isBlank()) {
-            conditions.add("lower(s.title) like :titlePrefix");
-            queryParams.put("titlePrefix", titleStartsWith.toLowerCase(Locale.ROOT) + "%");
+            conditions.add("lower(s.title) like :titlePrefix" + LikePatterns.ESCAPE_CLAUSE);
+            queryParams.put("titlePrefix", LikePatterns.startsWith(titleStartsWith.toLowerCase(Locale.ROOT)));
         }
 
         if (tag != null && !tag.isBlank()) {
