@@ -378,12 +378,7 @@
       "clear": "Clear filters",
       "instrumentation": "Instrumentation",
       "instrumentPlaceholder": "Select instrument",
-      "addInstrumentCriterion": "Add instrument filter",
-      "not": "NOT",
-      "notTooltip": "Negate this condition",
-      "operatorEQ": "=",
-      "operatorLTE": "≤",
-      "operatorGTE": "≥"
+      "addInstrumentCriterion": "Add instrument filter"
     },
     "collections": {
       "title": "Collections",

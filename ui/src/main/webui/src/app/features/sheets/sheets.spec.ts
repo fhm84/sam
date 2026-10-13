@@ -246,4 +246,61 @@ describe('Sheets', () => {
     expect((component as any).selectedLetter()).toBeNull();
     expect((component as any).currentPage).toBe(0);
   });
+
+  // ── instrument criteria ────────────────────────────────
+
+  describe('instrument criteria', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+      sheetsApi.find.mockClear();
+    });
+
+    afterEach(() => vi.useRealTimers());
+
+    const lastRequestedCriteria = () => sheetsApi.find.mock.lastCall?.[0].instrumentCriteria;
+
+    it('loads instruments only when the filter panel is first opened', () => {
+      expect(instrumentsApi.find).not.toHaveBeenCalled();
+
+      (component as any).toggleFilterPanel();
+      (component as any).toggleFilterPanel();
+      (component as any).toggleFilterPanel();
+
+      expect(instrumentsApi.find).toHaveBeenCalledTimes(1);
+    });
+
+    it('debounces edits into a single reload', () => {
+      (component as any).addInstrumentCriterionRow();
+      (component as any).updateInstrumentCriterionRow(0, { instrumentId: 'HORN' });
+      (component as any).updateInstrumentCriterionRow(0, { count: 2 });
+      (component as any).updateInstrumentCriterionRow(0, { count: 3 });
+      expect(sheetsApi.find).not.toHaveBeenCalled();
+
+      vi.advanceTimersByTime(300);
+
+      expect(sheetsApi.find).toHaveBeenCalledTimes(1);
+      expect(lastRequestedCriteria()).toEqual(['HORN:EQ:3']);
+    });
+
+    it('skips incomplete rows and edits that leave the criteria unchanged', () => {
+      (component as any).addInstrumentCriterionRow();
+      (component as any).updateInstrumentCriterionRow(0, { operator: 'GTE' });
+      vi.advanceTimersByTime(300);
+      expect(sheetsApi.find).not.toHaveBeenCalled();
+
+      (component as any).updateInstrumentCriterionRow(0, { instrumentId: 'HORN', count: null });
+      vi.advanceTimersByTime(300);
+      expect(sheetsApi.find).not.toHaveBeenCalled();
+      expect((component as any).activeFilterCount()).toBe(0);
+    });
+
+    it('reloads with the criteria once a row is complete', () => {
+      (component as any).addInstrumentCriterionRow();
+      (component as any).updateInstrumentCriterionRow(0, { instrumentId: 'OBOE', operator: 'LT' });
+      vi.advanceTimersByTime(300);
+
+      expect(lastRequestedCriteria()).toEqual(['OBOE:LT:1']);
+      expect((component as any).activeFilterCount()).toBe(1);
+    });
+  });
 });
