@@ -21,7 +21,7 @@ Results are ranked by combined score. The UI debounces input and paginates resul
 | Genre | Dropdown (all distinct genres in the database) |
 | Letter | A–Z browser by title first letter (optionally pre-filtered by genre) |
 | Ensemble coverage | Filter by coverage status for a selected ensemble |
-| Instrumentation count | Dynamic list of `[NOT] <instrument> [=|≤|≥] <count>` rows, ANDed together (see below) |
+| Instrumentation count | Dynamic list of `<instrument> <operator> <count>` rows, ANDed together (see below) |
 
 ### Instrumentation count filter
 
@@ -29,22 +29,24 @@ Finds sheets by their concrete instrumentation, e.g. "exactly 4 horns", "no oboe
 "4 horns and 2 clarinets but no oboes". Since a sheet's instrumentation is just one
 `Instrumentation` row per part (no count column — "4 horns" is 4 rows sharing the same
 instrument), each criterion counts a sheet's instrumentation rows for one instrument and
-compares that count with `=`, `≤`, or `≥`, optionally negated.
+compares that count with `=`, `≠`, `<`, `≤`, `>` or `≥`. No separate NOT is needed: the
+operator set is closed under negation ("no oboes" is `= 0`, "not at least 2" is `< 2`).
 
 `GET /sheets` accepts the filter as one or more repeated `instrumentCriterion` query
 parameters, each encoded as:
 
 ```
-[!]<instrumentId>:<operator>:<count>
+<instrumentId>:<operator>:<count>
 ```
 
-- `!` prefix negates the whole comparison.
-- `<operator>` is one of `EQ`, `LTE`, `GTE`.
-- Example: `?instrumentCriterion=HORN_F:EQ:4&instrumentCriterion=!OBOE:GTE:1` — exactly 4
+- `<operator>` is one of `EQ`, `NEQ`, `LT`, `LTE`, `GT`, `GTE`.
+- Operator and count are split off from the right, so an instrument ID may contain `:`.
+- Example: `?instrumentCriterion=HORN_F:EQ:4&instrumentCriterion=OBOE:EQ:0` — exactly 4
   horns AND no oboes.
 
-All criteria are combined with AND; this filter only applies to the structured filter
-path (i.e. it's ignored when a free-text `q` search is active, same as `genre`/`tag`).
+All criteria are combined with AND, and they also narrow a free-text `q` search (like the
+other filters). Malformed criteria and unknown instrument IDs are rejected with `400` —
+an unknown ID would otherwise count as 0 parts and silently match.
 
 ## Browse
 
