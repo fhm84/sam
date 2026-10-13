@@ -64,7 +64,12 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
             String tag,
             Boolean favorite,
             String composer,
-            List<InstrumentationCountCriterion> instrumentCriteria) {}
+            List<InstrumentationCountCriterion> instrumentCriteria) {
+
+        public SearchFilters {
+            instrumentCriteria = instrumentCriteria == null ? List.of() : instrumentCriteria;
+        }
+    }
 
     private static final String SEARCH_CTE = """
             WITH q AS (
@@ -157,19 +162,32 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
             conditions.add("s.composer_name = :composer");
             params.put("composer", filters.composer());
         }
-        List<InstrumentationCountCriterion> instrumentCriteria = filters.instrumentCriteria();
-        for (int idx = 0; idx < instrumentCriteria.size(); idx++) {
-            InstrumentationCountCriterion criterion = instrumentCriteria.get(idx);
+        addInstrumentCriteria(
+                filters.instrumentCriteria(),
+                "SELECT count(*) FROM instrumentations i WHERE i.sheet_id = s.id AND i.instrument_id = ",
+                conditions,
+                params);
+        return "WHERE " + String.join("\n  AND ", conditions);
+    }
+
+    /**
+     * Adds one condition per criterion, comparing a correlated count of the sheet {@code s}'s parts
+     * for the criterion's instrument with its count. {@code countQueryPrefix} is that count query
+     * (JPQL or native SQL) up to the instrument parameter; every value is bound as a parameter.
+     */
+    private static void addInstrumentCriteria(
+            final List<InstrumentationCountCriterion> criteria,
+            final String countQueryPrefix,
+            final List<String> conditions,
+            final Map<String, Object> params) {
+        for (int idx = 0; idx < criteria.size(); idx++) {
+            InstrumentationCountCriterion criterion = criteria.get(idx);
             String instrumentParam = "instrId" + idx;
             String countParam = "instrCount" + idx;
-            conditions.add(criterion.toCondition(
-                    "(SELECT count(*) FROM instrumentations i WHERE i.sheet_id = s.id AND i.instrument_id = :"
-                            + instrumentParam + ")",
-                    countParam));
+            conditions.add(criterion.toCondition("(" + countQueryPrefix + ":" + instrumentParam + ")", countParam));
             params.put(instrumentParam, criterion.instrumentId());
             params.put(countParam, criterion.count());
         }
-        return "WHERE " + String.join("\n  AND ", conditions);
     }
 
     public Optional<SheetMusicEntity> findByTitle(String title) {
@@ -243,17 +261,12 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
             queryParams.put("tag", tag);
         }
 
-        for (int idx = 0; idx < instrumentCriteria.size(); idx++) {
-            InstrumentationCountCriterion criterion = instrumentCriteria.get(idx);
-            String instrumentParam = "instrId" + idx;
-            String countParam = "instrCount" + idx;
-            conditions.add(criterion.toCondition(
-                    "(SELECT COUNT(ic) FROM InstrumentationEntity ic WHERE ic.sheet = s AND ic.instrument.id = :"
-                            + instrumentParam + ")",
-                    countParam));
-            queryParams.put(instrumentParam, criterion.instrumentId());
-            queryParams.put(countParam, criterion.count());
-        }
+        // COUNT(*), not COUNT(ic): counting the id column would rule out an index-only scan
+        addInstrumentCriteria(
+                instrumentCriteria == null ? List.of() : instrumentCriteria,
+                "SELECT COUNT(*) FROM InstrumentationEntity ic WHERE ic.sheet = s AND ic.instrument.id = ",
+                conditions,
+                queryParams);
 
         final String query =
                 "FROM SheetMusicEntity s" + (conditions.isEmpty() ? "" : " WHERE " + String.join(" AND ", conditions));
@@ -268,19 +281,23 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
 
     private Sort prepareSort(PaginationRequest paginationRequest) {
         final Sort sort;
-        // JAX-RS binds an absent sortBy to an empty array, not null
-        if (paginationRequest.getSortBy() != null && paginationRequest.getSortBy().length > 0) {
+        final Sort.Direction direction;
+        if (paginationRequest.getSortBy() != null) {
             SortFieldValidator.validate(paginationRequest.getSortBy(), ALLOWED_SORT_FIELDS);
             if (SortOrder.DESC == paginationRequest.getSortOrder()) {
                 sort = Sort.descending(paginationRequest.getSortBy());
+                direction = Sort.Direction.Descending;
             } else {
                 sort = Sort.ascending(paginationRequest.getSortBy());
+                direction = Sort.Direction.Ascending;
             }
         } else {
             sort = Sort.ascending("title");
+            direction = Sort.Direction.Ascending;
         }
-        // Unique tiebreaker: otherwise LIMIT/OFFSET paging repeats or skips sheets with equal sort values
-        return sort.and("id");
+        // Unique tiebreaker: otherwise LIMIT/OFFSET paging repeats or skips sheets with equal sort values.
+        // Same direction as the sort, so (title, id) either way can be read from sheets_title_id_idx.
+        return sort.and("id", direction);
     }
 
     /**

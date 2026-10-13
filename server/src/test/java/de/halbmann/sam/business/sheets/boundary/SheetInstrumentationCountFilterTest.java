@@ -7,11 +7,13 @@ import de.halbmann.sam.api.entity.instruments.CreateInstrument;
 import de.halbmann.sam.api.entity.sheets.CreateInstrumentation;
 import de.halbmann.sam.api.entity.sheets.Genre;
 import de.halbmann.sam.api.entity.sheets.SheetMusic;
+import de.halbmann.sam.business.sheets.controller.SheetService;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.security.TestSecurity;
 import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -179,13 +181,49 @@ class SheetInstrumentationCountFilterTest {
     }
 
     @Test
-    void unknownInstrument_isRejected() {
-        given().queryParam(
-                        "instrumentCriterion",
-                        "NO_SUCH_INSTRUMENT_" + UUID.randomUUID().toString().replace("-", "_") + ":EQ:0")
+    void descendingSort_breaksTiesByDescendingId() {
+        String horn = createInstrument("Horn");
+        String title = "Same Title " + UUID.randomUUID();
+        for (int i = 0; i < 4; i++) {
+            addInstrumentations(createSheet(title, null, "Publisher " + i), horn, 1);
+        }
+
+        List<String> ids = given().queryParam("sortBy", "title")
+                .queryParam("sortOrder", "DESC")
+                .queryParam("instrumentCriterion", criterion(horn, "EQ", 1))
+                .get("/api/sheets")
+                .then()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getList("data.id", String.class);
+
+        assertEquals(ids.stream().sorted(Comparator.reverseOrder()).toList(), ids);
+        assertEquals(4, ids.size());
+    }
+
+    @Test
+    void unknownInstrument_isRejectedOnListAndSearch() {
+        String unknown = "NO_SUCH_INSTRUMENT_" + UUID.randomUUID().toString().replace("-", "_") + ":EQ:0";
+        given().queryParam("instrumentCriterion", unknown)
                 .get("/api/sheets")
                 .then()
                 .statusCode(400);
+        given().queryParam("q", "anything")
+                .queryParam("instrumentCriterion", unknown)
+                .get("/api/sheets")
+                .then()
+                .statusCode(400);
+    }
+
+    @Test
+    void tooManyCriteria_areRejected() {
+        String horn = createInstrument("Horn");
+        var request = given();
+        for (int i = 0; i <= SheetService.MAX_INSTRUMENT_CRITERIA; i++) {
+            request = request.queryParam("instrumentCriterion", criterion(horn, "GTE", i));
+        }
+        request.get("/api/sheets").then().statusCode(400);
     }
 
     @Test
