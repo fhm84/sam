@@ -27,6 +27,12 @@ public class PaginationRequest {
     @QueryParam("sortBy")
     private String[] sortBy;
 
+    public String[] getSortBy() {
+        // JAX-RS binds an absent sortBy to an empty array; treat that like "no sort requested" so the
+        // repositories fall back to their default sort
+        return sortBy == null || sortBy.length == 0 ? null : sortBy;
+    }
+
     public int getSize() {
         // to "disable" paging, we just simply set the size to a negative value -> this is then mapped
         // to Integer.MAX_VALUE
