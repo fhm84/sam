@@ -62,6 +62,9 @@ public class SheetService {
     @Inject
     Event<ResourcesDeleted> resourcesDeleted;
 
+    /** Upper bound for instrument criteria per request; each one adds a correlated subquery. */
+    public static final int MAX_INSTRUMENT_CRITERIA = 20;
+
     public PaginatedResponse<SheetMusicSearchResult> findSheets(final SheetFilterRequest filterRequest) {
         PaginatedResponse<SheetMusicSearchResult> response;
         List<InstrumentationCountCriterion> instrumentCriteria =
@@ -233,6 +236,11 @@ public class SheetService {
     private List<InstrumentationCountCriterion> parseInstrumentCriteria(List<String> rawCriteria) {
         if (rawCriteria == null || rawCriteria.isEmpty()) {
             return List.of();
+        }
+        // Each criterion is a correlated subquery, evaluated in both the count and the page query
+        if (rawCriteria.size() > MAX_INSTRUMENT_CRITERIA) {
+            throw new ValidationException("At most " + MAX_INSTRUMENT_CRITERIA
+                    + " instrument criteria are allowed, got " + rawCriteria.size());
         }
         List<InstrumentationCountCriterion> criteria =
                 rawCriteria.stream().map(InstrumentationCountCriterion::parse).toList();
