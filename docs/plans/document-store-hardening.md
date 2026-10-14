@@ -1,6 +1,7 @@
 # Plan: Document Store Hardening
 
-Roadmap: [Document store hardening](../roadmap.md#document-store-hardening--planned)
+Roadmap: [Document store hardening](../roadmap.md#document-store-hardening--in-progress)
+· Tracking issue: [#154](https://github.com/fhm84/sam/issues/154) (milestone [Go-live](https://github.com/fhm84/sam/milestone/1))
 · Concept: [Storage & deduplication](../architecture/concepts/storage-and-deduplication.md)
 · Follow-up: [Storage encryption](storage-encryption.md) ([ADR-0011](../architecture/decisions/adr-0011-stored-document-encryption.md))
 
@@ -39,13 +40,13 @@ files (findings 1–3, fixed in d2d1646). The remaining tasks are also the prere
 | 1 | Use a unique temp name (UUID, under `.upload-tmp/`) instead of the user's file name. Local `openForWrite` uses `TRUNCATE_EXISTING`. Fixes 1. | done |
 | 2 | Always remove the temp file (`try`/`finally`): when the upload is a duplicate, rejected by a policy, or fails during the scan or I/O. Fixes 3. | done |
 | 3 | Detect the MIME type by reading the temp file back through `openForRead` (Tika with the file-name hint) instead of `resolve().toFile()`. Fixes 2. With encryption, that read-back goes through the decorator too. | done |
-| 4 | Drop the stream from `UploadContext` (it carries file name, size and MIME type only), or replace it with the header bytes if a policy needs content. | pending |
-| 5 | Store new files under random paths (`<uuid[0:2]>/<uuid[2:4]>/<uuid>`) decoupled from the hash, and write them there directly. If the content turns out to be a duplicate, delete the new file. Upload no longer needs `move`. `sha256` stays in the database for deduplication. Existing rows keep their paths, so no data migration is needed. Fixes 6. | pending |
-| 6 | Delete the physical file only **after commit** (transaction-synchronised callback), never before the row. Fixes 5. | pending |
-| 7 | Remove `resolve(String)` from the `FileSystemWrapper` interface (or document it as debug-only), so no code reads files without going through the stream API. No caller is left in `server` since d2d1646; an ArchUnit rule keeps it that way. | pending |
-| 8 | Integrity check: an admin-triggered job (endpoint or CLI) that recomputes each stored file's SHA-256, compares it with the database, and reports mismatches, missing files, orphaned files and leftover temp files. Run it once on existing data to find files already damaged by finding 1. It is reused for the encryption migration. | pending |
-| 9 | Tests: same file name with different content stores the correct bytes; a duplicate or rejected upload leaves no temp file; upload works against a fake wrapper whose `resolve` throws (proxy for S3); delete with a rolled-back transaction keeps the file. All but the last are covered by `DocumentStoreTempFileTest` (the S3 case via #119). | partial |
-| 10 | Update the [storage concept](../architecture/concepts/storage-and-deduplication.md) (paths no longer content-addressed, integrity check). | pending |
+| 4 | Drop the stream from `UploadContext` (it carries file name, size and MIME type only), or replace it with the header bytes if a policy needs content. | [#155](https://github.com/fhm84/sam/issues/155) |
+| 5 | Store new files under random paths (`<uuid[0:2]>/<uuid[2:4]>/<uuid>`) decoupled from the hash, and write them there directly. If the content turns out to be a duplicate, delete the new file. Upload no longer needs `move`. `sha256` stays in the database for deduplication. Existing rows keep their paths, so no data migration is needed. Fixes 6. | [#156](https://github.com/fhm84/sam/issues/156) |
+| 6 | Delete the physical file only **after commit** (transaction-synchronised callback), never before the row. Fixes 5. | [#157](https://github.com/fhm84/sam/issues/157) |
+| 7 | Remove `resolve(String)` from the `FileSystemWrapper` interface (or document it as debug-only), so no code reads files without going through the stream API. No caller is left in `server` since d2d1646; an ArchUnit rule keeps it that way. | [#158](https://github.com/fhm84/sam/issues/158) |
+| 8 | Integrity check: an admin-triggered job (endpoint or CLI) that recomputes each stored file's SHA-256, compares it with the database, and reports mismatches, missing files, orphaned files and leftover temp files. Run it once on existing data to find files already damaged by finding 1. It is reused for the encryption migration. | [#159](https://github.com/fhm84/sam/issues/159) |
+| 9 | Tests: same file name with different content stores the correct bytes; a duplicate or rejected upload leaves no temp file; upload works against a fake wrapper whose `resolve` throws (proxy for S3); delete with a rolled-back transaction keeps the file. All but the last are covered by `DocumentStoreTempFileTest` (the S3 case via #119). | [#160](https://github.com/fhm84/sam/issues/160) |
+| 10 | Update the [storage concept](../architecture/concepts/storage-and-deduplication.md) (paths no longer content-addressed, integrity check). | [#161](https://github.com/fhm84/sam/issues/161) |
 
 Tasks 1–3 shipped in d2d1646 (temp files under `.upload-tmp/`, MIME type read back through the
 wrapper), with tests in `DocumentStoreTempFileTest`. Files uploaded before that fix may already be

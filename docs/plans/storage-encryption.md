@@ -1,6 +1,7 @@
 # Plan: Encryption of Stored Documents
 
 Roadmap: [Encryption of stored documents](../roadmap.md#encryption-of-stored-documents--planned)
+· Tracking issue: [#162](https://github.com/fhm84/sam/issues/162) (milestone [Go-live](https://github.com/fhm84/sam/milestone/1))
 · Decision: [ADR-0011](../architecture/decisions/adr-0011-stored-document-encryption.md)
 · Depends on: [Document store hardening](document-store-hardening.md) (tasks 3, 5, 7, 8)
 
@@ -10,10 +11,12 @@ licence leaks by legitimate users. See the ADR for the threat model.
 
 ## Phase A: operations (no code, worth doing before go-live)
 
+Tracked in [#162](https://github.com/fhm84/sam/issues/162). Phase B gets issues once it moves to the roadmap's Now list.
+
 | # | Task | Status |
 |---|------|--------|
-| A1 | Encrypt the backup archives on the server with [age](https://age-encryption.org/), using a **public key**. The private key stays offline. Today the backup holds the files, both database dumps **and `.env`** in plaintext. Update `scripts/backup/backup.sh`, `restore.sh` and the [production setup](../architecture/production-setup.md#5-backups-a-second-machine-pulls-from-the-server). | pending |
-| A2 | Production setup: mention the provider's volume encryption or LUKS for the data volume as an optional extra layer. | pending |
+| A1 | Encrypt the backup archives on the server with [age](https://age-encryption.org/), using a **public key**. The private key stays offline. Today the backup holds the files, both database dumps **and `.env`** in plaintext. Update `scripts/backup/backup.sh`, `restore.sh` and the [production setup](../architecture/production-setup.md#5-backups-a-second-machine-pulls-from-the-server). | [#163](https://github.com/fhm84/sam/issues/163) |
+| A2 | Production setup: mention the provider's volume encryption or LUKS for the data volume as an optional extra layer. | [#164](https://github.com/fhm84/sam/issues/164) |
 
 ## Phase B: in-app encryption (opt-in feature)
 
