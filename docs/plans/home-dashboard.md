@@ -1,6 +1,7 @@
 # Plan: Home Dashboard
 
 Roadmap: [Home dashboard](../roadmap.md#home-dashboard--planned)
+· Tracking issue: [#193](https://github.com/fhm84/sam/issues/193) (milestone [Everyday use](https://github.com/fhm84/sam/milestone/2))
 
 **Why:** after login the app lands on an empty screen. The design (`Hi-Fi Shell`) shows
 an Inbox tab (KPIs, activity feed) and an Ensemble dashboard tab (coverage KPIs, gap cards,
@@ -19,29 +20,29 @@ next concert).
 
 | # | Task | Status |
 |---|------|--------|
-| 1 | `venue` on `SheetCollectionEntity` / `SheetCollection` + migration. | pending |
-| 2 | `MEMBER_JOINED` / `MEMBER_LEFT` in `EventType`, emitted from `EnsembleMembershipService`. | pending |
-| 3 | `sam.coverage.stale-threshold-days` (default 7) + staleness flag in the coverage status response. Mostly moot once [snapshot invalidation](coverage-snapshot-invalidation.md) ships; reconsider then. | pending |
+| 1 | `venue` on `SheetCollectionEntity` / `SheetCollection` + migration. | [#194](https://github.com/fhm84/sam/issues/194) |
+| 2 | `MEMBER_JOINED` / `MEMBER_LEFT` in `EventType`, emitted from `EnsembleMembershipService`. | [#195](https://github.com/fhm84/sam/issues/195) |
+| 3 | `sam.coverage.stale-threshold-days` (default 7) + staleness flag in the coverage status response. Mostly moot once [snapshot invalidation](coverage-snapshot-invalidation.md) ships; reconsider then. | [#196](https://github.com/fhm84/sam/issues/196) |
 
 ## API
 
 | # | Task | Status |
 |---|------|--------|
-| 4 | `GET /home/inbox-stats`: to-classify count, instrumentations without archive location, stale ensembles, new sheets this week. | pending |
-| 5 | `GET /home/activity`: recent event-log entries with display labels (respect the [role-aware access](rbac-role-aware-access.md) rules). | pending |
-| 6 | `GET /home/next-concert`: nearest upcoming `SETLIST` with venue, piece count, total duration, aggregate coverage. | pending |
-| 7 | `GET /ensembles/{id}/dashboard`: complete / playable / incomplete counts + repertoire size. | pending |
-| 8 | `GET /ensembles/{id}/gaps`: shared with [coverage breakdown](coverage-breakdown.md), task 3. | pending |
-| 9 | `GET /ensembles/{id}/near-complete`: sheets within N% of the PLAYABLE threshold. | pending |
+| 4 | `GET /home/inbox-stats`: to-classify count, instrumentations without archive location, stale ensembles, new sheets this week. | [#197](https://github.com/fhm84/sam/issues/197) |
+| 5 | `GET /home/activity`: recent event-log entries with display labels (respect the [role-aware access](rbac-role-aware-access.md) rules). | [#198](https://github.com/fhm84/sam/issues/198) |
+| 6 | `GET /home/next-concert`: nearest upcoming `SETLIST` with venue, piece count, total duration, aggregate coverage. | [#199](https://github.com/fhm84/sam/issues/199) |
+| 7 | `GET /ensembles/{id}/dashboard`: complete / playable / incomplete counts + repertoire size. | [#200](https://github.com/fhm84/sam/issues/200) |
+| 8 | `GET /ensembles/{id}/gaps`: shared with [coverage breakdown](coverage-breakdown.md), task 3. | [#169](https://github.com/fhm84/sam/issues/169) |
+| 9 | `GET /ensembles/{id}/near-complete`: sheets within N% of the PLAYABLE threshold. | [#201](https://github.com/fhm84/sam/issues/201) |
 
 ## Angular
 
 | # | Task | Status |
 |---|------|--------|
-| 10 | `/home` route as the default landing page, with Inbox and Ensemble dashboard tabs. | pending |
-| 11 | Inbox tab: KPI row, activity feed, right rail (quick upload, gap card, next concert). | pending |
-| 12 | Ensemble tab: KPI row, most-missing voices, one-voice-away list. | pending |
-| 13 | Venue field in the collection form. | pending |
+| 10 | `/home` route as the default landing page, with Inbox and Ensemble dashboard tabs. | [#202](https://github.com/fhm84/sam/issues/202) |
+| 11 | Inbox tab: KPI row, activity feed, right rail (quick upload, gap card, next concert). | [#203](https://github.com/fhm84/sam/issues/203) |
+| 12 | Ensemble tab: KPI row, most-missing voices, one-voice-away list. | [#204](https://github.com/fhm84/sam/issues/204) |
+| 13 | Venue field in the collection form. | [#205](https://github.com/fhm84/sam/issues/205) |
 
 ## Key files
 
