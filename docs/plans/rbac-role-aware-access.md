@@ -1,6 +1,7 @@
 # Plan: Role-Aware Access (RBAC Phase 4)
 
 Roadmap: [Full role-based access control](../roadmap.md#full-role-based-access-control-rbac--in-progress)
+· Tracking issue: [#129](https://github.com/fhm84/sam/issues/129) (milestone [Go-live](https://github.com/fhm84/sam/milestone/1))
 · Access model: [stakeholders, Section 6](../stakeholders.md)
 
 **Why now:** once real musicians log in, every authenticated account can see the admin
@@ -25,14 +26,14 @@ should see. Writes are already protected by `@RolesAllowed`, but reads are not s
 
 | # | Task | Status |
 |---|------|--------|
-| 1 | **Backend read audit**: go through every `*ResourceImpl` read method and decide per endpoint: any user / librarian+admin / admin. Record the result in `docs/features/api-surface.md`. | pending |
-| 2 | **Event log**: restrict `EventLogResource.find` to `admin` (librarian too, if wanted). The self-service "my own access history" view is part of [event log retention](event-log-retention.md). | pending |
-| 3 | **Musician contact data**: hide `email` / `mobile` / `notes` from non-librarian callers. Either use a separate DTO or have the mapper null the fields, decided via `CurrentUserService.hasRole()`. | pending |
+| 1 | **Backend read audit**: go through every `*ResourceImpl` read method and decide per endpoint: any user / librarian+admin / admin. Record the result in `docs/features/api-surface.md`. | [#130](https://github.com/fhm84/sam/issues/130) |
+| 2 | **Event log**: restrict `EventLogResource.find` to `admin` (librarian too, if wanted). The self-service "my own access history" view is part of [event log retention](event-log-retention.md). | [#131](https://github.com/fhm84/sam/issues/131) |
+| 3 | **Musician contact data**: hide `email` / `mobile` / `notes` from non-librarian callers. Either use a separate DTO or have the mapper null the fields, decided via `CurrentUserService.hasRole()`. | [#132](https://github.com/fhm84/sam/issues/132) |
 | 4 | **Share creation**: restrict `create` to librarian+admin. Decided: listing and revoking stay open to every authenticated user, scoped to their own shares (d2d1646). | done |
-| 5 | **Role route guard**: add a `roleGuard(...roles)` in `core/auth/` and put it on `admin/*`, `uploads`, `shares` (as task 1 decides). | pending |
-| 6 | **Menu filtering**: give menu items an optional `roles` list in `app-menu.ts` and filter them through `AuthService.hasRole()`. | pending |
-| 7 | **Action visibility**: hide create/edit/delete buttons for users without write roles (sheets, collections, musicians, instrumentations, documents). | pending |
-| 8 | **Tests**: add `@TestSecurity` tests per restricted endpoint (allowed role passes, plain user gets 403), plus Angular unit tests for the guard and menu filtering. | pending |
+| 5 | **Role route guard**: add a `roleGuard(...roles)` in `core/auth/` and put it on `admin/*`, `uploads`, `shares` (as task 1 decides). | [#133](https://github.com/fhm84/sam/issues/133) |
+| 6 | **Menu filtering**: give menu items an optional `roles` list in `app-menu.ts` and filter them through `AuthService.hasRole()`. | [#134](https://github.com/fhm84/sam/issues/134) |
+| 7 | **Action visibility**: hide create/edit/delete buttons for users without write roles (sheets, collections, musicians, instrumentations, documents). | [#135](https://github.com/fhm84/sam/issues/135) |
+| 8 | **Tests**: add `@TestSecurity` tests per restricted endpoint (allowed role passes, plain user gets 403), plus Angular unit tests for the guard and menu filtering. | [#136](https://github.com/fhm84/sam/issues/136) |
 
 ## Out of scope (separate follow-ups)
 

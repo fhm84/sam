@@ -12,7 +12,10 @@ For **technical architecture** see the [architecture docs](README.md#architectur
 Status values: `idea` · `planned` · `in progress` · `done`
 
 Task-level breakdowns for `planned` / `in progress` items live in
-[implementation plans](plans/README.md).
+[implementation plans](plans/README.md). Items on the **Now** list are also tracked as
+GitHub issues: one tracking issue per item, with a sub-issue per open plan task, all in
+the [Go-live milestone](https://github.com/fhm84/sam/milestone/1). An issue's state is the
+task's status.
 
 ---
 
@@ -25,16 +28,19 @@ unprioritised backlog.
 
 1. [Role-aware access](#full-role-based-access-control-rbac--in-progress): menu and route
    guarding, and scoping read endpoints (event log, musician contact data)
-   → [plan](plans/rbac-role-aware-access.md)
+   → [plan](plans/rbac-role-aware-access.md) · [#129](https://github.com/fhm84/sam/issues/129)
 2. [Automatic coverage snapshot invalidation](#automatic-coverage-snapshot-invalidation--planned)
-   → [plan](plans/coverage-snapshot-invalidation.md) (needs open question #5)
+   → [plan](plans/coverage-snapshot-invalidation.md) · [#137](https://github.com/fhm84/sam/issues/137)
+   (needs open question #5: [#138](https://github.com/fhm84/sam/issues/138))
 3. [Event log retention + own-history view](#document-access-log--partial)
-   → [plan](plans/event-log-retention.md) (needs open question #9)
-4. [Document store hardening](#document-store-hardening--planned): fixes silent file
-   corruption on uploads with the same file name and broken S3 uploads
-   → [plan](plans/document-store-hardening.md)
+   → [plan](plans/event-log-retention.md) · [#146](https://github.com/fhm84/sam/issues/146)
+   (needs open question #9: [#147](https://github.com/fhm84/sam/issues/147))
+4. [Document store hardening](#document-store-hardening--in-progress): the upload bugs
+   (same-name corruption, S3) are fixed; left are random storage paths, deleting files
+   only after commit, and an integrity check for files damaged before the fix
+   → [plan](plans/document-store-hardening.md) · [#154](https://github.com/fhm84/sam/issues/154)
 5. Encrypted backups (phase A of [encryption of stored documents](#encryption-of-stored-documents--planned))
-   → [plan](plans/storage-encryption.md)
+   → [plan](plans/storage-encryption.md) · [#162](https://github.com/fhm84/sam/issues/162)
 
 **Next: everyday use for the music librarian**
 
@@ -842,11 +848,11 @@ This is already noted as a known gap in the [coverage concept](architecture/conc
 
 ---
 
-### Document store hardening — `planned`
+### Document store hardening — `in progress`
 
-Fix `DocumentStore.upload`: leftover temp files named after the uploaded file can
-silently corrupt later uploads with the same file name, and uploads to S3 fail because MIME
-detection reads a local file. Also: storage paths no longer derived from the content
+Fix `DocumentStore.upload`: leftover temp files named after the uploaded file could
+silently corrupt later uploads with the same file name, and uploads to S3 failed because MIME
+detection read a local file (both fixed in d2d1646). Still open: storage paths no longer derived from the content
 hash, file deletion only after commit, and an integrity check that compares stored
 files with their recorded SHA-256. Prerequisite for
 [encryption of stored documents](#encryption-of-stored-documents--planned).
@@ -868,7 +874,7 @@ protect against licence leaks by legitimate users; for that see
 
 **Stakeholders:** S4 (Administrator), S1 (music librarian)
 **Effort:** Medium
-**Depends on:** [Document store hardening](#document-store-hardening--planned)
+**Depends on:** [Document store hardening](#document-store-hardening--in-progress)
 → [plan](plans/storage-encryption.md) · [ADR-0011](architecture/decisions/adr-0011-stored-document-encryption.md)
 
 ---

@@ -7,21 +7,29 @@ breakdown, the decisions made so far, the open questions and the key files.
 Conventions:
 
 - One page per roadmap item, named after it.
-- Task tables use `pending` / `partial` / `done`. Flip the status in the same commit
-  that ships the task, and flip the roadmap status when the last task is done.
+- **Plans on the Now list are tracked in GitHub issues.** Each has a tracking issue in the
+  [Go-live milestone](https://github.com/fhm84/sam/milestone/1), with one sub-issue per
+  open task. The task table's status cell links the issue, and the issue's state is the
+  status: close it from the pull request (`Closes #N`) and leave the table row alone.
+  Open questions a plan needs answered get an issue too.
+- When a plan moves onto the Now list, create its issues the same way (labels `now` and
+  `area: …`, milestone, sub-issues of the tracking issue) and put the links into the table.
+- Plans not yet on the Now list keep `pending` / `partial` / `done` in their task tables.
+  Flip the status in the same commit that ships the task.
+- Flip the roadmap status when the last task is done.
 - When a plan is fully shipped, delete the page. The feature reference in
   [features/](../features/README.md) and git history take over. Record lasting design
   choices as an [ADR](../architecture/decisions/README.md) rather than keeping the plan.
 
 ## Now: before go-live
 
-| Plan | Roadmap item | Blocked on |
-|---|---|---|
-| [Role-aware access](rbac-role-aware-access.md) | Full RBAC (Phase 4) | — |
-| [Coverage snapshot invalidation](coverage-snapshot-invalidation.md) | Automatic coverage snapshot invalidation | Open question #5 |
-| [Event log retention](event-log-retention.md) | Document access log (pending part) | Open question #9 |
-| [Document store hardening](document-store-hardening.md) | Document store hardening | — |
-| [Storage encryption](storage-encryption.md), phase A only | Encryption of stored documents (backup encryption) | — |
+| Plan | Roadmap item | Issue | Blocked on |
+|---|---|---|---|
+| [Role-aware access](rbac-role-aware-access.md) | Full RBAC (Phase 4) | [#129](https://github.com/fhm84/sam/issues/129) | — |
+| [Coverage snapshot invalidation](coverage-snapshot-invalidation.md) | Automatic coverage snapshot invalidation | [#137](https://github.com/fhm84/sam/issues/137) | Open question #5 ([#138](https://github.com/fhm84/sam/issues/138)) |
+| [Event log retention](event-log-retention.md) | Document access log (pending part) | [#146](https://github.com/fhm84/sam/issues/146) | Open question #9 ([#147](https://github.com/fhm84/sam/issues/147)) |
+| [Document store hardening](document-store-hardening.md) | Document store hardening | [#154](https://github.com/fhm84/sam/issues/154) | — |
+| [Storage encryption](storage-encryption.md), phase A only | Encryption of stored documents (backup encryption) | [#162](https://github.com/fhm84/sam/issues/162) | — |
 
 ## Next: everyday use for the music librarian
 
