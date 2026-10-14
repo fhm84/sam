@@ -12,10 +12,11 @@ For **technical architecture** see the [architecture docs](README.md#architectur
 Status values: `idea` · `planned` · `in progress` · `done`
 
 Task-level breakdowns for `planned` / `in progress` items live in
-[implementation plans](plans/README.md). Items on the **Now** list are also tracked as
-GitHub issues: one tracking issue per item, with a sub-issue per open plan task, all in
-the [Go-live milestone](https://github.com/fhm84/sam/milestone/1). An issue's state is the
-task's status.
+[implementation plans](plans/README.md). Items on the **Now** and **Next** lists are also
+tracked as GitHub issues: one tracking issue per item, with a sub-issue per open plan task,
+in the [Go-live](https://github.com/fhm84/sam/milestone/1) (Now) and
+[Everyday use](https://github.com/fhm84/sam/milestone/2) (Next) milestones. An issue's
+state is the task's status.
 
 ---
 
@@ -44,10 +45,10 @@ unprioritised backlog.
 
 **Next: everyday use for the music librarian**
 
-1. [Classification form enhancements](#classification-form-enhancements--planned) → [plan](plans/classification-enhancements.md)
-2. [Sheets overview filter & bulk actions](#sheets-overview-filter--bulk-actions--planned) → [plan](plans/sheets-overview.md)
-3. [Home dashboard](#home-dashboard--planned) → [plan](plans/home-dashboard.md),
-   including the gap report from [coverage breakdown enhancements](#coverage-breakdown-enhancements--planned) → [plan](plans/coverage-breakdown.md)
+1. [Classification form enhancements](#classification-form-enhancements--planned) → [plan](plans/classification-enhancements.md) · [#172](https://github.com/fhm84/sam/issues/172)
+2. [Sheets overview filter & bulk actions](#sheets-overview-filter--bulk-actions--planned) → [plan](plans/sheets-overview.md) · [#182](https://github.com/fhm84/sam/issues/182)
+3. [Home dashboard](#home-dashboard--planned) → [plan](plans/home-dashboard.md) · [#193](https://github.com/fhm84/sam/issues/193),
+   including the gap report from [coverage breakdown enhancements](#coverage-breakdown-enhancements--planned) → [plan](plans/coverage-breakdown.md) · [#166](https://github.com/fhm84/sam/issues/166)
 
 **Later**
 

@@ -7,14 +7,17 @@ breakdown, the decisions made so far, the open questions and the key files.
 Conventions:
 
 - One page per roadmap item, named after it.
-- **Plans on the Now list are tracked in GitHub issues.** Each has a tracking issue in the
-  [Go-live milestone](https://github.com/fhm84/sam/milestone/1), with one sub-issue per
-  open task. The task table's status cell links the issue, and the issue's state is the
-  status: close it from the pull request (`Closes #N`) and leave the table row alone.
-  Open questions a plan needs answered get an issue too.
-- When a plan moves onto the Now list, create its issues the same way (labels `now` and
-  `area: …`, milestone, sub-issues of the tracking issue) and put the links into the table.
-- Plans not yet on the Now list keep `pending` / `partial` / `done` in their task tables.
+- **Plans on the Now and Next lists are tracked in GitHub issues.** Each has a tracking
+  issue, with one sub-issue per open task, in the
+  [Go-live](https://github.com/fhm84/sam/milestone/1) (Now) or
+  [Everyday use](https://github.com/fhm84/sam/milestone/2) (Next) milestone. The task
+  table's status cell links the issue, and the issue's state is the status: close it from
+  the pull request (`Closes #N`) and leave the table row alone. Open questions a plan needs
+  answered get an issue too. A task shared by two plans has one issue, linked from both.
+- When a plan moves onto the Now or Next list, create its issues the same way (label `now`
+  or `next` plus `area: …`, milestone, sub-issues of the tracking issue) and put the links
+  into the table. When it moves from Next to Now, relabel and move its issues.
+- Plans on the Later list keep `pending` / `partial` / `done` in their task tables.
   Flip the status in the same commit that ships the task.
 - Flip the roadmap status when the last task is done.
 - When a plan is fully shipped, delete the page. The feature reference in
@@ -33,12 +36,12 @@ Conventions:
 
 ## Next: everyday use for the music librarian
 
-| Plan | Roadmap item |
-|---|---|
-| [Classification form enhancements](classification-enhancements.md) | Classification form enhancements |
-| [Sheets overview filters & bulk actions](sheets-overview.md) | Sheets overview filter & bulk actions |
-| [Home dashboard](home-dashboard.md) | Home dashboard |
-| [Coverage breakdown enhancements](coverage-breakdown.md) | Coverage breakdown enhancements |
+| Plan | Roadmap item | Issue |
+|---|---|---|
+| [Classification form enhancements](classification-enhancements.md) | Classification form enhancements | [#172](https://github.com/fhm84/sam/issues/172) |
+| [Sheets overview filters & bulk actions](sheets-overview.md) | Sheets overview filter & bulk actions | [#182](https://github.com/fhm84/sam/issues/182) |
+| [Home dashboard](home-dashboard.md) | Home dashboard | [#193](https://github.com/fhm84/sam/issues/193) |
+| [Coverage breakdown enhancements](coverage-breakdown.md) | Coverage breakdown enhancements | [#166](https://github.com/fhm84/sam/issues/166) |
 
 ## Later
 

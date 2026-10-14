@@ -1,6 +1,7 @@
 # Plan: Coverage Breakdown Enhancements
 
 Roadmap: [Coverage breakdown enhancements](../roadmap.md#coverage-breakdown-enhancements--planned)
+· Tracking issue: [#166](https://github.com/fhm84/sam/issues/166) (milestone [Everyday use](https://github.com/fhm84/sam/milestone/2))
 · Feature: [Ensembles & coverage](../features/ensembles-coverage.md)
 · Concept: [Coverage evaluation](../architecture/concepts/coverage.md)
 
@@ -11,11 +12,11 @@ Breakdown`) shows richer annotations and two aggregate views that don't exist ye
 
 | # | Task | Status |
 |---|------|--------|
-| 1 | **Condition/substitute annotations**: expose `conditionPenalty` and `substituteFactor` as named fields on `VoiceCoverageDetail` (already computed internally). | pending |
-| 2 | **Multi-ensemble view**: make `ensemble` optional on `GET /sheets/{id}/coverage`, returning results for all ensembles when omitted (side-by-side panel). | pending |
-| 3 | **Ensemble gap report**: `GET /ensembles/{id}/gaps`, the per-voice count of sheets missing that voice, sorted by prevalence. Shared with the [home dashboard](home-dashboard.md). | pending |
-| 4 | **Recommendations**: which 1–2 voices, if added, would move the most sheets from INCOMPLETE to PLAYABLE. | pending |
-| 5 | **Angular**: penalty labels, multi-ensemble panel and recommendations in the sheet detail coverage view. | pending |
+| 1 | **Condition/substitute annotations**: expose `conditionPenalty` and `substituteFactor` as named fields on `VoiceCoverageDetail` (already computed internally). | [#167](https://github.com/fhm84/sam/issues/167) |
+| 2 | **Multi-ensemble view**: make `ensemble` optional on `GET /sheets/{id}/coverage`, returning results for all ensembles when omitted (side-by-side panel). | [#168](https://github.com/fhm84/sam/issues/168) |
+| 3 | **Ensemble gap report**: `GET /ensembles/{id}/gaps`, the per-voice count of sheets missing that voice, sorted by prevalence. Shared with the [home dashboard](home-dashboard.md). | [#169](https://github.com/fhm84/sam/issues/169) |
+| 4 | **Recommendations**: which 1–2 voices, if added, would move the most sheets from INCOMPLETE to PLAYABLE. | [#170](https://github.com/fhm84/sam/issues/170) |
+| 5 | **Angular**: penalty labels, multi-ensemble panel and recommendations in the sheet detail coverage view. | [#171](https://github.com/fhm84/sam/issues/171) |
 
 ## Key files
 

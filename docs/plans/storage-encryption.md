@@ -11,7 +11,7 @@ licence leaks by legitimate users. See the ADR for the threat model.
 
 ## Phase A: operations (no code, worth doing before go-live)
 
-Tracked in [#162](https://github.com/fhm84/sam/issues/162). Phase B gets issues once it moves to the roadmap's Now list.
+Tracked in [#162](https://github.com/fhm84/sam/issues/162). Phase B gets issues once it moves to the roadmap's Now or Next list.
 
 | # | Task | Status |
 |---|------|--------|
