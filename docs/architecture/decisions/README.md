@@ -19,6 +19,7 @@ previously recorded in the roadmap's open-questions table and plan notes.
 | [0009](adr-0009-version-controlled-prompts.md) | Prompts are version-controlled resources, not runtime config | accepted |
 | [0010](adr-0010-caddy-edge-proxy.md) | Caddy replaces nginx as the single edge proxy in the UI image; `/q/*` not exposed publicly | accepted |
 | [0011](adr-0011-stored-document-encryption.md) | Opt-in application-level encryption of stored documents; key kept outside database and backups | accepted |
+| [0012](adr-0012-eupl-license.md) | SAM is licensed under the EUPL-1.2 (network copyleft, official in all EU languages) | accepted |
 
 New decisions: add the next number, keep it short (context, decision,
 consequences — a screen or less), and link it from this table.
