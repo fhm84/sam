@@ -42,6 +42,9 @@ unprioritised backlog.
    → [plan](plans/document-store-hardening.md) · [#154](https://github.com/fhm84/sam/issues/154)
 5. Encrypted backups (phase A of [encryption of stored documents](#encryption-of-stored-documents--planned))
    → [plan](plans/storage-encryption.md) · [#162](https://github.com/fhm84/sam/issues/162)
+6. [Pocket ID as default OIDC provider](#pocket-id-as-default-oidc-provider--planned):
+   lighter login stack with passkeys, Keycloak stays optional
+   → [plan](plans/pocket-id-provider.md) · [#210](https://github.com/fhm84/sam/issues/210)
 
 **Next: everyday use for the music librarian**
 
@@ -658,6 +661,21 @@ scoped to the logged-in musician's ensemble memberships (`/my-parts`, `GET /api/
 **Stakeholders:** All
 **Effort:** High
 **Auth provider chosen:** Self-hosted Keycloak 26 (`ensemble:{UUID}` groups for per-ensemble access)
+
+---
+
+### Pocket ID as default OIDC provider — `planned`
+
+Replace Keycloak as the default login provider with self-hosted Pocket ID: one small
+binary instead of Keycloak plus its own Postgres, and passkeys instead of passwords for
+members who log in only a few times a year. Keycloak stays a supported alternative,
+selected by one setting. Pocket ID keeps groups out of access tokens, so user roles come
+from userinfo and the `cli` service account's role from an API permission (spike
+2026-10-17, works end to end in dev).
+
+**Stakeholders:** S4 (Administrator), all users who log in
+**Effort:** Medium
+→ [plan](plans/pocket-id-provider.md) · [#210](https://github.com/fhm84/sam/issues/210)
 
 ---
 
@@ -1420,7 +1438,8 @@ answered before the relevant implementation work begins.
 | 4 | Is anonymous guest access (no link, open public URL) ever desirable? | Guest access scope | Open |
 | 5 | Should coverage snapshots be invalidated automatically, or remain manual? | Coverage accuracy, performance | Open: **blocks a Now item.** Proposed: automatic per-sheet recompute, async full recompute on voice changes ([plan](plans/coverage-snapshot-invalidation.md)) |
 | 6 | Should lending / checkout be tracked per instrumentation or per physical copy? (Relevant if multiple copies per instrumentation are ever supported) | Lending, physical archive | Open |
-| 7 | Which OIDC provider? Self-hosted (Keycloak) or SaaS (Auth0, Google)? | Auth implementation | **Resolved:** Self-hosted Keycloak 26. |
+| 7 | Which OIDC provider? Self-hosted (Keycloak) or SaaS (Auth0, Google)? | Auth implementation | **Resolved:** Self-hosted Keycloak 26. **Revisited 2026-10-17:** self-hosted Pocket ID as the default, Keycloak stays supported ([plan](plans/pocket-id-provider.md), ADR follows with [#220](https://github.com/fhm84/sam/issues/220)). |
 | 8 | Should IP addresses be stored in the document access log, or omitted/anonymised? Requires GDPR/privacy policy decision. | Document access log | **Resolved: not stored.** `userId` (OIDC sub) + snapshotted `username` give unambiguous attribution; IP adds GDPR obligations without meaningful benefit in an ensemble context. |
 | 9 | What retention period for the document access log? (e.g. 12 months) | Document access log | Open: **blocks a Now item.** Proposed: 12 months, configurable ([plan](plans/event-log-retention.md)) |
 | 10 | All Claude Design files have now been reviewed for data model gaps. Resulting plans are in [implementation plans](plans/README.md) (open ones) and the roadmap. | Multiple | **Resolved** |
+| 11 | May users request a Pocket ID login code by email themselves, or do only admins send them? | Pocket ID login recovery | Open. Proposed: admin only at first ([#222](https://github.com/fhm84/sam/issues/222)) |
