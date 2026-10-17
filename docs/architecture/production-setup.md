@@ -42,7 +42,7 @@ stay untouched. If the zone has CAA records, they must allow `letsencrypt.org`.
 
 1. Copy the repo (or at least `docker-compose.prod.yml`, `docker/`, `keycloak/prod/`) and a filled-in `.env` (from `.env.example`) to the server. Generate every `changeme` with `openssl rand -hex 24`.
 2. Set `SAM_DOMAIN`, `KEYCLOAK_DOMAIN` and `ACME_EMAIL`; `OIDC_SERVER_URL` must be `https://<KEYCLOAK_DOMAIN>/realms/sam`.
-3. `docker compose -f docker-compose.prod.yml up -d`. The `sam-ui` service (Caddy, `docker/Caddyfile`) is the only published service; it fetches the certificates once DNS resolves and ports 80/443 are open. Keycloak imports `keycloak/prod/sam-realm.json` on first boot only.
+3. `docker compose -f docker-compose.prod.yml pull` fetches the published images (no registry login needed; optionally pin `SAM_IMAGE_TAG`, see [Deployment](deployment.md)). Then `docker compose -f docker-compose.prod.yml up -d`. To update later: `pull`, then `up -d` again. The `sam-ui` service (Caddy, `docker/Caddyfile`) is the only published service; it fetches the certificates once DNS resolves and ports 80/443 are open. Keycloak imports `keycloak/prod/sam-realm.json` on first boot only.
 4. On the very first start `sam-server` may fail to reach the Keycloak issuer before Caddy has its certificate; the restart policy retries automatically, so give it a minute or two before investigating.
 
 What the production realm import contains: roles, the `sam-ui` / `sam-backend` / `sam-cli` clients (secrets and redirect URI filled from `.env`), and the two service accounts. It deliberately has **no dev users, no dev passwords, no localhost redirect URIs** (unlike `keycloak/sam-realm.json`, which is dev-only).

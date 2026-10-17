@@ -2,7 +2,9 @@
 # terminates TLS and proxies the API and Keycloak (see docker/Caddyfile).
 # Backend image is built by Jib: ./mvnw package -Dquarkus.container-image.build=true -pl server -am
 
-FROM node:26-alpine AS build
+# The build output is static JS/CSS, so build on the host platform even for an arm64
+# image (no emulated npm build).
+FROM --platform=$BUILDPLATFORM node:26-alpine AS build
 WORKDIR /app
 COPY ui/src/main/webui/package*.json ./
 RUN npm ci

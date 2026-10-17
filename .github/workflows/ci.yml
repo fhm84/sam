@@ -3,6 +3,7 @@ name: CI
 on:
   push:
     branches: [ "main" ]
+    tags: [ "v*" ]
   pull_request:
     branches: [ "main" ]
 
@@ -74,3 +75,119 @@ jobs:
       - name: Run UI unit tests
         working-directory: ui/src/main/webui
         run: npm test
+
+  # Images are published publicly to ghcr.io (ADR-0012) for amd64 and arm64, only from
+  # pushes to main (tags: latest, sha-<short>) and v* tags (tags: <version>, sha-<short>),
+  # and only after the tests passed.
+  server-image:
+    name: Publish server image
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push'
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v6
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      # Same tags and OCI labels as the UI image (title, description, source, licenses from
+      # the repo; version, revision, created per build). They also replace the base image's
+      # labels, which otherwise describe the Red Hat OpenJDK image.
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/fhm84/sam
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=semver,pattern={{version}}
+            type=sha
+          labels: |
+            org.opencontainers.image.documentation=https://github.com/fhm84/sam/tree/main/docs
+
+      # Jib assembles the arm64 image from the multi-arch base image without running it,
+      # so no QEMU is needed. A multi-platform Jib build can only push, not load locally.
+      - name: Build and push with Jib
+        env:
+          QUARKUS_CONTAINER_IMAGE_USERNAME: ${{ github.actor }}
+          QUARKUS_CONTAINER_IMAGE_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+          TAGS: ${{ steps.meta.outputs.tags }}
+          LABELS: ${{ steps.meta.outputs.labels }}
+        run: |
+          tags=()
+          while IFS= read -r ref; do
+            if [[ -n "$ref" ]]; then tags+=("${ref##*:}"); fi
+          done <<< "$TAGS"
+          additional=$(IFS=,; echo "${tags[*]:1}")
+          labels=()
+          while IFS= read -r label; do
+            # skip empty values (e.g. licenses while the repo has no detected license)
+            if [[ -n "${label#*=}" ]]; then
+              labels+=("-Dquarkus.container-image.labels.\"${label%%=*}\"=${label#*=}")
+            fi
+          done <<< "$LABELS"
+          ./mvnw -B package -pl server -am -DskipTests \
+            -Dquarkus.container-image.build=true \
+            -Dquarkus.container-image.push=true \
+            -Dquarkus.container-image.tag="${tags[0]}" \
+            -Dquarkus.container-image.additional-tags="$additional" \
+            -Dquarkus.jib.platforms=linux/amd64,linux/arm64 \
+            "${labels[@]}"
+
+  ui-image:
+    name: Publish UI image
+    runs-on: ubuntu-latest
+    needs: ui-test
+    if: github.event_name == 'push'
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # The Angular build stage runs on the build platform (see Dockerfile); QEMU only
+      # covers future RUN steps in the final stage.
+      - uses: docker/setup-qemu-action@v3
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Annotations on the index too: for multi-arch images GHCR reads the package
+      # description from the index, not from the image labels.
+      - id: meta
+        uses: docker/metadata-action@v5
+        env:
+          DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
+        with:
+          images: ghcr.io/fhm84/sam-ui
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=semver,pattern={{version}}
+            type=sha
+          labels: |
+            org.opencontainers.image.documentation=https://github.com/fhm84/sam/tree/main/docs
+          annotations: |
+            org.opencontainers.image.documentation=https://github.com/fhm84/sam/tree/main/docs
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          annotations: ${{ steps.meta.outputs.annotations }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
