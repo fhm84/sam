@@ -27,6 +27,7 @@ previously recorded in the roadmap's open-questions table and plan notes.
 | [0017](adr-0017-edge-access-log.md) | Caddy logs requests with client IPs for 14 days, with secrets in URLs masked | accepted |
 | [0018](adr-0018-alerts-dead-mans-switch.md) | Alerts via an outside dead man's switch (Healthchecks): host health check every 5 minutes, backup reports | accepted |
 | [0019](adr-0019-cli-import-additive-sync.md) | `cli` import compares with the target: adds missing records and child records, reports differing fields (`--update` writes them), never deletes; dry run reads the target | accepted |
+| [0020](adr-0020-eupl-license.md) | SAM is licensed under the EUPL-1.2 (network copyleft, official in all EU languages) | accepted |
 
 New decisions: add the next number, keep it short (context, decision,
 consequences — a screen or less), and link it from this table.
