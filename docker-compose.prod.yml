@@ -7,7 +7,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: de.halbmann/sam-ui:latest
+    image: ghcr.io/fhm84/sam-ui:${SAM_IMAGE_TAG:-latest}
     ports:
       - "80:80"
       - "443:443"
@@ -88,7 +88,7 @@ services:
 
   # Quarkus backend: REST API + OIDC config endpoint
   sam-server:
-    image: de.halbmann/sam:latest
+    image: ghcr.io/fhm84/sam:${SAM_IMAGE_TAG:-latest}
     environment:
       # Database
       DB_URL: jdbc:postgresql://database:5432/sam_music

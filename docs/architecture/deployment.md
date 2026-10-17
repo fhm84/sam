@@ -15,8 +15,14 @@ SAM ships as two Docker images:
 
 | Image | Built by | Contents |
 |-------|----------|----------|
-| `de.halbmann/sam:latest` | Jib (`./mvnw package -Dquarkus.container-image.build=true -pl server -am`) | Quarkus server JAR — REST API, Flyway, Hibernate, LangChain4j |
-| `de.halbmann/sam-ui:latest` | `docker build .` (multi-stage Dockerfile) | Built Angular SPA served by Caddy, which is also the TLS edge proxy |
+| `ghcr.io/fhm84/sam` | Jib (`./mvnw package -Dquarkus.container-image.build=true -pl server -am`) | Quarkus server JAR — REST API, Flyway, Hibernate, LangChain4j |
+| `ghcr.io/fhm84/sam-ui` | `docker build .` (multi-stage Dockerfile) | Built Angular SPA served by Caddy, which is also the TLS edge proxy |
+
+CI publishes both images publicly to the GitHub Container Registry, for `linux/amd64` and
+`linux/arm64` ([ADR-0012](decisions/adr-0012-public-images-on-ghcr.md)): every push to
+`main` that passes the tests gets `latest` and `sha-<short>`, and a `v*` tag gets the version
+(e.g. `1.2.0`) and `sha-<short>`. Local builds use the same names, so
+`docker-compose.prod.yml` runs either; it takes the tag from `SAM_IMAGE_TAG` (default `latest`).
 
 Caddy is the single public entry point and lives in the `sam-ui` image (`Dockerfile`, `docker/Caddyfile`, [ADR-0010](decisions/adr-0010-caddy-edge-proxy.md)). It terminates TLS (automatic Let's Encrypt certificates), serves the SPA, proxies `/api/*` and `/oidc-config.json` to `sam-server`, and proxies the Keycloak hostname to Keycloak — the only published service (ports 80/443). All Angular API calls use relative `/api/*` paths, which Caddy forwards to the backend — no CORS configuration required.
 
@@ -42,6 +48,7 @@ Copy `.env.example` → `.env` and fill in before running `docker compose -f doc
 | `KEYCLOAK_REALM` | sam-server | `sam` | Keycloak realm name |
 | `KEYCLOAK_BACKEND_CLIENT_ID` | sam-server | `sam-backend` | Service account client ID |
 | `SAM_FILESYSTEM_BASE_PATH` | sam-server | `/data/sam` | Mount point for sheet music file storage |
+| `SAM_IMAGE_TAG` | compose | `latest` | Image tag, e.g. a pinned `sha-<short>` or a version |
 
 ## Storage Volume
 

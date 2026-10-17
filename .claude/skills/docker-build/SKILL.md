@@ -5,25 +5,22 @@ description: Build and push SAM's Docker images (backend Jib image, frontend mul
 
 # Docker Build
 
-## Backend image (Jib — output: `de.halbmann/sam:latest`)
+## Backend image (Jib — output: `ghcr.io/fhm84/sam:latest`)
 
 ```bash
 ./mvnw package -Dquarkus.container-image.build=true -pl server -am
 ```
 
-Push to a registry (append registry/group overrides as needed):
+Registry and group are set in `application.properties`. Pushing by hand is normally not
+needed: CI already publishes both images for amd64 + arm64 to `ghcr.io/fhm84/sam` and
+`ghcr.io/fhm84/sam-ui` on every push to `main` (`ci.yml`, ADR-0012). A multi-platform Jib
+build (`-Dquarkus.jib.platforms=linux/amd64,linux/arm64`) can only push, not load into the
+local Docker daemon.
+
+## Frontend image (multi-stage Dockerfile — output: `ghcr.io/fhm84/sam-ui:latest`)
 
 ```bash
-./mvnw package -Dquarkus.container-image.build=true -Dquarkus.container-image.push=true \
-  -Dquarkus.container-image.registry=ghcr.io \
-  -Dquarkus.container-image.group=your-org \
-  -pl server -am
-```
-
-## Frontend image (multi-stage Dockerfile — output: `de.halbmann/sam-ui:latest`)
-
-```bash
-docker build -t de.halbmann/sam-ui:latest .
+docker build -t ghcr.io/fhm84/sam-ui:latest .
 ```
 
 ## Start full production stack
