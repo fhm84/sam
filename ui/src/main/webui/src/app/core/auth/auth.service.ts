@@ -2,6 +2,7 @@ import { Injectable, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { OidcSecurityService } from 'angular-auth-oidc-client';
 import { map } from 'rxjs';
+import { OidcClaimsConfig } from './auth.config';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -17,12 +18,30 @@ export class AuthService {
     { initialValue: null },
   );
 
-  // Decoded access token payload — contains realm_access.roles which the
-  // userinfo endpoint does not return by default in Keycloak.
-  private readonly tokenPayload = toSignal<{ realm_access?: { roles: string[] } } | null>(
+  private readonly claims = inject(OidcClaimsConfig);
+
+  // Decoded token payloads holding the roles. Keycloak: realm_access.roles in the access token
+  // (userinfo does not return it by default). Pocket ID: groups, only in the ID token.
+  private readonly accessTokenPayload = toSignal<Record<string, unknown> | null>(
     this.oidc.getPayloadFromAccessToken(),
     { initialValue: null },
   );
+  private readonly idTokenPayload = toSignal<Record<string, unknown> | null>(
+    this.oidc.getPayloadFromIdToken(),
+    { initialValue: null },
+  );
+
+  private readonly roles = computed(() => {
+    const value =
+      this.claimAt(this.accessTokenPayload()) ?? this.claimAt(this.idTokenPayload());
+    return Array.isArray(value) ? (value as string[]) : [];
+  });
+
+  private claimAt(payload: Record<string, unknown> | null): unknown {
+    return this.claims.roleClaimPath
+      .split('.')
+      .reduce<unknown>((node, key) => (node as Record<string, unknown> | null | undefined)?.[key], payload);
+  }
 
   readonly displayName = computed(() => {
     const ud = this.userData();
@@ -33,7 +52,7 @@ export class AuthService {
   readonly isAdmin = computed(() => this.hasRole('admin'));
 
   hasRole(role: string): boolean {
-    return this.tokenPayload()?.realm_access?.roles?.includes(role) ?? false;
+    return this.roles().includes(role);
   }
 
   login(): void {

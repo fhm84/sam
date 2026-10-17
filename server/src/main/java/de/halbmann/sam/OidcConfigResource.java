@@ -18,11 +18,19 @@ public class OidcConfigResource {
     @ConfigProperty(name = "quarkus.oidc.client-id", defaultValue = "sam-ui")
     String clientId;
 
+    /** Scopes the UI requests at login; Pocket ID only emits {@code groups} when asked for it. */
+    @ConfigProperty(name = "sam.oidc.ui.scope", defaultValue = "openid profile email")
+    String scope;
+
+    /** Dot-separated path to the roles array, read by the UI from the access token, else the ID token. */
+    @ConfigProperty(name = "sam.oidc.ui.role-claim-path", defaultValue = "realm_access.roles")
+    String roleClaimPath;
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public OidcConfigDto config() {
-        return new OidcConfigDto(issuerUrl.orElse("http://localhost:8180/realms/sam"), clientId);
+        return new OidcConfigDto(issuerUrl.orElse("http://localhost:8180/realms/sam"), clientId, scope, roleClaimPath);
     }
 
-    public record OidcConfigDto(String issuerUrl, String clientId) {}
+    public record OidcConfigDto(String issuerUrl, String clientId, String scope, String roleClaimPath) {}
 }

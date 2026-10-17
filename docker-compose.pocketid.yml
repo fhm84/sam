@@ -1,0 +1,21 @@
+services:
+
+  # Spike: Pocket ID as a lightweight alternative to Keycloak (docker-compose.keycloak.yml).
+  # Passkeys need a secure context; http://localhost counts as one, so no TLS for dev.
+  # Seed users/groups/clients with scripts/pocketid/seed-dev.sh after the first start.
+  pocket-id:
+    image: ghcr.io/pocket-id/pocket-id:v2.17.0
+    environment:
+      APP_URL: http://localhost:1411
+      TRUST_PROXY: "false"
+      # Dev-only values, never reuse in production
+      ENCRYPTION_KEY: sam-dev-encryption-key-change-me
+      STATIC_API_KEY: sam-dev-static-api-key
+    volumes:
+      - pocket-id-data:/app/data
+    ports:
+      - "1411:1411"
+    restart: unless-stopped
+
+volumes:
+  pocket-id-data:

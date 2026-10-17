@@ -24,4 +24,13 @@ class OidcConfigResourceTest {
                 .body("issuerUrl", not(emptyOrNullString()))
                 .body("clientId", equalTo("sam-ui"));
     }
+
+    @Test
+    void defaultsToKeycloakScopeAndRoleClaim() {
+        given().get("/api/oidc-config.json")
+                .then()
+                .statusCode(200)
+                .body("scope", equalTo("openid profile email"))
+                .body("roleClaimPath", equalTo("realm_access.roles"));
+    }
 }

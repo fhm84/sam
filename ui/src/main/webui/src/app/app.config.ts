@@ -11,7 +11,7 @@ import { AbstractSecurityStorage, DefaultSessionStorageService, authInterceptor,
 import { routes } from './app.routes';
 import { TranslationService } from './core/translation.service';
 import { errorInterceptor } from './core/error.interceptor';
-import { authConfigLoader } from './core/auth/auth.config';
+import { OidcClaimsConfig, authConfigLoader } from './core/auth/auth.config';
 import { removeLegacyLocalStorageTokens } from './core/auth/legacy-token-cleanup';
 
 export const appConfig: ApplicationConfig = {
@@ -34,7 +34,7 @@ export const appConfig: ApplicationConfig = {
         loader: {
           provide: StsConfigLoader,
           useFactory: authConfigLoader,
-          deps: [HttpClient],
+          deps: [HttpClient, OidcClaimsConfig],
         },
       },
       withAppInitializerAuthCheck(),

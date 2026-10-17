@@ -1,5 +1,6 @@
 package de.halbmann.sam.security;
 
+import io.quarkus.oidc.UserInfo;
 import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.enterprise.inject.Instance;
@@ -40,7 +41,12 @@ public class CurrentUserService {
         if (identity.isAnonymous() || jwt.isUnsatisfied()) {
             return null;
         }
-        return jwt.get().getClaim("preferred_username");
+        String username = jwt.get().getClaim("preferred_username");
+        if (username == null && identity.getAttribute("userinfo") instanceof UserInfo userInfo) {
+            // Providers like Pocket ID keep profile claims out of the access token
+            username = userInfo.getPreferredUserName();
+        }
+        return username;
     }
 
     /** Returns {@code true} if the current user holds the given realm role. */
