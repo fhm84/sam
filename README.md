@@ -7,6 +7,7 @@
 [![Quarkus](https://img.shields.io/badge/dynamic/xml?url=https://raw.githubusercontent.com/fhm84/sam/main/pom.xml&query=//%2A%5Blocal-name%28%29=%27quarkus.platform.version%27%5D&label=Quarkus&logo=quarkus&logoColor=white&color=4695EB)](https://quarkus.io)
 [![Angular](https://img.shields.io/github/package-json/dependency-version/fhm84/sam/@angular/core?filename=ui/src/main/webui/package.json&label=Angular&logo=angular&logoColor=white&color=DD0031)](https://angular.dev)
 [![PostgreSQL 17](https://img.shields.io/badge/PostgreSQL-17-336791?logo=postgresql&logoColor=white)](https://www.postgresql.org)
+[![License: EUPL-1.2](https://img.shields.io/badge/License-EUPL--1.2-blue)](LICENSE)
 
 A Quarkus-based application for archiving sheet music, managing instrumentations, musicians, and collections for bands and ensembles.
 
@@ -176,8 +177,8 @@ The operator of a SAM instance is responsible for:
 Do not upload, distribute, or share copyrighted sheet music unless the
 required permission or licence has been obtained.
 
-The software licence of SAM is separate from the rights in any content
-stored in a SAM instance.
+The software licence of SAM (see [License](#license)) is separate from the
+rights in any content stored in a SAM instance.
 
 For Germany, see for example:
 
@@ -203,6 +204,11 @@ git config core.hooksPath .githooks
 
 Pull requests are also checked by the `commit-lint` CI job (`.github/workflows/ci.yml`); both call the shared `scripts/check-commit-msg.sh`.
 
+### Licensing of Contributions
+
+By submitting a contribution, you agree that it is licensed under the
+[EUPL-1.2](LICENSE), the same licence as the rest of SAM.
+
 ## Roadmap
 
 ### Planned Features
@@ -214,4 +220,18 @@ Pull requests are also checked by the `commit-lint` CI job (`.github/workflows/c
 ### Technical Debt
 - Extended revision information (Envers metadata beyond current snapshots)
 - Optimize document storage directory structure
+
+## License
+
+SAM is licensed under the [European Union Public Licence v. 1.2](LICENSE)
+(EUPL-1.2). You may use, modify, and distribute it, including commercially.
+If you distribute a modified version or make it available to others over a
+network (for example as a hosted service), you must provide its source code
+under the EUPL-1.2 or a compatible licence listed in the licence's appendix.
+
+The EUPL has official versions in all EU languages (including German), all
+equally valid — see the [official texts](https://interoperable-europe.ec.europa.eu/collection/eupl/eupl-text-eupl-12).
+
+The reasoning behind this choice is recorded in
+[ADR-0012](docs/architecture/decisions/adr-0012-eupl-license.md).
 
