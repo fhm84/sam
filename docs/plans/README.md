@@ -33,6 +33,7 @@ Conventions:
 | [Event log retention](event-log-retention.md) | Document access log (pending part) | [#146](https://github.com/fhm84/sam/issues/146) | Open question #9 ([#147](https://github.com/fhm84/sam/issues/147)) |
 | [Document store hardening](document-store-hardening.md) | Document store hardening | [#154](https://github.com/fhm84/sam/issues/154) | — |
 | [Storage encryption](storage-encryption.md), phase A only | Encryption of stored documents (backup encryption) | [#162](https://github.com/fhm84/sam/issues/162) | — |
+| [Pocket ID as default OIDC provider](pocket-id-provider.md) | Pocket ID as default OIDC provider | [#210](https://github.com/fhm84/sam/issues/210) | — (open question #11, [#222](https://github.com/fhm84/sam/issues/222), only affects task 8) |
 
 ## Next: everyday use for the music librarian
 
