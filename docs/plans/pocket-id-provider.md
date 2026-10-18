@@ -60,7 +60,7 @@ linked musicians, shares, event-log entries and audit revisions would need remap
 | 4 | Dev default: compose starts and seeds Pocket ID, login-link helper, dev UI reads `/oidc-config.json` from the server via the dev proxy. Keycloak dev still works. | [#214](https://github.com/fhm84/sam/issues/214) |
 | 5 | `docker-compose.prod.yml`: `pocket-id` by default, `keycloak` + `keycloak-db` behind a compose profile; Caddy's login host proxies to the active provider; `.env.example` per provider. | [#215](https://github.com/fhm84/sam/issues/215) |
 | 6 | Backup/restore of Pocket ID's data. Proposed: its own database in SAM's Postgres container, so the scripts keep using `pg_dump`. Restore test. | [#216](https://github.com/fhm84/sam/issues/216) |
-| 7 | Production bootstrap: first admin via `/setup` with a passkey, then an idempotent env-driven seed (groups, `sam-ui`, `sam-cli` + API permission, user-directory API key). Replaces `keycloak/prod/sam-realm.json` for Pocket ID. | [#217](https://github.com/fhm84/sam/issues/217) |
+| 7 | Production bootstrap: first admin via `/setup` with a passkey, then an idempotent env-driven seed (groups `sam-admin` / `sam-music-librarian` / `sam-member`, `sam-ui` restricted to them, `sam-cli` + API permission, user-directory API key). Replaces `keycloak/prod/sam-realm.json` for Pocket ID. | [#217](https://github.com/fhm84/sam/issues/217) |
 | 8 | SMTP so admins can email login codes; document the recovery flow. | [#218](https://github.com/fhm84/sam/issues/218) |
 | 9 | Remove the unused `ensemble:` group logic in `CurrentUserService` (membership comes from the database). | [#219](https://github.com/fhm84/sam/issues/219) |
 | 10 | New ADR (Pocket ID default, Keycloak optional), ADR-0001 consequences, security concept, deployment, production setup, tech stack, `keycloak/README.md`, `cli`/`migration` READMEs, `CLAUDE.md`, open question #7. | [#220](https://github.com/fhm84/sam/issues/220) |
@@ -76,17 +76,21 @@ Order: 1 → 2 → (3, 4, 9 in any order) → 5 → 6 → 7 → 8 → 10; 11 on 
 From the security comparison of providers (2026-10-18). Pocket ID is often shared single
 sign-on for several self-hosted apps, so SAM must not assume it is the only client:
 
-- **#12** Should the default tenant enforce the token audience? Today only the `m2m` tenant
-  sets `token.audience`, so SAM accepts an access token Pocket ID issued to *any* client,
-  then takes the user's groups from userinfo. Another app on the same Pocket ID could
-  replay its users' tokens against SAM. Proposed: `quarkus.oidc.token.audience=sam-ui` for
-  both providers; first check which `aud` Pocket ID puts into user access tokens. Affects
-  task 2.
-- **#13** How do SAM's groups stay apart from other apps' groups? Pocket ID groups are
-  global, and a group named `admin` likely means admin elsewhere too. Proposed: configurable
-  group names for the two roles (Pocket ID seed uses `sam-admin` / `sam-music-librarian`,
-  Keycloak keeps its realm roles), and "allowed user groups" on the `sam-ui` client so only
-  SAM members can sign in. Affects tasks 2 and 7.
+- **#12** ~~Should the default tenant enforce the token audience?~~ **Resolved (task 2):**
+  yes, for both providers. Pocket ID puts the client ID into a user's access token
+  (`aud: [sam-ui, <issuer>]`), so its default tenant requires `sam-ui` (the configured UI
+  client ID). Keycloak puts no SAM audience into its tokens (user tokens have none, the
+  `cli` token has `account`), so the realm's `sam-ui` and `sam-cli` clients now add
+  `urn:sam:api` (protocol mapper `sam-api-audience`) and Keycloak's default tenant requires
+  that. Checked in dev: a token Pocket ID issued to another client, and a Keycloak
+  `sam-backend` token, are both rejected with 401.
+- **#13** ~~How do SAM's groups stay apart from other apps' groups?~~ **Resolved (task 2):**
+  `sam.oidc.role-groups.<role>` maps each SAM role to a provider group (Pocket ID:
+  `sam-admin`, `sam-music-librarian`; Keycloak: no mapping, its realm roles are SAM's).
+  `RoleGroupsAugmentor` (server) and `AuthService` (UI, via `roleGroups` in
+  `/oidc-config.json`) grant roles only from those groups. The dev seed adds `sam-member`
+  for everyone else and restricts `sam-ui` to the three groups; the production seed
+  (task 7) must do the same.
 - **#14** Is a full-admin Pocket ID API key on the SAM server acceptable for the user
   search? Pocket ID API keys cannot be scoped, so a compromised SAM server becomes a
   takeover of every app behind that Pocket ID (Keycloak's admin client can be limited to

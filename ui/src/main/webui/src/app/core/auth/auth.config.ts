@@ -9,6 +9,7 @@ interface OidcConfig {
   // Optional so a static oidc-config.json without them still works (Keycloak defaults)
   scope?: string;
   roleClaimPath?: string;
+  roleGroups?: Record<string, string>;
 }
 
 /** Provider-specific token layout, filled in once oidc-config.json has loaded. */
@@ -16,6 +17,8 @@ interface OidcConfig {
 export class OidcClaimsConfig {
   // Dot-separated path to the roles array in the access token
   roleClaimPath = 'realm_access.roles';
+  // SAM role → provider group (Pocket ID: sam-admin, …); empty when the claim holds SAM's roles
+  roleGroups: Record<string, string> = {};
 }
 
 export function authConfigLoader(httpClient: HttpClient, claims: OidcClaimsConfig): StsConfigHttpLoader {
@@ -23,6 +26,7 @@ export function authConfigLoader(httpClient: HttpClient, claims: OidcClaimsConfi
     httpClient.get<OidcConfig>('/oidc-config.json').pipe(
       map((config) => {
         claims.roleClaimPath = config.roleClaimPath ?? claims.roleClaimPath;
+        claims.roleGroups = config.roleGroups ?? claims.roleGroups;
         return {
           authority: config.issuerUrl,
           clientId: config.clientId,

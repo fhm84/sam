@@ -34,7 +34,12 @@ export class AuthService {
   private readonly roles = computed(() => {
     const value =
       this.claimAt(this.accessTokenPayload()) ?? this.claimAt(this.idTokenPayload());
-    return Array.isArray(value) ? (value as string[]) : [];
+    const claimed = Array.isArray(value) ? (value as string[]) : [];
+    // Mapped groups: only SAM-specific groups grant a role, like the server's RoleGroupsAugmentor
+    const mapping = Object.entries(this.claims.roleGroups);
+    return mapping.length === 0
+      ? claimed
+      : mapping.filter(([, group]) => claimed.includes(group)).map(([role]) => role);
   });
 
   private claimAt(payload: Record<string, unknown> | null): unknown {

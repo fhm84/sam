@@ -14,6 +14,17 @@
   ],
   "protocolMappers": [
     {
+      "name": "sam-api-audience",
+      "protocol": "openid-connect",
+      "protocolMapper": "oidc-audience-mapper",
+      "consentRequired": false,
+      "config": {
+        "included.custom.audience": "urn:sam:api",
+        "id.token.claim": "false",
+        "access.token.claim": "true"
+      }
+    },
+    {
       "name": "groups",
       "protocol": "openid-connect",
       "protocolMapper": "oidc-group-membership-mapper",

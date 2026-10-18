@@ -9,6 +9,7 @@ describe('AuthService.hasRole', () => {
     roleClaimPath: string,
     accessToken: Record<string, unknown>,
     idToken: Record<string, unknown> = {},
+    roleGroups: Record<string, string> = {},
   ): AuthService {
     TestBed.configureTestingModule({
       providers: [
@@ -23,7 +24,9 @@ describe('AuthService.hasRole', () => {
         },
       ],
     });
-    TestBed.inject(OidcClaimsConfig).roleClaimPath = roleClaimPath;
+    const claims = TestBed.inject(OidcClaimsConfig);
+    claims.roleClaimPath = roleClaimPath;
+    claims.roleGroups = roleGroups;
     return TestBed.inject(AuthService);
   }
 
@@ -40,6 +43,20 @@ describe('AuthService.hasRole', () => {
 
     expect(auth.hasRole('music_librarian')).toBe(true);
     expect(auth.isAdmin()).toBe(false);
+  });
+
+  it('maps SAM-specific groups to roles and ignores other apps’ groups', () => {
+    const roleGroups = { admin: 'sam-admin', music_librarian: 'sam-music-librarian' };
+    const librarian = create('groups', {}, { groups: ['sam-member', 'sam-music-librarian'] }, roleGroups);
+
+    expect(librarian.hasRole('music_librarian')).toBe(true);
+    expect(librarian.isAdmin()).toBe(false);
+
+    TestBed.resetTestingModule();
+    const otherAppsAdmin = create('groups', {}, { groups: ['admin', 'music_librarian'] }, roleGroups);
+
+    expect(otherAppsAdmin.isAdmin()).toBe(false);
+    expect(otherAppsAdmin.hasRole('music_librarian')).toBe(false);
   });
 
   it('has no roles when neither token carries the claim', () => {
