@@ -1,6 +1,7 @@
 package de.halbmann.sam;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -32,7 +33,8 @@ class OidcConfigResourceKeycloakTest {
                 .statusCode(200)
                 .body("clientId", equalTo("sam-ui"))
                 .body("scope", equalTo("openid profile email"))
-                .body("roleClaimPath", equalTo("realm_access.roles"));
+                .body("roleClaimPath", equalTo("realm_access.roles"))
+                .body("roleGroups", anEmptyMap());
     }
 
     @Test

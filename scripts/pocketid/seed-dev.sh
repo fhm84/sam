@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-# Seeds a fresh dev Pocket ID (docker-compose.pocketid.yml) with what SAM expects: the admin and
-# music_librarian groups (= SAM roles), the dev users, the public sam-ui client, and the sam-cli
-# service account with the music_librarian permission on the SAM API. Run once on an empty volume;
-# start over with `docker compose -f docker-compose.pocketid.yml down -v`.
+# Seeds a fresh dev Pocket ID (docker-compose.pocketid.yml) with what SAM expects: the sam-admin and
+# sam-music-librarian groups (= SAM roles, see sam.oidc.role-groups), the sam-member group for
+# everyone else, the dev users, the public sam-ui client (only members of those groups may sign in),
+# and the sam-cli service account with the music_librarian permission on the SAM API. Run once on an
+# empty volume; start over with `docker compose -f docker-compose.pocketid.yml down -v`.
 #
 # Users have no passkey yet: print a one-time login link per user with
 #   scripts/pocketid/seed-dev.sh login-link <username>
@@ -25,19 +26,23 @@ if [[ "${1:-}" == "login-link" ]]; then
   exit 0
 fi
 
-admin_group=$(call POST /user-groups '{"friendlyName":"Admin","name":"admin"}' | first_id)
-librarian_group=$(call POST /user-groups '{"friendlyName":"Music librarian","name":"music_librarian"}' | first_id)
+# SAM-specific names: Pocket ID groups are global, and another app's `admin` must not be SAM's
+admin_group=$(call POST /user-groups '{"friendlyName":"SAM admin","name":"sam-admin"}' | first_id)
+librarian_group=$(call POST /user-groups '{"friendlyName":"SAM music librarian","name":"sam-music-librarian"}' | first_id)
+member_group=$(call POST /user-groups '{"friendlyName":"SAM member","name":"sam-member"}' | first_id)
 
 user() { # username first group-ids-json is-admin
   call POST /users "{\"username\":\"$1\",\"email\":\"$1@sam.local\",\"firstName\":\"$2\",\"lastName\":\"One\",\"emailVerified\":true,\"isAdmin\":$4,\"userGroupIds\":$3}" >/dev/null
 }
-user admin1 Admin "[\"$admin_group\"]" true
-user librarian1 Librarian "[\"$librarian_group\"]" false
-user musician1 Musician "[]" false
+user admin1 Admin "[\"$member_group\",\"$admin_group\"]" true
+user librarian1 Librarian "[\"$member_group\",\"$librarian_group\"]" false
+user musician1 Musician "[\"$member_group\"]" false
 
 call POST /oidc/clients '{"id":"sam-ui","name":"SAM","isPublic":true,"pkceEnabled":true,"skipConsent":true,
-  "callbackURLs":["http://localhost:4200","http://localhost:8080"],
+  "isGroupRestricted":true,"callbackURLs":["http://localhost:4200","http://localhost:8080"],
   "logoutCallbackURLs":["http://localhost:4200","http://localhost:8080"]}' >/dev/null
+call PUT /oidc/clients/sam-ui/allowed-user-groups \
+  "{\"userGroupIds\":[\"$admin_group\",\"$librarian_group\",\"$member_group\"]}" >/dev/null
 
 # Client-credentials tokens carry no groups; the CLI's role comes from an API permission in `scp`
 call POST /oidc/clients '{"id":"sam-cli","name":"SAM CLI","isPublic":false,"callbackURLs":[],"logoutCallbackURLs":[]}' >/dev/null

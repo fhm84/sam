@@ -31,6 +31,8 @@ class OidcConfigResourceTest {
                 .then()
                 .statusCode(200)
                 .body("scope", equalTo("openid profile email groups"))
-                .body("roleClaimPath", equalTo("groups"));
+                .body("roleClaimPath", equalTo("groups"))
+                .body("roleGroups.admin", equalTo("sam-admin"))
+                .body("roleGroups.music_librarian", equalTo("sam-music-librarian"));
     }
 }

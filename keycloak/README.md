@@ -61,3 +61,12 @@ drifts and becomes a maintenance burden, that's the signal to drop
 `--import-realm` from the `keycloak` service entirely and make `configure`
 (run once after every fresh `docker compose up`) the only bootstrap path —
 at that point `sam-realm.json` can be deleted.
+
+## Token audience
+
+SAM only accepts Keycloak tokens whose `aud` contains `urn:sam:api`
+(`quarkus.oidc.token.audience` in `server/src/main/resources/oidc/keycloak.properties`),
+so tokens of other clients in the realm are rejected. The `sam-ui` and `sam-cli` clients
+add it with the `sam-api-audience` protocol mapper (`oidc-audience-mapper`). A dev realm
+imported before that mapper existed needs one `configure` run (see above), or logins fail
+with 401.

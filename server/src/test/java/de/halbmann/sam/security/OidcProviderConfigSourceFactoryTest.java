@@ -25,6 +25,17 @@ class OidcProviderConfigSourceFactoryTest {
         assertEquals("scp", config.getRawValue("quarkus.oidc.m2m.roles.role-claim-path"));
         assertEquals("openid profile email groups", config.getRawValue("sam.oidc.ui.scope"));
         assertEquals("groups", config.getRawValue("sam.oidc.ui.role-claim-path"));
+        assertEquals("sam-admin", config.getRawValue("sam.oidc.role-groups.admin"));
+        assertEquals("sam-music-librarian", config.getRawValue("sam.oidc.role-groups.music_librarian"));
+    }
+
+    @Test
+    void pocketIdAcceptsOnlyTokensIssuedToTheUiClient() {
+        assertEquals("sam-ui", config("prod", Map.of(), Map.of()).getRawValue("quarkus.oidc.token.audience"));
+        assertEquals(
+                "band-ui",
+                config("prod", Map.of("%prod.quarkus.oidc.client-id", "band-ui"), Map.of())
+                        .getRawValue("quarkus.oidc.token.audience"));
     }
 
     @Test
@@ -48,6 +59,9 @@ class OidcProviderConfigSourceFactoryTest {
                 .isPresent());
         assertEquals("openid profile email", config.getRawValue("sam.oidc.ui.scope"));
         assertEquals("realm_access.roles", config.getRawValue("sam.oidc.ui.role-claim-path"));
+        assertEquals("urn:sam:api", config.getRawValue("quarkus.oidc.token.audience"));
+        assertFalse(config.getOptionalValue("sam.oidc.role-groups.admin", String.class)
+                .isPresent());
     }
 
     @Test
