@@ -80,16 +80,23 @@ interface's class name; it would be ignored):
 - **Target server**: `quarkus.rest-client."sam-api".url` (default
   `http://localhost:8080/api`).
 - **Auth**: every request carries an OIDC client-credentials Bearer token for
-  the `sam-cli` Keycloak client (service account with the `music_librarian`
-  realm role — defined in `keycloak/sam-realm.json` and
-  `keycloak/configurator/sam/`). Token acquisition is lazy: nothing contacts
-  Keycloak at startup or during dry-runs, only when a real API call goes out.
+  the `sam-cli` service account (`music_librarian` role). Token acquisition is
+  lazy: nothing contacts the OIDC provider at startup or during dry-runs, only
+  when a real API call goes out.
+- **Provider**: `SAM_OIDC_PROVIDER`, `pocket-id` (default) or `keycloak` — the
+  same setting the server uses. It selects the token endpoint, the dev defaults
+  and, for Pocket ID, the API resource `urn:sam:api` the token is requested
+  for (the role travels as an API permission in `scp`). The settings per
+  provider are in `cli/src/main/resources/oidc/`. With Pocket ID the
+  `sam-cli` client is created by `scripts/pocketid/seed-dev.sh`; with Keycloak
+  it is defined in `keycloak/sam-realm.json` and `keycloak/configurator/sam/`.
 - **Pointing at another environment** (packaged jar runs under the `prod`
-  profile): set `OIDC_SERVER_URL` (Keycloak realm URL, same variable the server
-  uses), `SAM_CLI_CLIENT_ID` (default `sam-cli`), and `SAM_CLI_CLIENT_SECRET`.
-  The defaults match the local dev Keycloak (`localhost:8180/realms/sam`,
-  dev-only secret `sam-cli-secret`) so local usage works out of the box —
-  real deployments must override at least the secret.
+  profile): set `OIDC_SERVER_URL` (issuer URL, same variable the server uses),
+  `SAM_CLI_CLIENT_ID` (default `sam-cli`), and `SAM_CLI_CLIENT_SECRET`
+  (required, no default). The issuer defaults to the local dev provider
+  (`localhost:1411` for Pocket ID, `localhost:8180/realms/sam` for Keycloak);
+  the dev-only secrets are `sam-cli-dev-secret-0000` (Pocket ID) and
+  `sam-cli-secret` (Keycloak).
 
 ```bash
 OIDC_SERVER_URL=https://auth.example.com/realms/sam \

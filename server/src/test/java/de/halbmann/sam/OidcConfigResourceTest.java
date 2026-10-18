@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
  * Pins the path of the OIDC bootstrap endpoint. The Angular app fetches {@code /oidc-config.json};
  * in production the Caddy edge proxy ({@code docker/Caddyfile}) rewrites that to
  * {@code /api/oidc-config.json} because the JAX-RS application root is {@code /api}. If this
- * endpoint moves, the rewrite must move with it, or the app can't find Keycloak.
+ * endpoint moves, the rewrite must move with it, or the app can't find its OIDC provider.
  */
 @QuarkusTest
 class OidcConfigResourceTest {
@@ -26,11 +26,11 @@ class OidcConfigResourceTest {
     }
 
     @Test
-    void defaultsToKeycloakScopeAndRoleClaim() {
+    void defaultsToPocketIdScopeAndRoleClaim() {
         given().get("/api/oidc-config.json")
                 .then()
                 .statusCode(200)
-                .body("scope", equalTo("openid profile email"))
-                .body("roleClaimPath", equalTo("realm_access.roles"));
+                .body("scope", equalTo("openid profile email groups"))
+                .body("roleClaimPath", equalTo("groups"));
     }
 }

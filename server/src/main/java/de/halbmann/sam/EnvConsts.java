@@ -21,8 +21,14 @@ public class EnvConsts {
     public static final String FILETYPES = "sam.files.types";
 
     /**
+     * OIDC provider, {@code pocket-id} (default) or {@code keycloak}; selects the provider's
+     * settings in {@code oidc/<provider>.properties}. Env var {@code SAM_OIDC_PROVIDER}.
+     */
+    public static final String OIDC_PROVIDER = "sam.oidc.provider";
+
+    /**
      * Keycloak realm name used by the admin REST client for user search.
-     * Must be set per profile (dev/prod); no default.
+     * Env var {@code KEYCLOAK_REALM}, default {@code sam}.
      */
     public static final String KEYCLOAK_ADMIN_REALM = "sam.admin.keycloak.realm";
 

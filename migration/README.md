@@ -137,9 +137,14 @@ attaches it as a Bearer header to every `SamResources` call automatically
 (`cli/src/main/resources/application.properties`); there's no manual login
 step.
 
-- **Dev** (`quarkus:dev` or plain `mvn test`): uses the dev Keycloak
-  (`localhost:8180/realms/sam`) and the dev-only secret `sam-cli-secret`,
-  same convention as `sam-backend-secret`. Discovery and eager token
+- **Provider**: `SAM_OIDC_PROVIDER`, `pocket-id` (default) or `keycloak`,
+  the same setting `server` uses (see `cli/README.md`). With Pocket ID the
+  token is requested for the API resource `urn:sam:api` and carries the role
+  in `scp`; `server` routes it to its `m2m` tenant.
+- **Dev** (`quarkus:dev` or plain `mvn test`): uses the dev provider
+  (Pocket ID on `localhost:1411` with `sam-cli-dev-secret-0000`, or Keycloak
+  on `localhost:8180/realms/sam` with `sam-cli-secret`, same convention as
+  `sam-backend-secret`). Discovery and eager token
   acquisition are both disabled
   (`quarkus.oidc-client.discovery-enabled=false`,
   `.early-tokens-acquisition=false`), so nothing reaches out to Keycloak at

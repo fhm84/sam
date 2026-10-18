@@ -78,11 +78,11 @@ Order: 1 → 2 → (3, 4, 9 in any order) → 5 → 6 → 7 → 8 → 10; 11 on 
 ```bash
 docker compose -f docker-compose.pocketid.yml up -d
 scripts/pocketid/seed-dev.sh                       # groups, dev users, sam-ui, sam-cli
-./mvnw quarkus:dev -pl server -Dquarkus.profile=dev,pocketid
+./mvnw quarkus:dev -pl server -Dsam.oidc.provider=pocket-id   # dev defaults to Keycloak until task 4
 # UI (until task 4): point ui/src/main/webui/public/oidc-config.json at
 # curl localhost:8080/api/oidc-config.json for the session, don't commit it; then npm start
 scripts/pocketid/seed-dev.sh login-link admin1     # open the link, then http://localhost:4200
-java -Dquarkus.profile=pocketid -jar cli/target/quarkus-app/quarkus-run.jar list
+SAM_CLI_CLIENT_SECRET=sam-cli-dev-secret-0000 java -jar cli/target/quarkus-app/quarkus-run.jar list
 ```
 
 ## Key files
@@ -92,4 +92,5 @@ java -Dquarkus.profile=pocketid -jar cli/target/quarkus-app/quarkus-run.jar list
 `server/.../OidcConfigResource.java`, `server/.../api/impl/AdminUsersResourceImpl.java`,
 `ui/.../core/auth/auth.service.ts`, `ui/.../core/auth/auth.config.ts`,
 `docker-compose.prod.yml`, `docker/Caddyfile`, `.env.example`, `scripts/backup/`,
-`%pocketid` blocks in the `server` and `cli` `application.properties`.
+`OidcProviderConfigSourceFactory` and `oidc/{pocket-id,keycloak}.properties` in `server` and `cli`
+(`sam.oidc.provider`, env `SAM_OIDC_PROVIDER`).
