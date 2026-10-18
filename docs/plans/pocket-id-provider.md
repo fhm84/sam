@@ -73,6 +73,30 @@ Order: 1 → 2 → (3, 4, 9 in any order) → 5 → 6 → 7 → 8 → 10; 11 on 
 - **#11** May users request login codes by email themselves, or only admins send them?
   Proposed: admin only at first. → [#222](https://github.com/fhm84/sam/issues/222)
 
+From the security comparison of providers (2026-10-18). Pocket ID is often shared single
+sign-on for several self-hosted apps, so SAM must not assume it is the only client:
+
+- **#12** Should the default tenant enforce the token audience? Today only the `m2m` tenant
+  sets `token.audience`, so SAM accepts an access token Pocket ID issued to *any* client,
+  then takes the user's groups from userinfo. Another app on the same Pocket ID could
+  replay its users' tokens against SAM. Proposed: `quarkus.oidc.token.audience=sam-ui` for
+  both providers; first check which `aud` Pocket ID puts into user access tokens. Affects
+  task 2.
+- **#13** How do SAM's groups stay apart from other apps' groups? Pocket ID groups are
+  global, and a group named `admin` likely means admin elsewhere too. Proposed: configurable
+  group names for the two roles (Pocket ID seed uses `sam-admin` / `sam-music-librarian`,
+  Keycloak keeps its realm roles), and "allowed user groups" on the `sam-ui` client so only
+  SAM members can sign in. Affects tasks 2 and 7.
+- **#14** Is a full-admin Pocket ID API key on the SAM server acceptable for the user
+  search? Pocket ID API keys cannot be scoped, so a compromised SAM server becomes a
+  takeover of every app behind that Pocket ID (Keycloak's admin client can be limited to
+  `view-users`). Proposed: the key only in server env, never logged; rotation documented;
+  user search optional, with linking by pasting the user's `sub` as the fallback. Affects
+  task 3.
+- **#15** Keycloak profile: should Caddy block `/admin` on the public login host? Proposed:
+  yes, the admin console is reachable only from the internal network or an SSH tunnel.
+  Affects task 5.
+
 ## Try the spike
 
 ```bash
