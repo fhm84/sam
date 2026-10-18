@@ -94,7 +94,9 @@ services:
       DB_URL: jdbc:postgresql://database:5432/sam_music
       DB_USER: ${DB_USER:-sam}
       DB_PASS: ${DB_PASS:?DB_PASS is required}
-      # OIDC / Keycloak (token validation + oidc-config.json endpoint)
+      # OIDC / Keycloak (token validation + oidc-config.json endpoint). The server defaults to
+      # Pocket ID; this stack still runs Keycloak until it moves to Pocket ID (#215).
+      SAM_OIDC_PROVIDER: keycloak
       OIDC_SERVER_URL: ${OIDC_SERVER_URL:?OIDC_SERVER_URL is required}
       OIDC_CLIENT_ID: ${OIDC_CLIENT_ID:-sam-ui}
       # Keycloak admin client (used for user search in musician linking)
