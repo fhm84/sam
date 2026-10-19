@@ -88,7 +88,7 @@ interface's class name; it would be ignored):
   and, for Pocket ID, the API resource `urn:sam:api` the token is requested
   for (the role travels as an API permission in `scp`). The settings per
   provider are in `cli/src/main/resources/oidc/`. With Pocket ID the
-  `sam-cli` client is created by `scripts/pocketid/seed-dev.sh`; with Keycloak
+  `sam-cli` client is created by the `pocket-id-seed` service of `docker-compose.yml`; with Keycloak
   it is defined in `keycloak/sam-realm.json` and `keycloak/configurator/sam/`.
 - **Pointing at another environment** (packaged jar runs under the `prod`
   profile): set `OIDC_SERVER_URL` (issuer URL, same variable the server uses),

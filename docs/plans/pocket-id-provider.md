@@ -104,21 +104,23 @@ sign-on for several self-hosted apps, so SAM must not assume it is the only clie
   **Decided:** yes, the admin console is reachable only from the internal network or an
   SSH tunnel. Task 5.
 
-## Try the spike
+## Try it in dev
 
 ```bash
-docker compose -f docker-compose.pocketid.yml up -d
-scripts/pocketid/seed-dev.sh                       # groups, dev users, sam-ui, sam-cli
-./mvnw quarkus:dev -pl server -Dsam.oidc.provider=pocket-id   # dev defaults to Keycloak until task 4
-# UI (until task 4): point ui/src/main/webui/public/oidc-config.json at
-# curl localhost:8080/api/oidc-config.json for the session, don't commit it; then npm start
-scripts/pocketid/seed-dev.sh login-link admin1     # open the link, then http://localhost:4200
-SAM_CLI_CLIENT_SECRET=sam-cli-dev-secret-0000 java -jar cli/target/quarkus-app/quarkus-run.jar list
+docker compose up -d                               # Postgres + Pocket ID, seeded on first start
+./mvnw quarkus:dev -pl server                      # Pocket ID is the dev default
+docker compose run --rm pocket-id-seed login-link admin1   # open the link, then http://localhost:4200
+java -jar cli/target/quarkus-app/quarkus-run.jar list      # dev secret is the default
 ```
+
+The dev UI gets `/oidc-config.json` from the server through the dev proxy
+(`ui/src/main/webui/proxy.conf.json`), so switching provider needs no UI change. Keycloak
+in dev: `docker compose -f docker-compose.keycloak.yml up -d` and
+`./mvnw quarkus:dev -pl server -Dsam.oidc.provider=keycloak` (log in as `admin1` / `admin1`).
 
 ## Key files
 
-`docker-compose.pocketid.yml`, `scripts/pocketid/seed-dev.sh`,
+`docker-compose.yml` (`pocket-id`, `pocket-id-seed`), `scripts/pocketid/seed-dev.sh`, `ui/src/main/webui/proxy.conf.json`,
 `server/.../security/ClientCredentialsTenantResolver.java`, `server/.../security/CurrentUserService.java`,
 `server/.../OidcConfigResource.java`, `server/.../api/impl/AdminUsersResourceImpl.java`,
 `ui/.../core/auth/auth.service.ts`, `ui/.../core/auth/auth.config.ts`,

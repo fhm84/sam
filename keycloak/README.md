@@ -1,5 +1,10 @@
 # Keycloak configuration
 
+Keycloak is the optional OIDC provider; SAM defaults to Pocket ID (dev instance in
+`docker-compose.yml`). To run SAM against Keycloak in dev, start
+`docker compose -f docker-compose.keycloak.yml up -d` and the server with
+`-Dsam.oidc.provider=keycloak`.
+
 There are currently **two representations of the same `sam` realm config** in this
 directory. They are not auto-synced — see "Keeping the two in sync" below.
 

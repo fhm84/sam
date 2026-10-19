@@ -28,8 +28,14 @@ A Quarkus-based application for archiving sheet music, managing instrumentations
 # Build all modules
 ./mvnw package
 
+# Start PostgreSQL and the dev login provider (Pocket ID on :1411, seeded with dev users)
+docker compose up -d
+
 # Run server in dev mode (Dev UI at http://localhost:8080/q/dev/)
 ./mvnw quarkus:dev -pl server
+
+# Log in: open a one-time login link, then http://localhost:4200 (users: admin1, librarian1, musician1)
+docker compose run --rm pocket-id-seed login-link admin1
 
 # Run tests
 ./mvnw test
@@ -38,7 +44,7 @@ A Quarkus-based application for archiving sheet music, managing instrumentations
 ./mvnw spotless:apply
 ```
 
-**Prerequisites:** Java 25, Node.js (22.22.3+, 24.15+ or 26+ — Angular 22's requirement; CI and the Docker build use 26), PostgreSQL 17 (with `pg_trgm` and `fuzzystrmatch` extensions), default connection: `localhost:5432/sam_music`, user `sam`.
+**Prerequisites:** Java 25, Node.js (22.22.3+, 24.15+ or 26+ — Angular 22's requirement; CI and the Docker build use 26), PostgreSQL 17 (with `pg_trgm` and `fuzzystrmatch` extensions), default connection: `localhost:5432/sam_music`, user `sam` (`docker compose up -d` starts one). Keycloak instead of Pocket ID in dev: `docker compose -f docker-compose.keycloak.yml up -d` and `-Dsam.oidc.provider=keycloak`.
 
 ## Features
 

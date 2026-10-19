@@ -1,6 +1,6 @@
 # Authentication & Authorization
 
-Quarkus OIDC with self-hosted **Keycloak 26** (`docker-compose.keycloak.yml`; realm export at `keycloak/sam-realm.json`). See [ADR-0003](../decisions/adr-0003-self-hosted-keycloak.md).
+Quarkus OIDC with a self-hosted provider, selected by `sam.oidc.provider` (env `SAM_OIDC_PROVIDER`): **Pocket ID** (default; dev instance and seed in `docker-compose.yml`, see the [Pocket ID plan](../../plans/pocket-id-provider.md)) or **Keycloak 26** (`docker-compose.keycloak.yml`; realm export at `keycloak/sam-realm.json`). See [ADR-0003](../decisions/adr-0003-self-hosted-keycloak.md).
 
 | Concern | Mechanism |
 |---|---|
@@ -30,7 +30,7 @@ The general `PUT /api/musicians/{id}` (used by the form save) intentionally igno
 
 User lookup for the admin search autocomplete goes through `UserDirectory`, one implementation per provider, picked by `sam.oidc.provider`. `AdminUsersResource` (`GET /api/admin/users?search=`, `GET /api/admin/users/{id}`, `GET /api/admin/users/directory`) is restricted to the `admin` role; user IDs are the provider's `sub`.
 
-- **Pocket ID** (`PocketIdUserDirectory`): calls Pocket ID's `GET /api/users` with an API key (`X-API-KEY`), set as `SAM_OIDC_POCKET_ID_API_KEY` (optional `SAM_OIDC_POCKET_ID_URL` if SAM reaches Pocket ID under another address than the issuer URL). Pocket ID API keys cannot be scoped: the key acts with full admin rights on Pocket ID and every app behind it. So it lives only in the server's env, is never logged (errors name the HTTP status, never the key), and is **optional**: without it, `GET /directory` answers `searchable: false`, search answers 501, and the musician form asks for the user's ID instead (an admin copies it from the user's page in Pocket ID). Dev uses the static key of `docker-compose.pocketid.yml`.
+- **Pocket ID** (`PocketIdUserDirectory`): calls Pocket ID's `GET /api/users` with an API key (`X-API-KEY`), set as `SAM_OIDC_POCKET_ID_API_KEY` (optional `SAM_OIDC_POCKET_ID_URL` if SAM reaches Pocket ID under another address than the issuer URL). Pocket ID API keys cannot be scoped: the key acts with full admin rights on Pocket ID and every app behind it. So it lives only in the server's env, is never logged (errors name the HTTP status, never the key), and is **optional**: without it, `GET /directory` answers `searchable: false`, search answers 501, and the musician form asks for the user's ID instead (an admin copies it from the user's page in Pocket ID). Dev uses the static key of `docker-compose.yml`.
   - **Rotating the key:** in Pocket ID, *Settings → Administration → API Keys* (`/settings/admin/api-keys`), create a new key (with an expiry), set it as `SAM_OIDC_POCKET_ID_API_KEY`, restart `sam-server`, check that the musician form's user search works, then revoke the old key. Rotate at least when it expires and whenever the server or its `.env` may have been exposed.
 - **Keycloak** (`KeycloakUserDirectory`): the Keycloak Admin REST API via `quarkus-keycloak-admin-rest-client`, authenticated with client credentials as the confidential `sam-backend` client (role `view-users` only; dev secret in `oidc/keycloak.properties`). In production, configure `KEYCLOAK_ADMIN_URL`, `KEYCLOAK_REALM`, `KEYCLOAK_BACKEND_CLIENT_ID` (default `sam-backend`), and `KEYCLOAK_BACKEND_CLIENT_SECRET`.
 
