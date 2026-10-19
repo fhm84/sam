@@ -56,12 +56,12 @@ linked musicians, shares, event-log entries and audit revisions would need remap
 |---|------|--------|
 | 1 | Land the spike: tenant resolver + `m2m` tenant, userinfo roles, `scope`/`roleClaimPath` in `/oidc-config.json`, `AuthService` fallback, `preferred_username` from userinfo, dev compose + seed script. Keycloak stays the default until task 2. | [#211](https://github.com/fhm84/sam/issues/211) |
 | 2 | One setting selects the provider for server, UI config and CLI (Pocket ID default, Keycloak optional); one config block per provider; all prod URLs and secrets from env. Tests for both. | [#212](https://github.com/fhm84/sam/issues/212) |
-| 3 | `UserDirectory` behind `/api/admin/users`: Pocket ID (`/api/users?search=`, API key) and Keycloak (admin client). The API key acts with admin rights and stays server-side. | [#213](https://github.com/fhm84/sam/issues/213) |
+| 3 | `UserDirectory` behind `/api/admin/users`: Pocket ID (`/api/users?search=`, API key) and Keycloak (admin client). The API key acts with admin rights: server env only, never logged, rotation documented. Optional: without it, the UI links a musician by pasting the user's `sub` (open question #14). | [#213](https://github.com/fhm84/sam/issues/213) |
 | 4 | Dev default: compose starts and seeds Pocket ID, login-link helper, dev UI reads `/oidc-config.json` from the server via the dev proxy. Keycloak dev still works. | [#214](https://github.com/fhm84/sam/issues/214) |
-| 5 | `docker-compose.prod.yml`: `pocket-id` by default, `keycloak` + `keycloak-db` behind a compose profile; Caddy's login host proxies to the active provider; `.env.example` per provider. | [#215](https://github.com/fhm84/sam/issues/215) |
+| 5 | `docker-compose.prod.yml`: `pocket-id` by default, `keycloak` + `keycloak-db` behind a compose profile; Caddy's login host proxies to the active provider and, for Keycloak, blocks `/admin` (admin console via internal network or SSH tunnel only, open question #15); `.env.example` per provider. | [#215](https://github.com/fhm84/sam/issues/215) |
 | 6 | Backup/restore of Pocket ID's data. Proposed: its own database in SAM's Postgres container, so the scripts keep using `pg_dump`. Restore test. | [#216](https://github.com/fhm84/sam/issues/216) |
 | 7 | Production bootstrap: first admin via `/setup` with a passkey, then an idempotent env-driven seed (groups `sam-admin` / `sam-music-librarian` / `sam-member`, `sam-ui` restricted to them, `sam-cli` + API permission, user-directory API key). Replaces `keycloak/prod/sam-realm.json` for Pocket ID. | [#217](https://github.com/fhm84/sam/issues/217) |
-| 8 | SMTP so admins can email login codes; document the recovery flow. | [#218](https://github.com/fhm84/sam/issues/218) |
+| 8 | SMTP so admins can email login codes (self-service requests stay off, open question #11); document the recovery flow. | [#218](https://github.com/fhm84/sam/issues/218) |
 | 9 | Remove the unused `ensemble:` group logic in `CurrentUserService` (membership comes from the database). | [#219](https://github.com/fhm84/sam/issues/219) |
 | 10 | New ADR (Pocket ID default, Keycloak optional), ADR-0001 consequences, security concept, deployment, production setup, tech stack, `keycloak/README.md`, `cli`/`migration` READMEs, `CLAUDE.md`, open question #7. | [#220](https://github.com/fhm84/sam/issues/220) |
 | 11 | Real devices on the HTTPS deployment: passkeys on iPhone, Android and a Windows PC, phone-as-key via QR code, recovery by login code, silent sign-in in a new tab. | [#221](https://github.com/fhm84/sam/issues/221) |
@@ -70,8 +70,11 @@ Order: 1 → 2 → (3, 4, 9 in any order) → 5 → 6 → 7 → 8 → 10; 11 on 
 
 ## Open questions
 
-- **#11** May users request login codes by email themselves, or only admins send them?
-  Proposed: admin only at first. → [#222](https://github.com/fhm84/sam/issues/222)
+Decided 2026-10-19 as proposed:
+
+- **#11** ~~May users request login codes by email themselves, or only admins send them?~~
+  **Decided:** admin only at first (about 5 active users); revisit if it becomes a burden.
+  `EMAIL_ONE_TIME_ACCESS_AS_UNAUTHENTICATED_ENABLED` stays off. → [#222](https://github.com/fhm84/sam/issues/222), task 8.
 
 From the security comparison of providers (2026-10-18). Pocket ID is often shared single
 sign-on for several self-hosted apps, so SAM must not assume it is the only client:
@@ -91,15 +94,15 @@ sign-on for several self-hosted apps, so SAM must not assume it is the only clie
   `/oidc-config.json`) grant roles only from those groups. The dev seed adds `sam-member`
   for everyone else and restricts `sam-ui` to the three groups; the production seed
   (task 7) must do the same.
-- **#14** Is a full-admin Pocket ID API key on the SAM server acceptable for the user
-  search? Pocket ID API keys cannot be scoped, so a compromised SAM server becomes a
-  takeover of every app behind that Pocket ID (Keycloak's admin client can be limited to
-  `view-users`). Proposed: the key only in server env, never logged; rotation documented;
-  user search optional, with linking by pasting the user's `sub` as the fallback. Affects
-  task 3.
-- **#15** Keycloak profile: should Caddy block `/admin` on the public login host? Proposed:
-  yes, the admin console is reachable only from the internal network or an SSH tunnel.
-  Affects task 5.
+- **#14** ~~Is a full-admin Pocket ID API key on the SAM server acceptable for the user
+  search?~~ **Decided:** acceptable with limits. Pocket ID API keys cannot be scoped, so a
+  compromised SAM server becomes a takeover of every app behind that Pocket ID (Keycloak's
+  admin client can be limited to `view-users`). So the key lives only in the server's env
+  and is never logged; its rotation is documented; and user search is optional: without
+  a key, an admin links a musician by pasting the user's `sub`. Task 3.
+- **#15** ~~Keycloak profile: should Caddy block `/admin` on the public login host?~~
+  **Decided:** yes, the admin console is reachable only from the internal network or an
+  SSH tunnel. Task 5.
 
 ## Try the spike
 
