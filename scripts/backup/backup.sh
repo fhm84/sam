@@ -28,16 +28,18 @@ dump() { # <service> <output file>
   "${COMPOSE[@]}" exec -T "$1" sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" --format=custom' >"$2"
 }
 
-running="$("${COMPOSE[@]}" ps --status running --services)"
+# Services of the active provider (COMPOSE_PROFILES in .env). Decided by configuration, not by what
+# runs: a stopped keycloak-db must fail the backup, not drop out of it.
+services="$("${COMPOSE[@]}" config --services)"
 files=(sam_music.dump)
 
 echo "Dumping databases"
 dump database "$tmp/sam_music.dump"
-if grep -qx keycloak-db <<<"$running"; then
+if grep -qx keycloak-db <<<"$services"; then
   dump keycloak-db "$tmp/keycloak.dump"
   files+=(keycloak.dump)
 fi
-if grep -qx pocket-id <<<"$running"; then
+if grep -qx pocket-id <<<"$services"; then
   echo "NOTE: Pocket ID's data (volume pocket-id-data) is not part of this backup yet (#216)" >&2
 fi
 
