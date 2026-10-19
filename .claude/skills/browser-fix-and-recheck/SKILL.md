@@ -88,9 +88,9 @@ Resolved, Partially resolved, Not resolved.
 - Any uncertainty
 - Any additional test worth running
 
-## Angular and PrimeNG guidance
+## Angular and Optimus UI guidance
 
-When working on Angular or PrimeNG UIs:
+When working on Angular or Optimus UI (PrimeNG fork) UIs:
 - Recheck overlays after any CSS, container, or z-index change.
 - Recheck change-detection-sensitive UI after event handling or async logic changes.
 - Recheck tables, paginator state, dialogs, and form validation if the fix touched shared components.
@@ -101,7 +101,7 @@ When working on Angular or PrimeNG UIs:
 Explicitly say "Use Playwright MCP" when reproducing and when rechecking.
 
 Examples:
-- Use Playwright MCP to reproduce the clipped PrimeNG dropdown, fix the layout or overlay issue, then recheck on desktop and mobile.
+- Use Playwright MCP to reproduce the clipped Optimus UI dropdown, fix the layout or overlay issue, then recheck on desktop and mobile.
 - Use Playwright MCP to reproduce the broken validation message flow, implement a fix, and confirm the rendered result after submission.
 
 ## Boundaries
