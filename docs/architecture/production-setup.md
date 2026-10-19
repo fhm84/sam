@@ -49,7 +49,7 @@ stay untouched. If the zone has CAA records, they must allow `letsencrypt.org`.
 **Pocket ID first setup** (until an automated, env-driven setup lands: [#217](https://github.com/fhm84/sam/issues/217)). Do step 1 right after the first start: until an admin exists, whoever opens the setup page first becomes admin.
 
 1. Open `https://<LOGIN_DOMAIN>/setup` and create your admin account with a passkey.
-2. *Settings → Administration → User Groups*: create `sam-admin`, `sam-music-librarian` and `sam-member` (exactly these names; they map to SAM's roles, everyone else gets `sam-member`).
+2. *Settings → Administration → User Groups*: create `sam-admin`, `sam-music-librarian` and `sam-member` (exactly these names: the first two grant SAM's roles, `sam-member` lets everyone else sign in, because `sam-ui` admits only these three groups).
 3. *OIDC Clients → Add*: name `SAM`, **public** client, custom client ID `sam-ui` (or set `OIDC_CLIENT_ID` to the generated one), callback URL and logout callback URL `https://<SAM_DOMAIN>`; then allow only the three groups above.
 4. For the bulk import with the `cli`: an OIDC client with custom ID `sam-cli` (confidential; note its secret), and under *APIs* an API with resource `urn:sam:api`, a permission `music_librarian`, and client access for `sam-cli` with that permission.
 5. Optional: an API key (*API Keys*) for the musician–user search, set as `SAM_OIDC_POCKET_ID_API_KEY` (see [security](concepts/security.md) for what it can do and how to rotate it).
@@ -68,7 +68,7 @@ stay untouched. If the zone has CAA records, they must allow `letsencrypt.org`.
 | Keycloak (heap up to 768 MB; `keycloak` profile only) | 1.25 GB | about 600 MB |
 | Keycloak Postgres (`keycloak` profile only) | 384 MB | about 50 MB |
 
-With Pocket ID the limits add up to about 2.8 GB (with Keycloak: about 4.3 GB), leaving the rest of an 8 GB host for the OS, page cache and the optional monitoring stack. On a 4 GB host, lower the `sam-server` heap (`JAVA_TOOL_OPTIONS`) and skip the monitoring stack. `sam-server` exits on out-of-memory (`ExitOnOutOfMemoryError`) so the restart policy brings it back. Not yet load-tested: heavy PDF classification during a bulk import is the likeliest memory peak, so watch `docker stats` during the first imports.
+With Pocket ID the limits add up to about 2.8 GB (with Keycloak: about 4.2 GB), leaving the rest of an 8 GB host for the OS, page cache and the optional monitoring stack. On a 4 GB host, lower the `sam-server` heap (`JAVA_TOOL_OPTIONS`) and skip the monitoring stack. `sam-server` exits on out-of-memory (`ExitOnOutOfMemoryError`) so the restart policy brings it back. Not yet load-tested: heavy PDF classification during a bulk import is the likeliest memory peak, so watch `docker stats` during the first imports.
 
 **Known gaps:**
 
