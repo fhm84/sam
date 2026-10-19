@@ -684,6 +684,8 @@
       "linkedUserHint": "Search by name or email…",
       "linkedUserTooltip": "Links this musician to an authenticated user account, enabling the My Parts personalised view.",
       "linkedUserNone": "No account linked",
+      "linkedUserIdHint": "User ID",
+      "linkedUserIdHelp": "User search is not configured. Copy the user's ID from the login provider's user list (Pocket ID: Users → the user's page).",
       "linkAction": "Link",
       "unlinkAction": "Unlink",
       "linkSuccess": "User account linked",

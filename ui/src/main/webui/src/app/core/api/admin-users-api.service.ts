@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { UserInfo } from '../../model/datamodels';
+import { UserDirectoryInfo, UserInfo } from '../../model/datamodels';
 
 @Injectable({ providedIn: 'root' })
 export class AdminUsersApiService {
@@ -12,6 +12,11 @@ export class AdminUsersApiService {
   search(query: string): Observable<UserInfo[]> {
     const params = new HttpParams().set('search', query);
     return this.http.get<UserInfo[]>(this.baseUrl, { params });
+  }
+
+  /** Whether the login provider's users can be searched; if not, users are linked by ID. */
+  directory(): Observable<UserDirectoryInfo> {
+    return this.http.get<UserDirectoryInfo>(`${this.baseUrl}/directory`);
   }
 
   getById(id: string): Observable<UserInfo> {

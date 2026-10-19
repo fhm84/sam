@@ -27,6 +27,19 @@ public class EnvConsts {
     public static final String OIDC_PROVIDER = "sam.oidc.provider";
 
     /**
+     * Base URL of Pocket ID's API for user search ({@code PocketIdUserDirectory}). Defaults to the
+     * issuer URL; set it when SAM reaches Pocket ID under another address.
+     */
+    public static final String POCKET_ID_URL = "sam.oidc.pocket-id.url";
+
+    /**
+     * Pocket ID API key for user search. It acts with full admin rights on Pocket ID, so it is set
+     * only in the server's env ({@code SAM_OIDC_POCKET_ID_API_KEY}) and never logged. Absent → user
+     * search is off and admins link musicians by user ID.
+     */
+    public static final String POCKET_ID_API_KEY = "sam.oidc.pocket-id.api-key";
+
+    /**
      * Keycloak realm name used by the admin REST client for user search.
      * Env var {@code KEYCLOAK_REALM}, default {@code sam}.
      */

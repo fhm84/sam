@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 /**
- * Minimal user representation sourced from the Keycloak Admin API.
+ * Minimal user representation sourced from the OIDC provider's user API (Pocket ID or Keycloak).
  */
 public record UserInfo(@NotBlank String id, @NotNull String username, String email, String firstName, String lastName) {
 

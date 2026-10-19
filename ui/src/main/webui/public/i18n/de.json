@@ -684,6 +684,8 @@
       "linkedUserHint": "Nach Name oder E-Mail suchen…",
       "linkedUserTooltip": "Verknüpft diesen Musiker mit einem authentifizierten Benutzerkonto und ermöglicht die personalisierte Meine Stimmen-Ansicht.",
       "linkedUserNone": "Kein Konto verknüpft",
+      "linkedUserIdHint": "Benutzer-ID",
+      "linkedUserIdHelp": "Die Benutzersuche ist nicht eingerichtet. Kopiere die ID des Benutzers aus der Benutzerliste des Login-Anbieters (Pocket ID: Benutzer → Seite des Benutzers).",
       "linkAction": "Verknüpfen",
       "unlinkAction": "Verknüpfung aufheben",
       "linkSuccess": "Benutzerkonto verknüpft",

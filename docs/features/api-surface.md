@@ -22,7 +22,7 @@ Business endpoints are under the `/api` base path. Ops/diagnostic endpoints
 | Ensemble members | `/api/ensembles/{id}/members` | Sub-resource |
 | Shares | `/api/shares` | Authenticated share management (create, list, revoke) |
 | Public share | `/api/public/shares/{token}` | Unauthenticated; token-validated (`/download`, `/toc`, `/download/{instrumentationId}`, `/sheet/{attachmentId}`) — see [Shares](shares.md) |
-| Admin users | `/api/admin/users` | `admin` only; Keycloak user search for musician–account linking |
+| Admin users | `/api/admin/users` | `admin` only; user search for musician–account linking through the OIDC provider (Pocket ID or Keycloak); `/directory` tells whether search is available (501 without a Pocket ID API key) |
 | Event log | `/api/event-logs` | Read-only; requires authentication |
 | My parts | `/api/me/parts` | Authenticated; paginated sheets for the calling user's instruments |
 | App info | `/q/info` | Unauthenticated; management port (`:9000`), not `/api`. Git branch/commit, build timestamp, Quarkus/Java/OS versions |

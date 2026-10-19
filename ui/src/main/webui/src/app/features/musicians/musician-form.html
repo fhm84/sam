@@ -208,6 +208,30 @@
             (onClick)="onUnlink()"
           />
         </div>
+      } @else if (!userSearchAvailable()) {
+        <!-- Not linked, no user search: enter the user's ID -->
+        <div class="flex items-center gap-2">
+          <input
+            pInputText
+            id="musician-user-id"
+            class="flex-1"
+            [(ngModel)]="manualUserId"
+            [ngModelOptions]="{ standalone: true }"
+            [placeholder]="t.t('musicians.form.linkedUserIdHint')"
+            [disabled]="linking()"
+            (keydown.enter)="$event.preventDefault(); onLinkById()"
+          />
+          <p-button
+            [label]="t.t('musicians.form.linkAction')"
+            size="small"
+            [disabled]="!manualUserId.trim()"
+            [loading]="linking()"
+            (onClick)="onLinkById()"
+          />
+        </div>
+        <span class="text-xs text-[var(--sam-text-muted)]">
+          {{ 'musicians.form.linkedUserIdHelp' | translate }}
+        </span>
       } @else {
         <!-- Not linked: search autocomplete -->
         <p-autocomplete

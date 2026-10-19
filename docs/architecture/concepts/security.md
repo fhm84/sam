@@ -28,7 +28,13 @@ Dedicated endpoints (admin-only):
 
 The general `PUT /api/musicians/{id}` (used by the form save) intentionally ignores `userId` via `@Mapping(target = "userId", ignore = true)` in `MusicianMapper`, so a librarian updating a musician's name can never accidentally clear an existing link.
 
-User lookup for the admin search autocomplete is backed by the **Keycloak Admin REST API** via `quarkus-keycloak-admin-rest-client`. The `AdminUsersResource` (`GET /api/admin/users?search=`, `GET /api/admin/users/{id}`) proxies user searches to Keycloak and is restricted to the `admin` role. The admin client authenticates with client credentials as the confidential `sam-backend` client in the `sam` realm (dev secret committed in `application.properties`). In production, configure `KEYCLOAK_ADMIN_URL`, `KEYCLOAK_REALM`, `KEYCLOAK_BACKEND_CLIENT_ID` (default `sam-backend`), and `KEYCLOAK_BACKEND_CLIENT_SECRET`.
+User lookup for the admin search autocomplete goes through `UserDirectory`, one implementation per provider, picked by `sam.oidc.provider`. `AdminUsersResource` (`GET /api/admin/users?search=`, `GET /api/admin/users/{id}`, `GET /api/admin/users/directory`) is restricted to the `admin` role; user IDs are the provider's `sub`.
+
+- **Pocket ID** (`PocketIdUserDirectory`): calls Pocket ID's `GET /api/users` with an API key (`X-API-KEY`), set as `SAM_OIDC_POCKET_ID_API_KEY` (optional `SAM_OIDC_POCKET_ID_URL` if SAM reaches Pocket ID under another address than the issuer URL). Pocket ID API keys cannot be scoped: the key acts with full admin rights on Pocket ID and every app behind it. So it lives only in the server's env, is never logged (errors name the HTTP status, never the key), and is **optional**: without it, `GET /directory` answers `searchable: false`, search answers 501, and the musician form asks for the user's ID instead (an admin copies it from the user's page in Pocket ID). Dev uses the static key of `docker-compose.pocketid.yml`.
+  - **Rotating the key:** in Pocket ID, *Settings → Administration → API Keys* (`/settings/admin/api-keys`), create a new key (with an expiry), set it as `SAM_OIDC_POCKET_ID_API_KEY`, restart `sam-server`, check that the musician form's user search works, then revoke the old key. Rotate at least when it expires and whenever the server or its `.env` may have been exposed.
+- **Keycloak** (`KeycloakUserDirectory`): the Keycloak Admin REST API via `quarkus-keycloak-admin-rest-client`, authenticated with client credentials as the confidential `sam-backend` client (role `view-users` only; dev secret in `oidc/keycloak.properties`). In production, configure `KEYCLOAK_ADMIN_URL`, `KEYCLOAK_REALM`, `KEYCLOAK_BACKEND_CLIENT_ID` (default `sam-backend`), and `KEYCLOAK_BACKEND_CLIENT_SECRET`.
+
+A failing provider API (unreachable, rejected key) answers 502.
 
 ## Testing
 

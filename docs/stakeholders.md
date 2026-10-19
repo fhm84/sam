@@ -154,7 +154,7 @@ ensemble member.
 - Instruments catalogue management
 - Ensemble and voice definition management
 - Coverage snapshot recomputation
-- Keycloak user lookup (`AdminUsersResource`, admin-only) and linking a `Musician` record
+- Login-provider user lookup (`AdminUsersResource`, admin-only) and linking a `Musician` record
   to a login (`linkUser` / `unlinkUser`, admin-only) — the only two genuinely
   admin-exclusive actions in the system today
 - Content visibility / sharing settings — share links are implemented (see S5); a per-collection
