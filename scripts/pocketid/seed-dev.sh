@@ -1,15 +1,22 @@
-#!/usr/bin/env bash
-# Seeds a fresh dev Pocket ID (docker-compose.pocketid.yml) with what SAM expects: the sam-admin and
-# sam-music-librarian groups (= SAM roles, see sam.oidc.role-groups), the sam-member group for
-# everyone else, the dev users, the public sam-ui client (only members of those groups may sign in),
-# and the sam-cli service account with the music_librarian permission on the SAM API. Run once on an
-# empty volume; start over with `docker compose -f docker-compose.pocketid.yml down -v`.
+#!/bin/sh
+# Seeds a fresh dev Pocket ID with what SAM expects: the sam-admin and sam-music-librarian groups
+# (= SAM roles, see sam.oidc.role-groups), the sam-member group for everyone else, the dev users,
+# the public sam-ui client (only members of those groups may sign in), and the sam-cli service
+# account with the music_librarian permission on the SAM API.
+#
+# Runs as the `pocket-id-seed` service of docker-compose.yml on every `docker compose up` and skips
+# an instance that already has sam-ui. Start over with `docker compose down -v`. POSIX sh, because
+# the seed container (curlimages/curl) has no bash.
 #
 # Users have no passkey yet: print a one-time login link per user with
-#   scripts/pocketid/seed-dev.sh login-link <username>
-set -euo pipefail
+#   docker compose run --rm pocket-id-seed login-link <username>
+# or, with curl on the host, scripts/pocketid/seed-dev.sh login-link <username>
+set -eu
 
-BASE="${POCKET_ID_URL:-http://localhost:1411}/api"
+URL="${POCKET_ID_URL:-http://localhost:1411}"
+# What the browser opens; differs from POCKET_ID_URL inside the compose network
+APP_URL="${POCKET_ID_APP_URL:-$URL}"
+BASE="$URL/api"
 KEY="${POCKET_ID_API_KEY:-sam-dev-static-api-key}"
 CLI_SECRET="sam-cli-dev-secret-0000"
 API_RESOURCE="urn:sam:api"
@@ -19,10 +26,15 @@ call() { # method path [json]
 }
 first_id() { sed -E 's/^[^{]*\{"id":"([^"]+)".*/\1/'; }
 
-if [[ "${1:-}" == "login-link" ]]; then
+if [ "${1:-}" = "login-link" ]; then
   user_id=$(call GET "/users?search=${2:?username}" | sed -E 's/.*"data":\[\{"id":"([^"]+)".*/\1/')
   token=$(call POST "/users/$user_id/one-time-access-token" '{"ttl":"1h"}' | sed -E 's/.*"token":"([^"]+)".*/\1/')
-  echo "${POCKET_ID_URL:-http://localhost:1411}/lc/$token"
+  echo "$APP_URL/lc/$token"
+  exit 0
+fi
+
+if call GET /oidc/clients/sam-ui >/dev/null 2>&1; then
+  echo "Pocket ID is already seeded. Log in with: docker compose run --rm pocket-id-seed login-link admin1"
   exit 0
 fi
 
@@ -54,4 +66,4 @@ permission=$(call PUT "/apis/$api/permissions" \
 call PUT "/apis/$api/clients/sam-cli" \
   "{\"clientAccess\":true,\"clientPermissionIds\":[\"$permission\"],\"userDelegatedAccess\":false,\"userDelegatedPermissionIds\":[]}" >/dev/null
 
-echo "Seeded. Log in with: $0 login-link admin1"
+echo "Seeded. Log in with: docker compose run --rm pocket-id-seed login-link admin1"

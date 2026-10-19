@@ -12,3 +12,45 @@ services:
     ports:
       - "5432:5432"
     restart: unless-stopped
+
+  # Dev OIDC provider (the default, sam.oidc.provider=pocket-id). Keycloak instead:
+  # docker-compose.keycloak.yml and -Dsam.oidc.provider=keycloak.
+  # Passkeys need a secure context; http://localhost counts as one, so no TLS for dev.
+  pocket-id:
+    image: ghcr.io/pocket-id/pocket-id:v2.17.0
+    environment:
+      APP_URL: http://localhost:1411
+      TRUST_PROXY: "false"
+      # Dev-only values, never reuse in production
+      ENCRYPTION_KEY: sam-dev-encryption-key-change-me
+      STATIC_API_KEY: sam-dev-static-api-key
+    volumes:
+      - pocket-id-data:/app/data
+    ports:
+      - "1411:1411"
+    restart: unless-stopped
+    # The image checks every 90s, which would hold up the seed below
+    healthcheck:
+      test: ["CMD", "/app/pocket-id", "healthcheck"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # Seeds groups, dev users, sam-ui and sam-cli on every `up`; skips an already seeded instance.
+  # Login link for a user without a passkey:
+  #   docker compose run --rm pocket-id-seed login-link admin1
+  pocket-id-seed:
+    image: curlimages/curl:8.16.0
+    depends_on:
+      pocket-id:
+        condition: service_healthy
+    environment:
+      POCKET_ID_URL: http://pocket-id:1411
+      POCKET_ID_APP_URL: http://localhost:1411
+    volumes:
+      - ./scripts/pocketid:/seed:ro
+    entrypoint: ["sh", "/seed/seed-dev.sh"]
+    restart: "no"
+
+volumes:
+  pocket-id-data:

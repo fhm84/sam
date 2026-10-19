@@ -2,5 +2,10 @@
   "/api": {
     "target": "http://localhost:8080",
     "secure": false
+  },
+  "/oidc-config.json": {
+    "target": "http://localhost:8080",
+    "secure": false,
+    "pathRewrite": { "^/oidc-config.json": "/api/oidc-config.json" }
   }
 }
