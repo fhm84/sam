@@ -21,8 +21,8 @@ SAM (Sheet music Archiving & Management) is a Quarkus-based application for arch
 # Run unit tests (all modules)
 ./mvnw test
 
-# Run a single test class
-./mvnw test -pl server -am -Dtest=SheetImporterTest
+# Run a single test class (the flag keeps upstream modules without a match from failing)
+./mvnw test -pl server -am -Dtest=SheetImporterTest -Dsurefire.failIfNoSpecifiedTests=false
 
 # Run integration tests (skipped by default via skipITs=true)
 ./mvnw verify -pl server -am -DskipITs=false
@@ -71,11 +71,10 @@ Seven Maven modules under parent `de.halbmann:sam`:
 
 ## Security
 
-- **OIDC provider**: one setting, `sam.oidc.provider` / `SAM_OIDC_PROVIDER` = `pocket-id` (default, also in dev) or `keycloak`; it loads `oidc/<provider>.properties` in `server` and `cli` (`OidcProviderConfigSourceFactory`). See `docs/plans/pocket-id-provider.md`.
-- **Dev Pocket ID**: `docker compose up -d` starts it (port 1411) next to Postgres; the `pocket-id-seed` service seeds groups, `admin1`/`librarian1`/`musician1`, `sam-ui` and `sam-cli` on first start. Users have no passkey: `docker compose run --rm pocket-id-seed login-link admin1` prints a one-time login link.
-- **Keycloak** (optional): 26 (`docker-compose.keycloak.yml`). Realm export at `keycloak/sam-realm.json` (authoritative for dev startup via `--import-realm`, only applied on first boot). A parallel per-entity split under `keycloak/configurator/sam/` can be (re)applied to a running instance via `docker compose -f docker-compose.keycloak.yml --profile configure run --rm keycloak-configurator` (idempotent, uses [keycloak-configurator](https://github.com/CycriLabs/keycloak-configurator)) — see `keycloak/README.md` for how the two representations relate and must currently be kept in sync manually.
-- **Dev Keycloak**: `docker compose -f docker-compose.keycloak.yml up` — runs on port 8180, auto-imports realm; start the server with `-Dsam.oidc.provider=keycloak`.
-- **Angular OIDC config**: The Angular app fetches `/oidc-config.json` at startup. In **dev**, the Angular dev proxy (`ui/src/main/webui/proxy.conf.json`) rewrites it to the server's `/api/oidc-config.json`, so the UI follows `sam.oidc.provider` (there is no static file). In **production**, the Caddy edge proxy (`docker/Caddyfile`, ADR-0010) rewrites `/oidc-config.json` to `/api/oidc-config.json`, served by `OidcConfigResource` (`server/.../OidcConfigResource.java`; a `@PermitAll` JAX-RS endpoint, so it lives under the `/api` application path — `OidcConfigResourceTest` pins this), which returns `{issuerUrl, clientId, scope, roleClaimPath, roleGroups}`; issuer and client ID come from `quarkus.oidc.auth-server-url` / `quarkus.oidc.client-id`, which are set via `OIDC_SERVER_URL` and `OIDC_CLIENT_ID` env vars. No image rebuild needed to change the provider URL.
+- **OIDC provider**: `sam.oidc.provider` / `SAM_OIDC_PROVIDER` = `pocket-id` (default, also in dev) or `keycloak`; it loads `oidc/<provider>.properties` in `server` and `cli` (`OidcProviderConfigSourceFactory`). Plan: `docs/plans/pocket-id-provider.md`.
+- **Dev login**: `docker compose up -d` starts Pocket ID (port 1411) next to Postgres, seeded on first start (groups, `admin1`/`librarian1`/`musician1`, `sam-ui`, `sam-cli`). Users have no passkey: `docker compose run --rm pocket-id-seed login-link admin1` prints a one-time login link.
+- **Keycloak** (optional): `docker compose -f docker-compose.keycloak.yml up` (port 8180, imports `keycloak/sam-realm.json` on first boot only) plus `-Dsam.oidc.provider=keycloak`. `keycloak/configurator/sam/` is a per-entity copy of the realm that can be re-applied to a running instance (`--profile configure run --rm keycloak-configurator`); keep both in sync by hand, see `keycloak/README.md`.
+- **`/oidc-config.json`**, fetched by the Angular app at startup, is `OidcConfigResource` at `/api/oidc-config.json` (`@PermitAll`; `OidcConfigResourceTest` pins the path): issuer and client ID from `OIDC_SERVER_URL` / `OIDC_CLIENT_ID`, plus the provider's scope and role claim. The dev proxy (`ui/src/main/webui/proxy.conf.json`) and Caddy in prod (`docker/Caddyfile`, ADR-0010) rewrite the root path to it, so a provider change needs no UI rebuild.
 - **Roles**: `admin`, `music_librarian` (Keycloak realm roles; Pocket ID groups `sam-admin` / `sam-music-librarian`). Ensemble membership lives in the database (`EnsembleMembershipEntity`), not in the token.
 - **Auth enforcement**: `@Authenticated` at class level on all `*ResourceImpl` classes (all endpoints require a token). Write methods additionally carry `@RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})`. Role constants are in `server/src/main/java/de/halbmann/sam/security/Roles.java`.
 - **Do NOT put `@RolesAllowed` on the `api` module interfaces** — they are also used as REST clients by the `cli` module.
@@ -91,7 +90,7 @@ Opt-in Prometheus + Grafana stack — see `monitoring/CLAUDE.md`.
 
 - PostgreSQL with Flyway migrations in `server/src/main/resources/db/migration/`
 - Flyway owns the schema: every entity/column change needs a migration. Hibernate auto-update runs in `%dev` only (so a local DB can hide a missing migration); tests run on the Flyway-only schema and `FlywaySchemaValidationTest` boots with `validate`, as does prod (`%prod...schema-management.strategy=validate` refuses to start on drift).
-- Dev services are disabled; a running PostgreSQL instance is expected (default: `localhost:5432/sam_music`, user `sam`)
+- Dev services are disabled; dev expects PostgreSQL at `localhost:5432/sam_music`, user `sam` (`docker compose up -d` starts it)
 - Extensions required: `pg_trgm`, `fuzzystrmatch`
 
 ## Code Style
@@ -109,7 +108,7 @@ After implementing any backend change:
 2. **Run the affected tests** and confirm they pass before marking the task done:
    ```bash
    # Single test class (fast)
-   rtk ./mvnw test -pl server -am -Dtest=<TestClass>
+   rtk ./mvnw test -pl server -am -Dtest=<TestClass> -Dsurefire.failIfNoSpecifiedTests=false
 
    # All unit tests
    rtk ./mvnw test
@@ -155,7 +154,7 @@ domain area), `docs/plans/` (task breakdowns for planned roadmap items), `docs/r
 After implementing a feature or bugfix:
 1. Update README.md TODOs if the feature is now complete
 2. If architecture changed, verify the matching page under `docs/architecture/` (or `docs/architecture/concepts/`) still holds
-3. If UI patterns changed, check memory files (ui-architecture.md, etc.)
+3. If UI patterns changed, check `ui/src/main/webui/ARCHITECTURE.md`
 4. If adding new modules or resources, update `docs/architecture/building-blocks.md` (and `docs/architecture/data-model.md` for new entities)
 5. If a `docs/roadmap.md` item shipped, flip its status (`idea`/`planned`/`in progress` → `done`) instead of leaving it stale; for a plan on the Now or Next list, close its task's GitHub issue from the PR (`Closes #N`; the plan row links the issue and is left alone), otherwise flip the task rows in its `docs/plans/` page; delete the plan page once every task is done (conventions: `docs/plans/README.md`)
 6. If the change affects who can do what (new/changed `@RolesAllowed`, new endpoint, new share/visibility behavior, new personalised view), check `docs/stakeholders.md` — its use cases and the Section 6 access-control model drift silently and easily (e.g. RBAC and share links stayed marked "planned" long after they shipped)
