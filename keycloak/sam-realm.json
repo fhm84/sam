@@ -52,19 +52,6 @@
           }
         },
         {
-          "name": "groups",
-          "protocol": "openid-connect",
-          "protocolMapper": "oidc-group-membership-mapper",
-          "consentRequired": false,
-          "config": {
-            "full.path": "false",
-            "id.token.claim": "true",
-            "access.token.claim": "true",
-            "claim.name": "groups",
-            "userinfo.token.claim": "true"
-          }
-        },
-        {
           "name": "realm-roles",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-usermodel-realm-role-mapper",
@@ -121,13 +108,6 @@
     }
   ],
 
-  "groups": [
-    {
-      "name": "ensemble:00000000-0000-0000-0000-000000000001",
-      "path": "/ensemble:00000000-0000-0000-0000-000000000001"
-    }
-  ],
-
   "users": [
     {
       "username": "admin1",
@@ -171,8 +151,7 @@
       "enabled": true,
       "emailVerified": true,
       "credentials": [{ "type": "password", "value": "musician1", "temporary": false }],
-      "realmRoles": [],
-      "groups": ["/ensemble:00000000-0000-0000-0000-000000000001"]
+      "realmRoles": []
     }
   ]
 }

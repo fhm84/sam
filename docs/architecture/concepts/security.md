@@ -5,14 +5,14 @@ Quarkus OIDC with self-hosted **Keycloak 26** (`docker-compose.keycloak.yml`; re
 | Concern | Mechanism |
 |---|---|
 | Identity | `Musician.userId` = OIDC `sub` claim. No separate User entity — a musician either has a login or doesn't. See [ADR-0001](../decisions/adr-0001-musician-user-linking.md). |
-| Ensemble access | Keycloak group `ensemble:{UUID}` in the JWT `groups` claim, parsed by `CurrentUserService.getAccessibleEnsembleIds()` / `canAccessEnsemble()`. **Not yet enforced:** no endpoint calls these yet, and `SheetCollection.visibility` is stored but not checked — reads are open to every authenticated user. See the [role-aware access plan](../../plans/rbac-role-aware-access.md). |
+| Ensemble access | Membership lives in the database (`EnsembleMembershipEntity`), not in the token, so neither provider needs per-ensemble groups. **Not yet enforced:** `SheetCollection.visibility` is stored but not checked — reads are open to every authenticated user. See the [role-aware access plan](../../plans/rbac-role-aware-access.md). |
 | Roles | `music_librarian` (full archive write access), `admin` (system config). Keycloak: realm roles. Pocket ID: only the SAM-specific groups `sam-music-librarian` / `sam-admin` grant them (`sam.oidc.role-groups`, `RoleGroupsAugmentor`), so a shared Pocket ID's other groups grant nothing in SAM |
 | Token audience | Only tokens meant for SAM are accepted: Pocket ID `aud` must contain the UI client ID (`sam-ui`), Keycloak `aud` must contain `urn:sam:api` (audience mapper on `sam-ui` and `sam-cli`); the `cli`'s Pocket ID token goes to the `m2m` tenant, which requires `urn:sam:api` |
 | Public access | `/api/public/shares/{token}/…` endpoints are `@PermitAll` (no `@Authenticated`); the token is validated manually in `PublicShareResourceImpl` / `ShareService` |
 | Ops/diagnostic access | `/q/info`, `/q/metrics` are unauthenticated by design, isolated onto a separate management port (`:9000`) rather than `@Authenticated`'s `/api/*` surface. See [ADR-0007](../decisions/adr-0007-management-interface.md) |
 | Machine access | The `cli` module authenticates as the `sam-cli` Keycloak client (confidential client with a service account holding `music_librarian`) via OIDC client-credentials — no user login involved. See `cli/README.md`, "Server URL and authentication". |
 
-`CurrentUserService` (`@RequestScoped`) is the single injection point for identity in business logic — wraps JWT parsing, role checks, and ensemble-group resolution. Inject this instead of `JsonWebToken` directly.
+`CurrentUserService` (`@RequestScoped`) is the single injection point for identity in business logic — wraps the user ID, username and role checks. Inject this instead of `JsonWebToken` directly.
 
 `MyPartsService` extends this pattern for the personalized sheet view: it calls `currentUserService.getUserId()` to look up the linked `MusicianEntity`, collects all instrument IDs from the musician's `EnsembleMembershipEntity` records, and returns only sheets that contain at least one matching instrumentation. Conductor memberships (null instrument) are skipped automatically.
 
