@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Restore SAM from a backup directory produced by backup.sh.
-# DESTRUCTIVE: replaces the contents of both databases and the sheet music files.
+# DESTRUCTIVE: replaces the contents of the databases in the backup and the sheet music files.
 #
 #   scripts/backup/restore.sh /var/backups/sam/2026-09-19_030000 --yes
 set -euo pipefail
@@ -15,9 +15,20 @@ COMPOSE=(docker compose -f "$ROOT/docker-compose.prod.yml" --env-file "$ENV_FILE
 
 (cd "$SRC" && sha256sum -c SHA256SUMS)
 
+# Services of the active provider (COMPOSE_PROFILES in .env)
+services="$("${COMPOSE[@]}" config --services)"
+has() { grep -qx "$1" <<<"$services"; }
+
 echo "Stopping application services"
-"${COMPOSE[@]}" stop sam-ui sam-server keycloak
-"${COMPOSE[@]}" up -d database keycloak-db
+app=(sam-ui sam-server)
+for s in keycloak pocket-id; do has "$s" && app+=("$s"); done
+"${COMPOSE[@]}" stop "${app[@]}"
+dbs=(database)
+if [ -f "$SRC/keycloak.dump" ]; then
+  has keycloak-db || { echo "The backup has a Keycloak database, but the keycloak profile is not active" >&2; exit 1; }
+  dbs+=(keycloak-db)
+fi
+"${COMPOSE[@]}" up -d "${dbs[@]}"
 
 restore() { # <service> <dump file>
   until "${COMPOSE[@]}" exec -T "$1" pg_isready -q; do sleep 1; done
@@ -26,7 +37,7 @@ restore() { # <service> <dump file>
 }
 echo "Restoring databases"
 restore database "$SRC/sam_music.dump"
-restore keycloak-db "$SRC/keycloak.dump"
+[ -f "$SRC/keycloak.dump" ] && restore keycloak-db "$SRC/keycloak.dump"
 
 echo "Restoring sheet music files"
 "${COMPOSE[@]}" run --rm -T --no-deps restore-files sh -c \

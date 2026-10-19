@@ -1,5 +1,5 @@
 # Frontend/edge image — builds Angular with Node and serves it with Caddy, which also
-# terminates TLS and proxies the API and Keycloak (see docker/Caddyfile).
+# terminates TLS and proxies the API and the OIDC provider (see docker/Caddyfile).
 # Backend image is built by Jib: ./mvnw package -Dquarkus.container-image.build=true -pl server -am
 
 # The build output is static JS/CSS, so build on the host platform even for an arm64

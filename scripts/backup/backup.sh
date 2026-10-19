@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Nightly SAM backup: both Postgres databases, the sheet music files and .env.
+# Nightly SAM backup: the SAM database, Keycloak's database (with the keycloak profile), the sheet
+# music files and .env. Pocket ID's data is not covered yet (#216).
 # Writes a timestamped directory under $BACKUP_DIR and prunes old ones; a second machine (e.g. a NAS) pulls
 # the result (see docs/architecture/production-setup.md). Run as root via the systemd timer.
 #
@@ -27,9 +28,18 @@ dump() { # <service> <output file>
   "${COMPOSE[@]}" exec -T "$1" sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" --format=custom' >"$2"
 }
 
+running="$("${COMPOSE[@]}" ps --status running --services)"
+files=(sam_music.dump)
+
 echo "Dumping databases"
 dump database "$tmp/sam_music.dump"
-dump keycloak-db "$tmp/keycloak.dump"
+if grep -qx keycloak-db <<<"$running"; then
+  dump keycloak-db "$tmp/keycloak.dump"
+  files+=(keycloak.dump)
+fi
+if grep -qx pocket-id <<<"$running"; then
+  echo "NOTE: Pocket ID's data (volume pocket-id-data) is not part of this backup yet (#216)" >&2
+fi
 
 echo "Archiving sheet music files"
 "${COMPOSE[@]}" run --rm -T --no-deps backup-files czf "/out/.tmp-$stamp/sam-data.tar.gz" -C /data .
@@ -38,11 +48,12 @@ echo "Archiving sheet music files"
 install -m 600 "$ENV_FILE" "$tmp/env"
 
 echo "Verifying"
-for f in sam_music.dump keycloak.dump sam-data.tar.gz; do
+files+=(sam-data.tar.gz)
+for f in "${files[@]}"; do
   [ -s "$tmp/$f" ] || { echo "ERROR: $f is missing or empty" >&2; exit 1; }
 done
 gzip -t "$tmp/sam-data.tar.gz"
-(cd "$tmp" && sha256sum sam_music.dump keycloak.dump sam-data.tar.gz env >SHA256SUMS)
+(cd "$tmp" && sha256sum "${files[@]}" env >SHA256SUMS)
 
 if [ -n "${BACKUP_GROUP:-}" ]; then
   chgrp -R "$BACKUP_GROUP" "$tmp"

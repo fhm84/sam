@@ -1,5 +1,5 @@
 # Edge proxy, baked into the sam-ui image: serves the Angular SPA, proxies the API to
-# sam-server and the login hostname to Keycloak, and terminates TLS.
+# sam-server and the login hostname to the OIDC provider, and terminates TLS.
 # Certificates are obtained and renewed automatically (Let's Encrypt) once the DNS
 # records resolve to this host and ports 80/443 are reachable.
 {
@@ -35,6 +35,17 @@
 	}
 }
 
-{$KEYCLOAK_DOMAIN} {
-	reverse_proxy keycloak:8080
+# Login host: the active OIDC provider. Pocket ID and Keycloak both answer as oidc:8080 on the
+# internal network (docker-compose.prod.yml), so this needs no provider setting.
+{$LOGIN_DOMAIN} {
+	# Keycloak's admin console and admin REST API stay off the internet: use them through an
+	# SSH tunnel to the server. Pocket ID has no /admin path (its admin pages are /settings/admin).
+	@admin path /admin /admin/*
+	handle @admin {
+		respond "Not Found" 404
+	}
+
+	handle {
+		reverse_proxy oidc:8080
+	}
 }
