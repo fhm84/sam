@@ -26,8 +26,9 @@ services:
       STATIC_API_KEY: sam-dev-static-api-key
     volumes:
       - pocket-id-data:/app/data
+    # Localhost only: the static API key above has full admin rights
     ports:
-      - "1411:1411"
+      - "127.0.0.1:1411:1411"
     restart: unless-stopped
     # The image checks every 90s, which would hold up the seed below
     healthcheck:
