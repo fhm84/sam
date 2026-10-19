@@ -2,7 +2,7 @@ services:
 
   # Edge: Caddy + the Angular SPA (see Dockerfile, docker/Caddyfile). The only service
   # published to the internet: terminates TLS, serves the SPA, proxies /api/* and
-  # /oidc-config.json to sam-server, and ${KEYCLOAK_DOMAIN} to keycloak.
+  # /oidc-config.json to sam-server, and ${LOGIN_DOMAIN} to the OIDC provider.
   sam-ui:
     build:
       context: .
@@ -14,7 +14,7 @@ services:
       - "443:443/udp"
     environment:
       SAM_DOMAIN: ${SAM_DOMAIN:?SAM_DOMAIN is required}
-      KEYCLOAK_DOMAIN: ${KEYCLOAK_DOMAIN:?KEYCLOAK_DOMAIN is required}
+      LOGIN_DOMAIN: ${LOGIN_DOMAIN:?LOGIN_DOMAIN is required}
       ACME_EMAIL: ${ACME_EMAIL:?ACME_EMAIL is required}
     volumes:
       - caddy-data:/data
@@ -24,37 +24,80 @@ services:
         # sam-server validates tokens against the public issuer URL; the alias keeps
         # that request on the internal network instead of leaving via the public IP.
         aliases:
-          - ${KEYCLOAK_DOMAIN}
+          - ${LOGIN_DOMAIN}
     depends_on:
-      - sam-server
-      - keycloak
+      sam-server:
+        condition: service_started
+      pocket-id:
+        condition: service_started
+        required: false
+      keycloak:
+        condition: service_started
+        required: false
     mem_limit: 256m
     restart: unless-stopped
 
-  # Keycloak: OIDC provider. Imports keycloak/prod/sam-realm.json on first boot only
-  # (no dev users or dev secrets; ${...} placeholders are filled from the env below).
+  # OIDC provider: exactly one of the two below runs, selected by COMPOSE_PROFILES, which
+  # .env sets to SAM_OIDC_PROVIDER (pocket-id or keycloak). Both listen on oidc:8080, the
+  # upstream of Caddy's login host. Provider settings can't be marked required (`:?`)
+  # here, because compose checks them even for the provider that doesn't run.
+
+  # Pocket ID (default): passkey login, ~20 MB idle. Data (SQLite, uploaded logos) lives in
+  # the pocket-id-data volume.
+  pocket-id:
+    image: ghcr.io/pocket-id/pocket-id:v2.17.0
+    profiles: ["pocket-id"]
+    environment:
+      APP_URL: https://${LOGIN_DOMAIN}
+      PORT: "8080"
+      TRUST_PROXY: "true" # TLS terminates at Caddy
+      ENCRYPTION_KEY: ${POCKET_ID_ENCRYPTION_KEY:-}
+      ANALYTICS_DISABLED: "true"
+    volumes:
+      - pocket-id-data:/app/data
+    networks:
+      default:
+        aliases:
+          - oidc
+    healthcheck:
+      test: ["CMD", "/app/pocket-id", "healthcheck"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    mem_limit: 256m
+    restart: unless-stopped
+
+  # Keycloak (optional, profile keycloak). Imports keycloak/prod/sam-realm.json on first boot
+  # only (no dev users or dev secrets; ${...} placeholders are filled from the env below).
+  # Its admin console is not reachable from outside: Caddy answers /admin with 404.
   keycloak:
     image: quay.io/keycloak/keycloak:26.7.4
+    profiles: ["keycloak"]
     command: start --import-realm
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USER:-admin}
-      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?KEYCLOAK_ADMIN_PASSWORD is required}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-}
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak
       KC_DB_USERNAME: keycloak
       KC_DB_POOL_MAX_SIZE: "20"
-      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASS:?KEYCLOAK_DB_PASS is required}
-      KC_HOSTNAME: https://${KEYCLOAK_DOMAIN:?KEYCLOAK_DOMAIN is required}
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASS:-}
+      KC_HOSTNAME: https://${LOGIN_DOMAIN}
       KC_HTTP_ENABLED: "true" # TLS terminates at Caddy
       KC_PROXY_HEADERS: xforwarded
       KC_HEALTH_ENABLED: "true"
       JAVA_OPTS_KC_HEAP: "-Xms256m -Xmx768m"
       # Filled into keycloak/prod/sam-realm.json at import
-      SAM_DOMAIN: ${SAM_DOMAIN:?SAM_DOMAIN is required}
-      KEYCLOAK_BACKEND_CLIENT_SECRET: ${KEYCLOAK_BACKEND_CLIENT_SECRET:?KEYCLOAK_BACKEND_CLIENT_SECRET is required}
-      KEYCLOAK_CLI_CLIENT_SECRET: ${KEYCLOAK_CLI_CLIENT_SECRET:?KEYCLOAK_CLI_CLIENT_SECRET is required}
+      SAM_DOMAIN: ${SAM_DOMAIN}
+      KEYCLOAK_BACKEND_CLIENT_SECRET: ${KEYCLOAK_BACKEND_CLIENT_SECRET:-}
+      KEYCLOAK_CLI_CLIENT_SECRET: ${KEYCLOAK_CLI_CLIENT_SECRET:-}
     volumes:
       - ./keycloak/prod:/opt/keycloak/data/import:ro
+    networks:
+      default:
+        aliases:
+          - oidc
     mem_limit: 1280m
     depends_on:
       keycloak-db:
@@ -71,11 +114,12 @@ services:
 
   keycloak-db:
     image: postgres:17
+    profiles: ["keycloak"]
     command: ["postgres", "-c", "shared_buffers=64MB", "-c", "max_connections=50"]
     mem_limit: 384m
     environment:
       POSTGRES_USER: keycloak
-      POSTGRES_PASSWORD: ${KEYCLOAK_DB_PASS:?KEYCLOAK_DB_PASS is required}
+      POSTGRES_PASSWORD: ${KEYCLOAK_DB_PASS:-}
       POSTGRES_DB: keycloak
     volumes:
       - keycloak-db-data:/var/lib/postgresql/data
@@ -94,16 +138,20 @@ services:
       DB_URL: jdbc:postgresql://database:5432/sam_music
       DB_USER: ${DB_USER:-sam}
       DB_PASS: ${DB_PASS:?DB_PASS is required}
-      # OIDC / Keycloak (token validation + oidc-config.json endpoint). The server defaults to
-      # Pocket ID; this stack still runs Keycloak until it moves to Pocket ID (#215).
-      SAM_OIDC_PROVIDER: keycloak
-      OIDC_SERVER_URL: ${OIDC_SERVER_URL:?OIDC_SERVER_URL is required}
+      # OIDC (token validation + oidc-config.json endpoint)
+      SAM_OIDC_PROVIDER: ${SAM_OIDC_PROVIDER:-pocket-id}
+      # Pocket ID's issuer is the login host itself; Keycloak needs .../realms/sam (set in .env)
+      OIDC_SERVER_URL: ${OIDC_SERVER_URL:-https://${LOGIN_DOMAIN}}
       OIDC_CLIENT_ID: ${OIDC_CLIENT_ID:-sam-ui}
-      # Keycloak admin client (used for user search in musician linking)
-      KEYCLOAK_ADMIN_URL: ${KEYCLOAK_ADMIN_URL:?KEYCLOAK_ADMIN_URL is required}
+      # User search for musician linking. Pocket ID: optional API key (full admin rights on
+      # Pocket ID, see docs/architecture/concepts/security.md), called on the internal network.
+      SAM_OIDC_POCKET_ID_API_KEY: ${SAM_OIDC_POCKET_ID_API_KEY:-}
+      SAM_OIDC_POCKET_ID_URL: http://pocket-id:8080
+      # Keycloak: admin client as the sam-backend service account
+      KEYCLOAK_ADMIN_URL: ${KEYCLOAK_ADMIN_URL:-http://keycloak:8080}
       KEYCLOAK_REALM: ${KEYCLOAK_REALM:-sam}
       KEYCLOAK_BACKEND_CLIENT_ID: ${KEYCLOAK_BACKEND_CLIENT_ID:-sam-backend}
-      KEYCLOAK_BACKEND_CLIENT_SECRET: ${KEYCLOAK_BACKEND_CLIENT_SECRET:?KEYCLOAK_BACKEND_CLIENT_SECRET is required}
+      KEYCLOAK_BACKEND_CLIENT_SECRET: ${KEYCLOAK_BACKEND_CLIENT_SECRET:-}
       # AI — OpenAI for document classification
       QUARKUS_LANGCHAIN4J_OPENAI_API_KEY: ${OPENAI_API_KEY:?OPENAI_API_KEY is required}
       # Agentic classification (extra LLM pass with tool calls); opt-in, off unless set to true
@@ -118,8 +166,12 @@ services:
     depends_on:
       database:
         condition: service_healthy
+      pocket-id:
+        condition: service_healthy
+        required: false
       keycloak:
         condition: service_healthy
+        required: false
     mem_limit: 1536m
     restart: unless-stopped
 
@@ -160,6 +212,7 @@ services:
 volumes:
   postgres-data:
   sam-data:
+  pocket-id-data:
   keycloak-db-data:
   caddy-data:
   caddy-config:

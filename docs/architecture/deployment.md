@@ -10,7 +10,7 @@ SAM ships as two Docker images:
                                 ├── /oidc-config.json ──► sam-server:8080
                                 ├── /q/*              ──► 404 (internal only)
                                 └── /*                ──► Angular SPA (static, /srv)
-  Browser ──── Caddy (sam-ui) ── login hostname ──────► keycloak:8080
+  Browser ──── Caddy (sam-ui) ── login hostname ──────► oidc:8080 (Pocket ID or Keycloak; /admin → 404)
 ```
 
 | Image | Built by | Contents |
@@ -24,13 +24,13 @@ CI publishes both images publicly to the GitHub Container Registry, for `linux/a
 (e.g. `1.2.0`) and `sha-<short>`. Local builds use the same names, so
 `docker-compose.prod.yml` runs either; it takes the tag from `SAM_IMAGE_TAG` (default `latest`).
 
-Caddy is the single public entry point and lives in the `sam-ui` image (`Dockerfile`, `docker/Caddyfile`, [ADR-0010](decisions/adr-0010-caddy-edge-proxy.md)). It terminates TLS (automatic Let's Encrypt certificates), serves the SPA, proxies `/api/*` and `/oidc-config.json` to `sam-server`, and proxies the Keycloak hostname to Keycloak — the only published service (ports 80/443). All Angular API calls use relative `/api/*` paths, which Caddy forwards to the backend — no CORS configuration required.
+Caddy is the single public entry point and lives in the `sam-ui` image (`Dockerfile`, `docker/Caddyfile`, [ADR-0010](decisions/adr-0010-caddy-edge-proxy.md)). It terminates TLS (automatic Let's Encrypt certificates), serves the SPA, proxies `/api/*` and `/oidc-config.json` to `sam-server`, and proxies the login hostname to the active OIDC provider (Pocket ID or Keycloak, both reachable as `oidc:8080`; `/admin` answers 404) — the only published service (ports 80/443). All Angular API calls use relative `/api/*` paths, which Caddy forwards to the backend — no CORS configuration required.
 
 `sam-server` also listens on a separate, unpublished management port (`9000`, [ADR-0007](decisions/adr-0007-management-interface.md)) for `/q/*` ops endpoints (`/q/info` for version/build-id, `/q/metrics` for Prometheus) — kept off the main port so they don't fall under the public API's `@Authenticated` default. The edge proxy does not forward `/q/*` (404 from outside, [ADR-0010](decisions/adr-0010-caddy-edge-proxy.md)); Prometheus scrapes it over the internal network.
 
 ## OIDC Config Endpoint
 
-`GET /oidc-config.json` is handled by `OidcConfigResource` (a `@PermitAll` JAX-RS endpoint in the `server` module). It returns `{issuerUrl, clientId}` sourced from `quarkus.oidc.auth-server-url` / `quarkus.oidc.client-id` — which are supplied via `OIDC_SERVER_URL` / `OIDC_CLIENT_ID` env vars. The edge proxy rewrites this path to the resource's real location (`/api/oidc-config.json`, since the JAX-RS root is `/api`), so the Angular app always gets the deployment-correct Keycloak URL without requiring an image rebuild.
+`GET /oidc-config.json` is handled by `OidcConfigResource` (a `@PermitAll` JAX-RS endpoint in the `server` module). It returns `{issuerUrl, clientId, scope, roleClaimPath, roleGroups}`; issuer and client ID are sourced from `quarkus.oidc.auth-server-url` / `quarkus.oidc.client-id` — which are supplied via `OIDC_SERVER_URL` / `OIDC_CLIENT_ID` env vars. The edge proxy rewrites this path to the resource's real location (`/api/oidc-config.json`, since the JAX-RS root is `/api`), so the Angular app always gets the deployment-correct provider URL without requiring an image rebuild.
 
 ## Required Environment Variables
 
@@ -38,26 +38,31 @@ Copy `.env.example` → `.env` and fill in before running `docker compose -f doc
 
 | Variable | Used by | Default | Description |
 |----------|---------|---------|-------------|
+| `SAM_DOMAIN`, `LOGIN_DOMAIN`, `ACME_EMAIL` | sam-ui | — | Public hostnames of the app and the login provider; Let's Encrypt contact |
 | `DB_PASS` | sam-server | — | PostgreSQL password |
-| `OIDC_SERVER_URL` | sam-server | — | Full Keycloak realm URL (e.g. `https://kc.example.com/realms/sam`) |
+| `SAM_OIDC_PROVIDER` | sam-server | `pocket-id` | `pocket-id` or `keycloak` |
+| `COMPOSE_PROFILES` | compose | — | `${SAM_OIDC_PROVIDER}`: starts only the active provider's containers |
+| `OIDC_SERVER_URL` | sam-server | `https://<LOGIN_DOMAIN>` | Issuer URL; Keycloak: `https://<LOGIN_DOMAIN>/realms/sam` |
 | `OIDC_CLIENT_ID` | sam-server | `sam-ui` | OIDC client ID |
-| `KEYCLOAK_ADMIN_URL` | sam-server | — | Keycloak base URL for admin REST client |
-| `KEYCLOAK_BACKEND_CLIENT_SECRET` | sam-server | — | Service account secret for user search |
+| `POCKET_ID_ENCRYPTION_KEY` | pocket-id | — | Pocket ID only, required: encrypts its stored keys; never change it |
 | `SAM_OIDC_POCKET_ID_API_KEY` | sam-server | — | Pocket ID only, optional: API key for user search when linking musicians. Full admin rights on Pocket ID — see [security](concepts/security.md) for rotation; without it, musicians are linked by user ID |
-| `SAM_OIDC_POCKET_ID_URL` | sam-server | `OIDC_SERVER_URL` | Pocket ID only: base URL for its API, if SAM reaches it under another address |
+| `SAM_OIDC_POCKET_ID_URL` | sam-server | `OIDC_SERVER_URL` | Pocket ID only: base URL for its API; the prod compose sets the internal `http://pocket-id:8080` |
+| `KEYCLOAK_ADMIN_URL` | sam-server | `http://keycloak:8080` | Keycloak only: base URL for the admin REST client |
+| `KEYCLOAK_BACKEND_CLIENT_SECRET` | sam-server, keycloak | — | Keycloak only: service account secret for user search |
+| `KEYCLOAK_CLI_CLIENT_SECRET`, `KEYCLOAK_ADMIN_PASSWORD`, `KEYCLOAK_DB_PASS` | keycloak | — | Keycloak only: `cli` secret, bootstrap admin, Keycloak's database |
 | `OPENAI_API_KEY` | sam-server | — | OpenAI key for document classification |
 | `DB_USER` | sam-server, database | `sam` | PostgreSQL user |
-| `KEYCLOAK_REALM` | sam-server | `sam` | Keycloak realm name |
-| `KEYCLOAK_BACKEND_CLIENT_ID` | sam-server | `sam-backend` | Service account client ID |
+| `KEYCLOAK_REALM` | sam-server | `sam` | Keycloak only: realm name |
+| `KEYCLOAK_BACKEND_CLIENT_ID` | sam-server | `sam-backend` | Keycloak only: service account client ID |
 | `SAM_FILESYSTEM_BASE_PATH` | sam-server | `/data/sam` | Mount point for sheet music file storage |
 | `SAM_IMAGE_TAG` | compose | `latest` | Image tag, e.g. a pinned `sha-<short>` or a version |
 
 ## Storage Volume
 
-Sheet music files are stored in a named Docker volume (`sam-data`) mounted at `/data/sam` inside the container. The path is configurable via `SAM_FILESYSTEM_BASE_PATH`. The production compose file includes Keycloak (with its own Postgres) and imports `keycloak/prod/sam-realm.json` on first boot — a realm without dev users or dev secrets. See [Production Setup](production-setup.md).
+Sheet music files are stored in a named Docker volume (`sam-data`) mounted at `/data/sam` inside the container. The path is configurable via `SAM_FILESYSTEM_BASE_PATH`. The production compose file runs Pocket ID (data in the `pocket-id-data` volume) or, with the `keycloak` profile, Keycloak with its own Postgres, which imports `keycloak/prod/sam-realm.json` on first boot — a realm without dev users or dev secrets. See [Production Setup](production-setup.md).
 
 ## Related
 
 - [Production Setup](production-setup.md) — server, DNS, backups and go-live checklist
-- [Security](concepts/security.md) — OIDC / Keycloak setup
+- [Security](concepts/security.md) — OIDC providers, user search, API key rotation
 - [Storage & Deduplication](concepts/storage-and-deduplication.md) — local vs S3 backend selection
