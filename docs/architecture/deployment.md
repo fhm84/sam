@@ -43,6 +43,8 @@ Copy `.env.example` → `.env` and fill in before running `docker compose -f doc
 | `OIDC_CLIENT_ID` | sam-server | `sam-ui` | OIDC client ID |
 | `KEYCLOAK_ADMIN_URL` | sam-server | — | Keycloak base URL for admin REST client |
 | `KEYCLOAK_BACKEND_CLIENT_SECRET` | sam-server | — | Service account secret for user search |
+| `SAM_OIDC_POCKET_ID_API_KEY` | sam-server | — | Pocket ID only, optional: API key for user search when linking musicians. Full admin rights on Pocket ID — see [security](concepts/security.md) for rotation; without it, musicians are linked by user ID |
+| `SAM_OIDC_POCKET_ID_URL` | sam-server | `OIDC_SERVER_URL` | Pocket ID only: base URL for its API, if SAM reaches it under another address |
 | `OPENAI_API_KEY` | sam-server | — | OpenAI key for document classification |
 | `DB_USER` | sam-server, database | `sam` | PostgreSQL user |
 | `KEYCLOAK_REALM` | sam-server | `sam` | Keycloak realm name |

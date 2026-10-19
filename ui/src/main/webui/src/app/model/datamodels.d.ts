@@ -19,6 +19,11 @@ export interface UserInfo {
     username: string;
 }
 
+export interface UserDirectoryInfo {
+    provider: string;
+    searchable: boolean;
+}
+
 export interface DraftTextResult {
     draftText?: string;
 }

@@ -62,6 +62,9 @@ export class MusicianForm extends BaseForm<Musician, Musician> implements OnChan
   readonly userSuggestions = signal<UserInfo[]>([]);
   userSearchModel: UserInfo | null = null;
   readonly linking = signal(false);
+  // Without user search (Pocket ID without API key) the admin enters the user's ID instead
+  readonly userSearchAvailable = signal(true);
+  manualUserId = '';
 
   readonly instrumentSuggestions = signal<Instrument[]>([]);
 
@@ -82,6 +85,12 @@ export class MusicianForm extends BaseForm<Musician, Musician> implements OnChan
     });
     this.linkedUser.set(null);
     this.userSearchModel = null;
+    this.manualUserId = '';
+    if (this.auth.isAdmin()) {
+      this.adminUsersApi.directory()
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe((d) => this.userSearchAvailable.set(d.searchable));
+    }
     if (m.userId && this.auth.isAdmin()) {
       this.adminUsersApi.getById(m.userId)
         .pipe(takeUntilDestroyed(this.destroyRef))
@@ -152,6 +161,13 @@ export class MusicianForm extends BaseForm<Musician, Musician> implements OnChan
           this.messageService.add({ severity: 'error', summary: this.t.t('musicians.form.linkError') });
         },
       });
+  }
+
+  onLinkById(): void {
+    const id = this.manualUserId.trim();
+    if (id) {
+      this.onUserSelect({ id, username: id });
+    }
   }
 
   onUnlink(): void {

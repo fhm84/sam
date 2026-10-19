@@ -32,7 +32,7 @@ year. It changes the production stack, so it lands before go-live.
 | Roles: librarian writes, musician gets 403, admin reaches admin endpoints and UI | ✅ |
 | Asking for `scope=… admin music_librarian` as a user does not grant those scopes | ✅ |
 | `cli` client credentials (`list -v` on the real archive; write + delete with the same token) | ✅ |
-| Musician ↔ user linking (`/api/admin/users`) | ❌ still the Keycloak admin client (task 3) |
+| Musician ↔ user linking (`/api/admin/users`) | ✅ since task 3 (`PocketIdUserDirectory`); Pocket ID user ID = `sub` |
 
 **The provider quirk:** Pocket ID puts `groups` only into the ID token and userinfo, never
 into the access token ([pocket-id#1389](https://github.com/pocket-id/pocket-id/issues/1389),
