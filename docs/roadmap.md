@@ -632,7 +632,7 @@ auth model.
 - Quarkus OIDC extension configured (`quarkus-oidc`); dev profile points to local Keycloak 26
 - Keycloak realm export (`keycloak/sam-realm.json`) with roles, test users, and groups claim mapper
 - `docker-compose.keycloak.yml` for local development
-- `CurrentUserService` — reads JWT subject, realm roles, and ensemble group membership (`ensemble:{UUID}` flat groups)
+- `CurrentUserService` — reads JWT subject and realm roles (ensemble membership comes from the database; the unused `ensemble:{UUID}` group logic was removed, #219)
 - `@Authenticated` + `@RolesAllowed` enforced on all resource implementation classes; test profile uses `%test.quarkus.oidc.enabled=false` + `@TestSecurity` for auth-specific tests
 
 **Roles implemented:** `admin` · `music_librarian` (Keycloak realm roles)
@@ -660,7 +660,7 @@ scoped to the logged-in musician's ensemble memberships (`/my-parts`, `GET /api/
 
 **Stakeholders:** All
 **Effort:** High
-**Auth provider chosen:** Self-hosted Keycloak 26 (`ensemble:{UUID}` groups for per-ensemble access)
+**Auth provider chosen:** Self-hosted Keycloak 26; Pocket ID becomes the default ([plan](plans/pocket-id-provider.md))
 
 ---
 
@@ -731,7 +731,7 @@ Added missing fields to `SheetCollection` surfaced in the Claude Design mockup
 
 - **visibility** — enum (`WHOLE_ENSEMBLE` / `ADMINS_ONLY` / `PRIVATE`); meant to control
   who can see the collection (not enforced yet, see above). The design shows a "Whole ensemble" dropdown in the
-  create dialog. Will interact with `CurrentUserService.getAccessibleEnsembleIds()`.
+  create dialog. Enforcing it will check ensemble membership (`EnsembleMembershipEntity`).
 - **coverColor** — string (hex or named swatch); displayed as an initial-based
   gradient tile in the collection list.
 - **coverImageId** — nullable UUID reference to an uploaded document/attachment;

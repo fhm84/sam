@@ -6,6 +6,5 @@
   "enabled": true,
   "emailVerified": true,
   "credentials": [{ "type": "password", "value": "musician1", "temporary": false }],
-  "realmRoles": [],
-  "groups": ["/ensemble:00000000-0000-0000-0000-000000000001"]
+  "realmRoles": []
 }

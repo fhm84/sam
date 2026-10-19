@@ -701,8 +701,8 @@ Authentication is OIDC via a self-hosted Keycloak 26 (`docker-compose.keycloak.y
 dev, realm export at `keycloak/sam-realm.json`). `@Authenticated` is enforced at the class
 level on every `*ResourceImpl`; write methods additionally carry
 `@RolesAllowed({"music_librarian", "admin"})`. `CurrentUserService` exposes the JWT
-subject, realm roles, and `ensemble:{UUID}` group membership, but nothing currently reads
-the group claim to scope access — it's wired but unused. The Angular route guard
+subject and realm roles; ensemble membership lives in the database
+(`EnsembleMembershipEntity`), not in the token, and nothing uses it to scope access yet. The Angular route guard
 (`authGuard`) checks authentication only, not role, so every authenticated user sees every
 nav entry (including `/admin/*`); unauthorized write attempts fail server-side with 403
 rather than being hidden client-side.
@@ -789,8 +789,8 @@ restriction; partially realized as a different, additive feature)*. The plan was
 *restrict* a `MUSICIAN` role to their ensemble's repertoire. What exists instead is **My
 Parts** (UC-M5): an *instrument-based*, *additive* personal view layered on top of
 unrestricted read access — it doesn't gate what a musician *can* see, only what's
-highlighted for them. Genuine ensemble-scoped read restriction is still open; the unused
-`ensemble:{UUID}` group claim on the JWT (see 6.1) is the most likely foundation for it.
+highlighted for them. Genuine ensemble-scoped read restriction is still open; the
+database's ensemble memberships (see 6.1) are the foundation for it.
 
 ---
 
@@ -817,7 +817,7 @@ Genuinely new questions surfaced while writing this section:
 - Should `EventLogResourceImpl` get an explicit `@RolesAllowed` (matching its `/admin/`
   route), or is "any authenticated user can read the event log" an acceptable, deliberate
   choice worth just documenting as such?
-- Now that `CurrentUserService` already resolves `ensemble:{UUID}` group membership, is
+- Now that ensemble memberships are in the database, is
   there an actual demand for restricting general archive *read* access per ensemble
   (true Option C), or does "read everything, personalize via My Parts" remain sufficient?
 

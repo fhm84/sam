@@ -23,15 +23,16 @@ keycloak/configurator/
 └── sam/                    # realm name
     ├── realms/sam.json
     ├── clients/sam-backend.json
+    ├── clients/sam-cli.json
     ├── clients/sam-ui.json
     ├── realm-roles/admin.json
     ├── realm-roles/music_librarian.json
-    ├── groups/ensemble-00000000-0000-0000-0000-000000000001.json
     └── users/
         ├── admin1.json
         ├── librarian1.json
         ├── musician1.json
-        └── service-account-sam-backend.json
+        ├── service-account-sam-backend.json
+        └── service-account-sam-cli.json
 ```
 
 `keycloak/configurator/` is a dedicated root containing **only** realm-named

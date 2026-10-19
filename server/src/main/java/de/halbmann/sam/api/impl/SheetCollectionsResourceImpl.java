@@ -144,9 +144,9 @@ public class SheetCollectionsResourceImpl implements SheetCollectionsResource {
             throw new ValidationException(
                     "This collection has no ensemble set; assign one before using the assistant.");
         }
-        // No per-ensemble check here: the roles allowed on this method may access every ensemble
-        // (CurrentUserService.canAccessEnsemble is unconditionally true for them). If @RolesAllowed
-        // is ever widened, ensemble scoping must be enforced here.
+        // No per-ensemble check here: the roles allowed on this method may access every ensemble.
+        // If @RolesAllowed is ever widened, ensemble scoping (EnsembleMembershipEntity) must be
+        // enforced here.
 
         SetlistAssistantService.SuggestionOutcome outcome =
                 setlistAssistantService.suggestItems(collectionId, collection.getEnsembleId(), request.getGoal());
