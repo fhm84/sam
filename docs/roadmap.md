@@ -476,6 +476,22 @@ the batch download already merges PDFs, and setlist items have an order. What's 
 per-musician assembly, the TOC/page-number stamping, and handling parts that have no
 digital file yet (listed as "physical only" in the TOC).
 
+The tablet version is also how SAM connects to sheet music apps (forScore, MobileSheets
+and similar): every app can import a PDF, so a plain download is enough. Two details make
+it work there:
+
+- **One PDF outline entry (bookmark) per piece**, so the app shows the setlist as a list
+  of pieces instead of one long document.
+- **A "generated on …" date** on the title or TOC page. The PDF is a snapshot: a part
+  changed in SAM afterwards only reaches the tablet when the musician downloads again,
+  and the date makes an outdated copy easy to spot.
+
+Live sync to the apps (a personal feed link, a read-only WebDAV view, or pushing into
+each musician's cloud folder) was considered and left out: the download covers every
+app, while sync would need a second credential type next to OIDC or stored third-party
+credentials. Two-way sync of annotations is out of scope, as each app stores them in its
+own format.
+
 **Stakeholders:** S1 (music librarian), S3 (Musiker), S3b (Guest musician)
 **Effort:** Medium
 
