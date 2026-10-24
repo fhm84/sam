@@ -73,7 +73,6 @@ With Pocket ID the limits add up to about 2.8 GB (with Keycloak: about 4.2 GB), 
 **Known gaps:**
 
 - No SMTP is configured yet ([#218](https://github.com/fhm84/sam/issues/218)): Pocket ID admins hand out login codes as links; Keycloak's "forgot password" mails don't work, so admins set passwords in the console.
-- Pocket ID's data (`pocket-id-data` volume) is not in the nightly backup yet ([#216](https://github.com/fhm84/sam/issues/216)); `backup.sh` prints a notice.
 - Keycloak's admin console: reach it through an SSH tunnel, for example a temporary `ports: ["127.0.0.1:8180:8080"]` on the `keycloak` service plus `ssh -L 8180:localhost:8180 <server>`, then `http://localhost:8180/admin`.
 - Verified locally: the Caddyfile validates; with internal certificates (`*.localhost`), Caddy's login host reaches Pocket ID and Keycloak (healthy; issuer `https://<LOGIN_DOMAIN>` and `…/realms/sam`) and answers `/admin` with 404; `sam-server` in production mode accepts Pocket ID user tokens (roles from userinfo) and the `cli` token, and searches users with the API key; backup and restore run with Pocket ID. Not verified: Caddy's certificate issuance and the full stack against real DNS.
 
@@ -90,7 +89,7 @@ The backup machine **pulls**; the server never has credentials for it. A comprom
 
 **On the server** — `scripts/backup/backup.sh`, run nightly at 03:00 by a systemd timer:
 
-- Dumps the Postgres databases (`sam_music`, and `keycloak` with the Keycloak profile), archives the sheet music files (`sam-data` volume) and copies `.env`, into `/var/backups/sam/<timestamp>/` with a `SHA256SUMS` file. The directory is renamed into place only when complete, so a puller never sees a half-written backup.
+- Dumps the Postgres databases (`sam_music`, and `keycloak` with the Keycloak profile), exports Pocket ID's data with its own `pocket-id export` (`pocket-id.zip`: users, passkeys, groups, clients; consistent while it runs), archives the sheet music files (`sam-data` volume) and copies `.env`, into `/var/backups/sam/<timestamp>/` with a `SHA256SUMS` file. The directory is renamed into place only when complete, so a puller never sees a half-written backup.
 - Keeps the newest 7 backups locally; the backup machine keeps its own longer history.
 - `.env` contains secrets, so the backup directory is readable only by root and the `sam-backup` group.
 
@@ -113,11 +112,11 @@ rsync -a --exclude='.tmp-*' -e "ssh -i ~/.ssh/sam_backup -o IdentitiesOnly=yes" 
 - No `--delete`: the backup machine keeps backups after the server has pruned them. Prune its copy yourself (for example keep 30 dailies and a few monthlies).
 - Put the backup user's **public** key in `/home/sam-backup/.ssh/authorized_keys` on the server, restricted to read-only rsync: `restrict,command="rrsync -ro /var/backups/sam" ssh-ed25519 AAAA… backup`. (`rrsync` ships with the `rsync` package; on Debian/Ubuntu it may need to be enabled or copied from the package docs.) In that case use `sam-backup@…:/` as the source path.
 
-**Restore** — `scripts/backup/restore.sh <backup-dir> --yes` verifies the checksums, stops the app, replaces the databases in the backup and the files, and starts the stack again. On a fresh server, first do steps 2 and 3 (up to a running stack), copy a backup directory over from the backup machine, then run it. **Restore test:** do it once before go-live on a scratch machine, and again now and then.
+**Restore** — `scripts/backup/restore.sh <backup-dir> --yes` verifies the checksums, stops the app, replaces the databases in the backup, Pocket ID's data (`pocket-id import`, if the backup has it) and the files, and starts the stack again. On a fresh server, first do steps 2 and 3 (up to a running stack), copy a backup directory over from the backup machine, then run it. **Restore test:** do it once before go-live on a scratch machine, and again now and then.
 
 A provider's snapshots are not a backup — they live in the same account.
 
-**Verified locally** (Docker Desktop, test databases and volume): backup, pruning to the newest N, wiping the data, and restoring database rows and files from the backup. **Not verified:** the systemd timer, the `rrsync`-restricted key and the pull task, which need a real server and backup machine.
+**Verified locally** (Docker Desktop, test databases and volume): backup, pruning to the newest N, wiping the data, and restoring database rows, files and Pocket ID users from the backup. The systemd timer and the backup run on a Debian 13 server. **Not verified:** the `rrsync`-restricted key and the pull task, which need a backup machine.
 
 ## Related
 

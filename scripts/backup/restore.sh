@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Restore SAM from a backup directory produced by backup.sh.
-# DESTRUCTIVE: replaces the contents of the databases in the backup and the sheet music files.
+# DESTRUCTIVE: replaces the contents of the databases in the backup, Pocket ID's data (if the
+# backup has it) and the sheet music files.
 #
 #   scripts/backup/restore.sh /var/backups/sam/2026-09-19_030000 --yes
 set -euo pipefail
@@ -28,6 +29,11 @@ if [ -f "$SRC/keycloak.dump" ]; then
   has keycloak-db || { echo "The backup has a Keycloak database, but the keycloak profile is not active" >&2; exit 1; }
   dbs+=(keycloak-db)
 fi
+if [ -f "$SRC/pocket-id.zip" ]; then
+  has pocket-id || { echo "The backup has Pocket ID data, but the pocket-id profile is not active" >&2; exit 1; }
+elif has pocket-id; then
+  echo "NOTE: the backup has no Pocket ID data (older than #216); Pocket ID keeps its current data" >&2
+fi
 "${COMPOSE[@]}" up -d "${dbs[@]}"
 
 restore() { # <service> <dump file>
@@ -38,6 +44,12 @@ restore() { # <service> <dump file>
 echo "Restoring databases"
 restore database "$SRC/sam_music.dump"
 [ -f "$SRC/keycloak.dump" ] && restore keycloak-db "$SRC/keycloak.dump"
+
+if [ -f "$SRC/pocket-id.zip" ]; then
+  # Needs the stopped service: import takes exclusive access to Pocket ID's database
+  echo "Restoring Pocket ID"
+  "${COMPOSE[@]}" run --rm -T --no-deps pocket-id /app/pocket-id import -p - -y <"$SRC/pocket-id.zip"
+fi
 
 echo "Restoring sheet music files"
 "${COMPOSE[@]}" run --rm -T --no-deps restore-files sh -c \
