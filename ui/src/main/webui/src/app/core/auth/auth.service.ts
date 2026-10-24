@@ -3,6 +3,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { OidcSecurityService } from 'angular-auth-oidc-client';
 import { map } from 'rxjs';
 import { OidcClaimsConfig } from './auth.config';
+import { Roles, WRITE_ROLES } from './roles';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -54,10 +55,17 @@ export class AuthService {
     return ud.name ?? ud.preferred_username ?? ud.email ?? '';
   });
 
-  readonly isAdmin = computed(() => this.hasRole('admin'));
+  readonly isAdmin = computed(() => this.hasRole(Roles.ADMIN));
+
+  /** May change the archive; hides create/edit/delete actions for everyone else. */
+  readonly canWrite = computed(() => this.hasAnyRole(WRITE_ROLES));
 
   hasRole(role: string): boolean {
     return this.roles().includes(role);
+  }
+
+  hasAnyRole(roles: readonly string[]): boolean {
+    return roles.some((role) => this.hasRole(role));
   }
 
   login(): void {

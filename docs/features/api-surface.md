@@ -69,7 +69,7 @@ Endpoints not listed (writes) keep their `@RolesAllowed` as today.
 | `/admin/users` | admin | admin | |
 | `/oidc-config.json`, `/public/shares/{token}/…` | public | public | |
 
-UI routes, for the route guard ([#133](https://github.com/fhm84/sam/issues/133)) and menu ([#134](https://github.com/fhm84/sam/issues/134)):
+UI routes, enforced by `roleGuard` and the menu's `roles` (sheet create/edit forms count as librarian + admin):
 
 | Route | Who |
 |---|---|

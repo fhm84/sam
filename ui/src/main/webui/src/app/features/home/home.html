@@ -28,13 +28,15 @@
         <span class="block text-[0.9375rem] font-semibold text-[var(--sam-text)]">{{ 'nav.collections' | translate }}</span>
         <span class="block text-[0.8125rem] text-[var(--sam-text-muted)] leading-[1.55]">{{ 'home.cards.collections' | translate }}</span>
       </a>
-      <a class="group relative overflow-hidden flex flex-col gap-[0.875rem] p-6 bg-[var(--sam-surface)] border border-[var(--sam-border)] rounded-[14px] no-underline text-inherit transition-[border-color,box-shadow,transform] duration-200 hover:border-[var(--sam-accent)] hover:shadow-[0_6px_28px_rgba(0,0,0,0.07)] hover:-translate-y-0.5" routerLink="/uploads">
-        <i class="pi pi-arrow-up-right absolute top-[1.125rem] right-[1.125rem] text-xs text-[var(--sam-accent)] opacity-0 -translate-x-1 translate-y-1 transition-[opacity,transform] duration-200 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0" aria-hidden="true"></i>
-        <i class="pi pi-upload absolute -bottom-[0.625rem] -right-[0.375rem] text-[5.5rem] leading-none text-[var(--sam-accent)] opacity-[0.05] pointer-events-none transition-opacity duration-200 group-hover:opacity-[0.085]" aria-hidden="true"></i>
-        <span class="flex items-center justify-center w-10 h-10 rounded-[10px] bg-[var(--sam-active-bg)] shrink-0"><i class="pi pi-upload text-[1.125rem] text-[var(--sam-accent)]"></i></span>
-        <span class="block text-[0.9375rem] font-semibold text-[var(--sam-text)]">{{ 'nav.uploads' | translate }}</span>
-        <span class="block text-[0.8125rem] text-[var(--sam-text-muted)] leading-[1.55]">{{ 'home.cards.uploads' | translate }}</span>
-      </a>
+      @if (auth.canWrite()) {
+        <a class="group relative overflow-hidden flex flex-col gap-[0.875rem] p-6 bg-[var(--sam-surface)] border border-[var(--sam-border)] rounded-[14px] no-underline text-inherit transition-[border-color,box-shadow,transform] duration-200 hover:border-[var(--sam-accent)] hover:shadow-[0_6px_28px_rgba(0,0,0,0.07)] hover:-translate-y-0.5" routerLink="/uploads">
+          <i class="pi pi-arrow-up-right absolute top-[1.125rem] right-[1.125rem] text-xs text-[var(--sam-accent)] opacity-0 -translate-x-1 translate-y-1 transition-[opacity,transform] duration-200 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0" aria-hidden="true"></i>
+          <i class="pi pi-upload absolute -bottom-[0.625rem] -right-[0.375rem] text-[5.5rem] leading-none text-[var(--sam-accent)] opacity-[0.05] pointer-events-none transition-opacity duration-200 group-hover:opacity-[0.085]" aria-hidden="true"></i>
+          <span class="flex items-center justify-center w-10 h-10 rounded-[10px] bg-[var(--sam-active-bg)] shrink-0"><i class="pi pi-upload text-[1.125rem] text-[var(--sam-accent)]"></i></span>
+          <span class="block text-[0.9375rem] font-semibold text-[var(--sam-text)]">{{ 'nav.uploads' | translate }}</span>
+          <span class="block text-[0.8125rem] text-[var(--sam-text-muted)] leading-[1.55]">{{ 'home.cards.uploads' | translate }}</span>
+        </a>
+      }
       <a class="group relative overflow-hidden flex flex-col gap-[0.875rem] p-6 bg-[var(--sam-surface)] border border-[var(--sam-border)] rounded-[14px] no-underline text-inherit transition-[border-color,box-shadow,transform] duration-200 hover:border-[var(--sam-accent)] hover:shadow-[0_6px_28px_rgba(0,0,0,0.07)] hover:-translate-y-0.5" routerLink="/musicians">
         <i class="pi pi-arrow-up-right absolute top-[1.125rem] right-[1.125rem] text-xs text-[var(--sam-accent)] opacity-0 -translate-x-1 translate-y-1 transition-[opacity,transform] duration-200 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0" aria-hidden="true"></i>
         <i class="pi pi-user absolute -bottom-[0.625rem] -right-[0.375rem] text-[5.5rem] leading-none text-[var(--sam-accent)] opacity-[0.05] pointer-events-none transition-opacity duration-200 group-hover:opacity-[0.085]" aria-hidden="true"></i>
@@ -52,27 +54,33 @@
     </nav>
 
     <!-- Admin section -->
-    <section class="flex flex-col items-center gap-3 w-full">
-      <h2 class="text-[0.6875rem] font-semibold text-[var(--sam-text-muted)] uppercase tracking-[0.1em] m-0">{{ 'home.adminTitle' | translate }}</h2>
-      <div class="flex flex-wrap gap-2 justify-center">
-        <a class="inline-flex items-center gap-2 py-[0.4375rem] px-[0.875rem] bg-[var(--sam-surface)] border border-[var(--sam-border)] rounded-lg no-underline text-[0.8125rem] font-medium text-[var(--sam-text-secondary)] transition-[border-color,color] duration-150 hover:border-[var(--sam-accent)] hover:text-[var(--sam-accent)]" routerLink="/admin/ensembles">
-          <i class="pi pi-users text-[0.8125rem]"></i>
-          <span>{{ 'nav.admin.ensembles' | translate }}</span>
-        </a>
-        <a class="inline-flex items-center gap-2 py-[0.4375rem] px-[0.875rem] bg-[var(--sam-surface)] border border-[var(--sam-border)] rounded-lg no-underline text-[0.8125rem] font-medium text-[var(--sam-text-secondary)] transition-[border-color,color] duration-150 hover:border-[var(--sam-accent)] hover:text-[var(--sam-accent)]" routerLink="/admin/instruments">
-          <i class="pi pi-sliders-h text-[0.8125rem]"></i>
-          <span>{{ 'nav.admin.instruments' | translate }}</span>
-        </a>
-        <a class="inline-flex items-center gap-2 py-[0.4375rem] px-[0.875rem] bg-[var(--sam-surface)] border border-[var(--sam-border)] rounded-lg no-underline text-[0.8125rem] font-medium text-[var(--sam-text-secondary)] transition-[border-color,color] duration-150 hover:border-[var(--sam-accent)] hover:text-[var(--sam-accent)]" routerLink="/admin/configuration">
-          <i class="pi pi-wrench text-[0.8125rem]"></i>
-          <span>{{ 'nav.admin.configuration' | translate }}</span>
-        </a>
-        <a class="inline-flex items-center gap-2 py-[0.4375rem] px-[0.875rem] bg-[var(--sam-surface)] border border-[var(--sam-border)] rounded-lg no-underline text-[0.8125rem] font-medium text-[var(--sam-text-secondary)] transition-[border-color,color] duration-150 hover:border-[var(--sam-accent)] hover:text-[var(--sam-accent)]" routerLink="/admin/event-logs">
-          <i class="pi pi-list text-[0.8125rem]"></i>
-          <span>{{ 'nav.admin.eventLogs' | translate }}</span>
-        </a>
-      </div>
-    </section>
+    @if (auth.canWrite()) {
+      <section class="flex flex-col items-center gap-3 w-full">
+        <h2 class="text-[0.6875rem] font-semibold text-[var(--sam-text-muted)] uppercase tracking-[0.1em] m-0">{{ 'home.adminTitle' | translate }}</h2>
+        <div class="flex flex-wrap gap-2 justify-center">
+          <a class="inline-flex items-center gap-2 py-[0.4375rem] px-[0.875rem] bg-[var(--sam-surface)] border border-[var(--sam-border)] rounded-lg no-underline text-[0.8125rem] font-medium text-[var(--sam-text-secondary)] transition-[border-color,color] duration-150 hover:border-[var(--sam-accent)] hover:text-[var(--sam-accent)]" routerLink="/admin/ensembles">
+            <i class="pi pi-users text-[0.8125rem]"></i>
+            <span>{{ 'nav.admin.ensembles' | translate }}</span>
+          </a>
+          <a class="inline-flex items-center gap-2 py-[0.4375rem] px-[0.875rem] bg-[var(--sam-surface)] border border-[var(--sam-border)] rounded-lg no-underline text-[0.8125rem] font-medium text-[var(--sam-text-secondary)] transition-[border-color,color] duration-150 hover:border-[var(--sam-accent)] hover:text-[var(--sam-accent)]" routerLink="/admin/instruments">
+            <i class="pi pi-sliders-h text-[0.8125rem]"></i>
+            <span>{{ 'nav.admin.instruments' | translate }}</span>
+          </a>
+          @if (auth.isAdmin()) {
+            <a class="inline-flex items-center gap-2 py-[0.4375rem] px-[0.875rem] bg-[var(--sam-surface)] border border-[var(--sam-border)] rounded-lg no-underline text-[0.8125rem] font-medium text-[var(--sam-text-secondary)] transition-[border-color,color] duration-150 hover:border-[var(--sam-accent)] hover:text-[var(--sam-accent)]" routerLink="/admin/configuration">
+              <i class="pi pi-wrench text-[0.8125rem]"></i>
+              <span>{{ 'nav.admin.configuration' | translate }}</span>
+            </a>
+          }
+          @if (auth.isAdmin()) {
+            <a class="inline-flex items-center gap-2 py-[0.4375rem] px-[0.875rem] bg-[var(--sam-surface)] border border-[var(--sam-border)] rounded-lg no-underline text-[0.8125rem] font-medium text-[var(--sam-text-secondary)] transition-[border-color,color] duration-150 hover:border-[var(--sam-accent)] hover:text-[var(--sam-accent)]" routerLink="/admin/event-logs">
+              <i class="pi pi-list text-[0.8125rem]"></i>
+              <span>{{ 'nav.admin.eventLogs' | translate }}</span>
+            </a>
+          }
+        </div>
+      </section>
+    }
 
     <!-- Disclaimer -->
     <p class="text-xs text-[var(--p-text-muted-color)] text-center max-w-[40rem] leading-[1.6] m-0 px-4">{{ 'home.disclaimer' | translate }}</p>

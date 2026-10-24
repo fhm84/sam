@@ -81,37 +81,43 @@
           />
         </a>
       }
-      <p-button
-        icon="pi pi-pencil"
-        [rounded]="true"
-        [text]="true"
-        size="small"
-        [pTooltip]="t.t('sheets.edit')"
-        tooltipPosition="top"
-        (onClick)="onEdit()"
-      />
-      <p-button
-        icon="pi pi-sparkles"
-        [rounded]="true"
-        [text]="true"
-        size="small"
-        [pTooltip]="t.t('enrichment.action')"
-        tooltipPosition="top"
-        (onClick)="openEnrichDialog()"
-      />
-      <p-button
-        icon="pi pi-share-alt"
-        [rounded]="true"
-        [text]="true"
-        size="small"
-        [pTooltip]="t.t('sheets.shareSheet')"
-        tooltipPosition="top"
-        (onClick)="openShareSheetDialog()"
-      />
+      @if (auth.canWrite()) {
+        <p-button
+          icon="pi pi-pencil"
+          [rounded]="true"
+          [text]="true"
+          size="small"
+          [pTooltip]="t.t('sheets.edit')"
+          tooltipPosition="top"
+          (onClick)="onEdit()"
+        />
+      }
+      @if (auth.canWrite()) {
+        <p-button
+          icon="pi pi-sparkles"
+          [rounded]="true"
+          [text]="true"
+          size="small"
+          [pTooltip]="t.t('enrichment.action')"
+          tooltipPosition="top"
+          (onClick)="openEnrichDialog()"
+        />
+      }
+      @if (auth.canWrite()) {
+        <p-button
+          icon="pi pi-share-alt"
+          [rounded]="true"
+          [text]="true"
+          size="small"
+          [pTooltip]="t.t('sheets.shareSheet')"
+          tooltipPosition="top"
+          (onClick)="openShareSheetDialog()"
+        />
+      }
     </div>
   </div>
 
-  @if (showEnrichPrompt()) {
+  @if (showEnrichPrompt() && auth.canWrite()) {
     <div class="enrich-prompt">
       <i class="pi pi-sparkles enrich-prompt-icon"></i>
       <span class="enrich-prompt-text">{{ 'enrichment.prompt.text' | translate }}</span>
@@ -227,15 +233,17 @@
             <p-panel [header]="t.t('sheets.detail.documents')">
               <input #fileInput type="file" hidden (change)="uploadFile($event)" />
               <ng-template pTemplate="headeractions">
-                <label class="inline-flex">
-                  <p-button
-                    icon="pi pi-upload"
-                    [label]="t.t('sheets.detail.upload')"
-                    size="small"
-                    [outlined]="true"
-                    (onClick)="fileInput.click()"
-                  />
-                </label>
+                @if (auth.canWrite()) {
+                  <label class="inline-flex">
+                    <p-button
+                      icon="pi pi-upload"
+                      [label]="t.t('sheets.detail.upload')"
+                      size="small"
+                      [outlined]="true"
+                      (onClick)="fileInput.click()"
+                    />
+                  </label>
+                }
               </ng-template>
               @if (documentsLoading()) {
                 <div class="flex justify-center p-4 text-[1.2rem] text-[var(--sam-text-muted)]">
@@ -262,24 +270,28 @@
                             tooltipPosition="top"
                             (onClick)="downloadDocument(doc)"
                           />
-                          <p-button
-                            icon="pi pi-pencil"
-                            [rounded]="true"
-                            [text]="true"
-                            size="small"
-                            styleClass="row-action"
-                            [pTooltip]="t.t('sheets.detail.relinkDocument.tooltip')"
-                            tooltipPosition="top"
-                            (onClick)="openRelinkDialog(doc)"
-                          />
-                          <p-button
-                            icon="pi pi-trash"
-                            [rounded]="true"
-                            [text]="true"
-                            size="small"
-                            styleClass="row-action row-action-danger"
-                            (onClick)="confirmDeleteDocument(doc)"
-                          />
+                          @if (auth.canWrite()) {
+                            <p-button
+                              icon="pi pi-pencil"
+                              [rounded]="true"
+                              [text]="true"
+                              size="small"
+                              styleClass="row-action"
+                              [pTooltip]="t.t('sheets.detail.relinkDocument.tooltip')"
+                              tooltipPosition="top"
+                              (onClick)="openRelinkDialog(doc)"
+                            />
+                          }
+                          @if (auth.canWrite()) {
+                            <p-button
+                              icon="pi pi-trash"
+                              [rounded]="true"
+                              [text]="true"
+                              size="small"
+                              styleClass="row-action row-action-danger"
+                              (onClick)="confirmDeleteDocument(doc)"
+                            />
+                          }
                         </div>
                       </div>
                     }
@@ -378,13 +390,15 @@
         <p-tabpanel [value]="1">
           <div class="flex flex-col gap-3 pt-3">
             <div class="flex justify-end">
-              <p-button
-                icon="pi pi-plus"
-                [label]="t.t('sheets.instrumentations.new')"
-                size="small"
-                [outlined]="true"
-                (onClick)="openNewInstrumentation()"
-              />
+              @if (auth.canWrite()) {
+                <p-button
+                  icon="pi pi-plus"
+                  [label]="t.t('sheets.instrumentations.new')"
+                  size="small"
+                  [outlined]="true"
+                  (onClick)="openNewInstrumentation()"
+                />
+              }
             </div>
             <p-table
               #dtCompact
@@ -439,38 +453,40 @@
                     </div>
                   </td>
                   <td pFrozenColumn alignFrozen="right">
-                    <app-row-actions [items]="instrumentationRowMenuItems(instr)" size="small">
-                      <p-button
-                        icon="pi pi-pencil"
-                        [rounded]="true"
-                        [text]="true"
-                        size="small"
-                        styleClass="row-action"
-                        [pTooltip]="'sheets.instrumentations.edit' | translate"
-                        tooltipPosition="top"
-                        (onClick)="openEditInstrumentation(instr)"
-                      />
-                      <p-button
-                        icon="pi pi-share-alt"
-                        [rounded]="true"
-                        [text]="true"
-                        size="small"
-                        styleClass="row-action"
-                        [pTooltip]="'shares.tooltip' | translate"
-                        tooltipPosition="top"
-                        (onClick)="openShareDialog(instr)"
-                      />
-                      <p-button
-                        icon="pi pi-trash"
-                        [rounded]="true"
-                        [text]="true"
-                        size="small"
-                        styleClass="row-action row-action-danger"
-                        [pTooltip]="'common.delete' | translate"
-                        tooltipPosition="top"
-                        (onClick)="confirmDeleteInstrumentation(instr)"
-                      />
-                    </app-row-actions>
+                    @if (auth.canWrite()) {
+                      <app-row-actions [items]="instrumentationRowMenuItems(instr)" size="small">
+                        <p-button
+                          icon="pi pi-pencil"
+                          [rounded]="true"
+                          [text]="true"
+                          size="small"
+                          styleClass="row-action"
+                          [pTooltip]="'sheets.instrumentations.edit' | translate"
+                          tooltipPosition="top"
+                          (onClick)="openEditInstrumentation(instr)"
+                        />
+                        <p-button
+                          icon="pi pi-share-alt"
+                          [rounded]="true"
+                          [text]="true"
+                          size="small"
+                          styleClass="row-action"
+                          [pTooltip]="'shares.tooltip' | translate"
+                          tooltipPosition="top"
+                          (onClick)="openShareDialog(instr)"
+                        />
+                        <p-button
+                          icon="pi pi-trash"
+                          [rounded]="true"
+                          [text]="true"
+                          size="small"
+                          styleClass="row-action row-action-danger"
+                          [pTooltip]="'common.delete' | translate"
+                          tooltipPosition="top"
+                          (onClick)="confirmDeleteInstrumentation(instr)"
+                        />
+                      </app-row-actions>
+                    }
                   </td>
                 </tr>
               </ng-template>
@@ -719,15 +735,17 @@
         <p-panel [header]="t.t('sheets.detail.documents')">
           <input #fileInputFull type="file" hidden (change)="uploadFile($event)" />
           <ng-template pTemplate="headeractions">
-            <label class="inline-flex">
-              <p-button
-                icon="pi pi-upload"
-                [label]="t.t('sheets.detail.upload')"
-                size="small"
-                [outlined]="true"
-                (onClick)="fileInputFull.click()"
-              />
-            </label>
+            @if (auth.canWrite()) {
+              <label class="inline-flex">
+                <p-button
+                  icon="pi pi-upload"
+                  [label]="t.t('sheets.detail.upload')"
+                  size="small"
+                  [outlined]="true"
+                  (onClick)="fileInputFull.click()"
+                />
+              </label>
+            }
           </ng-template>
           @if (documentsLoading()) {
             <div class="flex justify-center p-4 text-[1.2rem] text-[var(--sam-text-muted)]">
@@ -754,40 +772,46 @@
                         tooltipPosition="top"
                         (onClick)="downloadDocument(doc)"
                       />
-                      <p-button
-                        icon="pi pi-pencil"
-                        [rounded]="true"
-                        [text]="true"
-                        size="small"
-                        styleClass="row-action"
-                        [pTooltip]="t.t('sheets.detail.relinkDocument.tooltip')"
-                        tooltipPosition="top"
-                        (onClick)="openRelinkDialog(doc)"
-                      />
-                      <p-button
-                        icon="pi pi-trash"
-                        [rounded]="true"
-                        [text]="true"
-                        size="small"
-                        styleClass="row-action row-action-danger"
-                        (onClick)="confirmDeleteDocument(doc)"
-                      />
+                      @if (auth.canWrite()) {
+                        <p-button
+                          icon="pi pi-pencil"
+                          [rounded]="true"
+                          [text]="true"
+                          size="small"
+                          styleClass="row-action"
+                          [pTooltip]="t.t('sheets.detail.relinkDocument.tooltip')"
+                          tooltipPosition="top"
+                          (onClick)="openRelinkDialog(doc)"
+                        />
+                      }
+                      @if (auth.canWrite()) {
+                        <p-button
+                          icon="pi pi-trash"
+                          [rounded]="true"
+                          [text]="true"
+                          size="small"
+                          styleClass="row-action row-action-danger"
+                          (onClick)="confirmDeleteDocument(doc)"
+                        />
+                      }
                     </div>
                   </div>
                 }
               </div>
             }
-            <div
-              class="drop-zone"
-              [class.drop-zone-active]="dragging()"
-              (dragover)="onDragOver($event)"
-              (dragleave)="onDragLeave($event)"
-              (drop)="onDrop($event)"
-              (click)="fileInputFull.click()"
-            >
-              <i class="pi pi-cloud-upload"></i>
-              <span>{{ 'sheets.detail.dropFiles' | translate }}</span>
-            </div>
+            @if (auth.canWrite()) {
+              <div
+                class="drop-zone"
+                [class.drop-zone-active]="dragging()"
+                (dragover)="onDragOver($event)"
+                (dragleave)="onDragLeave($event)"
+                (drop)="onDrop($event)"
+                (click)="fileInputFull.click()"
+              >
+                <i class="pi pi-cloud-upload"></i>
+                <span>{{ 'sheets.detail.dropFiles' | translate }}</span>
+              </div>
+            }
           }
         </p-panel>
       </div>
@@ -795,13 +819,15 @@
       <!-- Instrumentations -->
       <p-panel [header]="t.t('sheets.instrumentations.title')" [toggleable]="true">
         <ng-template pTemplate="headeractions">
-          <p-button
-            icon="pi pi-plus"
-            [label]="t.t('sheets.instrumentations.new')"
-            size="small"
-            [outlined]="true"
-            (onClick)="openNewInstrumentation()"
-          />
+          @if (auth.canWrite()) {
+            <p-button
+              icon="pi pi-plus"
+              [label]="t.t('sheets.instrumentations.new')"
+              size="small"
+              [outlined]="true"
+              (onClick)="openNewInstrumentation()"
+            />
+          }
         </ng-template>
         <p-table
           #dtFull
@@ -857,38 +883,40 @@
                 </div>
               </td>
               <td pFrozenColumn alignFrozen="right">
-                <app-row-actions [items]="instrumentationRowMenuItems(instr)" size="small">
-                  <p-button
-                    icon="pi pi-pencil"
-                    [rounded]="true"
-                    [text]="true"
-                    size="small"
-                    styleClass="row-action"
-                    [pTooltip]="'sheets.instrumentations.edit' | translate"
-                    tooltipPosition="top"
-                    (onClick)="openEditInstrumentation(instr)"
-                  />
-                  <p-button
-                    icon="pi pi-share-alt"
-                    [rounded]="true"
-                    [text]="true"
-                    size="small"
-                    styleClass="row-action"
-                    [pTooltip]="'shares.tooltip' | translate"
-                    tooltipPosition="top"
-                    (onClick)="openShareDialog(instr)"
-                  />
-                  <p-button
-                    icon="pi pi-trash"
-                    [rounded]="true"
-                    [text]="true"
-                    size="small"
-                    styleClass="row-action row-action-danger"
-                    [pTooltip]="'common.delete' | translate"
-                    tooltipPosition="top"
-                    (onClick)="confirmDeleteInstrumentation(instr)"
-                  />
-                </app-row-actions>
+                @if (auth.canWrite()) {
+                  <app-row-actions [items]="instrumentationRowMenuItems(instr)" size="small">
+                    <p-button
+                      icon="pi pi-pencil"
+                      [rounded]="true"
+                      [text]="true"
+                      size="small"
+                      styleClass="row-action"
+                      [pTooltip]="'sheets.instrumentations.edit' | translate"
+                      tooltipPosition="top"
+                      (onClick)="openEditInstrumentation(instr)"
+                    />
+                    <p-button
+                      icon="pi pi-share-alt"
+                      [rounded]="true"
+                      [text]="true"
+                      size="small"
+                      styleClass="row-action"
+                      [pTooltip]="'shares.tooltip' | translate"
+                      tooltipPosition="top"
+                      (onClick)="openShareDialog(instr)"
+                    />
+                    <p-button
+                      icon="pi pi-trash"
+                      [rounded]="true"
+                      [text]="true"
+                      size="small"
+                      styleClass="row-action row-action-danger"
+                      [pTooltip]="'common.delete' | translate"
+                      tooltipPosition="top"
+                      (onClick)="confirmDeleteInstrumentation(instr)"
+                    />
+                  </app-row-actions>
+                }
               </td>
             </tr>
           </ng-template>
@@ -998,13 +1026,15 @@
       <!-- Collections -->
       <p-panel [header]="t.t('sheets.collections.title')" [toggleable]="true" [collapsed]="true">
         <ng-template pTemplate="headeractions">
-          <p-button
-            icon="pi pi-folder-plus"
-            [label]="t.t('sheets.collections.add')"
-            size="small"
-            [outlined]="true"
-            (onClick)="collectionsPanel.openAdd()"
-          />
+          @if (auth.canWrite()) {
+            <p-button
+              icon="pi pi-folder-plus"
+              [label]="t.t('sheets.collections.add')"
+              size="small"
+              [outlined]="true"
+              (onClick)="collectionsPanel.openAdd()"
+            />
+          }
         </ng-template>
         <app-sheet-collections #collectionsPanel [sheetId]="sheetId" />
       </p-panel>

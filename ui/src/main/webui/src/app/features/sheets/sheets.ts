@@ -40,6 +40,7 @@ import { SheetDetail } from './sheet-detail';
 import { SheetCollections } from './sheet-collections';
 import { ExploreView } from './explore/explore-view';
 import { RowActions } from '../../shared/components/row-actions/row-actions';
+import { AuthService } from '../../core/auth/auth.service';
 
 type InstrumentCriterionOperator = 'EQ' | 'NEQ' | 'LT' | 'LTE' | 'GT' | 'GTE';
 
@@ -86,6 +87,7 @@ export class Sheets implements OnInit {
   @ViewChild(SheetCollections) protected collectionsDialogPanel?: SheetCollections;
 
   protected readonly t = inject(TranslationService);
+  protected readonly auth = inject(AuthService);
   private readonly api = inject(SheetsApiService);
   private readonly ensemblesApi = inject(EnsemblesApiService);
   private readonly instrumentsApi = inject(InstrumentsApiService);

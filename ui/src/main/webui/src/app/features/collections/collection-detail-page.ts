@@ -22,6 +22,7 @@ import { CollectionForm } from './collection-form';
 import { CollectionSheets } from './collection-sheets';
 import { ShareDialogComponent } from '../../shared/share-dialog/share-dialog';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AuthService } from '../../core/auth/auth.service';
 
 @Component({
   selector: 'app-collection-detail-page',
@@ -33,6 +34,7 @@ export class CollectionDetailPage implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly t = inject(TranslationService);
+  protected readonly auth = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly api = inject(CollectionsApiService);

@@ -23,6 +23,7 @@ import { BaseCrudList } from '../../shared/base/base-crud-list';
 import { CrudApi } from '../../shared/base/crud-api.interface';
 import { RowActions } from '../../shared/components/row-actions/row-actions';
 import { CollectionForm } from './collection-form';
+import { AuthService } from '../../core/auth/auth.service';
 
 @Component({
   selector: 'app-collections',
@@ -51,6 +52,7 @@ import { CollectionForm } from './collection-form';
 })
 export class Collections extends BaseCrudList<SheetCollection, SheetCollectionFilterRequest> {
   api: CrudApi<SheetCollection, SheetCollectionFilterRequest> = inject(CollectionsApiService);
+  protected readonly auth = inject(AuthService);
   private readonly layoutPref = inject(LayoutPreferenceService);
   private readonly router = inject(Router);
   translationPrefix = 'collections';
