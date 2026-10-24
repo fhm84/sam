@@ -166,6 +166,44 @@ class SecurityEnforcementTest {
         given().get("/api/admin/users").then().statusCode(403);
     }
 
+    // ── Librarian-only reads: upload inbox and GEMA report ─────────────────
+
+    @Test
+    @TestSecurity(
+            user = "musician1",
+            roles = {})
+    void authenticated_noRole_getUnlinkedDocuments_returns403() {
+        given().get("/api/documents/unlinked").then().statusCode(403);
+    }
+
+    @Test
+    @TestSecurity(
+            user = "librarian1",
+            roles = {"music_librarian"})
+    void musicLibrarian_getUnlinkedDocuments_returns200() {
+        given().get("/api/documents/unlinked").then().statusCode(200);
+    }
+
+    @Test
+    @TestSecurity(
+            user = "musician1",
+            roles = {})
+    void authenticated_noRole_getGemaSetlist_returns403() {
+        given().get("/api/sheet-collections/00000000-0000-0000-0000-000000000001/gema-setlist")
+                .then()
+                .statusCode(403);
+    }
+
+    @Test
+    @TestSecurity(
+            user = "librarian1",
+            roles = {"music_librarian"})
+    void musicLibrarian_getGemaSetlist_unknownCollection_returns404() {
+        given().get("/api/sheet-collections/00000000-0000-0000-0000-000000000001/gema-setlist")
+                .then()
+                .statusCode(404);
+    }
+
     // ── music_librarian has write access ──────────────────────────────────
 
     @Test

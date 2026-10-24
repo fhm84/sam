@@ -82,6 +82,7 @@ public class DocumentsResourceImpl implements DocumentsResource {
     }
 
     @Override
+    @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public PaginatedResponse<DocumentDownload> listUnlinkedDocuments(DocumentFilterRequest filterRequest) {
         var result = documentStore.listUnlinkedDocuments(filterRequest.getPage(), filterRequest.getSize());
         PaginatedResponse<DocumentDownload> response = new PaginatedResponse<>();

@@ -34,6 +34,7 @@ should see. Writes are already protected by `@RolesAllowed`, but reads are not s
 | 6 | **Menu filtering**: give menu items an optional `roles` list in `app-menu.ts` and filter them through `AuthService.hasRole()`. | [#134](https://github.com/fhm84/sam/issues/134) |
 | 7 | **Action visibility**: hide create/edit/delete buttons for users without write roles (sheets, collections, musicians, instrumentations, documents). | [#135](https://github.com/fhm84/sam/issues/135) |
 | 8 | **Tests**: add `@TestSecurity` tests per restricted endpoint (allowed role passes, plain user gets 403), plus Angular unit tests for the guard and menu filtering. | [#136](https://github.com/fhm84/sam/issues/136) |
+| 9 | **Collection visibility**: filter collection reads by `visibility` (`WHOLE_ENSEMBLE` any user; `ADMINS_ONLY`, `PRIVATE` librarian+admin), as task 1 decided. | [#243](https://github.com/fhm84/sam/issues/243) |
 
 ## Out of scope (separate follow-ups)
 
