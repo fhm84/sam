@@ -22,8 +22,6 @@
           size="small"
           (onClick)="openAddSheet()"
         />
-      }
-      @if (auth.canWrite()) {
         <p-button
           data-testid="btn-add-text-block"
           icon="pi pi-align-left"
@@ -32,8 +30,6 @@
           severity="secondary"
           (onClick)="openAddTextBlock()"
         />
-      }
-      @if (auth.canWrite()) {
         <p-button
           data-testid="btn-ai-assistant"
           icon="pi pi-sparkles"
@@ -59,22 +55,26 @@
   >
     <ng-template #header>
       <tr>
-        <th class="w-8"></th>
+        @if (auth.canWrite()) {
+          <th class="w-8"></th>
+        }
         <th class="w-12 text-right tabular-nums">{{ 'collections.items.columns.nr' | translate }}</th>
         <th>{{ 'collections.items.columns.title' | translate }}</th>
         <th class="w-28">{{ 'collections.items.columns.type' | translate }}</th>
         <th class="w-32">{{ 'collections.items.columns.genre' | translate }}</th>
-        <th class="w-32" pFrozenColumn alignFrozen="right">{{ 'collections.items.columns.actions' | translate }}</th>
+        @if (auth.canWrite()) {
+          <th class="w-32" pFrozenColumn alignFrozen="right">{{ 'collections.items.columns.actions' | translate }}</th>
+        }
       </tr>
     </ng-template>
 
     <ng-template #body let-item let-i="rowIndex">
       <tr [pReorderableRow]="i" [attr.data-testid]="'collection-item-row-' + item.id">
-        <td class="cursor-grab text-[var(--sam-text-muted)]">
-          @if (auth.canWrite()) {
+        @if (auth.canWrite()) {
+          <td class="cursor-grab text-[var(--sam-text-muted)]">
             <i class="pi pi-bars" pReorderableRowHandle></i>
-          }
-        </td>
+          </td>
+        }
         <td class="text-right font-semibold text-[var(--sam-text-secondary)] tabular-nums">{{ i + 1 }}</td>
         <td>
           @if (item.type === 'SHEET') {
@@ -117,8 +117,8 @@
             —
           }
         </td>
-        <td pFrozenColumn alignFrozen="right">
-          @if (auth.canWrite()) {
+        @if (auth.canWrite()) {
+          <td pFrozenColumn alignFrozen="right">
             <app-row-actions [items]="rowMenuItems(item)" size="small">
               <p-button
                 icon="pi pi-pencil"
@@ -182,8 +182,8 @@
                 (onClick)="confirmRemove(item)"
               />
             </app-row-actions>
-          }
-        </td>
+          </td>
+        }
       </tr>
     </ng-template>
 

@@ -660,8 +660,8 @@ scoped to the logged-in musician's ensemble memberships (`/my-parts`, `GET /api/
 **Done (Phase 4, 2026-10-24):** read access decided per endpoint, event log admin-only,
 musicians' personal data for the librarian only, and a role-aware UI: `roleGuard` on the
 routes, menu items filtered by role, write actions hidden from users without a write role.
-Left in the [plan](plans/rbac-role-aware-access.md): collection visibility (#243) and the
-remaining tests (#136).
+`RoleEnforcementTest` checks every role-restricted endpoint. Left in the
+[plan](plans/rbac-role-aware-access.md): collection visibility (#243).
 
 **Remaining (Phase 4+):**
 - **No frontend ensemble/context service** — "ensemble" only exists as a local filter

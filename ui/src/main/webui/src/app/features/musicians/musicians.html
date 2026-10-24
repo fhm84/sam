@@ -44,7 +44,9 @@
         <th>{{ 'musicians.columns.ipi' | translate }}</th>
         <th>{{ 'musicians.columns.birthYear' | translate }}</th>
         <th>{{ 'musicians.columns.deathYear' | translate }}</th>
-        <th pFrozenColumn alignFrozen="right">{{ 'musicians.columns.actions' | translate }}</th>
+        @if (auth.canWrite()) {
+          <th pFrozenColumn alignFrozen="right">{{ 'musicians.columns.actions' | translate }}</th>
+        }
       </tr>
     </ng-template>
 
@@ -65,8 +67,8 @@
         <td>{{ musician.ipi }}</td>
         <td>{{ musician.birthYear }}</td>
         <td>{{ musician.deathYear }}</td>
-        <td pFrozenColumn alignFrozen="right">
-          @if (auth.canWrite()) {
+        @if (auth.canWrite()) {
+          <td pFrozenColumn alignFrozen="right">
             <app-row-actions [items]="rowMenuItems(musician)">
               <p-button
                 icon="pi pi-pencil"
@@ -87,8 +89,8 @@
                 (onClick)="confirmDelete(musician)"
               />
             </app-row-actions>
-          }
-        </td>
+          </td>
+        }
       </tr>
     </ng-template>
 

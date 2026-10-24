@@ -1,7 +1,7 @@
 import { Component, computed, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { MenuItem } from '@openng/optimus-ui/api';
 import { AuthService } from '../../core/auth/auth.service';
-import { Roles, WRITE_ROLES } from '../../core/auth/roles';
+import { AREA_ROLES } from '../../core/auth/roles';
 import { TranslationService } from '../../core/translation.service';
 import { AppMenuitem } from './app-menuitem';
 
@@ -42,7 +42,7 @@ export class AppMenu {
             label: this.i18n.t('nav.uploads'),
             icon: 'pi pi-upload',
             routerLink: ['/uploads'],
-            roles: WRITE_ROLES,
+            roles: AREA_ROLES.uploads,
           },
           { label: this.i18n.t('nav.musicians'), icon: 'pi pi-user', routerLink: ['/musicians'] },
           { label: this.i18n.t('nav.shares'), icon: 'pi pi-share-alt', routerLink: ['/shares'] },
@@ -60,25 +60,25 @@ export class AppMenu {
             label: this.i18n.t('nav.admin.ensembles'),
             icon: 'pi pi-users',
             routerLink: ['/admin/ensembles'],
-            roles: WRITE_ROLES,
+            roles: AREA_ROLES.ensembles,
           },
           {
             label: this.i18n.t('nav.admin.instruments'),
             icon: 'pi pi-microphone',
             routerLink: ['/admin/instruments'],
-            roles: WRITE_ROLES,
+            roles: AREA_ROLES.instruments,
           },
           {
             label: this.i18n.t('nav.admin.configuration'),
             icon: 'pi pi-wrench',
             routerLink: ['/admin/configuration'],
-            roles: [Roles.ADMIN],
+            roles: AREA_ROLES.configuration,
           },
           {
             label: this.i18n.t('nav.admin.eventLogs'),
             icon: 'pi pi-list',
             routerLink: ['/admin/event-logs'],
-            roles: [Roles.ADMIN],
+            roles: AREA_ROLES.eventLogs,
           },
         ],
       },
@@ -90,19 +90,22 @@ export class AppMenu {
 export type RoleMenuItem = MenuItem & { roles?: readonly string[]; items?: RoleMenuItem[] };
 
 /**
- * Hides items whose `roles` the user doesn't hold, and groups left without a visible item. The
- * route guard enforces the same lists; the server enforces the roles themselves.
+ * Drops items whose `roles` the user doesn't hold, and groups left without an item. Dropped,
+ * not marked invisible, so no empty list item is rendered. The roles come from `AREA_ROLES`,
+ * like the route guard's; the server enforces the roles themselves.
  */
 export function withRoles(
   items: RoleMenuItem[],
   hasAnyRole: (roles: readonly string[]) => boolean,
 ): MenuItem[] {
-  return items.map(({ roles, items: children, ...item }) => {
-    const shown = roles === undefined || hasAnyRole(roles);
-    if (!children) {
-      return { ...item, visible: shown };
+  return items.flatMap(({ roles, items: children, ...item }) => {
+    if (roles !== undefined && !hasAnyRole(roles)) {
+      return [];
     }
-    const filtered = withRoles(children, hasAnyRole);
-    return { ...item, items: filtered, visible: shown && filtered.some((c) => c.visible !== false) };
+    if (!children) {
+      return [item];
+    }
+    const kept = withRoles(children, hasAnyRole);
+    return kept.length > 0 ? [{ ...item, items: kept }] : [];
   });
 }
