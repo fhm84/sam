@@ -26,7 +26,9 @@ CI publishes both images publicly to the GitHub Container Registry, for `linux/a
 
 Caddy is the single public entry point and lives in the `sam-ui` image (`Dockerfile`, `docker/Caddyfile`, [ADR-0010](decisions/adr-0010-caddy-edge-proxy.md)). It terminates TLS (automatic Let's Encrypt certificates), serves the SPA, proxies `/api/*` and `/oidc-config.json` to `sam-server`, and proxies the login hostname to the active OIDC provider (Pocket ID or Keycloak, both reachable as `oidc:8080`; `/admin` answers 404) — the only published service (ports 80/443). All Angular API calls use relative `/api/*` paths, which Caddy forwards to the backend — no CORS configuration required.
 
-`sam-server` also listens on a separate, unpublished management port (`9000`, [ADR-0007](decisions/adr-0007-management-interface.md)) for `/q/*` ops endpoints (`/q/info` for version/build-id, `/q/metrics` for Prometheus) — kept off the main port so they don't fall under the public API's `@Authenticated` default. The edge proxy does not forward `/q/*` (404 from outside, [ADR-0010](decisions/adr-0010-caddy-edge-proxy.md)); Prometheus scrapes it over the internal network.
+`sam-server` also listens on a separate, unpublished management port (`9000`, [ADR-0007](decisions/adr-0007-management-interface.md)) for `/q/*` ops endpoints (`/q/info` for version/build-id, `/q/metrics` for Prometheus, `/q/health` for health checks) — kept off the main port so they don't fall under the public API's `@Authenticated` default. The edge proxy does not forward `/q/*` (404 from outside, [ADR-0010](decisions/adr-0010-caddy-edge-proxy.md)); Prometheus scrapes it over the internal network.
+
+`sam-server`'s compose healthcheck calls `/q/health/ready` (database reachable, storage writable), and `sam-ui` starts only once it passes, so `docker compose up -d` waits for the server and fails if it stays unhealthy ([ADR-0013](decisions/adr-0013-readiness-gates-startup.md)). `docker inspect sam-server` (`.State.Health.Log`) shows which check is down.
 
 ## OIDC Config Endpoint
 
@@ -59,7 +61,7 @@ Copy `.env.example` → `.env` and fill in before running `docker compose -f doc
 
 ## Storage Volume
 
-Sheet music files are stored in a named Docker volume (`sam-data`) mounted at `/data/sam` inside the container. The path is configurable via `SAM_FILESYSTEM_BASE_PATH`. The production compose file runs Pocket ID (data in the `pocket-id-data` volume) or, with the `keycloak` profile, Keycloak with its own Postgres, which imports `keycloak/prod/sam-realm.json` on first boot — a realm without dev users or dev secrets. See [Production Setup](production-setup.md).
+Sheet music files are stored in a named Docker volume (`sam-data`) mounted at `/data/sam` inside the container. The path is configurable via `SAM_FILESYSTEM_BASE_PATH`. The server runs as uid 185, but a new volume belongs to root: the one-shot `sam-data-init` service hands the volume's root to uid 185 on every `up`, before the server starts. The production compose file runs Pocket ID (data in the `pocket-id-data` volume) or, with the `keycloak` profile, Keycloak with its own Postgres, which imports `keycloak/prod/sam-realm.json` on first boot — a realm without dev users or dev secrets. See [Production Setup](production-setup.md).
 
 ## Related
 
