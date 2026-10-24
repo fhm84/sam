@@ -1,0 +1,25 @@
+# Production scrape config (docker-compose.prod.yml, profile "monitoring"). Prometheus runs on
+# the stack's network and reaches every target by its service name; none of these ports is
+# published. Dev uses prometheus.yml.
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: sam
+    metrics_path: /q/metrics
+    static_configs:
+      # quarkus.management.port, see prometheus.yml
+      - targets:
+          - sam-server:9000
+
+  - job_name: caddy
+    static_configs:
+      # The metrics site in docker/Caddyfile
+      - targets:
+          - sam-ui:9180
+
+  - job_name: node
+    static_configs:
+      - targets:
+          - node-exporter:9100

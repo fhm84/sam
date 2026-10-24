@@ -503,6 +503,148 @@
         ]
       },
       "options": { "legend": { "displayMode": "list", "placement": "bottom" } }
+    },
+
+    { "type": "row", "id": 50, "title": "Edge (Caddy)", "collapsed": false, "gridPos": { "x": 0, "y": 45, "w": 24, "h": 1 } },
+
+    {
+      "type": "timeseries",
+      "id": 51,
+      "title": "Requests by Site and Status",
+      "description": "Production only (docker-compose.prod.yml, profile monitoring); no data in dev.",
+      "gridPos": { "x": 0, "y": 46, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "sum by (host, code) (rate(caddy_http_request_duration_seconds_count{server=\"srv0\"}[5m]))",
+          "legendFormat": "{{host}} {{code}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "reqps", "color": { "mode": "palette-classic" } },
+        "overrides": []
+      },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "lastNotNull"] } }
+    },
+
+    {
+      "type": "timeseries",
+      "id": 52,
+      "title": "Latency p95 by Site",
+      "description": "Production only (docker-compose.prod.yml, profile monitoring); no data in dev.",
+      "gridPos": { "x": 12, "y": 46, "w": 6, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "histogram_quantile(0.95, sum by (le, host) (rate(caddy_http_request_duration_seconds_bucket{server=\"srv0\"}[5m])))",
+          "legendFormat": "{{host}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "s", "color": { "mode": "palette-classic" } },
+        "overrides": []
+      },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "lastNotNull"] } }
+    },
+
+    {
+      "type": "timeseries",
+      "id": 53,
+      "title": "Response Traffic by Site",
+      "description": "Production only (docker-compose.prod.yml, profile monitoring); no data in dev.",
+      "gridPos": { "x": 18, "y": 46, "w": 6, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "sum by (host) (rate(caddy_http_response_size_bytes_sum{server=\"srv0\"}[5m]))",
+          "legendFormat": "{{host}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "Bps", "color": { "mode": "palette-classic" } },
+        "overrides": []
+      },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "lastNotNull"] } }
+    },
+
+    { "type": "row", "id": 60, "title": "Host", "collapsed": false, "gridPos": { "x": 0, "y": 54, "w": 24, "h": 1 } },
+
+    {
+      "type": "timeseries",
+      "id": 61,
+      "title": "CPU Busy",
+      "description": "Production only (docker-compose.prod.yml, profile monitoring); no data in dev.",
+      "gridPos": { "x": 0, "y": 55, "w": 8, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "100 * (1 - avg(rate(node_cpu_seconds_total{mode=\"idle\"}[5m])))",
+          "legendFormat": "busy",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "percent", "color": { "mode": "palette-classic" } },
+        "overrides": []
+      },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "lastNotNull"] } }
+    },
+
+    {
+      "type": "timeseries",
+      "id": 62,
+      "title": "Memory",
+      "description": "Production only (docker-compose.prod.yml, profile monitoring); no data in dev.",
+      "gridPos": { "x": 8, "y": 55, "w": 8, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes",
+          "legendFormat": "used",
+          "refId": "A"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "node_memory_MemTotal_bytes",
+          "legendFormat": "total",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "bytes", "color": { "mode": "palette-classic" } },
+        "overrides": []
+      },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "lastNotNull"] } }
+    },
+
+    {
+      "type": "timeseries",
+      "id": 63,
+      "title": "Disk Used",
+      "description": "Production only (docker-compose.prod.yml, profile monitoring); no data in dev. One line per disk; bind mounts of the same disk are merged.",
+      "gridPos": { "x": 16, "y": 55, "w": 8, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "100 * (1 - max by (device) (node_filesystem_avail_bytes{fstype=~\"ext4|xfs|btrfs\"}) / max by (device) (node_filesystem_size_bytes{fstype=~\"ext4|xfs|btrfs\"}))",
+          "legendFormat": "{{device}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "percent", "color": { "mode": "palette-classic" } },
+        "overrides": []
+      },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "lastNotNull"] } }
     }
 
   ]

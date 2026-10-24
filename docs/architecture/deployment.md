@@ -28,6 +28,8 @@ Caddy is the single public entry point and lives in the `sam-ui` image (`Dockerf
 
 `sam-server` also listens on a separate, unpublished management port (`9000`, [ADR-0007](decisions/adr-0007-management-interface.md)) for `/q/*` ops endpoints (`/q/info` for version/build-id, `/q/metrics` for Prometheus, `/q/health` for health checks) — kept off the main port so they don't fall under the public API's `@Authenticated` default. The edge proxy does not forward `/q/*` (404 from outside, [ADR-0010](decisions/adr-0010-caddy-edge-proxy.md)); Prometheus scrapes it over the internal network.
 
+The optional `monitoring` profile (`COMPOSE_PROFILES=<provider>,monitoring`) adds Prometheus, Grafana and node-exporter: Prometheus scrapes `sam-server:9000`, Caddy's metrics site (`:9180`, not published) and the host metrics; Grafana listens on the server's loopback only and is opened through an SSH tunnel. Details: [Monitoring](../../monitoring/CLAUDE.md).
+
 `sam-server`'s compose healthcheck calls `/q/health/ready` (database reachable, storage writable), and `sam-ui` starts only once it passes, so `docker compose up -d` waits for the server and fails if it stays unhealthy ([ADR-0013](decisions/adr-0013-readiness-gates-startup.md)). `docker inspect sam-server` (`.State.Health.Log`) shows which check is down.
 
 ## OIDC Config Endpoint
@@ -60,6 +62,7 @@ Copy `.env.example` → `.env` and fill in before running `docker compose -f doc
 | `KEYCLOAK_REALM` | sam-server | `sam` | Keycloak only: realm name |
 | `KEYCLOAK_BACKEND_CLIENT_ID` | sam-server | `sam-backend` | Keycloak only: service account client ID |
 | `SAM_FILESYSTEM_BASE_PATH` | sam-server | `/data/sam` | Mount point for sheet music file storage |
+| `GRAFANA_ADMIN_PASSWORD` | grafana | — | `monitoring` profile only, required there: Grafana's admin password (first start only) |
 | `SAM_IMAGE_TAG` | compose | `latest` | Image tag, e.g. a pinned `sha-<short>` or a version |
 
 ## Storage Volume
