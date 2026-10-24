@@ -34,6 +34,19 @@ describe('withRoles', () => {
     expect(visibleLabels(as('admin'))).toEqual(['Main', 'Sheets', 'Uploads', 'Administration', 'Event log']);
   });
 
+  it('drops hidden items instead of marking them invisible', () => {
+    const main = as()[0];
+
+    expect(main.items?.map((i) => i.label)).toEqual(['Sheets']);
+    expect(as()).toHaveLength(1);
+  });
+
+  it('keeps an item’s own visible flag', () => {
+    const items = withRoles([{ label: 'Beta', visible: false }], () => true);
+
+    expect(items[0].visible).toBe(false);
+  });
+
   it('does not pass the roles list on to the menu', () => {
     expect(as('admin')[0].items?.[1]).not.toHaveProperty('roles');
   });

@@ -21,10 +21,11 @@ should see. Writes are already protected by `@RolesAllowed`, but reads are not s
   `admin`, also where a musician is embedded (members, composer, arranger).
 - ~~`SharesResourceImpl.create` has no role check, so any user can create a public share link.~~
   Fixed in d2d1646: creating requires `music_librarian` or `admin`.
-- `AuthService` (`core/auth/auth.service.ts`) already exposes `hasRole()` and `isAdmin`,
-  read from the provider's role claim and mapped through `roleGroups` from
-  `/oidc-config.json` (Keycloak realm roles, Pocket ID groups). That is the building block
-  for the UI work; only `musician-form.ts` uses it so far.
+- `AuthService` (`core/auth/auth.service.ts`) exposes `hasRole()`, `hasAnyRole()`, `isAdmin`
+  and `canWrite`, read from the provider's role claim and mapped through `roleGroups` from
+  `/oidc-config.json` (Keycloak realm roles, Pocket ID groups). The route guard, the menu,
+  the home page and the write actions use them (#133–#135); `AREA_ROLES` in
+  `core/auth/roles.ts` holds who may open which area.
 
 ## Tasks
 

@@ -81,15 +81,18 @@ global error handling.
 
 **Roles in the UI** (`core/auth/`): the server enforces every role; the UI only hides
 what a user can't use.
-- Route: `canActivate: [roleGuard(...WRITE_ROLES)]` or `roleGuard(Roles.ADMIN)` (below
-  `authGuard`, which already ran); a user without the role lands on the home page.
-- Menu: give an item in `app-menu.ts` a `roles` list; `withRoles()` hides it, and a group
-  left without visible items.
+- Areas: `AREA_ROLES` in `core/auth/roles.ts` says who may open each restricted area. The
+  route guard, the menu and the home page read it, so change an area's roles only there.
+- Route: `canMatch: [roleGuard(AREA_ROLES.x)]` (`canMatch`, so the lazy chunk isn't loaded
+  for users without the role; runs below `authGuard`). Without the role → home page.
+- Menu: give an item in `app-menu.ts` `roles: AREA_ROLES.x`; `withRoles()` drops it, and a
+  group left without items.
 - Actions: inject `AuthService` as `protected readonly auth` and wrap create/edit/delete,
   upload, share, AI and reorder controls in `@if (auth.canWrite())` (`isAdmin()` for
   admin-only). Reading, downloading, favourites and own shares stay visible to everyone.
-- Specs of components that inject `AuthService`: add `provideAuthStub()` (librarian by
-  default, or `provideAuthStub()` with other roles) from `core/auth/auth.testing.ts`.
+- Specs of components that inject `AuthService`: add `provideAuthStub()` from
+  `core/auth/auth.testing.ts` (a music librarian), `provideAuthStub([])` for a plain
+  musician, or `provideAuthStub([Roles.ADMIN])`. `home.spec.ts` renders the page per role.
 - Who may use which route: [API surface](../../../../docs/features/api-surface.md#read-access-by-role).
 
 ### `shared/` — Reusable Pieces

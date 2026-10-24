@@ -91,8 +91,6 @@
           tooltipPosition="top"
           (onClick)="onEdit()"
         />
-      }
-      @if (auth.canWrite()) {
         <p-button
           icon="pi pi-sparkles"
           [rounded]="true"
@@ -102,8 +100,6 @@
           tooltipPosition="top"
           (onClick)="openEnrichDialog()"
         />
-      }
-      @if (auth.canWrite()) {
         <p-button
           icon="pi pi-share-alt"
           [rounded]="true"
@@ -281,8 +277,6 @@
                               tooltipPosition="top"
                               (onClick)="openRelinkDialog(doc)"
                             />
-                          }
-                          @if (auth.canWrite()) {
                             <p-button
                               icon="pi pi-trash"
                               [rounded]="true"
@@ -414,7 +408,9 @@
                   <th class="expand-col"></th>
                   <th>{{ 'sheets.instrumentations.columns.instrument' | translate }}</th>
                   <th class="docs-col">{{ 'sheets.instrumentations.columns.documents' | translate }}</th>
-                  <th pFrozenColumn alignFrozen="right">{{ 'sheets.instrumentations.columns.actions' | translate }}</th>
+                  @if (auth.canWrite()) {
+                    <th pFrozenColumn alignFrozen="right">{{ 'sheets.instrumentations.columns.actions' | translate }}</th>
+                  }
                 </tr>
               </ng-template>
               <ng-template #body let-instr let-expanded="expanded">
@@ -452,8 +448,8 @@
                       }
                     </div>
                   </td>
-                  <td pFrozenColumn alignFrozen="right">
-                    @if (auth.canWrite()) {
+                  @if (auth.canWrite()) {
+                    <td pFrozenColumn alignFrozen="right">
                       <app-row-actions [items]="instrumentationRowMenuItems(instr)" size="small">
                         <p-button
                           icon="pi pi-pencil"
@@ -486,8 +482,8 @@
                           (onClick)="confirmDeleteInstrumentation(instr)"
                         />
                       </app-row-actions>
-                    }
-                  </td>
+                    </td>
+                  }
                 </tr>
               </ng-template>
               <ng-template #expandedrow let-instr>
@@ -783,8 +779,6 @@
                           tooltipPosition="top"
                           (onClick)="openRelinkDialog(doc)"
                         />
-                      }
-                      @if (auth.canWrite()) {
                         <p-button
                           icon="pi pi-trash"
                           [rounded]="true"
@@ -843,7 +837,9 @@
               <th>{{ 'sheets.instrumentations.columns.instrument' | translate }}</th>
               <th>{{ 'sheets.instrumentations.columns.clef' | translate }}</th>
               <th class="docs-col">{{ 'sheets.instrumentations.columns.documents' | translate }}</th>
-              <th pFrozenColumn alignFrozen="right">{{ 'sheets.instrumentations.columns.actions' | translate }}</th>
+              @if (auth.canWrite()) {
+                <th pFrozenColumn alignFrozen="right">{{ 'sheets.instrumentations.columns.actions' | translate }}</th>
+              }
             </tr>
           </ng-template>
           <ng-template #body let-instr let-expanded="expanded">
@@ -882,8 +878,8 @@
                   }
                 </div>
               </td>
-              <td pFrozenColumn alignFrozen="right">
-                @if (auth.canWrite()) {
+              @if (auth.canWrite()) {
+                <td pFrozenColumn alignFrozen="right">
                   <app-row-actions [items]="instrumentationRowMenuItems(instr)" size="small">
                     <p-button
                       icon="pi pi-pencil"
@@ -916,8 +912,8 @@
                       (onClick)="confirmDeleteInstrumentation(instr)"
                     />
                   </app-row-actions>
-                }
-              </td>
+                </td>
+              }
             </tr>
           </ng-template>
           <ng-template #expandedrow let-instr>

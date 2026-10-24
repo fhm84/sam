@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { AppLayout } from './layout/component/app-layout';
 import { authGuard } from './core/auth/auth.guard';
 import { roleGuard } from './core/auth/role.guard';
-import { Roles, WRITE_ROLES } from './core/auth/roles';
+import { AREA_ROLES } from './core/auth/roles';
 
 export const routes: Routes = [
   {
@@ -27,7 +27,7 @@ export const routes: Routes = [
       },
       {
         path: 'uploads',
-        canActivate: [roleGuard(...WRITE_ROLES)],
+        canMatch: [roleGuard(AREA_ROLES.uploads)],
         loadChildren: () =>
           import('./features/uploads/uploads.routes').then((m) => m.UPLOADS_ROUTES),
       },
@@ -48,19 +48,19 @@ export const routes: Routes = [
       },
       {
         path: 'admin/ensembles',
-        canActivate: [roleGuard(...WRITE_ROLES)],
+        canMatch: [roleGuard(AREA_ROLES.ensembles)],
         loadChildren: () =>
           import('./features/ensembles/ensembles.routes').then((m) => m.ENSEMBLES_ROUTES),
       },
       {
         path: 'admin/instruments',
-        canActivate: [roleGuard(...WRITE_ROLES)],
+        canMatch: [roleGuard(AREA_ROLES.instruments)],
         loadChildren: () =>
           import('./features/instruments/instruments.routes').then((m) => m.INSTRUMENTS_ROUTES),
       },
       {
         path: 'admin/configuration',
-        canActivate: [roleGuard(Roles.ADMIN)],
+        canMatch: [roleGuard(AREA_ROLES.configuration)],
         loadChildren: () =>
           import('./features/configuration/configuration.routes').then(
             (m) => m.CONFIGURATION_ROUTES,
@@ -68,7 +68,7 @@ export const routes: Routes = [
       },
       {
         path: 'admin/event-logs',
-        canActivate: [roleGuard(Roles.ADMIN)],
+        canMatch: [roleGuard(AREA_ROLES.eventLogs)],
         loadChildren: () =>
           import('./features/event-logs/event-logs.routes').then((m) => m.EVENT_LOGS_ROUTES),
       },

@@ -11,7 +11,9 @@
         <th class="w-20">{{ 'collections.items.columns.identifier' | translate }}</th>
         <th>{{ 'sheets.collections.columnCollection' | translate }}</th>
         <th class="w-36">{{ 'collections.columns.type' | translate }}</th>
-        <th class="w-20" pFrozenColumn alignFrozen="right">{{ 'collections.columns.actions' | translate }}</th>
+        @if (auth.canWrite()) {
+          <th class="w-20" pFrozenColumn alignFrozen="right">{{ 'collections.columns.actions' | translate }}</th>
+        }
       </tr>
     </ng-template>
 
@@ -30,8 +32,8 @@
         <td>
           <p-tag [value]="'collections.types.' + col.type | translate" severity="secondary" />
         </td>
-        <td pFrozenColumn alignFrozen="right">
-          @if (auth.canWrite()) {
+        @if (auth.canWrite()) {
+          <td pFrozenColumn alignFrozen="right">
             <p-button
               icon="pi pi-times"
               [rounded]="true"
@@ -43,8 +45,8 @@
               tooltipPosition="top"
               (onClick)="confirmRemove(col)"
             />
-          }
-        </td>
+          </td>
+        }
       </tr>
     </ng-template>
 

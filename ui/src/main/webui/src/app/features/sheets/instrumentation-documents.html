@@ -45,8 +45,6 @@
                 tooltipPosition="top"
                 (onClick)="relinkRequested.emit(doc)"
               />
-            }
-            @if (auth.canWrite()) {
               <p-button
                 icon="pi pi-share-alt"
                 [rounded]="true"
@@ -56,8 +54,6 @@
                 tooltipPosition="top"
                 (onClick)="alsoLinkRequested.emit(doc)"
               />
-            }
-            @if (auth.canWrite()) {
               <p-button
                 icon="pi pi-trash"
                 [rounded]="true"
