@@ -1,5 +1,6 @@
 import { Directive, inject, signal, DestroyRef } from '@angular/core';
 import { ConfirmationService, MessageService } from '@openng/optimus-ui/api';
+import { AuthService } from '../../core/auth/auth.service';
 import { TranslationService } from '../../core/translation.service';
 import { DocumentsApiService } from '../../core/api/documents-api.service';
 import { Attachment, DocumentDownload } from '../../model/datamodels';
@@ -11,6 +12,7 @@ export abstract class DocumentHandler {
   protected readonly destroyRef = inject(DestroyRef);
 
   protected readonly t = inject(TranslationService);
+  protected readonly auth = inject(AuthService);
   protected readonly documentsApi = inject(DocumentsApiService);
   protected readonly confirmationService = inject(ConfirmationService);
   protected readonly messageService = inject(MessageService);

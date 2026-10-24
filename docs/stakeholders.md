@@ -45,9 +45,8 @@ human-centred perspective.
 > and S3 below (coverage-aware browsing, "My Parts") are additive views built on top of
 > that flat read access, not access *restrictions* — any authenticated user can still
 > browse the full archive. Guest (S5) access is implemented separately via resource-scoped
-> share links, not a login role. The Angular route guard only checks "is logged in," not
-> role, so admin-only nav entries are visible to all authenticated users even though the
-> underlying write calls are rejected server-side for non-privileged users.
+> share links, not a login role. The UI hides what a user's role can't use (menu entries,
+> admin routes, write actions); the server rejects those calls regardless.
 
 ---
 
@@ -703,10 +702,10 @@ level on every `*ResourceImpl`; write methods additionally carry
 subject and realm roles; ensemble membership lives in the database
 (`EnsembleMembershipEntity`), not in the token, and nothing uses it to scope access yet.
 Reads that are restricted (event log, upload inbox, GEMA setlist, musicians' personal
-data) are listed in [API surface](features/api-surface.md#read-access-by-role). The Angular route guard
-(`authGuard`) checks authentication only, not role, so every authenticated user sees every
-nav entry (including `/admin/*`); unauthorized write attempts fail server-side with 403
-rather than being hidden client-side.
+data) are listed in [API surface](features/api-surface.md#read-access-by-role). The Angular
+UI follows the same roles: `roleGuard` sends users without the role away from
+`uploads`, `admin/*` and the sheet forms, the menu hides those entries, and write actions
+are hidden unless `AuthService.canWrite()`; the server still answers 403 on its own.
 
 One finding worth flagging explicitly (surfaced while writing this section, not
 yet decided on):

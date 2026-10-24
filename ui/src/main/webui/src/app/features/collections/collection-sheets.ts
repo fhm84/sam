@@ -28,6 +28,7 @@ import {
 } from '../../model/datamodels';
 import { DIFFICULTY_LEVELS } from '../../shared/constants';
 import { RowActions } from '../../shared/components/row-actions/row-actions';
+import { AuthService } from '../../core/auth/auth.service';
 
 @Component({
   selector: 'app-collection-sheets',
@@ -57,6 +58,7 @@ import { RowActions } from '../../shared/components/row-actions/row-actions';
 })
 export class CollectionSheets implements OnInit, OnChanges {
   protected readonly t = inject(TranslationService);
+  protected readonly auth = inject(AuthService);
   private readonly collectionsApi = inject(CollectionsApiService);
   private readonly sheetsApi = inject(SheetsApiService);
   private readonly confirmationService = inject(ConfirmationService);

@@ -18,6 +18,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../core/translation.service';
 import { CollectionsApiService } from '../../core/api';
 import { SheetCollection } from '../../model/datamodels';
+import { AuthService } from '../../core/auth/auth.service';
 
 @Component({
   selector: 'app-sheet-collections',
@@ -43,6 +44,7 @@ import { SheetCollection } from '../../model/datamodels';
 })
 export class SheetCollections implements OnInit, OnChanges {
   protected readonly t = inject(TranslationService);
+  protected readonly auth = inject(AuthService);
   private readonly collectionsApi = inject(CollectionsApiService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly messageService = inject(MessageService);

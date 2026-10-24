@@ -64,4 +64,12 @@ describe('AuthService.hasRole', () => {
 
     expect(auth.hasRole('admin')).toBe(false);
   });
+
+  it('lets the music librarian and the admin write, nobody else', () => {
+    expect(create('groups', {}, { groups: ['music_librarian'] }).canWrite()).toBe(true);
+    TestBed.resetTestingModule();
+    expect(create('groups', {}, { groups: ['admin'] }).canWrite()).toBe(true);
+    TestBed.resetTestingModule();
+    expect(create('groups', {}, { groups: ['musician'] }).canWrite()).toBe(false);
+  });
 });

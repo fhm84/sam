@@ -31,17 +31,19 @@
           <p-tag [value]="'collections.types.' + col.type | translate" severity="secondary" />
         </td>
         <td pFrozenColumn alignFrozen="right">
-          <p-button
-            icon="pi pi-times"
-            [rounded]="true"
-            [text]="true"
-            size="small"
-            severity="danger"
-            [attr.data-testid]="'btn-remove-from-collection-' + col.id"
-            [pTooltip]="'common.remove' | translate"
-            tooltipPosition="top"
-            (onClick)="confirmRemove(col)"
-          />
+          @if (auth.canWrite()) {
+            <p-button
+              icon="pi pi-times"
+              [rounded]="true"
+              [text]="true"
+              size="small"
+              severity="danger"
+              [attr.data-testid]="'btn-remove-from-collection-' + col.id"
+              [pTooltip]="'common.remove' | translate"
+              tooltipPosition="top"
+              (onClick)="confirmRemove(col)"
+            />
+          }
         </td>
       </tr>
     </ng-template>

@@ -35,34 +35,40 @@
               tooltipPosition="top"
               (onClick)="downloadAttachment(doc)"
             />
-            <p-button
-              icon="pi pi-pencil"
-              [rounded]="true"
-              [text]="true"
-              size="small"
-              [pTooltip]="'sheets.detail.relinkDocument.tooltip' | translate"
-              tooltipPosition="top"
-              (onClick)="relinkRequested.emit(doc)"
-            />
-            <p-button
-              icon="pi pi-share-alt"
-              [rounded]="true"
-              [text]="true"
-              size="small"
-              [pTooltip]="'sheets.detail.alsoLinkDocument.tooltip' | translate"
-              tooltipPosition="top"
-              (onClick)="alsoLinkRequested.emit(doc)"
-            />
-            <p-button
-              icon="pi pi-trash"
-              [rounded]="true"
-              [text]="true"
-              size="small"
-              severity="danger"
-              [pTooltip]="'common.delete' | translate"
-              tooltipPosition="top"
-              (onClick)="confirmDeleteDocument(doc)"
-            />
+            @if (auth.canWrite()) {
+              <p-button
+                icon="pi pi-pencil"
+                [rounded]="true"
+                [text]="true"
+                size="small"
+                [pTooltip]="'sheets.detail.relinkDocument.tooltip' | translate"
+                tooltipPosition="top"
+                (onClick)="relinkRequested.emit(doc)"
+              />
+            }
+            @if (auth.canWrite()) {
+              <p-button
+                icon="pi pi-share-alt"
+                [rounded]="true"
+                [text]="true"
+                size="small"
+                [pTooltip]="'sheets.detail.alsoLinkDocument.tooltip' | translate"
+                tooltipPosition="top"
+                (onClick)="alsoLinkRequested.emit(doc)"
+              />
+            }
+            @if (auth.canWrite()) {
+              <p-button
+                icon="pi pi-trash"
+                [rounded]="true"
+                [text]="true"
+                size="small"
+                severity="danger"
+                [pTooltip]="'common.delete' | translate"
+                tooltipPosition="top"
+                (onClick)="confirmDeleteDocument(doc)"
+              />
+            }
           </div>
         </div>
       }
@@ -70,16 +76,18 @@
   }
   <div class="mt-1">
     <input #fileInput type="file" hidden (change)="uploadFile($event)" />
-    <div
-      class="instr-drop-zone"
-      [class.drop-zone-active]="dragging()"
-      (dragover)="onDragOver($event)"
-      (dragleave)="onDragLeave($event)"
-      (drop)="onDrop($event)"
-      (click)="fileInput.click()"
-    >
-      <i class="pi pi-upload"></i>
-      <span>{{ 'sheets.detail.dropFiles' | translate }}</span>
-    </div>
+    @if (auth.canWrite()) {
+      <div
+        class="instr-drop-zone"
+        [class.drop-zone-active]="dragging()"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)"
+        (click)="fileInput.click()"
+      >
+        <i class="pi pi-upload"></i>
+        <span>{{ 'sheets.detail.dropFiles' | translate }}</span>
+      </div>
+    }
   </div>
 }

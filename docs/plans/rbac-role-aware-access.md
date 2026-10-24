@@ -10,8 +10,9 @@ should see. Writes are already protected by `@RolesAllowed`, but reads are not s
 
 ## Findings (verified 2026-10-03, rechecked 2026-10-24)
 
-- `app-menu.ts` has no role filtering, and `app.routes.ts` only checks `authGuard`
-  (logged in or not). The `admin/*` routes are reachable by any account.
+- ~~`app-menu.ts` has no role filtering, and `app.routes.ts` only checks `authGuard`
+  (logged in or not). The `admin/*` routes are reachable by any account.~~ Fixed
+  (#133–#135): `roleGuard`, menu `roles`, write actions behind `AuthService.canWrite()`.
 - ~~`EventLogResourceImpl` is only `@Authenticated`, so any user can read the full event log,
   including other users' usernames and download history.~~ Fixed (#131): `admin` only.
 - ~~`MusiciansResourceImpl.findMusicians` returns `contact.email`, `contact.mobile` and

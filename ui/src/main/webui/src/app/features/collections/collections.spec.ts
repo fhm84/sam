@@ -9,6 +9,7 @@ import { Collections } from './collections';
 import { CollectionsApiService } from '../../core/api';
 import { TranslationService } from '../../core/translation.service';
 import { LayoutPreferenceService } from '../../core/layout-preference.service';
+import { provideAuthStub } from '../../core/auth/auth.testing';
 
 function paginatedOf<T>(data: T[], totalCount = data.length) {
   return of({ data, totalCount, page: 0, size: data.length });
@@ -39,6 +40,7 @@ describe('Collections', () => {
       .configureTestingModule({
         imports: [Collections],
         providers: [
+          provideAuthStub(),
           provideNoopAnimations(),
           provideRouter([]),
           MessageService,
