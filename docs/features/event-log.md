@@ -36,7 +36,7 @@ IP addresses are not stored ([ADR-0004](../architecture/decisions/adr-0004-no-ip
 
 ## Event log UI
 
-`/admin/event-logs` — read-only page with filtering by event type (multi-select), user ID, and entity type.
+`/admin/event-logs` — read-only page with filtering by event type (multi-select), user ID, and entity type. `GET /api/event-logs` is `admin` only; a user's own history is planned with [event log retention](../plans/event-log-retention.md).
 
 ## Related
 

@@ -374,8 +374,8 @@ grounding data source yet — would just be hallucination).
 
 **Done:** all fields shipped (migration `V1.1.2__MusicianFields.sql`, `MusicianStatus`,
 `MusicianRole`, `musician_instruments` junction table) together with the Angular musician
-form. See [Musicians](features/musicians.md). The contact fields are currently readable by
-every authenticated user; restricting that is part of [role-aware access](plans/rbac-role-aware-access.md).
+form. See [Musicians](features/musicians.md). The contact fields are returned only to the
+music librarian and the admin ([role-aware access](plans/rbac-role-aware-access.md)).
 
 Added missing fields to the `Musician` entity surfaced in the Claude Design mockup
 (`Create Flows (PrimeNG).html`).

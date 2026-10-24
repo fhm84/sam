@@ -40,7 +40,7 @@ human-centred perspective.
 > **Current state:** SAM implements authentication via OIDC (self-hosted Pocket ID by
 > default, Keycloak 26 as an alternative). Two roles exist today — `admin` and `music_librarian` — both granted full write
 > access across the archive; any other authenticated user has read-only access to
-> everything (there is no separate `CONDUCTOR` or `MUSICIAN` role at the API level — see
+> the music (not to other people's contact data or the event log) (there is no separate `CONDUCTOR` or `MUSICIAN` role at the API level — see
 > [Section 6](#6-access-control-model)). The personalised experiences described for S2
 > and S3 below (coverage-aware browsing, "My Parts") are additive views built on top of
 > that flat read access, not access *restrictions* — any authenticated user can still
@@ -626,11 +626,8 @@ already filled in.
 3. Reviews matching entries — each shows timestamp, actor (`username`, or "via share
    link" with the token ID for unauthenticated access), event type, and target entity.
 
-**Note:** despite living under the `/admin/` route, `EventLogResourceImpl` carries no
-`@RolesAllowed` restriction — any authenticated user can call `GET /api/event-logs`
-directly today. Read-only and contains no sensitive data beyond `userId`/`username`, but
-worth deciding deliberately (see the composite-role discussion in
-[Section 6](#6-access-control-model)) rather than leaving it as an accident of routing.
+**Note:** `GET /api/event-logs` is `admin` only, since it shows who downloaded what. Each
+user's own history is planned with [event log retention](plans/event-log-retention.md).
 
 ---
 
@@ -704,21 +701,19 @@ roles are Keycloak realm roles, or in Pocket ID the groups `sam-admin` /
 level on every `*ResourceImpl`; write methods additionally carry
 `@RolesAllowed({"music_librarian", "admin"})`. `CurrentUserService` exposes the JWT
 subject and realm roles; ensemble membership lives in the database
-(`EnsembleMembershipEntity`), not in the token, and nothing uses it to scope access yet. The Angular route guard
+(`EnsembleMembershipEntity`), not in the token, and nothing uses it to scope access yet.
+Reads that are restricted (event log, upload inbox, GEMA setlist, musicians' personal
+data) are listed in [API surface](features/api-surface.md#read-access-by-role). The Angular route guard
 (`authGuard`) checks authentication only, not role, so every authenticated user sees every
 nav entry (including `/admin/*`); unauthorized write attempts fail server-side with 403
 rather than being hidden client-side.
 
-Two findings worth flagging explicitly (surfaced while writing this section, not
+One finding worth flagging explicitly (surfaced while writing this section, not
 yet decided on):
 - **No `CONDUCTOR` write tier exists.** The originally planned model gave the Conductor
   write access to collections/setlists only. In the current code, `SheetCollectionsResourceImpl`
   and `CollectionItemsResourceImpl` require the same `music_librarian`/`admin` roles as
   everything else — a Conductor who isn't also a librarian cannot create a setlist today.
-- **`EventLogResourceImpl` has no `@RolesAllowed` at all** — any authenticated user can
-  call `GET /api/event-logs` directly, despite the Angular route living under `/admin/`.
-  Low risk (read-only, no sensitive data beyond `userId`/`username`), but it's an artifact
-  of routing rather than a deliberate access decision.
 
 ---
 
@@ -737,13 +732,16 @@ yet decided on):
 | Create share tokens | ✅ | ✅ | ❌ | ❌ |
 | List/revoke **own** share tokens | ✅ | ✅ | ✅ | ❌ |
 | Mark/unmark **own** favourite sheets | ✅ | ✅ | ✅ | ❌ |
+| See musicians' contact details, linked login, last invite (also embedded in sheets and members) | ✅ | ✅ | ❌ | ❌ |
+| Browse the upload inbox (`/documents/unlinked`); generate the GEMA setlist | ✅ | ✅ | ❌ | ❌ |
 | View My Parts (own personalised view, if linked) | ✅ | ✅ | ✅ | ❌ |
-| View event log (`GET /api/event-logs`) | ✅ | ✅ | ✅ *(see finding above)* | ❌ |
+| View event log (`GET /api/event-logs`) | ✅ | ❌ | ❌ | ❌ |
 | Access exactly the resource named by a share token | n/a | n/a | n/a | ✅ |
 
-The practical read model today is flat: **any login = read everything.** The only
+The practical read model today is almost flat: **any login reads the music.** The
 differentiators are (a) the two write roles, both equally powerful except for user
-linking, and (b) the unauthenticated, token-scoped guest path.
+linking and the event log, (b) a few librarian reads (other people's personal data, the
+upload inbox, the GEMA setlist), and (c) the unauthenticated, token-scoped guest path.
 
 #### 6.2.2 Target — composite roles mapped to use cases
 
@@ -820,9 +818,6 @@ Genuinely new questions surfaced while writing this section:
 - Should `CONDUCTOR` be added as a real role (6.2.2), or is routing conductors
   through `music_librarian` an acceptable permanent simplification for ensembles this
   size?
-- Should `EventLogResourceImpl` get an explicit `@RolesAllowed` (matching its `/admin/`
-  route), or is "any authenticated user can read the event log" an acceptable, deliberate
-  choice worth just documenting as such?
 - Now that ensemble memberships are in the database, is
   there an actual demand for restricting general archive *read* access per ensemble
   (true Option C), or does "read everything, personalize via My Parts" remain sufficient?
