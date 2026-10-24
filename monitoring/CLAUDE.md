@@ -15,7 +15,25 @@ docker compose -f docker-compose.monitoring.yml up
 
 - Prometheus scrape config: `monitoring/prometheus.yml`
 - Grafana dashboard (auto-provisioned): `monitoring/grafana/dashboards/sam.json`
-- Dashboard covers: HTTP request rate/latency/errors, JVM heap/GC/threads, HikariCP pool, AI classification (text vs vision mode, duration), LLM token usage
+- Dashboard covers: HTTP request rate/latency/errors, JVM heap/GC/threads, HikariCP pool, AI classification (text vs vision mode, duration), LLM token usage; in production also the edge (Caddy requests, latency, traffic per site) and the host (CPU, memory, disk)
+
+## Production
+
+`docker-compose.prod.yml` has the same stack as the opt-in profile `monitoring`
+(`COMPOSE_PROFILES=<provider>,monitoring` in `.env`, plus `GRAFANA_ADMIN_PASSWORD`):
+
+- Prometheus (`monitoring/prometheus.prod.yml`) runs on the stack's network and scrapes
+  `sam-server:9000`, Caddy (`sam-ui:9180`, a metrics site in `docker/Caddyfile` with
+  per-site labels) and node-exporter (host CPU, memory, disks; network collectors are off
+  because it runs in its own network namespace). Retention: 1 year or 5 GB, whichever comes
+  first (about 1,300 series, roughly 4 GB a year). No ports are published.
+- Grafana binds to the server's loopback only: `ssh -L 3000:localhost:3000 <server>`, then
+  `http://localhost:3000`. It refuses to start without `GRAFANA_ADMIN_PASSWORD`, which applies
+  on its first start only. It shares provisioning and dashboard with dev; the Edge and Host
+  rows only have data in production.
+- Metrics only, no alerting: nobody is notified when something breaks.
+- Memory limits: Prometheus 384 MB, Grafana 256 MB, node-exporter 64 MB (idle about 30, 140
+  and 10 MB).
 
 ## Management interface
 
