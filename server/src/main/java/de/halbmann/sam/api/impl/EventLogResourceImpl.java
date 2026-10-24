@@ -5,7 +5,9 @@ import de.halbmann.sam.api.entity.eventlog.EventLogEntry;
 import de.halbmann.sam.api.entity.eventlog.EventLogFilterRequest;
 import de.halbmann.sam.api.entity.shared.PaginatedResponse;
 import de.halbmann.sam.business.eventlog.controller.EventLogService;
+import de.halbmann.sam.security.Roles;
 import io.quarkus.security.Authenticated;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 
@@ -17,6 +19,7 @@ public class EventLogResourceImpl implements EventLogResource {
     EventLogService eventLogService;
 
     @Override
+    @RolesAllowed(Roles.ADMIN)
     public PaginatedResponse<EventLogEntry> find(EventLogFilterRequest filterRequest) {
         return eventLogService.find(filterRequest);
     }
