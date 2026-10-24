@@ -18,7 +18,7 @@ authoritative; the table below only pins the major lines.
 | Frontend UI | Optimus UI (`@openng/optimus-ui`, Aura preset) | 2.x |
 | Frontend language / styling | TypeScript, Tailwind CSS | 6.0 / 3.x |
 | Frontend tooling | Node.js (CI, Docker) | 26 |
-| Auth | Keycloak (OIDC) | 26.x |
+| Auth | Pocket ID (OIDC, default) / Keycloak (OIDC, alternative) | 2.x / 26.x |
 | CLI | PicoCLI (Quarkus ext.) | (via Quarkus BOM) |
 | Code Gen | Lombok, MapStruct | (see parent pom) |
 | TS Gen | typescript-generator-maven-plugin | (in ui module, `-Pgenerate-ts`) |

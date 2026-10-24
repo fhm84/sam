@@ -33,7 +33,7 @@ Business endpoints are under the `/api` base path. Ops/diagnostic endpoints
 All `/api/*` endpoints require authentication (valid OIDC bearer token), except the public share
 endpoints under `/api/public/shares/` (`@PermitAll`, token validated manually in
 `PublicShareResourceImpl`). Write operations (POST, PUT, DELETE) on archive data additionally
-require the `music_librarian` or `admin` realm role; exceptions are share management
+require the `music_librarian` or `admin` role; exceptions are share management
 (`/api/shares`, scoped to the caller's own shares — see [Shares](shares.md) for who may create
 links) and marking a sheet as favourite. Read operations (GET) are currently accessible to any authenticated user — ensemble
 scoping and collection visibility are not enforced yet (see the

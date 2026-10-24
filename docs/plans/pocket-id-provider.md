@@ -1,6 +1,6 @@
 # Plan: Pocket ID as Default OIDC Provider
 
-Roadmap: [Pocket ID as default OIDC provider](../roadmap.md#pocket-id-as-default-oidc-provider--planned)
+Roadmap: [Pocket ID as default OIDC provider](../roadmap.md#pocket-id-as-default-oidc-provider--in-progress)
 · Tracking issue: [#210](https://github.com/fhm84/sam/issues/210)
 · Concept: [Security](../architecture/concepts/security.md)
 · Revisits: [ADR-0003 self-hosted Keycloak](../architecture/decisions/adr-0003-self-hosted-keycloak.md)
