@@ -99,6 +99,7 @@ public class SheetCollectionsResourceImpl implements SheetCollectionsResource {
     }
 
     @Override
+    @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public Response generateGemaSetlist(final String collectionId) {
         ExportResult result = gemaSetlistService.generateGemaSetlist(collectionId);
         eventLogService.log(

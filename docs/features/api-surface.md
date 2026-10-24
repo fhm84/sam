@@ -35,11 +35,46 @@ endpoints under `/api/public/shares/` (`@PermitAll`, token validated manually in
 `PublicShareResourceImpl`). Write operations (POST, PUT, DELETE) on archive data additionally
 require the `music_librarian` or `admin` role; exceptions are share management
 (`/api/shares`, scoped to the caller's own shares — see [Shares](shares.md) for who may create
-links) and marking a sheet as favourite. Read operations (GET) are currently accessible to any authenticated user — ensemble
-scoping and collection visibility are not enforced yet (see the
+links) and marking a sheet as favourite. Read operations (GET) are open to any authenticated user unless the table below says
+otherwise; ensemble scoping and collection visibility are not enforced yet (see the
 [role-aware access plan](../plans/rbac-role-aware-access.md)). Role enforcement uses
 `@RolesAllowed` on the JAX-RS implementation classes; the API interface definitions remain
 role-free to stay usable as a REST client in the CLI module.
+
+### Read access by role
+
+**Decided in [#130](https://github.com/fhm84/sam/issues/130) (2026-10-24); the Follow-up column names the issue that enforces a row.**
+The rule of thumb: every login reads the music (sheets, parts, collections, ensembles, its
+own data); the music librarian also sees the working areas and other people's personal
+data; only the admin sees accounts and the event log. "Any" means any authenticated user.
+Endpoints not listed (writes) keep their `@RolesAllowed` as today.
+
+| Endpoint (GET unless noted) | Today | Decided | Follow-up |
+|---|---|---|---|
+| `/sheets`, `/sheets/{id}`, `/genres`, `/letters`, `/explore`, `/explore/surprise`, `/{id}/coverage`, `/{id}/collections`, `/{id}/export` | any | any | |
+| `/sheets/{id}/instrumentations`, `…/{iid}` | any | any | |
+| Sheet and instrumentation `…/documents`, `/documents/{id}`, `/documents/batch` (GET and POST by IDs) | any | any — musicians need their parts | |
+| `/documents` without sheet context (always empty) | any | any | |
+| `/documents/unlinked` (upload inbox, not yet reviewed) | librarian + admin | librarian + admin | done |
+| `/musicians`, `/musicians/{id}` | any | any; `contact` (email, mobile, notes), `membership.lastInviteSentAt` and `userId` only for librarian + admin | [#132](https://github.com/fhm84/sam/issues/132) |
+| `/ensembles/{id}/members` | any | any; the nested `musician` stripped as above | [#132](https://github.com/fhm84/sam/issues/132) |
+| `/instruments`, `/instruments/{id}` | any | any | |
+| `/ensembles`, `/ensembles/{id}`, `/voices`, `/voices/{vid}/options`, `/coverage/status` | any | any | |
+| `/sheet-collections`, `/{id}`, `/{id}/items`, `/{id}/toc`, `/{id}/export` | any | any, filtered by `visibility`: `WHOLE_ENSEMBLE` any, `ADMINS_ONLY` and `PRIVATE` librarian + admin (collections store no creator, so `PRIVATE` can't mean "creator only" yet; none exists today) | [#243](https://github.com/fhm84/sam/issues/243) |
+| `/sheet-collections/{id}/gema-setlist` (GEMA report) | librarian + admin | librarian + admin | done |
+| `/shares` | own shares | own shares | |
+| `/me/parts` | own | own | |
+| `/event-logs` | any | admin | [#131](https://github.com/fhm84/sam/issues/131); own history in [#146](https://github.com/fhm84/sam/issues/146) |
+| `/admin/users` | admin | admin | |
+| `/oidc-config.json`, `/public/shares/{token}/…` | public | public | |
+
+UI routes, for the route guard ([#133](https://github.com/fhm84/sam/issues/133)) and menu ([#134](https://github.com/fhm84/sam/issues/134)):
+
+| Route | Who |
+|---|---|
+| `sheets`, `collections`, `my-parts`, `shares`, `musicians`, `user/preferences` | any |
+| `uploads`, `admin/ensembles`, `admin/instruments` | librarian + admin |
+| `admin/configuration`, `admin/event-logs` | admin |
 
 Also unauthenticated, outside `/api/*`:
 - `/q/*` (management port `:9000`) — `/q/info` and `/q/metrics`; see [Security concept](../architecture/concepts/security.md) and [ADR-0007](../architecture/decisions/adr-0007-management-interface.md) for the rationale.
