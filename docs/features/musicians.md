@@ -11,7 +11,7 @@ A shared reference catalogue of composers, arrangers, and ensemble members.
 | Birth year | Integer | |
 | Death year | Integer | |
 | User ID | String | OIDC subject claim — links this musician to a system user account. Null for external/historical musicians with no login. Admins link it in the musician form by searching the login provider's users, or, with Pocket ID and no API key, by entering the user's ID ([security](../architecture/concepts/security.md)). See [ADR-0001](../architecture/decisions/adr-0001-musician-user-linking.md). |
-| Contact (email, mobile, notes) | Strings | Notes are meant for the music librarian only. The API currently returns them to every authenticated user (see [role-aware access plan](../plans/rbac-role-aware-access.md)) |
+| Contact (email, mobile, notes) | Strings | Returned only to `music_librarian` / `admin`, like the linked login and the last invite time; other callers get them removed wherever a musician appears (`MusicianMapper`, `PersonalDataAccess`) |
 | Status | Enum | `ACTIVE` · `INACTIVE` · `INVITED` · `PENDING` |
 | Role | Enum | `MEMBER` · `GUEST` · `SUBSTITUTE` · `CONDUCTOR`, independent of the per-ensemble conductor flag on memberships |
 | Last invite sent | Timestamp | Tracks self-service onboarding invites |

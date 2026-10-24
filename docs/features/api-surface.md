@@ -12,7 +12,7 @@ Business endpoints are under the `/api` base path. Ops/diagnostic endpoints
 | Sheet documents | `/api/sheets/{id}/documents` | Sub-resource |
 | Instrumentation documents | `/api/sheets/{sid}/instrumentations/{iid}/documents` | Sub-resource |
 | Global documents | `/api/documents` | Unlinked pool (`/unlinked`), `/batch` download by attachment IDs (ZIP or merged PDF), `/{id}/link`, `/{id}/classify`, `/{id}/apply` |
-| Musicians | `/api/musicians` | |
+| Musicians | `/api/musicians` | Contact details, linked login and last invite time only for `music_librarian` / `admin` |
 | Instruments | `/api/instruments` | |
 | Sheet collections | `/api/sheet-collections` | Including `/items` sub-resource, `/{id}/toc` (PDF), `/{id}/gema-setlist` (xlsx), `/{id}/export`, and `/{id}/ai/suggest-items` (AI setlist assistant) |
 | Collection items | `/api/sheet-collections/{id}/items` | Sub-resource; including `/{itemId}/ai/draft-text` (AI programme-text drafting) |
@@ -23,7 +23,7 @@ Business endpoints are under the `/api` base path. Ops/diagnostic endpoints
 | Shares | `/api/shares` | Authenticated share management (create, list, revoke) |
 | Public share | `/api/public/shares/{token}` | Unauthenticated; token-validated (`/download`, `/toc`, `/download/{instrumentationId}`, `/sheet/{attachmentId}`) — see [Shares](shares.md) |
 | Admin users | `/api/admin/users` | `admin` only; user search for musician–account linking through the OIDC provider (Pocket ID or Keycloak); `/directory` tells whether search is available (501 without a Pocket ID API key) |
-| Event log | `/api/event-logs` | Read-only; requires authentication |
+| Event log | `/api/event-logs` | Read-only; `admin` only |
 | My parts | `/api/me/parts` | Authenticated; paginated sheets for the calling user's instruments |
 | App info | `/q/info` | Unauthenticated; management port (`:9000`), not `/api`. Git branch/commit, build timestamp, Quarkus/Java/OS versions |
 | Metrics | `/q/metrics` | Unauthenticated; management port (`:9000`), not `/api`. Prometheus scrape endpoint |
@@ -57,15 +57,15 @@ Endpoints not listed (writes) keep their `@RolesAllowed` as today.
 | Sheet and instrumentation `…/documents`, `/documents/{id}`, `/documents/batch` (GET and POST by IDs) | any | any — musicians need their parts | |
 | `/documents` without sheet context (always empty) | any | any | |
 | `/documents/unlinked` (upload inbox, not yet reviewed) | librarian + admin | librarian + admin | done |
-| `/musicians`, `/musicians/{id}` | any | any; `contact` (email, mobile, notes), `membership.lastInviteSentAt` and `userId` only for librarian + admin | [#132](https://github.com/fhm84/sam/issues/132) |
-| `/ensembles/{id}/members` | any | any; the nested `musician` stripped as above | [#132](https://github.com/fhm84/sam/issues/132) |
+| `/musicians`, `/musicians/{id}` | any | any; `contact` (email, mobile, notes), `membership.lastInviteSentAt` and `userId` only for librarian + admin; also on sheets' `composer` / `arranger` | done |
+| `/ensembles/{id}/members` | any | any; the nested `musician` stripped as above | done |
 | `/instruments`, `/instruments/{id}` | any | any | |
 | `/ensembles`, `/ensembles/{id}`, `/voices`, `/voices/{vid}/options`, `/coverage/status` | any | any | |
 | `/sheet-collections`, `/{id}`, `/{id}/items`, `/{id}/toc`, `/{id}/export` | any | any, filtered by `visibility`: `WHOLE_ENSEMBLE` any, `ADMINS_ONLY` and `PRIVATE` librarian + admin (collections store no creator, so `PRIVATE` can't mean "creator only" yet; none exists today) | [#243](https://github.com/fhm84/sam/issues/243) |
 | `/sheet-collections/{id}/gema-setlist` (GEMA report) | librarian + admin | librarian + admin | done |
 | `/shares` | own shares | own shares | |
 | `/me/parts` | own | own | |
-| `/event-logs` | any | admin | [#131](https://github.com/fhm84/sam/issues/131); own history in [#146](https://github.com/fhm84/sam/issues/146) |
+| `/event-logs` | admin | admin | done; own history in [#146](https://github.com/fhm84/sam/issues/146) |
 | `/admin/users` | admin | admin | |
 | `/oidc-config.json`, `/public/shares/{token}/…` | public | public | |
 

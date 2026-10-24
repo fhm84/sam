@@ -12,11 +12,12 @@ should see. Writes are already protected by `@RolesAllowed`, but reads are not s
 
 - `app-menu.ts` has no role filtering, and `app.routes.ts` only checks `authGuard`
   (logged in or not). The `admin/*` routes are reachable by any account.
-- `EventLogResourceImpl` is only `@Authenticated`, so any user can read the full event log,
-  including other users' usernames and download history.
-- `MusiciansResourceImpl.findMusicians` returns `contact.email`, `contact.mobile` and
+- ~~`EventLogResourceImpl` is only `@Authenticated`, so any user can read the full event log,
+  including other users' usernames and download history.~~ Fixed (#131): `admin` only.
+- ~~`MusiciansResourceImpl.findMusicians` returns `contact.email`, `contact.mobile` and
   `contact.notes` to every authenticated user, although the roadmap describes notes as
-  "admin-visible only".
+  "admin-visible only".~~ Fixed (#132): removed for callers without `music_librarian` /
+  `admin`, also where a musician is embedded (members, composer, arranger).
 - ~~`SharesResourceImpl.create` has no role check, so any user can create a public share link.~~
   Fixed in d2d1646: creating requires `music_librarian` or `admin`.
 - `AuthService` (`core/auth/auth.service.ts`) already exposes `hasRole()` and `isAdmin`,
