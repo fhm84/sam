@@ -19,8 +19,8 @@ docker compose -f docker-compose.monitoring.yml up
 
 ## Management interface
 
-`quarkus.management.enabled=true` moves all `/q/*` ops endpoints (metrics, info, and
-any future health checks) off the main HTTP port (:8080, shared with the public
+`quarkus.management.enabled=true` moves all `/q/*` ops endpoints (metrics, info,
+health) off the main HTTP port (:8080, shared with the public
 `/api/*` surface) onto a dedicated management port (:9000). This keeps ops/diagnostic
 endpoints separate from the `@Authenticated`-by-default public API. See
 `docs/architecture/decisions/` for the rationale.
@@ -29,6 +29,8 @@ endpoints separate from the `@Authenticated`-by-default public API. See
   timestamp, Quarkus/Java/OS versions. Unauthenticated by design; deliberately
   configured with `quarkus.info.git.mode=standard` (not `full`) so it does *not*
   expose commit author/committer name+email or the build machine's hostname.
+- `GET :9000/q/health/ready` — readiness: database and writable storage. The prod compose
+  healthcheck calls it and gates `sam-ui`'s start on it ([ADR-0013](../docs/architecture/decisions/adr-0013-readiness-gates-startup.md)).
 - In prod, the Caddy edge proxy (`docker/Caddyfile`) answers `/q/*` with 404 — the
   management port is neither published nor proxied ([ADR-0010](../docs/architecture/decisions/adr-0010-caddy-edge-proxy.md)).
   Prometheus scrapes `sam-server:9000` over the internal network.

@@ -27,6 +27,7 @@ Business endpoints are under the `/api` base path. Ops/diagnostic endpoints
 | My parts | `/api/me/parts` | Authenticated; paginated sheets for the calling user's instruments |
 | App info | `/q/info` | Unauthenticated; management port (`:9000`), not `/api`. Git branch/commit, build timestamp, Quarkus/Java/OS versions |
 | Metrics | `/q/metrics` | Unauthenticated; management port (`:9000`), not `/api`. Prometheus scrape endpoint |
+| Health | `/q/health`, `/q/health/ready`, `/q/health/live` | Unauthenticated; management port (`:9000`), not `/api`. Readiness: database and storage; used by the prod compose healthcheck ([ADR-0013](../architecture/decisions/adr-0013-readiness-gates-startup.md)) |
 
 ## Access control
 
@@ -77,7 +78,7 @@ UI routes, for the route guard ([#133](https://github.com/fhm84/sam/issues/133))
 | `admin/configuration`, `admin/event-logs` | admin |
 
 Also unauthenticated, outside `/api/*`:
-- `/q/*` (management port `:9000`) — `/q/info` and `/q/metrics`; see [Security concept](../architecture/concepts/security.md) and [ADR-0007](../architecture/decisions/adr-0007-management-interface.md) for the rationale.
+- `/q/*` (management port `:9000`) — `/q/info`, `/q/metrics` and `/q/health`; see [Security concept](../architecture/concepts/security.md) and [ADR-0007](../architecture/decisions/adr-0007-management-interface.md) for the rationale.
 
 ## Related
 
