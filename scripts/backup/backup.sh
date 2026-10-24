@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Nightly SAM backup: the SAM database, Keycloak's database (with the keycloak profile), the sheet
-# music files and .env. Pocket ID's data is not covered yet (#216).
+# Nightly SAM backup: the SAM database, the active OIDC provider's data (Pocket ID's own export, or
+# Keycloak's database), the sheet music files and .env.
 # Writes a timestamped directory under $BACKUP_DIR and prunes old ones; a second machine (e.g. a NAS) pulls
 # the result (see docs/architecture/production-setup.md). Run as root via the systemd timer.
 #
@@ -40,7 +40,11 @@ if grep -qx keycloak-db <<<"$services"; then
   files+=(keycloak.dump)
 fi
 if grep -qx pocket-id <<<"$services"; then
-  echo "NOTE: Pocket ID's data (volume pocket-id-data) is not part of this backup yet (#216)" >&2
+  # Pocket ID's own export: a consistent ZIP of its database and uploads, taken while it runs
+  echo "Exporting Pocket ID"
+  "${COMPOSE[@]}" exec -T pocket-id /app/pocket-id export -p - >"$tmp/pocket-id.zip"
+  [ "$(head -c 2 "$tmp/pocket-id.zip")" = PK ] || { echo "ERROR: pocket-id.zip is not a ZIP file" >&2; exit 1; }
+  files+=(pocket-id.zip)
 fi
 
 echo "Archiving sheet music files"
