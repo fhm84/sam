@@ -4,13 +4,18 @@ import de.halbmann.sam.api.entity.musicians.Musician;
 import de.halbmann.sam.api.entity.musicians.MusicianContact;
 import de.halbmann.sam.api.entity.musicians.MusicianMembership;
 import de.halbmann.sam.business.musicians.entity.MusicianEntity;
+import de.halbmann.sam.security.PersonalDataAccess;
+import jakarta.inject.Inject;
 import org.mapstruct.*;
 
 @Mapper(
         componentModel = MappingConstants.ComponentModel.JAKARTA_CDI,
         uses = {MusicianInstrumentMapper.class},
         unmappedTargetPolicy = ReportingPolicy.ERROR)
-public interface MusicianMapper {
+public abstract class MusicianMapper {
+
+    @Inject
+    PersonalDataAccess personalDataAccess;
 
     @Mapping(target = "contact.email", source = "email")
     @Mapping(target = "contact.mobile", source = "mobile")
@@ -18,7 +23,7 @@ public interface MusicianMapper {
     @Mapping(target = "membership.status", source = "status")
     @Mapping(target = "membership.role", source = "role")
     @Mapping(target = "membership.lastInviteSentAt", source = "lastInviteSentAt")
-    Musician toDto(MusicianEntity entity);
+    public abstract Musician toDto(MusicianEntity entity);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)
@@ -31,7 +36,7 @@ public interface MusicianMapper {
     @Mapping(target = "notes", source = "contact.notes")
     @Mapping(target = "status", source = "membership.status")
     @Mapping(target = "role", source = "membership.role")
-    MusicianEntity fromDto(Musician dto);
+    public abstract MusicianEntity fromDto(Musician dto);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)
@@ -45,10 +50,19 @@ public interface MusicianMapper {
     @Mapping(target = "notes", source = "contact.notes")
     @Mapping(target = "status", source = "membership.status")
     @Mapping(target = "role", source = "membership.role")
-    void update(@MappingTarget MusicianEntity entity, Musician dto);
+    public abstract void update(@MappingTarget MusicianEntity entity, Musician dto);
 
     @AfterMapping
-    default void nullifyEmptySubObjects(@MappingTarget final Musician musician) {
+    void redactAndNullifyEmptySubObjects(@MappingTarget final Musician musician) {
+        // Sheets embed composer and arranger, ensemble members embed the musician: removing
+        // personal data here covers every response, not only /musicians
+        if (!personalDataAccess.callerMaySee()) {
+            musician.setContact(null);
+            musician.setUserId(null);
+            if (musician.getMembership() != null) {
+                musician.getMembership().setLastInviteSentAt(null);
+            }
+        }
         MusicianContact c = musician.getContact();
         if (c != null && c.getEmail() == null && c.getMobile() == null && c.getNotes() == null) {
             musician.setContact(null);

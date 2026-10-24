@@ -151,6 +151,24 @@ class SecurityEnforcementTest {
                 .statusCode(403);
     }
 
+    // ── Admin-only: event log ─────────────────────────────────────────────
+
+    @Test
+    @TestSecurity(
+            user = "librarian1",
+            roles = {"music_librarian"})
+    void musicLibrarian_getEventLogs_returns403() {
+        given().get("/api/event-logs").then().statusCode(403);
+    }
+
+    @Test
+    @TestSecurity(
+            user = "admin1",
+            roles = {"admin"})
+    void admin_getEventLogs_returns200() {
+        given().get("/api/event-logs").then().statusCode(200);
+    }
+
     // ── Admin-only: user search endpoint ──────────────────────────────────
 
     @Test
