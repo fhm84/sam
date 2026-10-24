@@ -37,8 +37,8 @@ human-centred perspective.
 > the same person. Use cases for both roles should be considered when designing workflows for
 > that combined user.
 
-> **Current state:** SAM implements authentication via OIDC (self-hosted Keycloak 26).
-> Two realm roles exist today — `admin` and `music_librarian` — both granted full write
+> **Current state:** SAM implements authentication via OIDC (self-hosted Pocket ID by
+> default, Keycloak 26 as an alternative). Two roles exist today — `admin` and `music_librarian` — both granted full write
 > access across the archive; any other authenticated user has read-only access to
 > everything (there is no separate `CONDUCTOR` or `MUSICIAN` role at the API level — see
 > [Section 6](#6-access-control-model)). The personalised experiences described for S2
@@ -697,8 +697,10 @@ revoked, renders the resource, and logs the access with `shareTokenId` set inste
 
 ### 6.1 Current state
 
-Authentication is OIDC via a self-hosted Keycloak 26 (`docker-compose.keycloak.yml` for
-dev, realm export at `keycloak/sam-realm.json`). `@Authenticated` is enforced at the class
+Authentication is OIDC via a self-hosted provider: Pocket ID by default, Keycloak 26 as an
+alternative (`sam.oidc.provider`, see [security](architecture/concepts/security.md)). The two
+roles are Keycloak realm roles, or in Pocket ID the groups `sam-admin` /
+`sam-music-librarian` (`sam.oidc.role-groups`). `@Authenticated` is enforced at the class
 level on every `*ResourceImpl`; write methods additionally carry
 `@RolesAllowed({"music_librarian", "admin"})`. `CurrentUserService` exposes the JWT
 subject and realm roles; ensemble membership lives in the database
@@ -731,9 +733,10 @@ yet decided on):
 | Create/edit/delete collections & setlist items; use the AI setlist assistant (suggest items, draft text) | ✅ | ✅ | ❌ | ❌ |
 | Create/edit/delete musicians & instruments | ✅ | ✅ | ❌ | ❌ |
 | Create/edit/delete ensembles, voices, voice options, members; compute coverage | ✅ | ✅ | ❌ | ❌ |
-| Link/unlink a `Musician` to a login; search Keycloak users | ✅ | ❌ | ❌ | ❌ |
+| Link/unlink a `Musician` to a login; search the login provider's users | ✅ | ❌ | ❌ | ❌ |
 | Create share tokens | ✅ | ✅ | ❌ | ❌ |
 | List/revoke **own** share tokens | ✅ | ✅ | ✅ | ❌ |
+| Mark/unmark **own** favourite sheets | ✅ | ✅ | ✅ | ❌ |
 | View My Parts (own personalised view, if linked) | ✅ | ✅ | ✅ | ❌ |
 | View event log (`GET /api/event-logs`) | ✅ | ✅ | ✅ *(see finding above)* | ❌ |
 | Access exactly the resource named by a share token | n/a | n/a | n/a | ✅ |
@@ -752,9 +755,9 @@ additive on top of 6.2.1.
 |---|---|---|---|
 | `ARCHIVE_ADMIN` | S4 Administrator | Everything `music_librarian` has, plus user/account linking | None — already `admin` today |
 | `ARCHIVE_MANAGER` | S1 Music librarian | Write: sheets, instrumentations, documents, classification, musicians, instruments, ensembles/voices/members. Read: everything | None — already `music_librarian` today |
-| `CONDUCTOR` | S2 Conductor | Read: everything. Write: collections/setlist items + trigger coverage compute only | New 3rd Keycloak role; narrow `@RolesAllowed` on `SheetCollectionsResourceImpl`, `CollectionItemsResourceImpl`, and the ensemble coverage-compute endpoint to accept it alongside `music_librarian`/`admin` |
+| `CONDUCTOR` | S2 Conductor | Read: everything. Write: collections/setlist items + trigger coverage compute only | New 3rd role (Keycloak realm role; Pocket ID group mapped through `sam.oidc.role-groups`); narrow `@RolesAllowed` on `SheetCollectionsResourceImpl`, `CollectionItemsResourceImpl`, and the ensemble coverage-compute endpoint to accept it alongside `music_librarian`/`admin` |
 | `MUSICIAN` | S3a Authenticated musician | Read: everything (unchanged). Own: My Parts | Formalizing this as an explicit role buys nothing functionally yet (it's already the default for any login) — only worth adding once read access needs to be *restricted* (e.g. per-ensemble), per Option C below |
-| `GUEST` | S5 / S3b | Read: exactly one resource per token, until expiry/revocation | None — already implemented as token-based access, deliberately not a Keycloak role |
+| `GUEST` | S5 / S3b | Read: exactly one resource per token, until expiry/revocation | None — already implemented as token-based access, deliberately not a login role |
 
 **Recommendation:** don't add `CONDUCTOR` speculatively. Add it only when a real Conductor
 needs to build setlists without also holding `music_librarian` — until then, give
@@ -796,11 +799,14 @@ database's ensemble memberships (see 6.1) are the foundation for it.
 
 ### 6.4 Authentication mechanism
 
-**Resolved and implemented:** self-hosted Keycloak 26, via `quarkus-oidc` on the backend
-and `angular-auth-oidc-client` on the frontend. Dev environment: realm auto-imported from
-`keycloak/sam-realm.json` via `docker compose -f docker-compose.keycloak.yml up` (port
-8180). Production config (`OidcConfigResource`) reads `OIDC_SERVER_URL` /
-`OIDC_CLIENT_ID` from env vars — no rebuild needed to point at a different Keycloak.
+**Resolved and implemented:** self-hosted Pocket ID by default, Keycloak 26 as a supported
+alternative, selected by `sam.oidc.provider` (see the
+[Pocket ID plan](plans/pocket-id-provider.md)); `quarkus-oidc` on the backend and
+`angular-auth-oidc-client` on the frontend. Dev environment: `docker compose up -d` starts a
+seeded Pocket ID (port 1411); Keycloak via `docker compose -f docker-compose.keycloak.yml up`
+(port 8180, realm imported from `keycloak/sam-realm.json`). The UI reads its OIDC settings
+from `/oidc-config.json` (`OidcConfigResource`, from `OIDC_SERVER_URL` / `OIDC_CLIENT_ID`
+and the provider's claims), so switching provider or issuer needs no UI rebuild.
 
 ---
 
@@ -811,7 +817,7 @@ Most of the original open questions here are now resolved — see
 is updated alongside feature work, so this doc intentionally doesn't duplicate it).
 Genuinely new questions surfaced while writing this section:
 
-- Should `CONDUCTOR` be added as a real Keycloak role (6.2.2), or is routing conductors
+- Should `CONDUCTOR` be added as a real role (6.2.2), or is routing conductors
   through `music_librarian` an acceptable permanent simplification for ensembles this
   size?
 - Should `EventLogResourceImpl` get an explicit `@RolesAllowed` (matching its `/admin/`
@@ -849,4 +855,4 @@ Genuinely new questions surfaced while writing this section:
 | Share token / share link | Freigabe-Link | Resource-scoped, optionally time-limited token granting unauthenticated read access to exactly one sheet instrumentation or collection |
 | My Parts | Meine Stimmen | Personalised, read-only view for an authenticated musician showing only sheets containing an instrumentation for an instrument they play |
 | Event log | Zugriffsprotokoll | Write-once log of read events (downloads, exports, classification) not captured by the Envers audit trail |
-| Composite role | — | A proposed bundle of capabilities mapped to a persona (e.g. `CONDUCTOR`), as distinct from the Keycloak realm roles actually enforced today (`admin`, `music_librarian`) |
+| Composite role | — | A proposed bundle of capabilities mapped to a persona (e.g. `CONDUCTOR`), as distinct from the roles actually enforced today (`admin`, `music_librarian`; Keycloak realm roles or Pocket ID groups `sam-admin` / `sam-music-librarian`) |

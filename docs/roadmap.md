@@ -42,7 +42,7 @@ unprioritised backlog.
    → [plan](plans/document-store-hardening.md) · [#154](https://github.com/fhm84/sam/issues/154)
 5. Encrypted backups (phase A of [encryption of stored documents](#encryption-of-stored-documents--planned))
    → [plan](plans/storage-encryption.md) · [#162](https://github.com/fhm84/sam/issues/162)
-6. [Pocket ID as default OIDC provider](#pocket-id-as-default-oidc-provider--planned):
+6. [Pocket ID as default OIDC provider](#pocket-id-as-default-oidc-provider--in-progress):
    lighter login stack with passkeys, Keycloak stays optional
    → [plan](plans/pocket-id-provider.md) · [#210](https://github.com/fhm84/sam/issues/210)
 
@@ -645,19 +645,19 @@ auth model.
 
 **Done (Phase 1–3):**
 - `EnsembleMembership` data model with `userId` on `Musician` for OIDC identity linking
-- Quarkus OIDC extension configured (`quarkus-oidc`); dev profile points to local Keycloak 26
+- Quarkus OIDC extension configured (`quarkus-oidc`); dev profile points to the local Pocket ID (Keycloak 26 optional, see below)
 - Keycloak realm export (`keycloak/sam-realm.json`) with roles, test users, and groups claim mapper
 - `docker-compose.keycloak.yml` for local development
 - `CurrentUserService` — reads JWT subject and realm roles (ensemble membership comes from the database; the unused `ensemble:{UUID}` group logic was removed, #219)
 - `@Authenticated` + `@RolesAllowed` enforced on all resource implementation classes; test profile uses `%test.quarkus.oidc.enabled=false` + `@TestSecurity` for auth-specific tests
 
-**Roles implemented:** `admin` · `music_librarian` (Keycloak realm roles)
+**Roles implemented:** `admin` · `music_librarian` (Keycloak realm roles; Pocket ID groups `sam-admin` / `sam-music-librarian`)
 
 **Done:** Frontend OIDC integration (`angular-auth-oidc-client`) and the "My parts" view
 scoped to the logged-in musician's ensemble memberships (`/my-parts`, `GET /api/me/parts`)
 — both verified working end-to-end as of 2026-09-08.
 
-**Remaining (Phase 4+) — role-aware UI, verified still missing 2026-09-08:**
+**Remaining (Phase 4+) — role-aware UI, verified still missing 2026-10-24:**
 - **Route/menu guarding by role** — `app.routes.ts` only gates on "authenticated or not"
   (`authGuard`); `app-menu.ts` has no role filtering at all. Any authenticated user
   currently sees and can navigate to `admin/ensembles`, `admin/instruments`,
@@ -676,11 +676,11 @@ scoped to the logged-in musician's ensemble memberships (`/my-parts`, `GET /api/
 
 **Stakeholders:** All
 **Effort:** High
-**Auth provider chosen:** Self-hosted Keycloak 26; Pocket ID becomes the default ([plan](plans/pocket-id-provider.md))
+**Auth provider chosen:** Self-hosted Pocket ID by default, Keycloak 26 as an alternative ([plan](plans/pocket-id-provider.md))
 
 ---
 
-### Pocket ID as default OIDC provider — `planned`
+### Pocket ID as default OIDC provider — `in progress`
 
 Replace Keycloak as the default login provider with self-hosted Pocket ID: one small
 binary instead of Keycloak plus its own Postgres, and passkeys instead of passwords for

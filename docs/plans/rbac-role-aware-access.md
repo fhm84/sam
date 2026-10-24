@@ -8,7 +8,7 @@ Roadmap: [Full role-based access control](../roadmap.md#full-role-based-access-c
 menu. Several read endpoints also return data that only the music librarian or admin
 should see. Writes are already protected by `@RolesAllowed`, but reads are not scoped.
 
-## Findings (verified 2026-10-03)
+## Findings (verified 2026-10-03, rechecked 2026-10-24)
 
 - `app-menu.ts` has no role filtering, and `app.routes.ts` only checks `authGuard`
   (logged in or not). The `admin/*` routes are reachable by any account.
@@ -19,8 +19,10 @@ should see. Writes are already protected by `@RolesAllowed`, but reads are not s
   "admin-visible only".
 - ~~`SharesResourceImpl.create` has no role check, so any user can create a public share link.~~
   Fixed in d2d1646: creating requires `music_librarian` or `admin`.
-- `AuthService` (`core/auth/auth.service.ts`) already exposes `hasRole()` and `isAdmin`
-  from the token's `realm_access.roles`, which is the building block for the UI work.
+- `AuthService` (`core/auth/auth.service.ts`) already exposes `hasRole()` and `isAdmin`,
+  read from the provider's role claim and mapped through `roleGroups` from
+  `/oidc-config.json` (Keycloak realm roles, Pocket ID groups). That is the building block
+  for the UI work; only `musician-form.ts` uses it so far.
 
 ## Tasks
 
