@@ -17,7 +17,7 @@
         <quarkus-langchain4j.version>1.14.2</quarkus-langchain4j.version>
         <pdfbox-tools.version>3.0.8</pdfbox-tools.version>
         <flying-saucer-pdf.version>10.6.0</flying-saucer-pdf.version>
-        <poi.version>5.5.1</poi.version>
+        <poi.version>6.0.0</poi.version>
     </properties>
 
     <dependencyManagement>
