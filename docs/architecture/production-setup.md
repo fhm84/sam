@@ -40,7 +40,7 @@ stay untouched. If the zone has CAA records, they must allow `letsencrypt.org`.
 
 ## 3. Deploy the stack
 
-1. Copy the repo (or at least `docker-compose.prod.yml`, `docker/`, and for Keycloak `keycloak/prod/`) and a filled-in `.env` (from `.env.example`) to the server. Generate every `changeme` with `openssl rand -hex 24` (`POCKET_ID_ENCRYPTION_KEY`: `openssl rand -base64 32`, and never change it afterwards).
+1. Copy the repo (or at least `docker-compose.prod.yml`, `docker/`, for Keycloak `keycloak/prod/`, and for the monitoring profile `monitoring/`) and a filled-in `.env` (from `.env.example`) to the server. Generate every `changeme` with `openssl rand -hex 24` (`POCKET_ID_ENCRYPTION_KEY`: `openssl rand -base64 32`, and never change it afterwards).
 2. Set `SAM_DOMAIN`, `LOGIN_DOMAIN` and `ACME_EMAIL`. Choose the login provider with `SAM_OIDC_PROVIDER` (`pocket-id`, the default, or `keycloak`) and fill in only that provider's section of `.env`. `COMPOSE_PROFILES=${SAM_OIDC_PROVIDER}` (already in `.env.example`) makes compose start only that provider. With Keycloak, `OIDC_SERVER_URL` must be `https://<LOGIN_DOMAIN>/realms/sam`; Pocket ID's issuer is the login host itself, which is the default.
 3. `docker compose -f docker-compose.prod.yml pull` fetches the published images (no registry login needed; optionally pin `SAM_IMAGE_TAG`, see [Deployment](deployment.md)). Then `docker compose -f docker-compose.prod.yml up -d`. To update later: `pull`, then `up -d` again. The `sam-ui` service (Caddy, `docker/Caddyfile`) is the only published service; it fetches the certificates once DNS resolves and ports 80/443 are open. It proxies the login host to the active provider (both answer as `oidc:8080` on the internal network) and answers `/admin` there with 404, so Keycloak's admin console and admin API are reachable only through an SSH tunnel to the server.
 4. On the very first start `sam-server` may fail to reach the provider's issuer before Caddy has its certificate; the restart policy retries automatically, so give it a minute or two before investigating.
@@ -67,8 +67,9 @@ stay untouched. If the zone has CAA records, they must allow `letsencrypt.org`.
 | Pocket ID (default provider) | 256 MB | about 20 MB |
 | Keycloak (heap up to 768 MB; `keycloak` profile only) | 1.25 GB | about 600 MB |
 | Keycloak Postgres (`keycloak` profile only) | 384 MB | about 50 MB |
+| Prometheus, Grafana, node-exporter (`monitoring` profile only) | 384 + 256 + 64 MB | about 30 + 140 + 10 MB |
 
-With Pocket ID the limits add up to about 2.8 GB (with Keycloak: about 4.2 GB), leaving the rest of an 8 GB host for the OS, page cache and the optional monitoring stack. On a 4 GB host, lower the `sam-server` heap (`JAVA_TOOL_OPTIONS`) and skip the monitoring stack. `sam-server` exits on out-of-memory (`ExitOnOutOfMemoryError`) so the restart policy brings it back. Not yet load-tested: heavy PDF classification during a bulk import is the likeliest memory peak, so watch `docker stats` during the first imports.
+With Pocket ID the limits add up to about 2.8 GB (with Keycloak: about 4.2 GB), leaving the rest of an 8 GB host for the OS, page cache and the optional monitoring stack (another 0.7 GB; `monitoring` profile, see [Monitoring](../../monitoring/CLAUDE.md)). On a 4 GB host, lower the `sam-server` heap (`JAVA_TOOL_OPTIONS`) and skip the monitoring stack. `sam-server` exits on out-of-memory (`ExitOnOutOfMemoryError`) so the restart policy brings it back. Not yet load-tested: heavy PDF classification during a bulk import is the likeliest memory peak, so watch `docker stats` during the first imports.
 
 **Known gaps:**
 

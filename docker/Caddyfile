@@ -4,6 +4,16 @@
 # records resolve to this host and ports 80/443 are reachable.
 {
 	email {$ACME_EMAIL}
+	# Request metrics per site, served below on the internal network
+	metrics {
+		per_host
+	}
+}
+
+# Prometheus metrics (docker-compose.prod.yml, profile "monitoring"). Port 9180 is not
+# published, so only containers on the stack's network reach it.
+:9180 {
+	metrics
 }
 
 {$SAM_DOMAIN} {
