@@ -65,13 +65,15 @@
             <i [class]="item.icon"></i>
           </ng-template>
         </p-selectbutton>
-        <p-button
-          data-testid="btn-new-sheet"
-          icon="pi pi-plus"
-          (onClick)="openNew()"
-        >
-          <span class="hidden min-[900px]:inline">{{ 'sheets.new' | translate }}</span>
-        </p-button>
+        @if (auth.canWrite()) {
+          <p-button
+            data-testid="btn-new-sheet"
+            icon="pi pi-plus"
+            (onClick)="openNew()"
+          >
+            <span class="hidden min-[900px]:inline">{{ 'sheets.new' | translate }}</span>
+          </p-button>
+        }
       </div>
     </ng-template>
   </p-toolbar>
@@ -311,38 +313,40 @@
             </td>
           }
           <td pFrozenColumn alignFrozen="right">
-            <app-row-actions [items]="rowMenuItems(sheet)">
-              <p-button
-                icon="pi pi-folder-plus"
-                [rounded]="true"
-                [text]="true"
-                styleClass="row-action"
-                [attr.data-testid]="'btn-add-to-collection-' + sheet.id"
-                [pTooltip]="'common.addToCollection' | translate"
-                tooltipPosition="top"
-                (onClick)="openCollectionsDialog(sheet, $event)"
-              />
-              <p-button
-                icon="pi pi-pencil"
-                [rounded]="true"
-                [text]="true"
-                styleClass="row-action"
-                [attr.data-testid]="'btn-edit-sheet-' + sheet.id"
-                [pTooltip]="'sheets.edit' | translate"
-                tooltipPosition="top"
-                (onClick)="openEdit(sheet); $event.stopPropagation()"
-              />
-              <p-button
-                icon="pi pi-trash"
-                [rounded]="true"
-                [text]="true"
-                styleClass="row-action row-action-danger"
-                [attr.data-testid]="'btn-delete-sheet-' + sheet.id"
-                [pTooltip]="'common.delete' | translate"
-                tooltipPosition="top"
-                (onClick)="confirmDelete(sheet); $event.stopPropagation()"
-              />
-            </app-row-actions>
+            @if (auth.canWrite()) {
+              <app-row-actions [items]="rowMenuItems(sheet)">
+                <p-button
+                  icon="pi pi-folder-plus"
+                  [rounded]="true"
+                  [text]="true"
+                  styleClass="row-action"
+                  [attr.data-testid]="'btn-add-to-collection-' + sheet.id"
+                  [pTooltip]="'common.addToCollection' | translate"
+                  tooltipPosition="top"
+                  (onClick)="openCollectionsDialog(sheet, $event)"
+                />
+                <p-button
+                  icon="pi pi-pencil"
+                  [rounded]="true"
+                  [text]="true"
+                  styleClass="row-action"
+                  [attr.data-testid]="'btn-edit-sheet-' + sheet.id"
+                  [pTooltip]="'sheets.edit' | translate"
+                  tooltipPosition="top"
+                  (onClick)="openEdit(sheet); $event.stopPropagation()"
+                />
+                <p-button
+                  icon="pi pi-trash"
+                  [rounded]="true"
+                  [text]="true"
+                  styleClass="row-action row-action-danger"
+                  [attr.data-testid]="'btn-delete-sheet-' + sheet.id"
+                  [pTooltip]="'common.delete' | translate"
+                  tooltipPosition="top"
+                  (onClick)="confirmDelete(sheet); $event.stopPropagation()"
+                />
+              </app-row-actions>
+            }
           </td>
         </tr>
       </ng-template>
@@ -368,41 +372,43 @@
             [attr.data-testid]="'sheet-card-' + sheet.id"
             (click)="openDetail(sheet)"
           >
-            <div class="card-actions">
-              <p-button
-                icon="pi pi-folder-plus"
-                [rounded]="true"
-                [text]="true"
-                size="small"
-                styleClass="row-action"
-                [attr.data-testid]="'btn-add-to-collection-' + sheet.id"
-                [pTooltip]="'common.addToCollection' | translate"
-                tooltipPosition="top"
-                (onClick)="openCollectionsDialog(sheet, $event)"
-              />
-              <p-button
-                icon="pi pi-pencil"
-                [rounded]="true"
-                [text]="true"
-                size="small"
-                styleClass="row-action"
-                [attr.data-testid]="'btn-edit-sheet-' + sheet.id"
-                [pTooltip]="'sheets.edit' | translate"
-                tooltipPosition="top"
-                (onClick)="openEdit(sheet); $event.stopPropagation()"
-              />
-              <p-button
-                icon="pi pi-trash"
-                [rounded]="true"
-                [text]="true"
-                size="small"
-                styleClass="row-action row-action-danger"
-                [attr.data-testid]="'btn-delete-sheet-' + sheet.id"
-                [pTooltip]="'common.delete' | translate"
-                tooltipPosition="top"
-                (onClick)="confirmDelete(sheet); $event.stopPropagation()"
-              />
-            </div>
+            @if (auth.canWrite()) {
+              <div class="card-actions">
+                <p-button
+                  icon="pi pi-folder-plus"
+                  [rounded]="true"
+                  [text]="true"
+                  size="small"
+                  styleClass="row-action"
+                  [attr.data-testid]="'btn-add-to-collection-' + sheet.id"
+                  [pTooltip]="'common.addToCollection' | translate"
+                  tooltipPosition="top"
+                  (onClick)="openCollectionsDialog(sheet, $event)"
+                />
+                <p-button
+                  icon="pi pi-pencil"
+                  [rounded]="true"
+                  [text]="true"
+                  size="small"
+                  styleClass="row-action"
+                  [attr.data-testid]="'btn-edit-sheet-' + sheet.id"
+                  [pTooltip]="'sheets.edit' | translate"
+                  tooltipPosition="top"
+                  (onClick)="openEdit(sheet); $event.stopPropagation()"
+                />
+                <p-button
+                  icon="pi pi-trash"
+                  [rounded]="true"
+                  [text]="true"
+                  size="small"
+                  styleClass="row-action row-action-danger"
+                  [attr.data-testid]="'btn-delete-sheet-' + sheet.id"
+                  [pTooltip]="'common.delete' | translate"
+                  tooltipPosition="top"
+                  (onClick)="confirmDelete(sheet); $event.stopPropagation()"
+                />
+              </div>
+            }
             <div class="flex flex-row items-start gap-0.5 mb-3">
               <p-button
                 [icon]="sheet.favorite ? 'pi pi-star-fill' : 'pi pi-star'"

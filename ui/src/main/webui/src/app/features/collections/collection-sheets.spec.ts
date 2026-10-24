@@ -10,6 +10,7 @@ import { CollectionSheets } from './collection-sheets';
 import { CollectionsApiService, SheetsApiService } from '../../core/api';
 import { TranslationService } from '../../core/translation.service';
 import { CollectionItem, SheetMusicSearchResult } from '../../model/datamodels';
+import { provideAuthStub } from '../../core/auth/auth.testing';
 
 function paginatedOf<T>(data: T[], totalCount = data.length) {
   return of({ data, totalCount, page: 0, size: data.length });
@@ -56,6 +57,7 @@ describe('CollectionSheets', () => {
       .configureTestingModule({
         imports: [CollectionSheets],
         providers: [
+          provideAuthStub(),
           provideNoopAnimations(),
           provideRouter([]),
           MessageService,

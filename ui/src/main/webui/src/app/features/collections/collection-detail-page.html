@@ -18,7 +18,7 @@
       }
     </ng-template>
     <ng-template #end>
-      @if (collection()) {
+      @if (collection() && auth.canWrite()) {
         <p-button
           icon="pi pi-pencil"
           [label]="t.t('collections.edit')"
@@ -62,7 +62,7 @@
         size="small"
         (onClick)="generateToc()"
       />
-      @if (isSetlist) {
+      @if (isSetlist && auth.canWrite()) {
         <p-button
           icon="pi pi-file-excel"
           [label]="t.t('collections.detail.actions.generateGemaSetlist')"
@@ -81,14 +81,16 @@
         size="small"
         (onClick)="exportCollection('ZIP')"
       />
-      <p-button
-        icon="pi pi-share-alt"
-        [label]="t.t('shares.tooltip')"
-        severity="secondary"
-        [outlined]="true"
-        size="small"
-        (onClick)="openShareDialog()"
-      />
+      @if (auth.canWrite()) {
+        <p-button
+          icon="pi pi-share-alt"
+          [label]="t.t('shares.tooltip')"
+          severity="secondary"
+          [outlined]="true"
+          size="small"
+          (onClick)="openShareDialog()"
+        />
+      }
     </div>
 
     <app-collection-sheets [collectionId]="collectionId()" [ensembleId]="col.ensembleId" />

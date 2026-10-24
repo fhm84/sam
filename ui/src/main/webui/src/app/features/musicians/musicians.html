@@ -16,11 +16,13 @@
           (input)="onFilter($event)"
         />
       </p-iconfield>
-      <p-button
-        [label]="t.t('musicians.new')"
-        icon="pi pi-plus"
-        (onClick)="openNew()"
-      />
+      @if (auth.canWrite()) {
+        <p-button
+          [label]="t.t('musicians.new')"
+          icon="pi pi-plus"
+          (onClick)="openNew()"
+        />
+      }
     </ng-template>
   </p-toolbar>
 
@@ -64,26 +66,28 @@
         <td>{{ musician.birthYear }}</td>
         <td>{{ musician.deathYear }}</td>
         <td pFrozenColumn alignFrozen="right">
-          <app-row-actions [items]="rowMenuItems(musician)">
-            <p-button
-              icon="pi pi-pencil"
-              [rounded]="true"
-              [text]="true"
-              styleClass="row-action"
-              [pTooltip]="'musicians.edit' | translate"
-              tooltipPosition="top"
-              (onClick)="openEdit(musician)"
-            />
-            <p-button
-              icon="pi pi-trash"
-              [rounded]="true"
-              [text]="true"
-              styleClass="row-action row-action-danger"
-              [pTooltip]="'common.delete' | translate"
-              tooltipPosition="top"
-              (onClick)="confirmDelete(musician)"
-            />
-          </app-row-actions>
+          @if (auth.canWrite()) {
+            <app-row-actions [items]="rowMenuItems(musician)">
+              <p-button
+                icon="pi pi-pencil"
+                [rounded]="true"
+                [text]="true"
+                styleClass="row-action"
+                [pTooltip]="'musicians.edit' | translate"
+                tooltipPosition="top"
+                (onClick)="openEdit(musician)"
+              />
+              <p-button
+                icon="pi pi-trash"
+                [rounded]="true"
+                [text]="true"
+                styleClass="row-action row-action-danger"
+                [pTooltip]="'common.delete' | translate"
+                tooltipPosition="top"
+                (onClick)="confirmDelete(musician)"
+              />
+            </app-row-actions>
+          }
         </td>
       </tr>
     </ng-template>

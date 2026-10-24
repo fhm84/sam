@@ -27,11 +27,13 @@
           <i [class]="item.icon"></i>
         </ng-template>
       </p-selectbutton>
-      <p-button
-        [label]="t.t('collections.new')"
-        icon="pi pi-plus"
-        (onClick)="openNew()"
-      />
+      @if (auth.canWrite()) {
+        <p-button
+          [label]="t.t('collections.new')"
+          icon="pi pi-plus"
+          (onClick)="openNew()"
+        />
+      }
     </ng-template>
   </p-toolbar>
 
@@ -105,26 +107,28 @@
           <td>{{ formatDate(collection.date) }}</td>
           <td>{{ collection.sheets?.length ?? 0 }}</td>
           <td pFrozenColumn alignFrozen="right">
-            <app-row-actions [items]="rowMenuItems(collection)">
-              <p-button
-                icon="pi pi-pencil"
-                [rounded]="true"
-                [text]="true"
-                styleClass="row-action"
-                [pTooltip]="'collections.edit' | translate"
-                tooltipPosition="top"
-                (onClick)="openEdit(collection)"
-              />
-              <p-button
-                icon="pi pi-trash"
-                [rounded]="true"
-                [text]="true"
-                styleClass="row-action row-action-danger"
-                [pTooltip]="'common.delete' | translate"
-                tooltipPosition="top"
-                (onClick)="confirmDelete(collection)"
-              />
-            </app-row-actions>
+            @if (auth.canWrite()) {
+              <app-row-actions [items]="rowMenuItems(collection)">
+                <p-button
+                  icon="pi pi-pencil"
+                  [rounded]="true"
+                  [text]="true"
+                  styleClass="row-action"
+                  [pTooltip]="'collections.edit' | translate"
+                  tooltipPosition="top"
+                  (onClick)="openEdit(collection)"
+                />
+                <p-button
+                  icon="pi pi-trash"
+                  [rounded]="true"
+                  [text]="true"
+                  styleClass="row-action row-action-danger"
+                  [pTooltip]="'common.delete' | translate"
+                  tooltipPosition="top"
+                  (onClick)="confirmDelete(collection)"
+                />
+              </app-row-actions>
+            }
           </td>
         </tr>
       </ng-template>
@@ -146,28 +150,30 @@
       <div class="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-4">
         @for (collection of items(); track collection.id) {
           <div class="relative flex flex-col gap-3 p-5 bg-[var(--sam-surface)] border border-[var(--sam-border)] rounded-[var(--p-border-radius)] transition-shadow duration-200 group hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)]">
-            <div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-              <p-button
-                icon="pi pi-pencil"
-                [rounded]="true"
-                [text]="true"
-                size="small"
-                styleClass="row-action"
-                [pTooltip]="'collections.edit' | translate"
-                tooltipPosition="top"
-                (onClick)="openEdit(collection)"
-              />
-              <p-button
-                icon="pi pi-trash"
-                [rounded]="true"
-                [text]="true"
-                size="small"
-                styleClass="row-action row-action-danger"
-                [pTooltip]="'common.delete' | translate"
-                tooltipPosition="top"
-                (onClick)="confirmDelete(collection)"
-              />
-            </div>
+            @if (auth.canWrite()) {
+              <div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <p-button
+                  icon="pi pi-pencil"
+                  [rounded]="true"
+                  [text]="true"
+                  size="small"
+                  styleClass="row-action"
+                  [pTooltip]="'collections.edit' | translate"
+                  tooltipPosition="top"
+                  (onClick)="openEdit(collection)"
+                />
+                <p-button
+                  icon="pi pi-trash"
+                  [rounded]="true"
+                  [text]="true"
+                  size="small"
+                  styleClass="row-action row-action-danger"
+                  [pTooltip]="'common.delete' | translate"
+                  tooltipPosition="top"
+                  (onClick)="confirmDelete(collection)"
+                />
+              </div>
+            }
             <div class="flex flex-col gap-1 cursor-pointer" (click)="navigateToDetail(collection)">
               <span class="font-semibold text-base text-[var(--p-primary-color)] hover:underline">{{ collection.name }}</span>
               @if (collection.description) {

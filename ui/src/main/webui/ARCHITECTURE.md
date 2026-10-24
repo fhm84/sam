@@ -76,8 +76,21 @@ import { SheetsApiService } from '../../core/api';
 
 ### `core/` — Application Services
 
-Singleton services that don't belong to any feature: theme management, future
-auth guards/interceptors, global error handling.
+Singleton services that don't belong to any feature: theme management, auth,
+global error handling.
+
+**Roles in the UI** (`core/auth/`): the server enforces every role; the UI only hides
+what a user can't use.
+- Route: `canActivate: [roleGuard(...WRITE_ROLES)]` or `roleGuard(Roles.ADMIN)` (below
+  `authGuard`, which already ran); a user without the role lands on the home page.
+- Menu: give an item in `app-menu.ts` a `roles` list; `withRoles()` hides it, and a group
+  left without visible items.
+- Actions: inject `AuthService` as `protected readonly auth` and wrap create/edit/delete,
+  upload, share, AI and reorder controls in `@if (auth.canWrite())` (`isAdmin()` for
+  admin-only). Reading, downloading, favourites and own shares stay visible to everyone.
+- Specs of components that inject `AuthService`: add `provideAuthStub()` (librarian by
+  default, or `provideAuthStub()` with other roles) from `core/auth/auth.testing.ts`.
+- Who may use which route: [API surface](../../../../docs/features/api-surface.md#read-access-by-role).
 
 ### `shared/` — Reusable Pieces
 

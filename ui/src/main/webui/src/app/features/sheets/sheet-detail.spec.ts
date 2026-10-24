@@ -10,6 +10,7 @@ import { SheetsApiService, InstrumentationsApiService } from '../../core/api';
 import { DocumentsApiService } from '../../core/api/documents-api.service';
 import { TranslationService } from '../../core/translation.service';
 import { Attachment, AttachmentType, Instrumentation } from '../../model/datamodels';
+import { provideAuthStub } from '../../core/auth/auth.testing';
 
 function makeInstr(id: string, name: string, partLabel?: string): Instrumentation {
   return { id, instrument: { id: 'x', name } as any, partLabel } as any;
@@ -52,6 +53,7 @@ describe('SheetDetail', () => {
       .configureTestingModule({
         imports: [SheetDetail],
         providers: [
+          provideAuthStub(),
           provideNoopAnimations(),
           provideRouter([]),
           MessageService,

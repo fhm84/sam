@@ -657,17 +657,17 @@ auth model.
 scoped to the logged-in musician's ensemble memberships (`/my-parts`, `GET /api/me/parts`)
 — both verified working end-to-end as of 2026-09-08.
 
-**Remaining (Phase 4+) — role-aware UI, verified still missing 2026-10-24:**
-- **Route/menu guarding by role** — `app.routes.ts` only gates on "authenticated or not"
-  (`authGuard`); `app-menu.ts` has no role filtering at all. Any authenticated user
-  currently sees and can navigate to `admin/ensembles`, `admin/instruments`,
-  `admin/configuration`, `admin/event-logs` in the menu regardless of role — the backend's
-  `@RolesAllowed` still blocks writes, but read-only UI exposure is broader than intended
-  for a plain `music_librarian`/musician account.
+**Done (Phase 4, 2026-10-24):** read access decided per endpoint, event log admin-only,
+musicians' personal data for the librarian only, and a role-aware UI: `roleGuard` on the
+routes, menu items filtered by role, write actions hidden from users without a write role.
+Left in the [plan](plans/rbac-role-aware-access.md): collection visibility (#243) and the
+remaining tests (#136).
+
+**Remaining (Phase 4+):**
 - **No frontend ensemble/context service** — "ensemble" only exists as a local filter
   dropdown inside the sheets list (`sheets.ts`); there is no shared context (selected
   ensemble/sheet) that other features (menu, dashboards, forms) could read from. This is
-  the natural foundation for both route guarding above and use-case-tailored UI below.
+  the natural foundation for use-case-tailored UI below.
 - **Use-case-tailored UI** — no differentiation in what's shown/available between
   Musiker, music librarian (Notenwart), Dirigent, and Guest beyond raw role checks; e.g.
   no simplified/guest-appropriate views distinct from the full librarian UI.

@@ -10,6 +10,7 @@ import { SheetCollections } from './sheet-collections';
 import { CollectionsApiService } from '../../core/api';
 import { TranslationService } from '../../core/translation.service';
 import { SheetCollection } from '../../model/datamodels';
+import { provideAuthStub } from '../../core/auth/auth.testing';
 
 function paginatedOf<T>(data: T[], totalCount = data.length) {
   return of({ data, totalCount, page: 0, size: data.length });
@@ -43,6 +44,7 @@ describe('SheetCollections', () => {
       .configureTestingModule({
         imports: [SheetCollections],
         providers: [
+          provideAuthStub(),
           provideNoopAnimations(),
           provideRouter([]),
           MessageService,

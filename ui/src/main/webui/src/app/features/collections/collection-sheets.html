@@ -14,33 +14,39 @@
         tooltipPosition="top"
         (onClick)="toggleMyPartsOnly()"
       />
-      <p-button
-        data-testid="btn-add-sheet"
-        icon="pi pi-music"
-        [label]="t.t('collections.items.addSheet')"
-        size="small"
-        (onClick)="openAddSheet()"
-      />
-      <p-button
-        data-testid="btn-add-text-block"
-        icon="pi pi-align-left"
-        [label]="t.t('collections.items.addTextBlock')"
-        size="small"
-        severity="secondary"
-        (onClick)="openAddTextBlock()"
-      />
-      <p-button
-        data-testid="btn-ai-assistant"
-        icon="pi pi-sparkles"
-        [label]="t.t('collections.items.assistant.open')"
-        size="small"
-        severity="secondary"
-        [outlined]="true"
-        [disabled]="!ensembleId"
-        [pTooltip]="ensembleId ? undefined : t.t('collections.items.assistant.needsEnsembleTooltip')"
-        tooltipPosition="top"
-        (onClick)="openAssistant()"
-      />
+      @if (auth.canWrite()) {
+        <p-button
+          data-testid="btn-add-sheet"
+          icon="pi pi-music"
+          [label]="t.t('collections.items.addSheet')"
+          size="small"
+          (onClick)="openAddSheet()"
+        />
+      }
+      @if (auth.canWrite()) {
+        <p-button
+          data-testid="btn-add-text-block"
+          icon="pi pi-align-left"
+          [label]="t.t('collections.items.addTextBlock')"
+          size="small"
+          severity="secondary"
+          (onClick)="openAddTextBlock()"
+        />
+      }
+      @if (auth.canWrite()) {
+        <p-button
+          data-testid="btn-ai-assistant"
+          icon="pi pi-sparkles"
+          [label]="t.t('collections.items.assistant.open')"
+          size="small"
+          severity="secondary"
+          [outlined]="true"
+          [disabled]="!ensembleId"
+          [pTooltip]="ensembleId ? undefined : t.t('collections.items.assistant.needsEnsembleTooltip')"
+          tooltipPosition="top"
+          (onClick)="openAssistant()"
+        />
+      }
     </div>
   </div>
 
@@ -65,7 +71,9 @@
     <ng-template #body let-item let-i="rowIndex">
       <tr [pReorderableRow]="i" [attr.data-testid]="'collection-item-row-' + item.id">
         <td class="cursor-grab text-[var(--sam-text-muted)]">
-          <i class="pi pi-bars" pReorderableRowHandle></i>
+          @if (auth.canWrite()) {
+            <i class="pi pi-bars" pReorderableRowHandle></i>
+          }
         </td>
         <td class="text-right font-semibold text-[var(--sam-text-secondary)] tabular-nums">{{ i + 1 }}</td>
         <td>
@@ -110,69 +118,71 @@
           }
         </td>
         <td pFrozenColumn alignFrozen="right">
-          <app-row-actions [items]="rowMenuItems(item)" size="small">
-            <p-button
-              icon="pi pi-pencil"
-              [rounded]="true"
-              [text]="true"
-              size="small"
-              styleClass="row-action"
-              [attr.data-testid]="'btn-edit-item-' + item.id"
-              [pTooltip]="t.t(item.type === 'SHEET' ? 'collections.items.editSheet' : 'collections.items.editTextBlock')"
-              (onClick)="openEdit(item)"
-            />
-            @if (item.type === 'TEXT') {
+          @if (auth.canWrite()) {
+            <app-row-actions [items]="rowMenuItems(item)" size="small">
               <p-button
-                icon="pi pi-sparkles"
+                icon="pi pi-pencil"
                 [rounded]="true"
                 [text]="true"
                 size="small"
                 styleClass="row-action"
-                [attr.data-testid]="'btn-draft-text-' + item.id"
-                [pTooltip]="t.t('collections.items.assistant.draftText')"
-                tooltipPosition="top"
-                [loading]="draftingItemId() === item.id"
-                (onClick)="onDraftText(item)"
+                [attr.data-testid]="'btn-edit-item-' + item.id"
+                [pTooltip]="t.t(item.type === 'SHEET' ? 'collections.items.editSheet' : 'collections.items.editTextBlock')"
+                (onClick)="openEdit(item)"
               />
-              @if (item.attachment) {
+              @if (item.type === 'TEXT') {
                 <p-button
-                  icon="pi pi-paperclip"
+                  icon="pi pi-sparkles"
                   [rounded]="true"
                   [text]="true"
                   size="small"
-                  severity="danger"
                   styleClass="row-action"
-                  [attr.data-testid]="'btn-remove-attachment-' + item.id"
-                  [pTooltip]="t.t('collections.items.attachment.remove')"
+                  [attr.data-testid]="'btn-draft-text-' + item.id"
+                  [pTooltip]="t.t('collections.items.assistant.draftText')"
                   tooltipPosition="top"
-                  (onClick)="confirmRemoveAttachment(item)"
+                  [loading]="draftingItemId() === item.id"
+                  (onClick)="onDraftText(item)"
                 />
-              } @else {
-                <p-button
-                  icon="pi pi-upload"
-                  [rounded]="true"
-                  [text]="true"
-                  size="small"
-                  severity="secondary"
-                  styleClass="row-action"
-                  [attr.data-testid]="'btn-upload-attachment-' + item.id"
-                  [pTooltip]="t.t('collections.items.attachment.upload')"
-                  tooltipPosition="top"
-                  [loading]="uploadingAttachment && uploadingItem?.id === item.id"
-                  (onClick)="triggerAttachmentUpload(item)"
-                />
+                @if (item.attachment) {
+                  <p-button
+                    icon="pi pi-paperclip"
+                    [rounded]="true"
+                    [text]="true"
+                    size="small"
+                    severity="danger"
+                    styleClass="row-action"
+                    [attr.data-testid]="'btn-remove-attachment-' + item.id"
+                    [pTooltip]="t.t('collections.items.attachment.remove')"
+                    tooltipPosition="top"
+                    (onClick)="confirmRemoveAttachment(item)"
+                  />
+                } @else {
+                  <p-button
+                    icon="pi pi-upload"
+                    [rounded]="true"
+                    [text]="true"
+                    size="small"
+                    severity="secondary"
+                    styleClass="row-action"
+                    [attr.data-testid]="'btn-upload-attachment-' + item.id"
+                    [pTooltip]="t.t('collections.items.attachment.upload')"
+                    tooltipPosition="top"
+                    [loading]="uploadingAttachment && uploadingItem?.id === item.id"
+                    (onClick)="triggerAttachmentUpload(item)"
+                  />
+                }
               }
-            }
-            <p-button
-              icon="pi pi-trash"
-              [rounded]="true"
-              [text]="true"
-              size="small"
-              styleClass="row-action row-action-danger"
-              [attr.data-testid]="'btn-delete-item-' + item.id"
-              (onClick)="confirmRemove(item)"
-            />
-          </app-row-actions>
+              <p-button
+                icon="pi pi-trash"
+                [rounded]="true"
+                [text]="true"
+                size="small"
+                styleClass="row-action row-action-danger"
+                [attr.data-testid]="'btn-delete-item-' + item.id"
+                (onClick)="confirmRemove(item)"
+              />
+            </app-row-actions>
+          }
         </td>
       </tr>
     </ng-template>

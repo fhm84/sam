@@ -9,6 +9,7 @@ import { CollectionDetailPage } from './collection-detail-page';
 import { CollectionsApiService } from '../../core/api';
 import { TranslationService } from '../../core/translation.service';
 import { SheetCollection } from '../../model/datamodels';
+import { provideAuthStub } from '../../core/auth/auth.testing';
 
 function makeCollection(overrides: Partial<SheetCollection> = {}): SheetCollection {
   return { id: 'col-1' as any, name: 'Test', type: 'SETLIST', ...overrides };
@@ -44,6 +45,7 @@ describe('CollectionDetailPage', () => {
       .configureTestingModule({
         imports: [CollectionDetailPage],
         providers: [
+          provideAuthStub(),
           provideNoopAnimations(),
           provideRouter([]),
           MessageService,
