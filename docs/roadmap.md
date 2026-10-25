@@ -1238,6 +1238,18 @@ Write tools should require confirmation.
 
 ---
 
+### Multitenancy — `idea`
+
+Host several bands or associations in one SAM instance, each with its own archive,
+ensembles, and members, instead of one deployment per band. Every entity would need a
+tenant reference, every query a tenant filter, and roles would apply per tenant. Today
+one instance serves one band; separate instances are the simpler way to host several.
+
+**Stakeholders:** operators hosting SAM for more than one band
+**Effort:** High
+
+---
+
 ## 7. UX & Discovery
 
 ### Sheets overview filter & bulk actions — `planned`

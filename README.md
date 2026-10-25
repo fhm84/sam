@@ -10,17 +10,14 @@
 
 A Quarkus-based application for archiving sheet music, managing instrumentations, musicians, and collections for bands and ensembles.
 
-> **Copyright and licensing**
->
-> SAM is a tool for managing sheet music archives. It does not grant
-> permission to scan, reproduce, store, distribute, or share copyrighted
-> sheet music. Users and operators are responsible for obtaining all
-> required permissions and licenses and for respecting applicable copyright
-> law. This applies in particular to scanned PDFs and other digital copies.
->
-> Only upload or share material for which the required rights or permissions
-> exist, such as public-domain material, appropriately licensed material,
-> or material covered by a specific permission.
+> [!IMPORTANT]
+> **SAM manages sheet music — it grants no rights to it.** Using SAM does not
+> permit anyone to scan, reproduce, store, distribute, or share copyrighted
+> sheet music. Operators and users of a SAM instance are solely responsible for
+> the copyright and licensing status of everything they upload or share, in
+> particular scanned PDFs and other digital copies. Only store and share
+> material that is in the public domain, appropriately licensed, or covered by
+> a specific permission. See [Copyright and Licensing](#copyright-and-licensing).
 
 ## Quick Start
 
@@ -44,57 +41,33 @@ docker compose run --rm pocket-id-seed login-link admin1
 ./mvnw spotless:apply
 ```
 
-**Prerequisites:** Java 25, Node.js (22.22.3+, 24.15+ or 26+ — Angular 22's requirement; CI and the Docker build use 26), PostgreSQL 17 (with `pg_trgm` and `fuzzystrmatch` extensions), default connection: `localhost:5432/sam_music`, user `sam` (`docker compose up -d` starts one). Keycloak instead of Pocket ID in dev: `docker compose -f docker-compose.keycloak.yml up -d` and `-Dsam.oidc.provider=keycloak`.
+**Prerequisites:** Java 25, Node.js (22.22.3+, 24.15+ or 26+ — Angular 22's requirement; CI and the Docker build use 26), Docker, PostgreSQL 17 (with `pg_trgm` and `fuzzystrmatch` extensions), default connection: `localhost:5432/sam_music`, user `sam` (`docker compose up -d` starts one). Keycloak instead of Pocket ID in dev: `docker compose -f docker-compose.keycloak.yml up -d` and `-Dsam.oidc.provider=keycloak`.
 
 ## Features
 
-### Sheet Music Management
-- Full CRUD for sheet music entries (title, subtitle, composer, arranger, publisher, genre, difficulty level, copyright, ISWC, GEMA work number, etc.)
-- Paginated search with full-text search (PostgreSQL `tsvector`), trigram fuzzy matching (`pg_trgm`), and phonetic search (`dmetaphone`)
-- Content-based fingerprinting for deduplication of sheet music
+An overview — each area links to its page in the [feature reference](docs/features/README.md).
 
-### Instrumentations
-- Per-sheet instrumentation management (sub-resource of sheets)
-- Each instrumentation links to a canonical instrument with part label, clef, notation type
-- Bulk import of instrumentations
-- Document attachments per instrumentation
+- **[Sheet music](docs/features/sheets.md)** — title, composer, arranger, publisher, genre, difficulty, ISWC, GEMA work number and more; [search](docs/features/search-discovery.md) with full-text, trigram (fuzzy) and phonetic matching; content fingerprints against duplicates
+- **[Instrumentations](docs/features/instrumentations.md)** — the parts of a sheet, each linked to the [instrument catalogue](docs/features/instruments.md) (transposition, clef, notation type), with physical location and condition
+- **[Documents](docs/features/documents.md)** — upload with a staging area, content-addressed storage (SHA-256 deduplication) on the local filesystem or S3, attachments typed as full score, part, cover, lyrics, MIDI, audio, …
+- **[Musicians](docs/features/musicians.md)** — composers, arrangers, and ensemble members
+- **[Collections & setlists](docs/features/collections.md)** — folders and dated concert programmes, with a table-of-contents PDF and a GEMA setlist export; *booklets are planned*
+- **[Ensembles & coverage](docs/features/ensembles-coverage.md)** — weighted voice definitions and a score of how well the line-up can play a sheet (Complete / Playable / Incomplete)
+- **AI assistance** — [classification](docs/features/ai-classification.md) of uploads (text extraction first, vision fallback for scans), [metadata enrichment](docs/features/ai-enrichment.md), and a [setlist assistant](docs/features/ai-setlist-assistant.md), via LangChain4j (OpenAI or a local Ollama)
+- **Access** — OIDC login ([Pocket ID by default, Keycloak optional](docs/architecture/concepts/security.md)), roles for admins and music librarians, [share links](docs/features/shares.md) for guests, and [My Parts](docs/features/my-parts.md) for musicians
+- **Audit** — full change history via Hibernate Envers, plus an admin-only [event log](docs/features/event-log.md) of downloads, exports, and AI classification runs
+- **CLI** — import and export of sheets, instruments, musicians, and ensembles over the REST API (see [cli/README.md](cli/README.md))
 
-### Instruments
-- Canonical instrument registry with transposition metadata (C, Bb, Eb, F, etc.)
-- Paginated, filterable CRUD
+The endpoints are summarised in the [API surface](docs/features/api-surface.md).
 
-### Musicians
-- Composer/arranger registry with birth/death years and IPI numbers
-- Paginated, filterable CRUD
+## Roadmap
 
-### Collections & Booklets
-- **Sheet Collections** — group sheets into folders or setlists, with optional date (e.g. for gig programs)
-- **Booklets** *(planned — API interfaces exist, no server implementation yet)* — named groupings of sheets (e.g. "27 Weihnachtslieder", "Gotteslob")
-- Collections support adding/removing/reordering sheets and text items with per-collection identifiers
-
-### Ensembles & Coverage Evaluation
-- **Ensemble definitions** — define named ensembles with weighted, prioritized voice requirements
-- **Ensemble voices** — each voice has a label, weight, required flag, and multiple instrument options (primary/alternate/fallback with scoring factors)
-- **Coverage evaluation** — score-based matching of a sheet's instrumentations against an ensemble definition, producing per-voice breakdown with explanations and an overall coverage status (Complete / Playable / Incomplete)
-
-### Document Management
-- File upload/download with content-addressed storage (SHA-256 deduplication, reference counting)
-- Pluggable storage backends: local filesystem, AWS S3
-- Attachment system linking documents to sheets and instrumentations (typed: full score, part, cover, lyrics, MIDI, audio, etc.)
-
-### AI-Powered Classification
-- LangChain4j integration for automated sheet music analysis
-- PDF-to-image conversion with intelligent cropping (header/footer extraction)
-- Vision-based extraction of metadata (title, composer, instrument, etc.) from scanned sheet music images
-
-### Audit Trail
-- Full entity history via Hibernate Envers (every table has an `_AUD` mirror)
-- Validity audit strategy with revision start/end tracking
-- Event log for read-side events (downloads, exports, AI classification) not captured by Envers: records `userId`, `username`, `eventType`, `entityType`, `entityId`, and a JSONB `metadata` payload; queryable via `GET /api/event-logs` with filtering by event type (multi-select), user, and entity type; pre-wired for share-link access via `shareTokenId`
-
-### CLI
-- PicoCLI-based command-line tool for batch importing sheet music data
-- Consumes the same REST API interfaces as the server (shared `api` module)
+Planned work lives in the [roadmap](docs/roadmap.md): the **Now / Next / Later**
+priorities at the top, followed by the backlog of ideas and the open questions.
+Items on the Now and Next lists are tracked as GitHub issues in the
+[Go-live](https://github.com/fhm84/sam/milestone/1) and
+[Everyday use](https://github.com/fhm84/sam/milestone/2) milestones; their task
+breakdowns are in the [implementation plans](docs/plans/README.md).
 
 ## Architecture
 
@@ -115,23 +88,12 @@ sam (parent)
 
 ## Configuration
 
-### Environment Variables (Production)
+### Production Deployment
 
-These are read at startup via MicroProfile Config placeholders in `application.properties`.
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `DB_URL` | `jdbc:postgresql://localhost:5432/sam_music` | JDBC connection URL |
-| `DB_USER` | `sam` | Database username |
-| `DB_PASS` | `s4mP@ssword` | Database password |
-| `OIDC_SERVER_URL` | — | Keycloak realm base URL, e.g. `https://auth.example.com/realms/sam` |
-| `OIDC_CLIENT_ID` | `sam-ui` | OIDC client ID registered in Keycloak |
-| `KEYCLOAK_ADMIN_URL` | — | Keycloak server URL for the admin REST API |
-| `KEYCLOAK_REALM` | `sam` | Keycloak realm used for admin user lookup |
-| `KEYCLOAK_BACKEND_CLIENT_ID` | `sam-backend` | Service account client ID (needs `view-users` role) |
-| `KEYCLOAK_BACKEND_CLIENT_SECRET` | — | Service account client secret |
-| `SAM_CLI_CLIENT_ID` | `sam-cli` | `cli` module's service account client ID (needs `music_librarian` role), read together with `OIDC_SERVER_URL` above |
-| `SAM_CLI_CLIENT_SECRET` | `sam-cli-secret` (dev-only) | `cli` module's service account client secret — must be overridden for real deployments |
+The production stack (`docker-compose.prod.yml`) and **all its environment
+variables** are described in [Deployment](docs/architecture/deployment.md);
+server, DNS, backups, and the go-live checklist are in
+[Production Setup](docs/architecture/production-setup.md).
 
 ### Application Config (`application.properties`)
 
@@ -139,11 +101,12 @@ SAM-specific config keys are defined as constants in `server/.../EnvConsts.java`
 
 | Key | Default | Description |
 |-----|---------|-------------|
-| `sam.filesystem.base.path` | — | **Required.** Storage root for uploaded files. See [Storage Backends](#storage-backends). |
+| `sam.filesystem.base.path` | `/data/sam` (prod, env `SAM_FILESYSTEM_BASE_PATH`) | Storage root for uploaded files. See [Storage Backends](#storage-backends). |
 | `sam.files.types` | *(allow all)* | Optional file-type filter applied on upload. Whitelist: `pdf\|xml`; blacklist (prefix `^`): `^exe\|bat`. |
+| `sam.oidc.provider` | `pocket-id` | Login provider, `pocket-id` or `keycloak` (env `SAM_OIDC_PROVIDER`). |
 | `sam.coverage.base-score` | `0.7` | Minimum score (0–1) awarded to an ensemble voice with any positive instrumentation match. |
 | `sam.classification.agentic` | `false` | Enable agentic LLM entity resolution pass after AI classification. |
-| `sam.admin.keycloak.realm` | — | Keycloak realm queried by the admin user-search endpoint (set per profile). |
+| `sam.admin.keycloak.realm` | `sam` (env `KEYCLOAK_REALM`) | Keycloak only: realm queried by the admin user-search endpoint. |
 
 ### Storage Backends
 
@@ -160,15 +123,17 @@ Set `quarkus.langchain4j.chat-model.provider` and enable exactly one provider:
 
 | Provider value | Required additional config |
 |----------------|---------------------------|
-| `openai` (default) | `quarkus.langchain4j.openai.api-key=<key>`; model defaults to `gpt-4o` |
+| `openai` (default) | `quarkus.langchain4j.openai.api-key=<key>` (prod: env `OPENAI_API_KEY`); model defaults to `gpt-4o` |
 | `ollama` | `quarkus.langchain4j.ollama.base-url=http://localhost:11434`; `quarkus.langchain4j.ollama.chat-model.model-id=llava` |
-| `vertexai` (Gemini) | `quarkus.langchain4j.vertexai.gemini.project-id=<id>` and `.location=<region>`; model: `gemini-2.0-flash` |
+| `vertexai` (Gemini) | Not built by default: uncomment the `quarkus-langchain4j-vertex-ai-gemini` dependency in `server/pom.xml`, then set `quarkus.langchain4j.vertexai.gemini.project-id=<id>` and `.location=<region>` |
 
 ## Copyright and Licensing
 
 SAM is software for cataloguing and managing sheet music. It does not
 provide any rights to the musical works, sheet music editions, lyrics,
-recordings, or other files managed with the application.
+recordings, or other files managed with the application. The authors and
+contributors of SAM have no control over the content stored in or shared
+from any SAM instance and accept no responsibility for it.
 
 The operator of a SAM instance is responsible for:
 
@@ -177,7 +142,13 @@ The operator of a SAM instance is responsible for:
 - restricting access and downloads where required;
 - ensuring that shared collections and public links comply with the
   applicable licence terms;
-- deleting material when the applicable permission or licence expires.
+- deleting material when the applicable permission or licence expires;
+- deciding whether documents may be sent to an external AI provider: AI
+  classification sends the extracted text or cropped header and footer of
+  page 1 to the configured LLM (a local Ollama keeps them on your own
+  infrastructure);
+- reporting public performances to the collecting society (e.g. GEMA) —
+  SAM's GEMA setlist export only prepares the list.
 
 Do not upload, distribute, or share copyrighted sheet music unless the
 required permission or licence has been obtained.
@@ -190,6 +161,8 @@ For Germany, see for example:
 - [MIZ: Noten vervielfältigen, bearbeiten, veröffentlichen und verbreiten](https://miz.org/de/tutorials/noten-vervielfaeltigen-bearbeiten-veroeffentlichen-und-verbreiten)
 - [VG Musikedition: Vervielfältigungen](https://vg-musikedition.de/nutzer/vervielfaeltigungen)
 - [frag-amu.de: Digitale Noten](https://frag-amu.de/digitale-noten/)
+
+This section is general information, not legal advice.
 
 ## Contributing
 
@@ -208,16 +181,3 @@ git config core.hooksPath .githooks
 ```
 
 Pull requests are also checked by the `commit-lint` CI job (`.github/workflows/ci.yml`); both call the shared `scripts/check-commit-msg.sh`.
-
-## Roadmap
-
-### Planned Features
-- Multitenancy
-- Dashboard/statistics (sheets by composer/arranger/genre)
-- Auto-convert to MusicXML format (for transposition)
-- Advanced file-upload workflows (linking/metadata in upload dialog)
-
-### Technical Debt
-- Extended revision information (Envers metadata beyond current snapshots)
-- Optimize document storage directory structure
-
