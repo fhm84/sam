@@ -50,6 +50,7 @@ public class CollectionItemsResourceImpl implements CollectionItemsResource {
     @Override
     public PaginatedResponse<CollectionItem> listAll(
             final PaginationRequest paginationRequest, final boolean myPartsOnly) {
+        service.requireVisible(collectionId);
         return service.listItems(collectionId, paginationRequest, myPartsOnly, currentUserService.getUserId());
     }
 

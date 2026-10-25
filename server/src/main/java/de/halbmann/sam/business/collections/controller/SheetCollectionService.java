@@ -2,6 +2,7 @@ package de.halbmann.sam.business.collections.controller;
 
 import de.halbmann.sam.api.entity.collections.CollectionItem;
 import de.halbmann.sam.api.entity.collections.CollectionItemType;
+import de.halbmann.sam.api.entity.collections.CollectionVisibility;
 import de.halbmann.sam.api.entity.collections.CreateCollectionItem;
 import de.halbmann.sam.api.entity.collections.SheetCollection;
 import de.halbmann.sam.api.entity.collections.SheetCollectionFilterRequest;
@@ -30,6 +31,8 @@ import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
 import de.halbmann.sam.core.entity.PaginatedEntities;
 import de.halbmann.sam.core.exception.EntityNotFoundException;
 import de.halbmann.sam.core.exception.ValidationException;
+import de.halbmann.sam.security.CurrentUserService;
+import de.halbmann.sam.security.Roles;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Event;
 import jakarta.inject.Inject;
@@ -83,9 +86,38 @@ public class SheetCollectionService {
     @Inject
     Event<ResourcesDeleted> resourcesDeleted;
 
+    @Inject
+    CurrentUserService currentUserService;
+
+    /**
+     * Whether the caller sees {@code ADMINS_ONLY} and {@code PRIVATE} collections: only the music
+     * librarian and the admin. Collections store no creator yet, so {@code PRIVATE} can't mean
+     * "the creator only".
+     */
+    private boolean callerSeesRestricted() {
+        return currentUserService.hasRole(Roles.MUSIC_LIBRARIAN) || currentUserService.hasRole(Roles.ADMIN);
+    }
+
+    private static boolean openToAll(final SheetCollectionEntity entity) {
+        return entity.getVisibility() == null || entity.getVisibility() == CollectionVisibility.WHOLE_ENSEMBLE;
+    }
+
+    /**
+     * Fails with 404, as if the collection didn't exist, when the caller may not see it. For the
+     * logged-in read endpoints; share links reach the same services without it.
+     */
+    public void requireVisible(final String id) {
+        SheetCollectionEntity entity = repository
+                .findByIdOptional(UUID.fromString(id))
+                .orElseThrow(() -> new EntityNotFoundException("SheetCollection", id));
+        if (!openToAll(entity) && !callerSeesRestricted()) {
+            throw new EntityNotFoundException("SheetCollection", id);
+        }
+    }
+
     public PaginatedResponse<SheetCollection> findCollections(final SheetCollectionFilterRequest filter) {
         PaginatedEntities<SheetCollectionEntity> result =
-                repository.findCollections(filter, filter.getName(), filter.getType());
+                repository.findCollections(filter, filter.getName(), filter.getType(), callerSeesRestricted());
         PaginatedResponse<SheetCollection> response = new PaginatedResponse<>();
         response.setData(result.data().stream().map(mapper::toDto).toList());
         response.setPage(filter.getPage());
@@ -222,7 +254,8 @@ public class SheetCollectionService {
     public PaginatedResponse<SheetCollection> findCollectionsForSheet(
             final String sheetId, final PaginationRequest pagination) {
         UUID sheetUuid = UUID.fromString(sheetId);
-        PaginatedEntities<SheetCollectionEntity> result = repository.findBySheetId(sheetUuid, pagination);
+        PaginatedEntities<SheetCollectionEntity> result =
+                repository.findBySheetId(sheetUuid, pagination, callerSeesRestricted());
         PaginatedResponse<SheetCollection> response = new PaginatedResponse<>();
         response.setData(result.data().stream()
                 .map(entity -> {
@@ -307,7 +340,7 @@ public class SheetCollectionService {
         final PaginationRequest all = new PaginationRequest();
         all.setSize(-1);
         for (final SheetCollectionEntity collection :
-                repository.findBySheetId(sheetId, all).data()) {
+                repository.findBySheetId(sheetId, all, true).data()) {
             final List<CollectionItemEntity> toRemove = collection.getItems().stream()
                     .filter(item -> item instanceof SheetCollectionItemEntity sheetItem
                             && sheetItem.getSheet() != null

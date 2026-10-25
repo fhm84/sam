@@ -157,7 +157,7 @@ ensemble member.
   to a login (`linkUser` / `unlinkUser`, admin-only) — the only two genuinely
   admin-exclusive actions in the system today
 - Content visibility / sharing settings — share links are implemented (see S5); a per-collection
-  visibility field exists but is not enforced yet *(planned)*, see 6.3
+  visibility field hides `ADMINS_ONLY` / `PRIVATE` collections from musicians, see 6.3
 - *(stub)* `/admin/configuration` route exists but currently renders only a page title —
   no settings are implemented yet
 
@@ -723,6 +723,7 @@ yet decided on):
 | Capability | `admin` | `music_librarian` | authenticated, no special role | unauthenticated + valid share token |
 |---|---|---|---|---|
 | Browse/search/read archive (sheets, collections, instrumentations, coverage) | ✅ | ✅ | ✅ | ➖ (only the one shared resource) |
+| See `ADMINS_ONLY` / `PRIVATE` collections | ✅ | ✅ | ❌ (404) | ➖ (only through a share link to it) |
 | Create/edit/delete sheets, instrumentations, documents; run AI classify/apply/enrich | ✅ | ✅ | ❌ | ❌ |
 | Create/edit/delete collections & setlist items; use the AI setlist assistant (suggest items, draft text) | ✅ | ✅ | ❌ | ❌ |
 | Create/edit/delete musicians & instruments | ✅ | ✅ | ❌ | ❌ |
@@ -769,13 +770,14 @@ since it changes nothing observable today.
 Three options were considered for how "selected content" is defined for guests and
 musicians. Status, updated against what shipped:
 
-**Option A — Per-collection visibility flag** — *(field shipped, enforcement still
-planned)*. `SheetCollection.visibility` (`WHOLE_ENSEMBLE` / `ADMINS_ONLY` / `PRIVATE`) is
-stored and editable in the collection form (see the
-[roadmap](roadmap.md#5-access-control--sharing), "Collection visibility & cover"), but no read
-endpoint checks it yet; enforcing it is part of the
-[role-aware access plan](plans/rbac-role-aware-access.md). No equivalent field exists on
-`SheetMusicEntity`.
+**Option A — Per-collection visibility flag** — *(implemented, by role)*.
+`SheetCollection.visibility` (`WHOLE_ENSEMBLE` / `ADMINS_ONLY` / `PRIVATE`) is editable in
+the collection form (see the [roadmap](roadmap.md#5-access-control--sharing), "Collection
+visibility & cover") and enforced on reads (#243): `ADMINS_ONLY` and `PRIVATE` collections
+are seen only by the music librarian and the admin, and answer 404 to everyone else.
+`WHOLE_ENSEMBLE` is open to every login, not only that ensemble's members (that would be
+Option C), and `PRIVATE` can't mean "the creator only" because collections store no creator.
+No equivalent field exists on `SheetMusicEntity`.
 
 **Option B — Collection-based / resource-scoped sharing** — *(implemented, in a
 different shape than proposed)*. Rather than a persistent "shared" flag on a collection,
