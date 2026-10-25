@@ -24,6 +24,16 @@ services:
       # Dev-only values, never reuse in production
       ENCRYPTION_KEY: sam-dev-encryption-key-change-me
       STATIC_API_KEY: sam-dev-static-api-key
+      # Application settings come from here, as in production (docker-compose.prod.yml); mail
+      # goes to Mailpit below
+      UI_CONFIG_DISABLED: "true"
+      APP_NAME: SAM
+      SMTP_HOST: mailpit
+      SMTP_PORT: "1025"
+      SMTP_TLS: none
+      SMTP_FROM: sam@sam.local
+      EMAIL_ONE_TIME_ACCESS_AS_ADMIN_ENABLED: "true"
+      EMAIL_ONE_TIME_ACCESS_AS_UNAUTHENTICATED_ENABLED: "false"
     volumes:
       - pocket-id-data:/app/data
     # Localhost only: the static API key above has full admin rights
@@ -36,6 +46,14 @@ services:
       interval: 5s
       timeout: 5s
       retries: 20
+
+  # Catches every mail Pocket ID sends (login codes, new-device notices); nothing leaves the
+  # machine. Inbox: http://localhost:8025
+  mailpit:
+    image: axllent/mailpit:v1.31.6
+    ports:
+      - "127.0.0.1:8025:8025"
+    restart: unless-stopped
 
   # Seeds groups, dev users, sam-ui and sam-cli on every `up`; skips an already seeded instance.
   # Login link for a user without a passkey:

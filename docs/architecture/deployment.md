@@ -48,6 +48,9 @@ Copy `.env.example` → `.env` and fill in before running `docker compose -f doc
 | `OIDC_CLIENT_ID` | sam-server | `sam-ui` | OIDC client ID |
 | `POCKET_ID_ENCRYPTION_KEY` | pocket-id | — | Pocket ID only, required: encrypts its stored keys; never change it |
 | `SAM_OIDC_POCKET_ID_API_KEY` | sam-server | — | Pocket ID only, optional: API key for user search when linking musicians. Full admin rights on Pocket ID — see [security](concepts/security.md) for rotation; without it, musicians are linked by user ID |
+| `POCKET_ID_APP_NAME` | pocket-id | `SAM` | Pocket ID only: name on the login pages and in its mails |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_TLS`, `SMTP_FROM`, `SMTP_USER`, `SMTP_PASSWORD` | pocket-id | —, `587`, `starttls` | Pocket ID only, optional: mail server for login codes; see [Production Setup](production-setup.md#mail-and-lost-devices) |
+| `POCKET_ID_EMAIL_LOGIN_CODES` | pocket-id | `false` | Pocket ID only: admins may email login codes; turn on once the test mail arrives |
 | `SAM_OIDC_POCKET_ID_URL` | sam-server | `OIDC_SERVER_URL` | Pocket ID only: base URL for its API; the prod compose sets the internal `http://pocket-id:8080` |
 | `KEYCLOAK_ADMIN_URL` | sam-server | `http://keycloak:8080` | Keycloak only: base URL for the admin REST client |
 | `KEYCLOAK_BACKEND_CLIENT_SECRET` | sam-server, keycloak | — | Keycloak only: service account secret for user search |

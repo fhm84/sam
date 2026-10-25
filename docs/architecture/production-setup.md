@@ -55,6 +55,8 @@ stay untouched. If the zone has CAA records, they must allow `letsencrypt.org`.
 5. Optional: an API key (*API Keys*) for the musician–user search, set as `SAM_OIDC_POCKET_ID_API_KEY` (see [security](concepts/security.md) for what it can do and how to rotate it).
 6. Create the users, put them into the groups, and send each a login code (*Users*, then the user's menu) to register their passkey.
 
+Pocket ID takes its application settings from the compose file and `.env` (`UI_CONFIG_DISABLED`), so its admin UI shows them read-only; change them in `.env` and run `up -d`. Logos and images stay editable in the UI. Settings changed in the admin UI before this was introduced are no longer used: carry them over to `.env` first.
+
 **Keycloak** imports `keycloak/prod/sam-realm.json` on first boot only: roles, the `sam-ui` / `sam-backend` / `sam-cli` clients (secrets and redirect URI filled from `.env`), and the two service accounts. It deliberately has **no dev users, no dev passwords, no localhost redirect URIs** (unlike `keycloak/sam-realm.json`, which is dev-only).
 
 **Memory limits** (`mem_limit` in the compose file, sized for an 8 GB host; idle usage measured locally):
@@ -72,9 +74,24 @@ With Pocket ID the limits add up to about 2.8 GB (with Keycloak: about 4.2 GB), 
 
 **Known gaps:**
 
-- No SMTP is configured yet ([#218](https://github.com/fhm84/sam/issues/218)): Pocket ID admins hand out login codes as links; Keycloak's "forgot password" mails don't work, so admins set passwords in the console.
+- Keycloak has no SMTP configured: its "forgot password" mails don't work, so admins set passwords in the console. (Pocket ID: see [Mail and lost devices](#mail-and-lost-devices).)
 - Keycloak's admin console: reach it through an SSH tunnel, for example a temporary `ports: ["127.0.0.1:8180:8080"]` on the `keycloak` service plus `ssh -L 8180:localhost:8180 <server>`, then `http://localhost:8180/admin`.
 - Verified locally: the Caddyfile validates; with internal certificates (`*.localhost`), Caddy's login host reaches Pocket ID and Keycloak (healthy; issuer `https://<LOGIN_DOMAIN>` and `…/realms/sam`) and answers `/admin` with 404; `sam-server` in production mode accepts Pocket ID user tokens (roles from userinfo) and the `cli` token, and searches users with the API key; backup and restore run with Pocket ID. Not verified: Caddy's certificate issuance and the full stack against real DNS.
+
+### Mail and lost devices
+
+**Mail setup** (optional, but saves handing out links). Use a dedicated mailbox, for example `sam@<your domain>` at your mail provider, and check that the domain's SPF and DKIM records cover the provider's mail servers, or login codes land in spam.
+
+1. Fill in the `SMTP_*` settings in `.env` (port 587 with `starttls`, or 465 with `tls`) and run `docker compose -f docker-compose.prod.yml up -d`.
+2. In Pocket ID: *Settings → Application Configuration → Email → Send test email*. It goes to your own address and reports SMTP errors directly.
+3. Once it arrives, set `POCKET_ID_EMAIL_LOGIN_CODES=true` and run `up -d` again. Not before: Pocket ID reports a login code as sent even when the mail fails (only its log shows the error).
+
+**New member, lost or new phone.** Members sign in with a passkey; without one, an admin issues a login code (*Settings → Administration → Users*, the user's menu, *Login code*):
+
+- **By mail** (with `POCKET_ID_EMAIL_LOGIN_CODES=true`): the member gets a code and a sign-in link, valid for 15 minutes. Send it when they can act on it.
+- **As a link**: choose a validity, copy the link and send it by any channel (messenger, in person).
+
+The member opens it, is signed in, and adds a passkey under *My account*. After a lost or stolen phone, they also delete that phone's passkey there. Members can't request a code themselves ([#222](https://github.com/fhm84/sam/issues/222)): whoever controls a mailbox would otherwise control the account.
 
 ## 4. Go-live check
 
