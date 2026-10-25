@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { EventTypes, OidcSecurityService, PublicEventsService } from 'angular-auth-oidc-client';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { OidcClaimsConfig } from './auth.config';
 import { AuthService } from './auth.service';
 
@@ -103,6 +103,37 @@ describe('AuthService after a token refresh', () => {
 
     expect(auth.canWrite()).toBe(false);
     expect(auth.hasRole('music_librarian')).toBe(false);
+  });
+
+  it('treats an undecodable token as no roles and recovers with the next one', () => {
+    let idToken: Record<string, unknown> | 'broken' = { groups: ['admin'] };
+    TestBed.configureTestingModule({
+      providers: [
+        {
+          provide: OidcSecurityService,
+          useValue: {
+            isAuthenticated$: of({ isAuthenticated: true }),
+            userData$: of({ userData: null }),
+            getPayloadFromAccessToken: () => of({}),
+            getPayloadFromIdToken: () =>
+              idToken === 'broken' ? throwError(() => new SyntaxError('Unexpected token')) : of(idToken),
+          },
+        },
+      ],
+    });
+    TestBed.inject(OidcClaimsConfig).roleClaimPath = 'groups';
+    const auth = TestBed.inject(AuthService);
+    const events = TestBed.inject(PublicEventsService);
+    const refresh = () =>
+      events.fireEvent(EventTypes.NewAuthenticationResult, { isAuthenticated: true, isRenewProcess: true });
+
+    idToken = 'broken';
+    refresh();
+    expect(auth.isAdmin()).toBe(false);
+
+    idToken = { groups: ['admin'] };
+    refresh();
+    expect(auth.isAdmin()).toBe(true);
   });
 
   it('ignores other library events', () => {

@@ -1,7 +1,7 @@
 import { Injectable, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { EventTypes, OidcSecurityService, PublicEventsService } from 'angular-auth-oidc-client';
-import { filter, map, startWith, switchMap } from 'rxjs';
+import { Observable, catchError, filter, map, of, startWith, switchMap } from 'rxjs';
 import { OidcClaimsConfig } from './auth.config';
 import { Roles, WRITE_ROLES } from './roles';
 
@@ -33,13 +33,24 @@ export class AuthService {
   // Decoded token payloads holding the roles. Keycloak: realm_access.roles in the access token
   // (userinfo does not return it by default). Pocket ID: groups, only in the ID token.
   private readonly accessTokenPayload = toSignal<Record<string, unknown> | null>(
-    this.tokensChanged$.pipe(switchMap(() => this.oidc.getPayloadFromAccessToken())),
+    this.payloadOnEveryChange(() => this.oidc.getPayloadFromAccessToken()),
     { initialValue: null },
   );
   private readonly idTokenPayload = toSignal<Record<string, unknown> | null>(
-    this.tokensChanged$.pipe(switchMap(() => this.oidc.getPayloadFromIdToken())),
+    this.payloadOnEveryChange(() => this.oidc.getPayloadFromIdToken()),
     { initialValue: null },
   );
+
+  /**
+   * Reads a token payload now and after each token change. A token that can't be decoded counts
+   * as no payload (no roles) for that round, instead of ending the stream and with it every
+   * role check until a reload.
+   */
+  private payloadOnEveryChange(
+    read: () => Observable<Record<string, unknown> | null>,
+  ): Observable<Record<string, unknown> | null> {
+    return this.tokensChanged$.pipe(switchMap(() => read().pipe(catchError(() => of(null)))));
+  }
 
   private readonly roles = computed(() => {
     const value =
