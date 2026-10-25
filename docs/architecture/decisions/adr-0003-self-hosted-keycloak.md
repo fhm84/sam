@@ -1,6 +1,9 @@
 # ADR-0003: Self-hosted Keycloak 26 as OIDC provider
 
-**Status:** accepted
+**Status:** superseded by [ADR-0016](adr-0016-pocket-id-default-provider.md):
+Pocket ID is the default, Keycloak stays supported as the alternative. The
+`ensemble:{UUID}` groups below were never used and are gone; ensemble membership
+lives in the database.
 
 ## Context
 

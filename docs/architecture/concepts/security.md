@@ -1,6 +1,6 @@
 # Authentication & Authorization
 
-Quarkus OIDC with a self-hosted provider, selected by `sam.oidc.provider` (env `SAM_OIDC_PROVIDER`): **Pocket ID** (default; dev instance and seed in `docker-compose.yml`, see the [Pocket ID plan](../../plans/pocket-id-provider.md)) or **Keycloak 26** (`docker-compose.keycloak.yml`; realm export at `keycloak/sam-realm.json`). See [ADR-0003](../decisions/adr-0003-self-hosted-keycloak.md).
+Quarkus OIDC with a self-hosted provider, selected by `sam.oidc.provider` (env `SAM_OIDC_PROVIDER`): **Pocket ID** (default; dev instance and seed in `docker-compose.yml`, see the [Pocket ID plan](../../plans/pocket-id-provider.md)) or **Keycloak 26** (`docker-compose.keycloak.yml`; realm export at `keycloak/sam-realm.json`). See [ADR-0016](../decisions/adr-0016-pocket-id-default-provider.md) (which superseded [ADR-0003](../decisions/adr-0003-self-hosted-keycloak.md)).
 
 | Concern | Mechanism |
 |---|---|

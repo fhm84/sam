@@ -53,7 +53,7 @@ the commands are scriptable.
   invalid files are reported per violation and counted as failures.
 - **`-d`/`--dry-run`** parses and validates only — it makes **no network
   calls** whatsoever (no existence checks either), so it works without a
-  server or Keycloak.
+  server or OIDC provider.
 - **Ordering matters for a fresh instance:** sheets and ensemble voice options
   reference instruments by ID and the server rejects unknown IDs — always
   `importInstrument` first, then the rest in any order.
@@ -99,10 +99,10 @@ interface's class name; it would be ignored):
   `sam-cli-secret` (Keycloak).
 
 ```bash
-OIDC_SERVER_URL=https://auth.example.com/realms/sam \
+OIDC_SERVER_URL=https://login.example.org \
 SAM_CLI_CLIENT_SECRET=***** \
 java -jar cli/target/quarkus-app/quarkus-run.jar \
-  -Dquarkus.rest-client.\"sam-api\".url=https://sam.example.com/api list
+  -Dquarkus.rest-client.\"sam-api\".url=https://sam.example.org/api list
 ```
 
 ## Known limitations

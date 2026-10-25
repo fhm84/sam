@@ -3,7 +3,7 @@
 Roadmap: [Pocket ID as default OIDC provider](../roadmap.md#pocket-id-as-default-oidc-provider--in-progress)
 · Tracking issue: [#210](https://github.com/fhm84/sam/issues/210)
 · Concept: [Security](../architecture/concepts/security.md)
-· Revisits: [ADR-0003 self-hosted Keycloak](../architecture/decisions/adr-0003-self-hosted-keycloak.md)
+· Decision: [ADR-0016](../architecture/decisions/adr-0016-pocket-id-default-provider.md) (supersedes ADR-0003)
 
 **Why now:** Keycloak is the heaviest part of a small deployment: about 425–600 MB RAM
 idle plus its own Postgres, and a realm export that has to be kept in sync by hand.
