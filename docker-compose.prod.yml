@@ -53,6 +53,21 @@ services:
       TRUST_PROXY: "true" # TLS terminates at Caddy
       ENCRYPTION_KEY: ${POCKET_ID_ENCRYPTION_KEY:-}
       ANALYTICS_DISABLED: "true"
+      # Application settings come from here, not from Pocket ID's admin UI (which shows them
+      # read-only; logos stay editable). Settings not listed keep Pocket ID's defaults.
+      UI_CONFIG_DISABLED: "true"
+      APP_NAME: ${POCKET_ID_APP_NAME:-SAM}
+      # Mail for login codes: any SMTP server, e.g. a mailbox on the band's domain
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_TLS: ${SMTP_TLS:-starttls}
+      SMTP_FROM: ${SMTP_FROM:-}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      # Admins email login codes. Off until the test mail arrives: Pocket ID reports a code as
+      # sent even when SMTP isn't set up. Members can't request a code themselves (#222).
+      EMAIL_ONE_TIME_ACCESS_AS_ADMIN_ENABLED: ${POCKET_ID_EMAIL_LOGIN_CODES:-false}
+      EMAIL_ONE_TIME_ACCESS_AS_UNAUTHENTICATED_ENABLED: "false"
     volumes:
       - pocket-id-data:/app/data
     networks:
