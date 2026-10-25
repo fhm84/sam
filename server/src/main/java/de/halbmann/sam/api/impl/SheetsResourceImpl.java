@@ -64,6 +64,9 @@ public class SheetsResourceImpl implements SheetsResource {
     @Override
     @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public SheetMusic add(final CreateSheetMusic sheetMusic) {
+        if (sheetMusic.getCollectionId() != null) {
+            sheetCollectionService.requireVisible(sheetMusic.getCollectionId().toString());
+        }
         return sheetService.addSheet(sheetMusic);
     }
 

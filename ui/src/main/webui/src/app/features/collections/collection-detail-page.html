@@ -94,6 +94,10 @@
     </div>
 
     <app-collection-sheets [collectionId]="collectionId()" [ensembleId]="col.ensembleId" />
+  } @else if (notFound()) {
+    <p class="m-0 p-8 text-center text-[var(--sam-text-muted)]" data-testid="collection-not-found">
+      {{ 'collections.detail.notFound' | translate }}
+    </p>
   }
 </div>
 

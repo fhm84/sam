@@ -7,7 +7,7 @@ import {
   DestroyRef,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { HttpResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { MessageService } from '@openng/optimus-ui/api';
 import { Button } from '@openng/optimus-ui/button';
 import { Dialog } from '@openng/optimus-ui/dialog';
@@ -42,6 +42,8 @@ export class CollectionDetailPage implements OnInit {
 
   protected readonly collectionId = signal('');
   protected readonly collection = signal<SheetCollection | null>(null);
+  /** Unknown, or hidden from this user by its visibility (the server answers 404 for both). */
+  protected readonly notFound = signal(false);
   protected editDialogVisible = false;
   protected shareDialogVisible = false;
 
@@ -153,7 +155,7 @@ export class CollectionDetailPage implements OnInit {
   private loadCollection(id: string): void {
     this.api.load(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (c) => this.collection.set(c),
-      error: () => {},
+      error: (err: HttpErrorResponse) => this.notFound.set(err.status === 404),
     });
   }
 }

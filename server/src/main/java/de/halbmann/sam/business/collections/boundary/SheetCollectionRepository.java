@@ -1,7 +1,6 @@
 package de.halbmann.sam.business.collections.boundary;
 
 import de.halbmann.sam.api.entity.collections.CollectionType;
-import de.halbmann.sam.api.entity.collections.CollectionVisibility;
 import de.halbmann.sam.api.entity.shared.PaginationRequest;
 import de.halbmann.sam.business.collections.entity.SheetCollectionEntity;
 import de.halbmann.sam.core.controller.LikePatterns;
@@ -19,21 +18,18 @@ import java.util.UUID;
 @ApplicationScoped
 public class SheetCollectionRepository implements PanacheRepositoryBase<SheetCollectionEntity, UUID> {
 
-    /** JPQL condition on alias {@code sc}: visible to everyone (no visibility set counts as the whole ensemble). */
-    private static final String OPEN_TO_ALL = "(sc.visibility is null or sc.visibility = :openToAll)";
-
     public PaginatedEntities<SheetCollectionEntity> findCollections(
             final PaginationRequest paginationRequest,
             final String nameFilter,
             final CollectionType typeFilter,
-            final boolean includeRestricted) {
+            final CollectionReader reader) {
         Sort sort = Sort.ascending("name");
         List<String> conditions = new ArrayList<>();
         Map<String, Object> params = new HashMap<>();
 
-        if (!includeRestricted) {
-            conditions.add("(visibility is null or visibility = :openToAll)");
-            params.put("openToAll", CollectionVisibility.WHOLE_ENSEMBLE);
+        String visible = reader.condition("", params);
+        if (visible != null) {
+            conditions.add(visible);
         }
         if (nameFilter != null && !nameFilter.isEmpty()) {
             conditions.add("lower(name) like :name" + LikePatterns.ESCAPE_CLAUSE);
@@ -62,20 +58,22 @@ public class SheetCollectionRepository implements PanacheRepositoryBase<SheetCol
         return new PaginatedEntities<>(entities, totalItems);
     }
 
+    /** Collections containing the sheet, limited to what {@code reader} may see ({@code null}: all of them). */
     public PaginatedEntities<SheetCollectionEntity> findBySheetId(
-            UUID sheetId, PaginationRequest pagination, boolean includeRestricted) {
+            UUID sheetId, PaginationRequest pagination, CollectionReader reader) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("sheetId", sheetId);
+        String visible = reader == null ? null : reader.condition("sc.", params);
         String where =
                 " FROM SheetCollectionEntity sc JOIN sc.items cs WHERE TYPE(cs) = SheetCollectionItemEntity AND TREAT(cs AS SheetCollectionItemEntity).sheet.id = :sheetId"
-                        + (includeRestricted ? "" : " AND " + OPEN_TO_ALL);
+                        + (visible == null ? "" : " AND " + visible);
         var countQuery = getEntityManager().createQuery("SELECT COUNT(DISTINCT sc)" + where, Long.class);
         var pageQuery = getEntityManager()
                 .createQuery("SELECT DISTINCT sc" + where + " ORDER BY sc.name ASC", SheetCollectionEntity.class);
-        countQuery.setParameter("sheetId", sheetId);
-        pageQuery.setParameter("sheetId", sheetId);
-        if (!includeRestricted) {
-            countQuery.setParameter("openToAll", CollectionVisibility.WHOLE_ENSEMBLE);
-            pageQuery.setParameter("openToAll", CollectionVisibility.WHOLE_ENSEMBLE);
-        }
+        params.forEach((name, value) -> {
+            countQuery.setParameter(name, value);
+            pageQuery.setParameter(name, value);
+        });
         List<SheetCollectionEntity> page = pageQuery
                 .setFirstResult(pagination.getPage() * pagination.getSize())
                 .setMaxResults(pagination.getSize())

@@ -4,6 +4,8 @@ import de.halbmann.sam.api.boundary.SharesResource;
 import de.halbmann.sam.api.entity.shared.PaginatedResponse;
 import de.halbmann.sam.api.entity.shares.CreateShareRequest;
 import de.halbmann.sam.api.entity.shares.ShareResponse;
+import de.halbmann.sam.api.entity.shares.ShareType;
+import de.halbmann.sam.business.collections.controller.SheetCollectionService;
 import de.halbmann.sam.business.shares.controller.ShareService;
 import de.halbmann.sam.security.CurrentUserService;
 import de.halbmann.sam.security.Roles;
@@ -29,9 +31,16 @@ public class SharesResourceImpl implements SharesResource {
     @Inject
     CurrentUserService currentUserService;
 
+    @Inject
+    SheetCollectionService collectionService;
+
     @Override
     @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public ShareResponse create(CreateShareRequest request) {
+        if (request.getResourceType() == ShareType.COLLECTION && request.getResourceId() != null) {
+            // No share links to a collection the caller can't see (someone else's private draft)
+            collectionService.requireVisible(request.getResourceId().toString());
+        }
         return shareService.create(request, currentUserService.getUserId());
     }
 

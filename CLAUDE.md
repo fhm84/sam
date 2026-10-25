@@ -78,7 +78,7 @@ Seven Maven modules under parent `de.halbmann:sam`:
 - **Roles**: `admin`, `music_librarian` (Keycloak realm roles; Pocket ID groups `sam-admin` / `sam-music-librarian`). Ensemble membership lives in the database (`EnsembleMembershipEntity`), not in the token.
 - **Auth enforcement**: `@Authenticated` at class level on all `*ResourceImpl` classes (all endpoints require a token). Write methods additionally carry `@RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})`. Role constants are in `server/src/main/java/de/halbmann/sam/security/Roles.java`.
 - **Do NOT put `@RolesAllowed` on the `api` module interfaces** — they are also used as REST clients by the `cli` module.
-- **Test profile**: `%test.quarkus.oidc.enabled=false` — existing `@QuarkusTest` tests run without auth. Auth-specific tests use `@TestSecurity` from `quarkus-test-security`.
+- **Test profile**: `%test.quarkus.oidc.enabled=false` — existing `@QuarkusTest` tests run without auth. Auth-specific tests use `@TestSecurity` from `quarkus-test-security`; add `@OidcSecurity(claims = @Claim(key = "sub", value = "…"))` (`quarkus-test-security-oidc`) when the code needs `CurrentUserService.getUserId()`, which is `null` otherwise.
 - **`CurrentUserService`** (`@RequestScoped`, `server/.../security/`): provides `getUserId()`, `getUsername()`, `hasRole()` — inject this instead of `JsonWebToken` directly in business logic.
 - **`cli` authentication**: authenticates as the active provider's `sam-cli` client (service account with the `music_librarian` role; Pocket ID: an API permission on `urn:sam:api`) via OIDC client-credentials (`quarkus-rest-client-oidc-filter`), not a user login — see `migration/README.md`'s "Authentication" section for dev/prod config.
 

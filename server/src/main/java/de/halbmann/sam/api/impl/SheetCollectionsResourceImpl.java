@@ -75,12 +75,14 @@ public class SheetCollectionsResourceImpl implements SheetCollectionsResource {
     @Override
     @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public void update(final String collectionId, final SheetCollection sheetCollection) {
+        service.requireVisible(collectionId);
         service.update(collectionId, sheetCollection);
     }
 
     @Override
     @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public void delete(final String collectionId) {
+        service.requireVisible(collectionId);
         service.delete(collectionId);
     }
 
@@ -103,6 +105,7 @@ public class SheetCollectionsResourceImpl implements SheetCollectionsResource {
     @Override
     @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public Response generateGemaSetlist(final String collectionId) {
+        service.requireVisible(collectionId);
         ExportResult result = gemaSetlistService.generateGemaSetlist(collectionId);
         eventLogService.log(
                 EventType.GEMA_SETLIST_GENERATED,
@@ -143,6 +146,7 @@ public class SheetCollectionsResourceImpl implements SheetCollectionsResource {
     @Override
     @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public SetlistSuggestions suggestItems(final String collectionId, final SuggestSetlistItemsRequest request) {
+        service.requireVisible(collectionId);
         SheetCollection collection = service.load(collectionId);
         if (collection.getEnsembleId() == null) {
             throw new ValidationException(

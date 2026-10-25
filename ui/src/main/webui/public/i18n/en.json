@@ -464,7 +464,7 @@
       "typePlaceholder": "Select type",
       "date": "Date",
       "visibility": "Visibility",
-      "visibilityTooltip": "Controls who can see this collection.",
+      "visibilityTooltip": "Who can see this collection. Whole ensemble: everyone with a login. Librarians & admins: music librarians and admins. Private (draft): only whoever created it, and the admin.",
       "coverColor": "Cover Color",
       "coverColorClear": "Clear color",
       "ensemble": "Ensemble",
@@ -476,8 +476,8 @@
     },
     "visibility": {
       "WHOLE_ENSEMBLE": "Whole Ensemble",
-      "ADMINS_ONLY": "Admins Only",
-      "PRIVATE": "Private"
+      "ADMINS_ONLY": "Librarians & Admins",
+      "PRIVATE": "Private (Draft)"
     },
     "delete": {
       "confirm": "Are you sure you want to delete the collection \"{name}\"?",
@@ -500,6 +500,7 @@
     "cancel": "Cancel",
     "detail": {
       "backToList": "Back to Collections",
+      "notFound": "This collection doesn't exist, or it isn't visible to you.",
       "actions": {
         "label": "Actions",
         "generateToc": "Generate Table of Contents",

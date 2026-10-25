@@ -2,7 +2,6 @@ package de.halbmann.sam.business.collections.controller;
 
 import de.halbmann.sam.api.entity.collections.CollectionItem;
 import de.halbmann.sam.api.entity.collections.CollectionItemType;
-import de.halbmann.sam.api.entity.collections.CollectionVisibility;
 import de.halbmann.sam.api.entity.collections.CreateCollectionItem;
 import de.halbmann.sam.api.entity.collections.SheetCollection;
 import de.halbmann.sam.api.entity.collections.SheetCollectionFilterRequest;
@@ -12,6 +11,7 @@ import de.halbmann.sam.api.entity.documents.DocumentUpload;
 import de.halbmann.sam.api.entity.shared.PaginatedResponse;
 import de.halbmann.sam.api.entity.shared.PaginationRequest;
 import de.halbmann.sam.business.collections.boundary.CollectionItemRepository;
+import de.halbmann.sam.business.collections.boundary.CollectionReader;
 import de.halbmann.sam.business.collections.boundary.SheetCollectionRepository;
 import de.halbmann.sam.business.collections.entity.CollectionItemEntity;
 import de.halbmann.sam.business.collections.entity.SheetCollectionEntity;
@@ -89,35 +89,31 @@ public class SheetCollectionService {
     @Inject
     CurrentUserService currentUserService;
 
-    /**
-     * Whether the caller sees {@code ADMINS_ONLY} and {@code PRIVATE} collections: only the music
-     * librarian and the admin. Collections store no creator yet, so {@code PRIVATE} can't mean
-     * "the creator only".
-     */
-    private boolean callerSeesRestricted() {
-        return currentUserService.hasRole(Roles.MUSIC_LIBRARIAN) || currentUserService.hasRole(Roles.ADMIN);
-    }
-
-    private static boolean openToAll(final SheetCollectionEntity entity) {
-        return entity.getVisibility() == null || entity.getVisibility() == CollectionVisibility.WHOLE_ENSEMBLE;
+    /** The calling user, for {@link CollectionReader}'s visibility rule. */
+    private CollectionReader reader() {
+        return new CollectionReader(
+                currentUserService.hasRole(Roles.ADMIN),
+                currentUserService.hasRole(Roles.MUSIC_LIBRARIAN),
+                currentUserService.getUserId());
     }
 
     /**
-     * Fails with 404, as if the collection didn't exist, when the caller may not see it. For the
-     * logged-in read endpoints; share links reach the same services without it.
+     * Fails with 404, as if the collection didn't exist, when the caller may not see it (reads and
+     * writes alike, so a private draft can't be changed by ID either). For the logged-in
+     * endpoints; share links reach the same services without it.
      */
     public void requireVisible(final String id) {
         SheetCollectionEntity entity = repository
                 .findByIdOptional(UUID.fromString(id))
                 .orElseThrow(() -> new EntityNotFoundException("SheetCollection", id));
-        if (!openToAll(entity) && !callerSeesRestricted()) {
+        if (!reader().maySee(entity)) {
             throw new EntityNotFoundException("SheetCollection", id);
         }
     }
 
     public PaginatedResponse<SheetCollection> findCollections(final SheetCollectionFilterRequest filter) {
         PaginatedEntities<SheetCollectionEntity> result =
-                repository.findCollections(filter, filter.getName(), filter.getType(), callerSeesRestricted());
+                repository.findCollections(filter, filter.getName(), filter.getType(), reader());
         PaginatedResponse<SheetCollection> response = new PaginatedResponse<>();
         response.setData(result.data().stream().map(mapper::toDto).toList());
         response.setPage(filter.getPage());
@@ -128,6 +124,7 @@ public class SheetCollectionService {
 
     public SheetCollection add(final SheetCollection dto) {
         SheetCollectionEntity entity = mapper.fromDto(dto);
+        entity.setCreatedBy(currentUserService.getUserId());
         repository.persistAndFlush(entity);
         return mapper.toDto(entity);
     }
@@ -254,8 +251,7 @@ public class SheetCollectionService {
     public PaginatedResponse<SheetCollection> findCollectionsForSheet(
             final String sheetId, final PaginationRequest pagination) {
         UUID sheetUuid = UUID.fromString(sheetId);
-        PaginatedEntities<SheetCollectionEntity> result =
-                repository.findBySheetId(sheetUuid, pagination, callerSeesRestricted());
+        PaginatedEntities<SheetCollectionEntity> result = repository.findBySheetId(sheetUuid, pagination, reader());
         PaginatedResponse<SheetCollection> response = new PaginatedResponse<>();
         response.setData(result.data().stream()
                 .map(entity -> {
@@ -340,7 +336,7 @@ public class SheetCollectionService {
         final PaginationRequest all = new PaginationRequest();
         all.setSize(-1);
         for (final SheetCollectionEntity collection :
-                repository.findBySheetId(sheetId, all, true).data()) {
+                repository.findBySheetId(sheetId, all, null).data()) {
             final List<CollectionItemEntity> toRemove = collection.getItems().stream()
                     .filter(item -> item instanceof SheetCollectionItemEntity sheetItem
                             && sheetItem.getSheet() != null

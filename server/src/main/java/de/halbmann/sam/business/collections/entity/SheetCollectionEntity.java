@@ -45,6 +45,12 @@ public class SheetCollectionEntity extends AbstractEntity {
      */
     UUID ensembleId;
 
+    /**
+     * OIDC subject of the login that created the collection, so a {@code PRIVATE} collection can
+     * be its creator's draft. {@code null} for collections created before it was recorded.
+     */
+    String createdBy;
+
     @OneToMany
     @JoinTable(
             name = "sheet_collections_items",
