@@ -28,6 +28,7 @@ import {
 } from '../../model/datamodels';
 import { DIFFICULTY_LEVELS } from '../../shared/constants';
 import { RowActions } from '../../shared/components/row-actions/row-actions';
+import { Overflows } from '../../shared/directives/overflows';
 import { AuthService } from '../../core/auth/auth.service';
 
 @Component({
@@ -40,6 +41,7 @@ import { AuthService } from '../../core/auth/auth.service';
     Dialog,
     ConfirmDialog,
     RowActions,
+    Overflows,
     Button,
     InputText,
     Textarea,
@@ -78,11 +80,6 @@ export class CollectionSheets implements OnInit, OnChanges {
 
   protected isTextExpanded(itemId: string): boolean {
     return this.expandedTexts().has(itemId);
-  }
-
-  /** Long enough to be cut off at two lines: offer "Show more". */
-  protected isLongText(text: string | undefined): boolean {
-    return !!text && (text.length > 140 || text.includes('\n'));
   }
 
   protected toggleText(itemId: string): void {

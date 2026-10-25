@@ -87,13 +87,15 @@
             }
           } @else {
             <span
+              appOverflows
+              #clamp="overflows"
               class="text-[var(--sam-text-secondary)] italic text-sm leading-snug"
               [class.line-clamp-2]="!isTextExpanded(item.id)"
               [class.whitespace-pre-line]="isTextExpanded(item.id)"
               [attr.data-testid]="'text-content-' + item.id"
               >{{ item.textContent }}</span
             >
-            @if (isLongText(item.textContent)) {
+            @if (isTextExpanded(item.id) || clamp.overflowing()) {
               <a
                 class="block w-fit text-[0.75rem] text-[var(--p-primary-color)] cursor-pointer hover:underline"
                 [attr.data-testid]="'btn-toggle-text-' + item.id"
