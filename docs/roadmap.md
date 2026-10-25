@@ -661,7 +661,8 @@ scoped to the logged-in musician's ensemble memberships (`/my-parts`, `GET /api/
 musicians' personal data for the librarian only, and a role-aware UI: `roleGuard` on the
 routes, menu items filtered by role, write actions hidden from users without a write role.
 `RoleEnforcementTest` checks every role-restricted endpoint. Left in the
-[plan](plans/rbac-role-aware-access.md): collection visibility (#243).
+[plan](plans/rbac-role-aware-access.md): collection visibility (#243), roles after a token
+refresh (#249), and fields readers can only see in edit dialogs (#251).
 
 **Remaining (Phase 4+):**
 - **No frontend ensemble/context service** — "ensemble" only exists as a local filter
