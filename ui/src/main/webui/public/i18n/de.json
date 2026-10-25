@@ -464,7 +464,7 @@
       "typePlaceholder": "Typ auswählen",
       "date": "Datum",
       "visibility": "Sichtbarkeit",
-      "visibilityTooltip": "Legt fest, wer diese Sammlung sehen kann.",
+      "visibilityTooltip": "Wer diese Sammlung sieht. Ganzes Ensemble: alle mit Login. Notenwarte & Admins: Notenwarte und Admins. Privat (Entwurf): nur wer sie angelegt hat, und der Admin.",
       "coverColor": "Deckfarbe",
       "coverColorClear": "Farbe entfernen",
       "ensemble": "Ensemble",
@@ -476,8 +476,8 @@
     },
     "visibility": {
       "WHOLE_ENSEMBLE": "Ganzes Ensemble",
-      "ADMINS_ONLY": "Nur Admins",
-      "PRIVATE": "Privat"
+      "ADMINS_ONLY": "Notenwarte & Admins",
+      "PRIVATE": "Privat (Entwurf)"
     },
     "delete": {
       "confirm": "Möchten Sie die Sammlung \"{name}\" wirklich löschen?",
@@ -500,6 +500,7 @@
     "cancel": "Abbrechen",
     "detail": {
       "backToList": "Zurück zu Sammlungen",
+      "notFound": "Diese Sammlung gibt es nicht, oder sie ist für dich nicht sichtbar.",
       "actions": {
         "label": "Aktionen",
         "generateToc": "Inhaltsverzeichnis erstellen",

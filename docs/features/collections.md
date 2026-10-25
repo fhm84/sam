@@ -19,7 +19,7 @@ The two-value enum is a deliberate decision — see [ADR-0006](../architecture/d
 | Description | String | |
 | Type | `FOLDER` or `SETLIST` | |
 | Date | Date | For setlists (performance date) |
-| Visibility | `WHOLE_ENSEMBLE` / `ADMINS_ONLY` / `PRIVATE` | Who sees the collection: `WHOLE_ENSEMBLE` (or unset) for every login, `ADMINS_ONLY` and `PRIVATE` only for `music_librarian` / `admin`. Hidden collections are left out of lists (also a sheet's collections) and answer 404. `PRIVATE` can't mean "the creator only" yet, collections store no creator. A share link still opens the collection it names |
+| Visibility | `WHOLE_ENSEMBLE` / `ADMINS_ONLY` / `PRIVATE` | Who sees the collection: `WHOLE_ENSEMBLE` (or unset) every login, `ADMINS_ONLY` `music_librarian` and `admin`, `PRIVATE` its creator and `admin` (librarians too while no creator is recorded, i.e. collections from before `createdBy`). `PRIVATE` is a librarian's draft, e.g. a setlist that isn't ready yet. Hidden collections are left out of lists (also a sheet's collections) and answer 404, for reads and writes. A share link still opens the collection it names |
 | Cover color | Hex string | Cover background in the collections overview |
 | Cover image | FK → documents | Optional cover image |
 | Ensemble | FK → ensembles (nullable) | Which ensemble the setlist belongs to; scopes coverage evaluation and the [AI setlist assistant](ai-setlist-assistant.md) |

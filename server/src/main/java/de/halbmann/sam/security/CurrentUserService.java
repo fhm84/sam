@@ -24,10 +24,14 @@ public class CurrentUserService {
 
     /** Returns the OIDC subject claim (unique user ID), or {@code null} for anonymous requests. */
     public String getUserId() {
-        if (identity.isAnonymous() || jwt.isUnsatisfied()) {
+        if (identity.isAnonymous()) {
             return null;
         }
-        return jwt.get().getSubject();
+        // A bearer token's principal is the token itself; also where @OidcSecurity tests put it
+        if (identity.getPrincipal() instanceof JsonWebToken token) {
+            return token.getSubject();
+        }
+        return jwt.isUnsatisfied() ? null : jwt.get().getSubject();
     }
 
     /** Returns the {@code preferred_username} claim, or {@code null} for anonymous requests. */

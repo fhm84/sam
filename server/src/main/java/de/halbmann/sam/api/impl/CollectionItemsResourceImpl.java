@@ -57,24 +57,28 @@ public class CollectionItemsResourceImpl implements CollectionItemsResource {
     @Override
     @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public void addItem(final CreateCollectionItem createCollectionItem) {
+        service.requireVisible(collectionId);
         service.addItem(collectionId, createCollectionItem);
     }
 
     @Override
     @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public void updateItem(final String itemId, final CollectionItem collectionItem) {
+        service.requireVisible(collectionId);
         service.updateItem(collectionId, itemId, collectionItem);
     }
 
     @Override
     @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public void removeItem(final String itemId) {
+        service.requireVisible(collectionId);
         service.removeItem(collectionId, itemId);
     }
 
     @Override
     @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public Attachment uploadAttachment(final String itemId, final FileUploadRequest request) {
+        service.requireVisible(collectionId);
         try {
             return service.attachDocument(
                     collectionId,
@@ -89,18 +93,21 @@ public class CollectionItemsResourceImpl implements CollectionItemsResource {
     @Override
     @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public void removeAttachment(final String itemId) {
+        service.requireVisible(collectionId);
         service.removeAttachment(collectionId, itemId);
     }
 
     @Override
     @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public void reorderItems(final List<String> orderedIds) {
+        service.requireVisible(collectionId);
         service.reorderItems(collectionId, orderedIds);
     }
 
     @Override
     @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public DraftTextResult draftText(final String itemId, final String language) {
+        service.requireVisible(collectionId);
         ProgrammeTextDraftService.DraftOutcome outcome =
                 programmeTextDraftService.draft(collectionId, itemId, language);
 

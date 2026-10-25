@@ -6,6 +6,6 @@ public enum CollectionVisibility {
     WHOLE_ENSEMBLE,
     /** Visible only to users with the admin or music-librarian role. */
     ADMINS_ONLY,
-    /** Visible only to the user who created the collection. */
+    /** Visible only to the user who created the collection (a draft) and to admins. */
     PRIVATE
 }

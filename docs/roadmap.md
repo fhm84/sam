@@ -746,8 +746,8 @@ Added missing fields to `SheetCollection` surfaced in the Claude Design mockup
 (`Create Flows (PrimeNG).html`).
 
 - **visibility** — enum (`WHOLE_ENSEMBLE` / `ADMINS_ONLY` / `PRIVATE`); meant to control
-  who can see the collection: `ADMINS_ONLY` and `PRIVATE` only the music librarian and the
-  admin. The design shows a "Whole ensemble" dropdown in the create dialog; limiting
+  who can see the collection: `ADMINS_ONLY` the music librarian and the admin, `PRIVATE`
+  its creator and the admin (a draft). The design shows a "Whole ensemble" dropdown in the create dialog; limiting
   `WHOLE_ENSEMBLE` to that ensemble's members (`EnsembleMembershipEntity`) is not done.
 - **coverColor** — string (hex or named swatch); displayed as an initial-based
   gradient tile in the collection list.

@@ -25,6 +25,7 @@ public interface SheetCollectionMapper {
     @Mapping(target = "created", ignore = true)
     @Mapping(target = "lastUpdate", ignore = true)
     @Mapping(target = "items", ignore = true)
+    @Mapping(target = "createdBy", ignore = true)
     SheetCollectionEntity fromDto(SheetCollection dto);
 
     @Mapping(target = "id", ignore = true)
@@ -32,5 +33,6 @@ public interface SheetCollectionMapper {
     @Mapping(target = "created", ignore = true)
     @Mapping(target = "lastUpdate", ignore = true)
     @Mapping(target = "items", ignore = true)
+    @Mapping(target = "createdBy", ignore = true)
     void update(@MappingTarget SheetCollectionEntity entity, SheetCollection dto);
 }
