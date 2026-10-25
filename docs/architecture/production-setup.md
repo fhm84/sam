@@ -46,7 +46,7 @@ stay untouched. If the zone has CAA records, they must allow `letsencrypt.org`.
 4. On the very first start `sam-server` may fail to reach the provider's issuer before Caddy has its certificate; the restart policy retries automatically, so give it a minute or two before investigating.
 5. Set up the provider (below).
 
-**Pocket ID first setup** (until an automated, env-driven setup lands: [#217](https://github.com/fhm84/sam/issues/217)). Do step 1 right after the first start: until an admin exists, whoever opens the setup page first becomes admin.
+**Pocket ID first setup.** Do step 1 right after the first start: until an admin exists, whoever opens the setup page first becomes admin.
 
 1. Open `https://<LOGIN_DOMAIN>/setup` and create your admin account with a passkey.
 2. *Settings → Administration → User Groups*: create `sam-admin`, `sam-music-librarian` and `sam-member` (exactly these names: the first two grant SAM's roles, `sam-member` lets everyone else sign in, because `sam-ui` admits only these three groups).

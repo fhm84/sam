@@ -10,7 +10,7 @@ previously recorded in the roadmap's open-questions table and plan notes.
 |-----|----------|--------|
 | [0001](adr-0001-musician-user-linking.md) | Link user accounts via `Musician.userId` — no separate User entity | accepted |
 | [0002](adr-0002-resource-scoped-share-tokens.md) | Guest access via resource-scoped share tokens, not visibility flags | accepted |
-| [0003](adr-0003-self-hosted-keycloak.md) | Self-hosted Keycloak 26 as OIDC provider | accepted |
+| [0003](adr-0003-self-hosted-keycloak.md) | Self-hosted Keycloak 26 as OIDC provider | superseded by 0016 |
 | [0004](adr-0004-no-ip-logging.md) | No IP addresses in the event log | accepted |
 | [0005](adr-0005-single-name-field.md) | Keep single `name` field on Musician (no first/last split) | accepted |
 | [0006](adr-0006-collection-type-enum.md) | Keep `FOLDER`/`SETLIST` collection type enum; UI maps richer labels onto it | accepted |
@@ -22,6 +22,7 @@ previously recorded in the roadmap's open-questions table and plan notes.
 | [0012](adr-0012-public-images-on-ghcr.md) | CI publishes multi-arch (amd64 + arm64) images publicly to ghcr.io | accepted |
 | [0013](adr-0013-readiness-gates-startup.md) | Readiness check (database + storage) gates the edge's start; no liveness-driven restarts | accepted |
 | [0014](adr-0014-mermaid-diagrams.md) | Diagrams in the docs are inline Mermaid blocks; ASCII art and PlantUML files are replaced | accepted |
+| [0016](adr-0016-pocket-id-default-provider.md) | Pocket ID as the default OIDC provider; Keycloak stays supported | accepted |
 
 New decisions: add the next number, keep it short (context, decision,
 consequences — a screen or less), and link it from this table.

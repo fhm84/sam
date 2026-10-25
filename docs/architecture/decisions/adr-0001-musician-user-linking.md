@@ -20,7 +20,8 @@ ignores `userId` so a form save can never clear an existing link.
 
 - Personalisation (My Parts) resolves the caller's `sub` to a `Musician` and
   works off their ensemble memberships — no join table between users and domain.
-- User metadata (email verification, credentials) stays entirely in Keycloak.
+- User metadata (email, credentials) stays entirely in the OIDC provider
+  (Pocket ID or Keycloak, [ADR-0016](adr-0016-pocket-id-default-provider.md)).
 - If SAM ever needs users who are *not* musicians, this decision must be revisited.
 
 See [Security concept](../concepts/security.md) for the implementation.

@@ -69,11 +69,11 @@ java -jar cli/target/quarkus-app/quarkus-run.jar import migration/src/migration-
 ```
 
 Point the CLI at the target server via
-`quarkus.rest-client."de.halbmann.sam.api.boundary.SamResources".url`
+`quarkus.rest-client."sam-api".url`
 (defaults to `http://localhost:8080/api`, see `cli/src/main/resources/application.properties`).
-`cli` authenticates as the `sam-cli` Keycloak client (service account, `music_librarian`
-realm role) via OIDC client-credentials — see "Authentication" below for how to
-point it at a different Keycloak/realm in production.
+`cli` authenticates as the OIDC provider's `sam-cli` client (`music_librarian` role)
+via client credentials — see "Authentication" below for how to point it at a
+production provider.
 
 Both commands accept `-d`/`--dry-run`. Note its actual scope: it only checks
 that each file **deserializes** into the expected DTO — it does not run Jakarta
@@ -128,10 +128,10 @@ isn't machine-reimportable today even though the bytes are there.
 ## Authentication
 
 Every `*ResourceImpl` in `server` is `@Authenticated`, and write endpoints
-additionally require the `music_librarian` or `admin` realm role. `cli`
-authenticates as a dedicated Keycloak client, `sam-cli` — a confidential
-client with a service account, granted the `music_librarian` realm role
-(same pattern as `sam-backend`'s service account; see `keycloak/README.md`).
+additionally require the `music_librarian` or `admin` role. `cli`
+authenticates as a dedicated confidential client, `sam-cli`, that holds the
+`music_librarian` role: with Pocket ID as an API permission on `urn:sam:api`,
+with Keycloak as a service-account realm role (see `keycloak/README.md`).
 `quarkus-rest-client-oidc-filter` acquires a client-credentials token and
 attaches it as a Bearer header to every `SamResources` call automatically
 (`cli/src/main/resources/application.properties`); there's no manual login
@@ -147,20 +147,20 @@ step.
   `sam-backend-secret`). Discovery and eager token
   acquisition are both disabled
   (`quarkus.oidc-client.discovery-enabled=false`,
-  `.early-tokens-acquisition=false`), so nothing reaches out to Keycloak at
+  `.early-tokens-acquisition=false`), so nothing reaches out to the provider at
   CLI startup — only when a command actually calls the API (dry-run import
   and pure-logic tests never do, so they stay hermetic).
 - **Prod**: override via `OIDC_SERVER_URL` (same variable `server` uses),
   `SAM_CLI_CLIENT_ID` (default `sam-cli`), and `SAM_CLI_CLIENT_SECRET`
-  (required, no default). The `sam-cli` client and its service-account role
-  grant are defined in both `keycloak/sam-realm.json` and
-  `keycloak/configurator/sam/{clients,users}/`, kept in sync per
-  `keycloak/README.md`'s existing convention.
+  (required, no default). With Pocket ID, create the `sam-cli` client as in
+  [production setup](../docs/architecture/production-setup.md); with Keycloak
+  it and its service-account role are in `keycloak/prod/sam-realm.json`
+  (dev: `keycloak/sam-realm.json` and `keycloak/configurator/sam/`, kept in
+  sync per `keycloak/README.md`).
 
-Verified by obtaining a real token from a running dev Keycloak via
-`grant_type=client_credentials` and confirming `realm_access.roles` contains
-`music_librarian` — the exact claim path `server` reads
-(`quarkus.oidc.roles.role-claim-path=realm_access/roles`).
+The claim the role travels in differs per provider: `scp` on Pocket ID (read by
+`server`'s `m2m` tenant), `realm_access.roles` on Keycloak
+(`server/src/main/resources/oidc/<provider>.properties`).
 
 ## Known gaps
 
