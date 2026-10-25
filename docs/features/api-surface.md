@@ -38,7 +38,7 @@ require the `music_librarian` or `admin` role; exceptions are share management
 (`/api/shares`, scoped to the caller's own shares — see [Shares](shares.md) for who may create
 links) and marking a sheet as favourite. Read operations (GET) are open to any authenticated user unless the table below says
 otherwise; nothing scopes reads per ensemble yet (see the
-[role-aware access plan](../plans/rbac-role-aware-access.md)). Role enforcement uses
+[roadmap](../roadmap.md#full-role-based-access-control-rbac--in-progress)). Role enforcement uses
 `@RolesAllowed` on the JAX-RS implementation classes; the API interface definitions remain
 role-free to stay usable as a REST client in the CLI module.
 

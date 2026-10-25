@@ -9,6 +9,7 @@ import { InputText } from '@openng/optimus-ui/inputtext';
 import { IconField } from '@openng/optimus-ui/iconfield';
 import { InputIcon } from '@openng/optimus-ui/inputicon';
 import { Toolbar } from '@openng/optimus-ui/toolbar';
+import { Tag } from '@openng/optimus-ui/tag';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { MusiciansApiService } from '../../core/api';
 import { AuthService } from '../../core/auth/auth.service';
@@ -33,6 +34,7 @@ import { MusicianForm } from './musician-form';
     TranslatePipe,
     MusicianForm,
     Toolbar,
+    Tag,
   ],
   providers: [ConfirmationService],
   templateUrl: './musicians.html',

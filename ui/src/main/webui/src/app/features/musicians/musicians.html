@@ -41,6 +41,9 @@
     <ng-template #header>
       <tr>
         <th>{{ 'musicians.columns.name' | translate }}</th>
+        <th>{{ 'musicians.columns.instruments' | translate }}</th>
+        <th>{{ 'musicians.columns.role' | translate }}</th>
+        <th>{{ 'musicians.columns.status' | translate }}</th>
         <th>{{ 'musicians.columns.ipi' | translate }}</th>
         <th>{{ 'musicians.columns.birthYear' | translate }}</th>
         <th>{{ 'musicians.columns.deathYear' | translate }}</th>
@@ -63,6 +66,28 @@
               ></i>
             }
           </span>
+        </td>
+        <td>
+          <div class="flex flex-wrap gap-1">
+            @for (instrument of musician.instruments ?? []; track instrument.instrumentId) {
+              <p-tag
+                [value]="instrument.instrumentName"
+                [severity]="instrument.primary ? 'info' : 'secondary'"
+                [pTooltip]="instrument.primary ? t.t('musicians.primaryInstrument') : undefined"
+                tooltipPosition="top"
+              />
+            }
+          </div>
+        </td>
+        <td>
+          @if (musician.membership?.role; as role) {
+            {{ 'musicians.role.' + role | translate }}
+          }
+        </td>
+        <td>
+          @if (musician.membership?.status; as status) {
+            <p-tag [value]="'musicians.status.' + status | translate" severity="secondary" />
+          }
         </td>
         <td>{{ musician.ipi }}</td>
         <td>{{ musician.birthYear }}</td>
@@ -96,7 +121,7 @@
 
     <ng-template #emptymessage>
       <tr>
-        <td colspan="5" class="text-center text-[var(--sam-text-muted)] !p-8">
+        <td colspan="8" class="text-center text-[var(--sam-text-muted)] !p-8">
           {{ 'musicians.empty' | translate }}
         </td>
       </tr>

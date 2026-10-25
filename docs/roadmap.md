@@ -27,22 +27,19 @@ unprioritised backlog.
 
 **Now: before go-live** (real musicians will log in, and the event log will hold personal data)
 
-1. [Role-aware access](#full-role-based-access-control-rbac--in-progress): menu and route
-   guarding, and scoping read endpoints (event log, musician contact data)
-   → [plan](plans/rbac-role-aware-access.md) · [#129](https://github.com/fhm84/sam/issues/129)
-2. [Automatic coverage snapshot invalidation](#automatic-coverage-snapshot-invalidation--planned)
+1. [Automatic coverage snapshot invalidation](#automatic-coverage-snapshot-invalidation--planned)
    → [plan](plans/coverage-snapshot-invalidation.md) · [#137](https://github.com/fhm84/sam/issues/137)
    (needs open question #5: [#138](https://github.com/fhm84/sam/issues/138))
-3. [Event log retention + own-history view](#document-access-log--partial)
+2. [Event log retention + own-history view](#document-access-log--partial)
    → [plan](plans/event-log-retention.md) · [#146](https://github.com/fhm84/sam/issues/146)
    (needs open question #9: [#147](https://github.com/fhm84/sam/issues/147))
-4. [Document store hardening](#document-store-hardening--in-progress): the upload bugs
+3. [Document store hardening](#document-store-hardening--in-progress): the upload bugs
    (same-name corruption, S3) are fixed; left are random storage paths, deleting files
    only after commit, and an integrity check for files damaged before the fix
    → [plan](plans/document-store-hardening.md) · [#154](https://github.com/fhm84/sam/issues/154)
-5. Encrypted backups (phase A of [encryption of stored documents](#encryption-of-stored-documents--planned))
+4. Encrypted backups (phase A of [encryption of stored documents](#encryption-of-stored-documents--planned))
    → [plan](plans/storage-encryption.md) · [#162](https://github.com/fhm84/sam/issues/162)
-6. [Pocket ID as default OIDC provider](#pocket-id-as-default-oidc-provider--in-progress):
+5. [Pocket ID as default OIDC provider](#pocket-id-as-default-oidc-provider--in-progress):
    lighter login stack with passkeys, Keycloak stays optional
    → [plan](plans/pocket-id-provider.md) · [#210](https://github.com/fhm84/sam/issues/210)
 
@@ -85,7 +82,7 @@ round are in their sections too, as new `idea` entries or as extensions of exist
 2. [Repertoire Planning](#2-repertoire-planning)
 3. [Musician-Facing](#3-musician-facing)
 4. [Statistics & Reporting](#4-statistics--reporting)
-5. [Access Control & Sharing](#5-access-control--sharing)
+4. [Access Control & Sharing](#5-access-control--sharing)
 6. [Operational & Integration](#6-operational--integration)
 7. [UX & Discovery](#7-ux--discovery)
 8. [Open Questions](#8-open-questions)
@@ -375,7 +372,7 @@ grounding data source yet — would just be hallucination).
 **Done:** all fields shipped (migration `V1.1.2__MusicianFields.sql`, `MusicianStatus`,
 `MusicianRole`, `musician_instruments` junction table) together with the Angular musician
 form. See [Musicians](features/musicians.md). The contact fields are returned only to the
-music librarian and the admin ([role-aware access](plans/rbac-role-aware-access.md)).
+music librarian and the admin ([read access by role](features/api-surface.md#read-access-by-role)).
 
 Added missing fields to the `Musician` entity surfaced in the Claude Design mockup
 (`Create Flows (PrimeNG).html`).
@@ -661,8 +658,10 @@ scoped to the logged-in musician's ensemble memberships (`/my-parts`, `GET /api/
 musicians' personal data for the librarian only, and a role-aware UI: `roleGuard` on the
 routes, menu items filtered by role, write actions hidden from users without a write role.
 `RoleEnforcementTest` checks every role-restricted endpoint; collection visibility is
-enforced (#243); the UI's roles follow a token refresh (#249). Left in the
-[plan](plans/rbac-role-aware-access.md): fields readers can only see in edit dialogs (#251).
+enforced (#243); the UI's roles follow a token refresh (#249); readers see the fields that
+used to be only in edit dialogs (#251). Phase 4 is complete (tracking issue
+[#129](https://github.com/fhm84/sam/issues/129)); who may read what is in
+[API surface](features/api-surface.md#read-access-by-role).
 
 **Remaining (Phase 4+):**
 - **No frontend ensemble/context service** — "ensemble" only exists as a local filter
@@ -739,7 +738,7 @@ existing `COLLECTION` share row and enforced in `ShareService`/`PublicShareResou
 
 **Done:** shipped in migration `V1.1.3__CollectionFields.sql` with a visibility dropdown and
 a cover colour picker in the collection form. `visibility` is enforced on reads since #243
-([role-aware access](plans/rbac-role-aware-access.md)). **Leftover:** `coverImageId` exists, but no upload control sets it yet (tracked in
+([Collections](features/collections.md)). **Leftover:** `coverImageId` exists, but no upload control sets it yet (tracked in
 [attachment metadata](plans/attachment-metadata.md)).
 
 Added missing fields to `SheetCollection` surfaced in the Claude Design mockup

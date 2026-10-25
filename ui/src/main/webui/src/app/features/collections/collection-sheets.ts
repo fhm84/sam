@@ -73,6 +73,27 @@ export class CollectionSheets implements OnInit, OnChanges {
   protected readonly totalRecords = signal(0);
   protected readonly loading = signal(false);
   protected readonly myPartsOnly = signal(false);
+  /** TEXT items shown in full instead of clamped to two lines (a signal: the table is OnPush). */
+  private readonly expandedTexts = signal<ReadonlySet<string>>(new Set());
+
+  protected isTextExpanded(itemId: string): boolean {
+    return this.expandedTexts().has(itemId);
+  }
+
+  /** Long enough to be cut off at two lines: offer "Show more". */
+  protected isLongText(text: string | undefined): boolean {
+    return !!text && (text.length > 140 || text.includes('\n'));
+  }
+
+  protected toggleText(itemId: string): void {
+    this.expandedTexts.update((ids) => {
+      const next = new Set(ids);
+      if (!next.delete(itemId)) {
+        next.add(itemId);
+      }
+      return next;
+    });
+  }
   protected rows = 1000;
   protected currentPage = 0;
 

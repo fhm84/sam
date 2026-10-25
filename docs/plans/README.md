@@ -28,7 +28,6 @@ Conventions:
 
 | Plan | Roadmap item | Issue | Blocked on |
 |---|---|---|---|
-| [Role-aware access](rbac-role-aware-access.md) | Full RBAC (Phase 4) | [#129](https://github.com/fhm84/sam/issues/129) | — |
 | [Coverage snapshot invalidation](coverage-snapshot-invalidation.md) | Automatic coverage snapshot invalidation | [#137](https://github.com/fhm84/sam/issues/137) | Open question #5 ([#138](https://github.com/fhm84/sam/issues/138)) |
 | [Event log retention](event-log-retention.md) | Document access log (pending part) | [#146](https://github.com/fhm84/sam/issues/146) | Open question #9 ([#147](https://github.com/fhm84/sam/issues/147)) |
 | [Document store hardening](document-store-hardening.md) | Document store hardening | [#154](https://github.com/fhm84/sam/issues/154) | — |

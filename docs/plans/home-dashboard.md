@@ -29,7 +29,7 @@ next concert).
 | # | Task | Status |
 |---|------|--------|
 | 4 | `GET /home/inbox-stats`: to-classify count, instrumentations without archive location, stale ensembles, new sheets this week. | [#197](https://github.com/fhm84/sam/issues/197) |
-| 5 | `GET /home/activity`: recent event-log entries with display labels (respect the [role-aware access](rbac-role-aware-access.md) rules). | [#198](https://github.com/fhm84/sam/issues/198) |
+| 5 | `GET /home/activity`: recent event-log entries with display labels (respect the [read access by role](../features/api-surface.md#read-access-by-role): the event log is admin-only). | [#198](https://github.com/fhm84/sam/issues/198) |
 | 6 | `GET /home/next-concert`: nearest upcoming `SETLIST` with venue, piece count, total duration, aggregate coverage. | [#199](https://github.com/fhm84/sam/issues/199) |
 | 7 | `GET /ensembles/{id}/dashboard`: complete / playable / incomplete counts + repertoire size. | [#200](https://github.com/fhm84/sam/issues/200) |
 | 8 | `GET /ensembles/{id}/gaps`: shared with [coverage breakdown](coverage-breakdown.md), task 3. | [#169](https://github.com/fhm84/sam/issues/169) |

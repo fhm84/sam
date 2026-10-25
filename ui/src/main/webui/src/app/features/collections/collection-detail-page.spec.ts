@@ -6,7 +6,7 @@ import { of, throwError } from 'rxjs';
 import { MessageService } from '@openng/optimus-ui/api';
 
 import { CollectionDetailPage } from './collection-detail-page';
-import { CollectionsApiService } from '../../core/api';
+import { CollectionsApiService, EnsemblesApiService } from '../../core/api';
 import { TranslationService } from '../../core/translation.service';
 import { SheetCollection } from '../../model/datamodels';
 import { provideAuthStub } from '../../core/auth/auth.testing';
@@ -50,6 +50,7 @@ describe('CollectionDetailPage', () => {
           provideRouter([]),
           MessageService,
           { provide: CollectionsApiService, useValue: collectionsApi },
+          { provide: EnsemblesApiService, useValue: { load: () => of({ name: 'Concert Band' }) } },
           {
             provide: TranslationService,
             useValue: { t: (k: string) => k, version: { subscribe: () => {} } },

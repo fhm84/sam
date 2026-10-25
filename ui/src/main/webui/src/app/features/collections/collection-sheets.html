@@ -86,7 +86,21 @@
               <span class="block text-[0.75rem] text-[var(--sam-text-muted)] italic">{{ item.identifier }}</span>
             }
           } @else {
-            <span class="text-[var(--sam-text-secondary)] italic text-sm leading-snug line-clamp-2">{{ item.textContent }}</span>
+            <span
+              class="text-[var(--sam-text-secondary)] italic text-sm leading-snug"
+              [class.line-clamp-2]="!isTextExpanded(item.id)"
+              [class.whitespace-pre-line]="isTextExpanded(item.id)"
+              [attr.data-testid]="'text-content-' + item.id"
+              >{{ item.textContent }}</span
+            >
+            @if (isLongText(item.textContent)) {
+              <a
+                class="block w-fit text-[0.75rem] text-[var(--p-primary-color)] cursor-pointer hover:underline"
+                [attr.data-testid]="'btn-toggle-text-' + item.id"
+                (click)="toggleText(item.id)"
+                >{{ (isTextExpanded(item.id) ? 'collections.items.showLess' : 'collections.items.showMore') | translate }}</a
+              >
+            }
             @if (item.identifier) {
               <span class="block text-[0.75rem] text-[var(--sam-text-muted)]">{{ item.identifier }}</span>
             }

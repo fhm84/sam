@@ -20,7 +20,7 @@ A shared reference catalogue of composers, arrangers, and ensemble members.
 ## Actions
 
 - **Create / edit / delete** via a dialog.
-- Paginated list with search by name.
+- Paginated list with search by name; it shows instruments (primary highlighted), role and status to everyone, contact data only in the librarian's form.
 - Referenced from sheets as composer / arranger.
 - Can be assigned to ensembles as members (see [Ensembles & Coverage](ensembles-coverage.md)).
 

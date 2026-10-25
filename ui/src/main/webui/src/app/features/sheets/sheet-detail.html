@@ -254,6 +254,9 @@
                       <div class="flex items-center gap-2 px-2 py-[0.4rem] rounded-md hover:bg-[var(--p-surface-100)]">
                         <i class="pi pi-file text-[var(--sam-text-muted)]"></i>
                         <span class="flex-1 text-[0.9rem] text-[var(--sam-text)] overflow-hidden text-ellipsis whitespace-nowrap">{{ doc.displayName }}</span>
+                        @if (doc.type) {
+                          <span class="text-xs text-[var(--sam-text-muted)] bg-[var(--p-surface-200)] rounded px-[0.4rem] py-[0.1rem] whitespace-nowrap shrink-0">{{ 'uploads.attachmentTypes.' + doc.type | translate }}</span>
+                        }
                         <span class="text-[0.8rem] text-[var(--sam-text-muted)] whitespace-nowrap">{{ formatSize(doc.fileSize) }}</span>
                         <div class="flex gap-0.5">
                           <p-button
@@ -316,6 +319,12 @@
                   <div class="meta-entry">
                     <span class="detail-label">{{ 'sheets.detail.edition' | translate }}</span>
                     <span class="detail-value">{{ s.edition }}</span>
+                  </div>
+                }
+                @if (s.source) {
+                  <div class="meta-entry">
+                    <span class="detail-label">{{ 'sheets.detail.source' | translate }}</span>
+                    <span class="detail-value">{{ s.source }}</span>
                   </div>
                 }
                 @if (s.copyright) {
@@ -512,6 +521,12 @@
                         <span class="instr-meta-item">
                           <span class="detail-label">{{ 'sheets.instrumentations.form.physicalLocation' | translate }}:</span>
                           <span>{{ instr.physicalLocation }}</span>
+                        </span>
+                      }
+                      @if (instr.pages) {
+                        <span class="instr-meta-item">
+                          <span class="detail-label">{{ 'sheets.instrumentations.form.pages' | translate }}:</span>
+                          <span>{{ instr.pages }}</span>
                         </span>
                       }
                       @if (instr.notes) {
@@ -756,6 +771,9 @@
                   <div class="flex items-center gap-2 px-2 py-[0.4rem] rounded-md hover:bg-[var(--p-surface-100)]">
                     <i class="pi pi-file text-[var(--sam-text-muted)]"></i>
                     <span class="flex-1 text-[0.9rem] text-[var(--sam-text)] overflow-hidden text-ellipsis whitespace-nowrap">{{ doc.displayName }}</span>
+                    @if (doc.type) {
+                      <span class="text-xs text-[var(--sam-text-muted)] bg-[var(--p-surface-200)] rounded px-[0.4rem] py-[0.1rem] whitespace-nowrap shrink-0">{{ 'uploads.attachmentTypes.' + doc.type | translate }}</span>
+                    }
                     <span class="text-[0.8rem] text-[var(--sam-text-muted)] whitespace-nowrap">{{ formatSize(doc.fileSize) }}</span>
                     <div class="flex gap-0.5">
                       <p-button
@@ -938,6 +956,12 @@
                       <span>{{ instr.physicalLocation }}</span>
                     </span>
                   }
+                  @if (instr.pages) {
+                    <span class="instr-meta-item">
+                      <span class="detail-label">{{ 'sheets.instrumentations.form.pages' | translate }}:</span>
+                      <span>{{ instr.pages }}</span>
+                    </span>
+                  }
                   @if (instr.notes) {
                     <span class="instr-meta-item">
                       <span class="detail-label">{{ 'sheets.instrumentations.form.notes' | translate }}:</span>
@@ -1096,6 +1120,12 @@
             <div class="meta-entry">
               <span class="detail-label">{{ 'sheets.detail.edition' | translate }}</span>
               <span class="detail-value">{{ s.edition }}</span>
+            </div>
+          }
+          @if (s.source) {
+            <div class="meta-entry">
+              <span class="detail-label">{{ 'sheets.detail.source' | translate }}</span>
+              <span class="detail-value">{{ s.source }}</span>
             </div>
           }
           @if (s.copyright) {
