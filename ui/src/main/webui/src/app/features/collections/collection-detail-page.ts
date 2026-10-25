@@ -16,7 +16,7 @@ import { Tag } from '@openng/optimus-ui/tag';
 import { Toolbar } from '@openng/optimus-ui/toolbar';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../core/translation.service';
-import { CollectionsApiService } from '../../core/api';
+import { CollectionsApiService, EnsemblesApiService } from '../../core/api';
 import { SheetCollection } from '../../model/datamodels';
 import { CollectionForm } from './collection-form';
 import { CollectionSheets } from './collection-sheets';
@@ -38,12 +38,15 @@ export class CollectionDetailPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly api = inject(CollectionsApiService);
+  private readonly ensemblesApi = inject(EnsemblesApiService);
   private readonly messageService = inject(MessageService);
 
   protected readonly collectionId = signal('');
   protected readonly collection = signal<SheetCollection | null>(null);
   /** Unknown, or hidden from this user by its visibility (the server answers 404 for both). */
   protected readonly notFound = signal(false);
+  /** Name of the collection's ensemble, shown under the title; the collection only carries the ID. */
+  protected readonly ensembleName = signal<string | null>(null);
   protected editDialogVisible = false;
   protected shareDialogVisible = false;
 
@@ -152,9 +155,26 @@ export class CollectionDetailPage implements OnInit {
       });
   }
 
+  private loadEnsembleName(ensembleId: string | undefined): void {
+    if (!ensembleId) {
+      this.ensembleName.set(null);
+      return;
+    }
+    this.ensemblesApi
+      .load(ensembleId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (ensemble) => this.ensembleName.set(ensemble.name),
+        error: () => this.ensembleName.set(null),
+      });
+  }
+
   private loadCollection(id: string): void {
     this.api.load(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (c) => this.collection.set(c),
+      next: (c) => {
+        this.collection.set(c);
+        this.loadEnsembleName(c.ensembleId);
+      },
       error: (err: HttpErrorResponse) => this.notFound.set(err.status === 404),
     });
   }

@@ -36,14 +36,31 @@
         @if (col.type) {
           <p-tag [value]="'collections.types.' + col.type | translate" severity="secondary" />
         }
+        @if (col.visibility === 'ADMINS_ONLY' || col.visibility === 'PRIVATE') {
+          <p-tag
+            icon="pi pi-lock"
+            [value]="'collections.visibility.' + col.visibility | translate"
+            severity="warn"
+            data-testid="collection-visibility"
+          />
+        }
       </div>
       @if (col.description) {
         <p class="m-0 text-[var(--sam-text-secondary)] text-[0.95rem]">{{ col.description }}</p>
       }
-      @if (col.date) {
-        <span class="flex items-center gap-1.5 text-[0.85rem] text-[var(--sam-text-secondary)]">
-          <i class="pi pi-calendar text-[0.8rem]"></i> {{ formatDate(col.date) }}
-        </span>
+      @if (col.date || ensembleName()) {
+        <div class="flex items-center gap-4 flex-wrap text-[0.85rem] text-[var(--sam-text-secondary)]">
+          @if (col.date) {
+            <span class="flex items-center gap-1.5">
+              <i class="pi pi-calendar text-[0.8rem]"></i> {{ formatDate(col.date) }}
+            </span>
+          }
+          @if (ensembleName(); as ensemble) {
+            <span class="flex items-center gap-1.5" data-testid="collection-ensemble">
+              <i class="pi pi-users text-[0.8rem]"></i> {{ ensemble }}
+            </span>
+          }
+        </div>
       }
     </div>
 

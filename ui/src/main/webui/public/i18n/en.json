@@ -173,6 +173,7 @@
       "publisher": "Publisher",
       "publisherIpi": "Publisher IPI",
       "edition": "Edition",
+      "source": "Source",
       "difficulty": "Difficulty",
       "copyright": "Copyright",
       "rightsStatus": "Rights Status",
@@ -514,6 +515,8 @@
       "error": "Export failed"
     },
     "items": {
+      "showMore": "Show more",
+      "showLess": "Show less",
       "title": "Programme",
       "addSheet": "Add Sheet",
       "addTextBlock": "Add Text Block",
@@ -663,6 +666,9 @@
       "ipi": "IPI",
       "birthYear": "Birth Year",
       "deathYear": "Death Year",
+      "instruments": "Instruments",
+      "role": "Role",
+      "status": "Status",
       "actions": "Actions"
     },
     "form": {
@@ -716,6 +722,7 @@
       "deleted": "Musician deleted successfully",
       "error": "An error occurred"
     },
+    "primaryInstrument": "Primary instrument",
     "linkedAccountTooltip": "Linked to a user account",
     "search": "Search by name",
     "empty": "No musicians found",

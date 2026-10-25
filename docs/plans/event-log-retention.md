@@ -27,7 +27,7 @@ Proposed answer: **12 months**, configurable via `sam.event-log.retention-months
 | 5 | Tests for the retention job (seed old and new rows, run the job, assert only the old rows are gone) and for `me/event-logs` scoping. | [#152](https://github.com/fhm84/sam/issues/152) |
 | 6 | Close open question #9, update `docs/features/event-log.md`, and add a privacy-policy note template to the production setup guide. | [#153](https://github.com/fhm84/sam/issues/153) |
 
-Admin-only access to the full log is handled in [role-aware access](rbac-role-aware-access.md), task 2.
+Admin-only access to the full log shipped with role-aware access ([#131](https://github.com/fhm84/sam/issues/131)); see [Event log](../features/event-log.md).
 
 ## Key files
 

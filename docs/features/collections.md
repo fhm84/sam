@@ -22,14 +22,14 @@ The two-value enum is a deliberate decision — see [ADR-0006](../architecture/d
 | Visibility | `WHOLE_ENSEMBLE` / `ADMINS_ONLY` / `PRIVATE` | Who sees the collection: `WHOLE_ENSEMBLE` (or unset) every login, `ADMINS_ONLY` `music_librarian` and `admin`, `PRIVATE` its creator and `admin` (librarians too while no creator is recorded, i.e. collections from before `createdBy`). `PRIVATE` is a librarian's draft, e.g. a setlist that isn't ready yet. Hidden collections are left out of lists (also a sheet's collections) and answer 404, for reads and writes. A share link still opens the collection it names |
 | Cover color | Hex string | Cover background in the collections overview |
 | Cover image | FK → documents | Optional cover image |
-| Ensemble | FK → ensembles (nullable) | Which ensemble the setlist belongs to; scopes coverage evaluation and the [AI setlist assistant](ai-setlist-assistant.md) |
+| Ensemble | FK → ensembles (nullable) | Which ensemble the setlist belongs to; scopes coverage evaluation and the [AI setlist assistant](ai-setlist-assistant.md). Shown under the title on the detail page, with a lock tag when the visibility is restricted |
 
 ## Collection items
 
 An ordered list of items, each either:
 
 - **SHEET** — links to a sheet, carries an **identifier** (position or label, e.g. `1`, `A1`, `Intro`)
-- **TEXT** — a free-text programme block (e.g. the spoken introduction between pieces), optionally with an uploaded attachment. Draftable with AI — see [AI Setlist Assistant](ai-setlist-assistant.md).
+- **TEXT** — a free-text programme block (e.g. the spoken introduction between pieces), optionally with an uploaded attachment. Draftable with AI — see [AI Setlist Assistant](ai-setlist-assistant.md). Long texts are clamped to two lines in the programme, with "Show more" to read them in full.
 
 Order is persisted server-side (a JPA-managed position, not just array order) and exposed on each item as a 0-based `orderNumber`. Drag-and-drop reordering in the UI calls `PUT /sheet-collections/{id}/items/order` with the full list of item IDs in the new order.
 

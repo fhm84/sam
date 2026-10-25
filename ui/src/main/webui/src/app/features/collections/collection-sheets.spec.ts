@@ -282,4 +282,28 @@ describe('CollectionSheets', () => {
       expect.any(Boolean),
     );
   });
+
+  describe('long TEXT items', () => {
+    const c = () => component as unknown as {
+      isLongText(text: string | undefined): boolean;
+      isTextExpanded(id: string): boolean;
+      toggleText(id: string): void;
+    };
+
+    it('offers "Show more" only for texts that a two-line clamp would cut', () => {
+      expect(c().isLongText(undefined)).toBe(false);
+      expect(c().isLongText('Welcome to our concert!')).toBe(false);
+      expect(c().isLongText('Line one\nLine two')).toBe(true);
+      expect(c().isLongText('x'.repeat(141))).toBe(true);
+    });
+
+    it('expands and collapses one item at a time', () => {
+      c().toggleText('a');
+      expect(c().isTextExpanded('a')).toBe(true);
+      expect(c().isTextExpanded('b')).toBe(false);
+
+      c().toggleText('a');
+      expect(c().isTextExpanded('a')).toBe(false);
+    });
+  });
 });
