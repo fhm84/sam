@@ -146,6 +146,8 @@ If a change is purely structural (rename, move, formatting) or documentation-onl
 `docs/` is organised as small, single-topic, cross-linked pages (arc42-inspired; also
 opened as an Obsidian vault). `docs/README.md` is the map of content. Use plain relative
 Markdown links between pages — never `[[wikilinks]]` (they don't render on GitHub).
+Diagrams are inline ```` ```mermaid ```` blocks (flowchart / erDiagram / sequenceDiagram,
+default theme) — no ASCII art, no PlantUML files (ADR-0014); folder trees stay plain text.
 Layout: `docs/architecture/` (context, building-blocks, data-model, deployment,
 tech-stack + `concepts/`, `runtime/`, `decisions/`), `docs/features/` (one page per
 domain area), `docs/plans/` (task breakdowns for planned roadmap items), `docs/reviews/`

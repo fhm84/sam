@@ -4,7 +4,8 @@
 
 The docs are organised as small, single-topic pages linked to each other
 (arc42-inspired structure, browsable in Obsidian or on GitHub — plain relative
-Markdown links only, no wikilinks).
+Markdown links only, no wikilinks). Diagrams are inline Mermaid blocks
+([ADR-0014](architecture/decisions/adr-0014-mermaid-diagrams.md)).
 
 ## Architecture
 
@@ -30,8 +31,7 @@ used as a menu, not a form.
 
 ### Runtime Views
 
-- [Key flows](architecture/runtime/README.md) — PlantUML sequence diagrams for the four core workflows
-- [architecture.puml](architecture/architecture.puml) — component diagram
+- [Key flows](architecture/runtime/README.md) — sequence diagrams for the four core workflows
 
 ### Decisions
 
