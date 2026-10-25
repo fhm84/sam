@@ -68,6 +68,7 @@ public class SheetCollectionsResourceImpl implements SheetCollectionsResource {
 
     @Override
     public SheetCollection load(final String collectionId) {
+        service.requireVisible(collectionId);
         return service.load(collectionId);
     }
 
@@ -85,6 +86,7 @@ public class SheetCollectionsResourceImpl implements SheetCollectionsResource {
 
     @Override
     public Response generateToc(final String collectionId, final boolean includeTextItems) {
+        service.requireVisible(collectionId);
         byte[] pdf = tocService.generateToc(collectionId, includeTextItems);
         String filename = "toc-" + collectionId + ".pdf";
         eventLogService.log(
@@ -119,6 +121,7 @@ public class SheetCollectionsResourceImpl implements SheetCollectionsResource {
             final ExportFormat format,
             final boolean includeTextItems,
             final boolean includeTextAttachments) {
+        service.requireVisible(collectionId);
         ExportResult result =
                 sheetExportService.exportCollection(collectionId, format, includeTextItems, includeTextAttachments);
         eventLogService.log(

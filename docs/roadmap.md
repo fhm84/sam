@@ -660,8 +660,8 @@ scoped to the logged-in musician's ensemble memberships (`/my-parts`, `GET /api/
 **Done (Phase 4, 2026-10-24):** read access decided per endpoint, event log admin-only,
 musicians' personal data for the librarian only, and a role-aware UI: `roleGuard` on the
 routes, menu items filtered by role, write actions hidden from users without a write role.
-`RoleEnforcementTest` checks every role-restricted endpoint. Left in the
-[plan](plans/rbac-role-aware-access.md): collection visibility (#243), roles after a token
+`RoleEnforcementTest` checks every role-restricted endpoint; collection visibility is
+enforced (#243). Left in the [plan](plans/rbac-role-aware-access.md): roles after a token
 refresh (#249), and fields readers can only see in edit dialogs (#251).
 
 **Remaining (Phase 4+):**
@@ -738,17 +738,17 @@ existing `COLLECTION` share row and enforced in `ShareService`/`PublicShareResou
 ### Collection visibility & cover — `done`
 
 **Done:** shipped in migration `V1.1.3__CollectionFields.sql` with a visibility dropdown and
-a cover colour picker in the collection form. **Leftovers:** `visibility` is stored but no read
-endpoint enforces it yet (part of [role-aware access](plans/rbac-role-aware-access.md));
-`coverImageId` exists, but no upload control sets it yet (tracked in
+a cover colour picker in the collection form. `visibility` is enforced on reads since #243
+([role-aware access](plans/rbac-role-aware-access.md)). **Leftover:** `coverImageId` exists, but no upload control sets it yet (tracked in
 [attachment metadata](plans/attachment-metadata.md)).
 
 Added missing fields to `SheetCollection` surfaced in the Claude Design mockup
 (`Create Flows (PrimeNG).html`).
 
 - **visibility** — enum (`WHOLE_ENSEMBLE` / `ADMINS_ONLY` / `PRIVATE`); meant to control
-  who can see the collection (not enforced yet, see above). The design shows a "Whole ensemble" dropdown in the
-  create dialog. Enforcing it will check ensemble membership (`EnsembleMembershipEntity`).
+  who can see the collection: `ADMINS_ONLY` and `PRIVATE` only the music librarian and the
+  admin. The design shows a "Whole ensemble" dropdown in the create dialog; limiting
+  `WHOLE_ENSEMBLE` to that ensemble's members (`EnsembleMembershipEntity`) is not done.
 - **coverColor** — string (hex or named swatch); displayed as an initial-based
   gradient tile in the collection list.
 - **coverImageId** — nullable UUID reference to an uploaded document/attachment;

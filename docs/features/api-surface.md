@@ -37,7 +37,7 @@ endpoints under `/api/public/shares/` (`@PermitAll`, token validated manually in
 require the `music_librarian` or `admin` role; exceptions are share management
 (`/api/shares`, scoped to the caller's own shares — see [Shares](shares.md) for who may create
 links) and marking a sheet as favourite. Read operations (GET) are open to any authenticated user unless the table below says
-otherwise; ensemble scoping and collection visibility are not enforced yet (see the
+otherwise; nothing scopes reads per ensemble yet (see the
 [role-aware access plan](../plans/rbac-role-aware-access.md)). Role enforcement uses
 `@RolesAllowed` on the JAX-RS implementation classes; the API interface definitions remain
 role-free to stay usable as a REST client in the CLI module.
@@ -61,7 +61,7 @@ Endpoints not listed (writes) keep their `@RolesAllowed` as today.
 | `/ensembles/{id}/members` | any | any; the nested `musician` stripped as above | done |
 | `/instruments`, `/instruments/{id}` | any | any | |
 | `/ensembles`, `/ensembles/{id}`, `/voices`, `/voices/{vid}/options`, `/coverage/status` | any | any | |
-| `/sheet-collections`, `/{id}`, `/{id}/items`, `/{id}/toc`, `/{id}/export` | any | any, filtered by `visibility`: `WHOLE_ENSEMBLE` any, `ADMINS_ONLY` and `PRIVATE` librarian + admin (collections store no creator, so `PRIVATE` can't mean "creator only" yet; none exists today) | [#243](https://github.com/fhm84/sam/issues/243) |
+| `/sheet-collections`, `/{id}`, `/{id}/items`, `/{id}/toc`, `/{id}/export` | any | any, filtered by `visibility`: `WHOLE_ENSEMBLE` any, `ADMINS_ONLY` and `PRIVATE` librarian + admin (collections store no creator, so `PRIVATE` can't mean "creator only" yet); a hidden one answers 404; also filters a sheet's `/collections` | done |
 | `/sheet-collections/{id}/gema-setlist` (GEMA report) | librarian + admin | librarian + admin | done |
 | `/shares` | own shares | own shares | |
 | `/me/parts` | own | own | |
