@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { OidcSecurityService } from 'angular-auth-oidc-client';
+import { EventTypes, OidcSecurityService, PublicEventsService } from 'angular-auth-oidc-client';
 import { of } from 'rxjs';
 import { OidcClaimsConfig } from './auth.config';
 import { AuthService } from './auth.service';
@@ -71,5 +71,61 @@ describe('AuthService.hasRole', () => {
     expect(create('groups', {}, { groups: ['admin'] }).canWrite()).toBe(true);
     TestBed.resetTestingModule();
     expect(create('groups', {}, { groups: ['musician'] }).canWrite()).toBe(false);
+  });
+});
+
+describe('AuthService after a token refresh', () => {
+  it('re-reads the roles when the library stores new tokens', () => {
+    let idToken: Record<string, unknown> = { groups: ['music_librarian'] };
+    TestBed.configureTestingModule({
+      providers: [
+        {
+          provide: OidcSecurityService,
+          useValue: {
+            isAuthenticated$: of({ isAuthenticated: true }),
+            userData$: of({ userData: null }),
+            getPayloadFromAccessToken: () => of({}),
+            getPayloadFromIdToken: () => of(idToken),
+          },
+        },
+      ],
+    });
+    TestBed.inject(OidcClaimsConfig).roleClaimPath = 'groups';
+    const auth = TestBed.inject(AuthService);
+    expect(auth.canWrite()).toBe(true);
+
+    // An admin removed the user from the librarian group; the next silent refresh brings it
+    idToken = { groups: [] };
+    TestBed.inject(PublicEventsService).fireEvent(EventTypes.NewAuthenticationResult, {
+      isAuthenticated: true,
+      isRenewProcess: true,
+    });
+
+    expect(auth.canWrite()).toBe(false);
+    expect(auth.hasRole('music_librarian')).toBe(false);
+  });
+
+  it('ignores other library events', () => {
+    let idToken: Record<string, unknown> = { groups: ['admin'] };
+    TestBed.configureTestingModule({
+      providers: [
+        {
+          provide: OidcSecurityService,
+          useValue: {
+            isAuthenticated$: of({ isAuthenticated: true }),
+            userData$: of({ userData: null }),
+            getPayloadFromAccessToken: () => of({}),
+            getPayloadFromIdToken: () => of(idToken),
+          },
+        },
+      ],
+    });
+    TestBed.inject(OidcClaimsConfig).roleClaimPath = 'groups';
+    const auth = TestBed.inject(AuthService);
+
+    idToken = { groups: [] };
+    TestBed.inject(PublicEventsService).fireEvent(EventTypes.SilentRenewStarted, null);
+
+    expect(auth.isAdmin()).toBe(true);
   });
 });

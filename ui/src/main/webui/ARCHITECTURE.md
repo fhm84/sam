@@ -80,7 +80,9 @@ Singleton services that don't belong to any feature: theme management, auth,
 global error handling.
 
 **Roles in the UI** (`core/auth/`): the server enforces every role; the UI only hides
-what a user can't use.
+what a user can't use. `AuthService` re-reads the roles whenever the OIDC library stores new
+tokens (`NewAuthenticationResult`), so a group change in the provider shows up at the next
+silent refresh, without a reload.
 - Areas: `AREA_ROLES` in `core/auth/roles.ts` says who may open each restricted area. The
   route guard, the menu and the home page read it, so change an area's roles only there.
 - Route: `canMatch: [roleGuard(AREA_ROLES.x)]` (`canMatch`, so the lazy chunk isn't loaded

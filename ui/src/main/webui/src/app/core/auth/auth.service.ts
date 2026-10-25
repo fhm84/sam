@@ -1,7 +1,7 @@
 import { Injectable, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { OidcSecurityService } from 'angular-auth-oidc-client';
-import { map } from 'rxjs';
+import { EventTypes, OidcSecurityService, PublicEventsService } from 'angular-auth-oidc-client';
+import { filter, map, startWith, switchMap } from 'rxjs';
 import { OidcClaimsConfig } from './auth.config';
 import { Roles, WRITE_ROLES } from './roles';
 
@@ -21,14 +21,23 @@ export class AuthService {
 
   private readonly claims = inject(OidcClaimsConfig);
 
+  // Fires on start and whenever the library stores new tokens (login callback, silent refresh),
+  // so roles follow group changes in the provider without a page reload.
+  private readonly tokensChanged$ = inject(PublicEventsService)
+    .registerForEvents()
+    .pipe(
+      filter((event) => event.type === EventTypes.NewAuthenticationResult),
+      startWith(null),
+    );
+
   // Decoded token payloads holding the roles. Keycloak: realm_access.roles in the access token
   // (userinfo does not return it by default). Pocket ID: groups, only in the ID token.
   private readonly accessTokenPayload = toSignal<Record<string, unknown> | null>(
-    this.oidc.getPayloadFromAccessToken(),
+    this.tokensChanged$.pipe(switchMap(() => this.oidc.getPayloadFromAccessToken())),
     { initialValue: null },
   );
   private readonly idTokenPayload = toSignal<Record<string, unknown> | null>(
-    this.oidc.getPayloadFromIdToken(),
+    this.tokensChanged$.pipe(switchMap(() => this.oidc.getPayloadFromIdToken())),
     { initialValue: null },
   );
 
