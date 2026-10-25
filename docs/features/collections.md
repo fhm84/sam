@@ -29,7 +29,7 @@ The two-value enum is a deliberate decision — see [ADR-0006](../architecture/d
 An ordered list of items, each either:
 
 - **SHEET** — links to a sheet, carries an **identifier** (position or label, e.g. `1`, `A1`, `Intro`)
-- **TEXT** — a free-text programme block (e.g. the spoken introduction between pieces), optionally with an uploaded attachment. Draftable with AI — see [AI Setlist Assistant](ai-setlist-assistant.md). Long texts are clamped to two lines in the programme, with "Show more" to read them in full.
+- **TEXT** — a free-text programme block (e.g. the spoken introduction between pieces), optionally with an uploaded attachment. Draftable with AI — see [AI Setlist Assistant](ai-setlist-assistant.md). Texts are clamped to two lines in the programme; when that cuts one off (measured, so it depends on the screen width), "Show more" shows it in full.
 
 Order is persisted server-side (a JPA-managed position, not just array order) and exposed on each item as a 0-based `orderNumber`. Drag-and-drop reordering in the UI calls `PUT /sheet-collections/{id}/items/order` with the full list of item IDs in the new order.
 
