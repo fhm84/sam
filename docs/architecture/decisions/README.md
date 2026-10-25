@@ -22,6 +22,7 @@ previously recorded in the roadmap's open-questions table and plan notes.
 | [0012](adr-0012-public-images-on-ghcr.md) | CI publishes multi-arch (amd64 + arm64) images publicly to ghcr.io | accepted |
 | [0013](adr-0013-readiness-gates-startup.md) | Readiness check (database + storage) gates the edge's start; no liveness-driven restarts | accepted |
 | [0014](adr-0014-mermaid-diagrams.md) | Diagrams in the docs are inline Mermaid blocks; ASCII art and PlantUML files are replaced | accepted |
+| [0015](adr-0015-person-catalogue-and-member-profile.md) | Person catalogue for credits plus an optional member profile for band members (shared id) | accepted |
 | [0016](adr-0016-pocket-id-default-provider.md) | Pocket ID as the default OIDC provider; Keycloak stays supported | accepted |
 
 New decisions: add the next number, keep it short (context, decision,

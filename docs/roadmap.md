@@ -42,6 +42,10 @@ unprioritised backlog.
 5. [Pocket ID as default OIDC provider](#pocket-id-as-default-oidc-provider--in-progress):
    lighter login stack with passkeys, Keycloak stays optional
    → [plan](plans/pocket-id-provider.md) · [#210](https://github.com/fhm84/sam/issues/210)
+6. [Person catalogue and member profiles](#person-catalogue-and-member-profiles--planned):
+   split credited people from band members, with GDPR deletion and retention, while the
+   roster holds no real personal data yet
+   → [plan](plans/people-catalogue.md) · [#259](https://github.com/fhm84/sam/issues/259)
 
 **Next: everyday use for the music librarian**
 
@@ -380,8 +384,8 @@ Added missing fields to the `Musician` entity surfaced in the Claude Design mock
 Fields added:
 - **email** and **mobile** — contact details for self-service folder access and
   part distribution
-- **notes** — free-text textarea, admin-visible only (allergies, vacation patterns,
-  instrument quirks)
+- **notes** — free-text textarea, librarian/admin-visible only (vacation patterns,
+  instrument quirks; no health data, see the [member profiles plan](plans/people-catalogue.md#gdpr-dsgvo))
 - **status** — enum (`ACTIVE` / `INACTIVE` / `INVITED` / `PENDING`); drives the
   "Active member" toggle in the UI
 - **lastInviteSentAt** — timestamp tracking whether an invite email was sent for
@@ -396,6 +400,22 @@ Fields added:
 
 **Stakeholders:** S1 (music librarian), S3 (Musiker)
 **Effort:** Medium
+
+---
+
+### Person catalogue and member profiles — `planned`
+
+One `musicians` table holds both the people credited on sheets (composers, arrangers) and
+the band members with their contact data, login and memberships. Split it into a `persons`
+catalogue and an optional `members` profile with the same id, so a conductor who arranges
+stays one record and personal data lives in one place, where GDPR deletion and retention
+apply ([ADR-0015](architecture/decisions/adr-0015-person-catalogue-and-member-profile.md)).
+The role (member, guest, substitute, conductor) moves onto each ensemble membership, and
+the status splits into membership status and a derived onboarding state.
+→ [plan](plans/people-catalogue.md)
+
+**Stakeholders:** S1 (music librarian), S3 (Musiker)
+**Effort:** Medium to large (schema, API, `cli`, UI)
 
 ---
 
@@ -963,6 +983,21 @@ Remaining attachment work: [plan](plans/attachment-metadata.md).
 **Deferred:** Duplicate / Merge / Split sheet operations (More menu in v2).
 
 **Stakeholders:** S1 (music librarian), S2 (Dirigent), S4 (Administrator)
+**Effort:** Medium
+
+---
+
+### Credit roles on sheets — `idea`
+
+Today a sheet has exactly one composer and one arranger (two foreign keys to the person
+catalogue) and a free-text `originalBy`. GEMA also asks for the lyricist (Textdichter) of
+vocal pieces, and some pieces have two arrangers. Replace the two keys with
+`sheet_credits (sheet, person, role, position)`, roles `COMPOSER` / `ARRANGER` /
+`LYRICIST`, keep `originalBy` as text. The GEMA setlist, fingerprints, search and the
+classification then read credits.
+
+**Depends on:** [Person catalogue and member profiles](#person-catalogue-and-member-profiles--planned)
+**Stakeholders:** S1 (music librarian)
 **Effort:** Medium
 
 ---
