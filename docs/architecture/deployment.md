@@ -4,13 +4,18 @@
 
 SAM ships as two Docker images:
 
-```
-                        :443
-  Browser ──── Caddy (sam-ui) ──┬── /api/*           ──► sam-server:8080
-                                ├── /oidc-config.json ──► sam-server:8080
-                                ├── /q/*              ──► 404 (internal only)
-                                └── /*                ──► Angular SPA (static, /srv)
-  Browser ──── Caddy (sam-ui) ── login hostname ──────► oidc:8080 (Pocket ID or Keycloak; /admin → 404)
+```mermaid
+flowchart LR
+    browser(["Browser"]) -->|":443"| caddy
+    subgraph ui ["sam-ui image"]
+        caddy["Caddy<br/>TLS edge proxy"]
+        spa["Angular SPA<br/>static, /srv"]
+    end
+    caddy -->|"/*"| spa
+    caddy -->|"/api/*, /oidc-config.json"| server["sam-server:8080"]
+    caddy -->|"login hostname<br/>(/admin → 404)"| oidc["oidc:8080<br/>Pocket ID or Keycloak"]
+    caddy -. "/q/* → 404" .-x server
+    prometheus["Prometheus<br/>(optional)"] -->|":9000 /q/metrics"| server
 ```
 
 | Image | Built by | Contents |

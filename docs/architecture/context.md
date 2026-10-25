@@ -6,39 +6,33 @@ For the human-centred view (personas, use cases, flows) see [Stakeholders](../st
 
 ## System Context
 
-```
-                          +----------------+
-                          |   Musician /   |
-                          |  Band Leader   |
-                          +-------+--------+
-                                  |
-                     browses, uploads, manages
-                                  |
-                          +-------v--------+
-                          |    Angular UI  |
-                          | (Quarkus Quinoa)|
-                          +-------+--------+
-                                  |
-                             REST/JSON
-                                  |
-    +-------------+       +-------v--------+       +----------------+
-    |   CLI       +------>|   SAM Server   +------>|  PostgreSQL    |
-    | (PicoCLI)   | REST  |  (Quarkus)     |  JDBC |  + pg_trgm     |
-    +-------------+       +-------+--------+       |  + fuzzystrmatch|
-                                  |                +----------------+
-                                  |
-                          +-------v--------+
-                          | Storage Backend|
-                          | (Local / S3)   |
-                          +----------------+
-                                  |
-                          +-------v--------+
-                          |   LLM Provider |
-                          | (Ollama/OpenAI)|
-                          +----------------+
+```mermaid
+flowchart TB
+    users(["Musicians, conductor,<br/>music librarian, admin"])
+    guest(["Guest with a share link"])
+    operator(["Operator"])
+    ui["Angular UI"]
+    cli["CLI (PicoCLI)"]
+    server["SAM Server (Quarkus)"]
+    oidc["OIDC provider<br/>Pocket ID or Keycloak"]
+    db[("PostgreSQL<br/>pg_trgm, fuzzystrmatch")]
+    storage[("Document storage<br/>local filesystem or S3")]
+    llm["LLM provider<br/>OpenAI or Ollama"]
+
+    users -->|"browse, upload, manage"| ui
+    guest -->|"opens shared resource"| ui
+    users -->|"log in"| oidc
+    operator -->|"batch import / export"| cli
+    ui -->|"REST/JSON"| server
+    cli -->|"REST/JSON, client credentials"| server
+    server -->|"validates tokens"| oidc
+    cli -->|"service account token"| oidc
+    server -->|JDBC| db
+    server --> storage
+    server -->|"classification, enrichment, assistant"| llm
 ```
 
-**Users** interact via the Angular frontend or the CLI for batch operations. The server is the single backend, persisting to PostgreSQL and storing documents via a pluggable storage layer. AI classification uses LangChain4j with configurable LLM providers.
+**Users** work in the Angular frontend; the CLI handles batch imports and exports. The server is the single backend: it checks the tokens issued by the OIDC provider, persists to PostgreSQL, and stores documents via a pluggable storage layer. AI features use LangChain4j with a configurable LLM provider.
 
 ## Key Quality Goals
 

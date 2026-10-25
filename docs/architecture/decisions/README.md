@@ -21,6 +21,7 @@ previously recorded in the roadmap's open-questions table and plan notes.
 | [0011](adr-0011-stored-document-encryption.md) | Opt-in application-level encryption of stored documents; key kept outside database and backups | accepted |
 | [0012](adr-0012-public-images-on-ghcr.md) | CI publishes multi-arch (amd64 + arm64) images publicly to ghcr.io | accepted |
 | [0013](adr-0013-readiness-gates-startup.md) | Readiness check (database + storage) gates the edge's start; no liveness-driven restarts | accepted |
+| [0014](adr-0014-mermaid-diagrams.md) | Diagrams in the docs are inline Mermaid blocks; ASCII art and PlantUML files are replaced | accepted |
 
 New decisions: add the next number, keep it short (context, decision,
 consequences — a screen or less), and link it from this table.

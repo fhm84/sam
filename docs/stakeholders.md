@@ -211,34 +211,35 @@ These goals are derived directly from stakeholder needs. They are listed in prio
 
 ## 3. System Context
 
+```mermaid
+flowchart TB
+    s1(["S1 Archive Manager<br/>(Notenwart)"])
+    s2(["S2 Conductor<br/>(Dirigent)"])
+    s3(["S3 Musician<br/>(Musiker)"])
+    s4(["S4 Administrator"])
+    s5(["S5 Guest<br/>(Gast)"])
+    ui["SAM UI (Angular)"]
+    cli["CLI (PicoCLI)"]
+    server["SAM Server (Quarkus)"]
+    db[("PostgreSQL")]
+    storage[("Storage<br/>local / S3")]
+    llm["LLM provider"]
+
+    s1 -->|"manages archive,<br/>uploads, classifies"| ui
+    s1 -->|"batch import"| cli
+    s2 -->|"plans repertoire,<br/>checks coverage"| ui
+    s3 -->|"finds parts,<br/>downloads files"| ui
+    s4 -->|"users, roles,<br/>event log"| ui
+    s5 -->|"share link"| ui
+    ui -->|"REST/JSON"| server
+    cli -->|"REST/JSON"| server
+    server --> db
+    server --> storage
+    server --> llm
 ```
-  ┌──────────────────┐    ┌──────────────────┐    ┌──────────────────┐
-  │  S1 Archive Mgr  │    │  S2 Conductor    │    │  S3 Musician     │
-  │  (Notenwart)     │    │  (Dirigent)      │    │  (Musiker)       │
-  └────────┬─────────┘    └────────┬─────────┘    └────────┬─────────┘
-           │                       │                        │
-           │  manages archive      │  plans repertoire      │  finds parts
-           │  uploads, classifies  │  checks coverage       │  downloads files
-           │                       │                        │
-           └───────────────────────┼────────────────────────┘
-                                   │
-                            ┌──────▼──────┐
-                            │   SAM UI    │
-                            │  (Angular)  │
-                            └──────┬──────┘
-                                   │ REST/JSON
-                            ┌──────▼──────┐          ┌─────────────────┐
-                            │ SAM Server  ├──────────►│   PostgreSQL    │
-                            │  (Quarkus)  │          └─────────────────┘
-                            └──────┬──────┘
-                                   │
-                    ┌──────────────┼──────────────┐
-                    │              │              │
-             ┌──────▼──────┐ ┌────▼────┐  ┌──────▼──────┐
-             │   Storage   │ │   LLM   │  │     CLI     │
-             │ (Local/S3)  │ │Provider │  │  (PicoCLI)  │
-             └─────────────┘ └─────────┘  └─────────────┘
-```
+
+The technical view, including the login provider, is in
+[Context & Scope](architecture/context.md#system-context).
 
 **External interfaces**
 
@@ -632,12 +633,9 @@ user's own history is planned with [event log retention](plans/event-log-retenti
 
 ## 5. Key Flows
 
-Full sequence diagrams for these flows live in
-[`docs/architecture/runtime/`](architecture/runtime/README.md) (one `.puml` file per
-flow, viewable in any PlantUML renderer or IDE plugin — matching the
-one-diagram-per-file convention already used by `docs/architecture/architecture.puml`
-and `src/site/resources/*.puml` elsewhere in this repo). This section gives the short
-version of each.
+Sequence diagrams for these flows are in the
+[runtime views](architecture/runtime/README.md). This section gives the short version of
+each.
 
 ### Flow 1 – AI-assisted archival of a new physical score
 
@@ -646,7 +644,7 @@ scan → upload to staging → *Classify* (text extraction, vision fallback for 
 pages) → review pre-filled form → *Apply* (creates/resolves Sheet, Instrumentation,
 Attachment) → record physical location and condition on the resulting instrumentation.
 
-→ [flow-1-ai-assisted-archival.puml](architecture/runtime/flow-1-ai-assisted-archival.puml)
+→ [sequence diagram](architecture/runtime/README.md#flow-1-ai-assisted-archival)
 
 ---
 
@@ -656,7 +654,7 @@ Opens the Sheets list scoped to an ensemble, reads coverage badges (`COMPLETE` /
 `PLAYABLE` / `INCOMPLETE`), drills into an incomplete piece for the per-voice breakdown,
 then creates a setlist and adds suitable pieces to it.
 
-→ [flow-2-concert-programme-check.puml](architecture/runtime/flow-2-concert-programme-check.puml)
+→ [sequence diagram](architecture/runtime/README.md#flow-2-concert-programme-check)
 
 ---
 
@@ -666,7 +664,7 @@ Searches by title, opens the sheet's *Instrumentations* tab, finds the row for t
 instrument (archive location, condition), expands it for attached files, and downloads
 the part.
 
-→ [flow-3-musician-retrieves-part.puml](architecture/runtime/flow-3-musician-retrieves-part.puml)
+→ [sequence diagram](architecture/runtime/README.md#flow-3-musician-retrieves-part)
 
 ---
 
@@ -678,7 +676,7 @@ instrumentation or collection, copies the public URL, and distributes it. The gu
 revoked, renders the resource, and logs the access with `shareTokenId` set instead of a
 `userId`.
 
-→ [flow-4-share-creation-guest-access.puml](architecture/runtime/flow-4-share-creation-guest-access.puml)
+→ [sequence diagram](architecture/runtime/README.md#flow-4-share-creation-and-guest-access)
 
 ---
 
