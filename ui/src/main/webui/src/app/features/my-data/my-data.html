@@ -1,0 +1,78 @@
+<div class="flex flex-col gap-4">
+  <div>
+    <h1 class="font-[var(--sam-font-display)] text-2xl font-bold text-[var(--sam-text)] mt-0 mb-1">{{ 'myData.title' | translate }}</h1>
+    <p class="text-sm text-[var(--sam-text-muted)] m-0">{{ 'myData.subtitle' | translate }}</p>
+  </div>
+
+  @if (loading()) {
+    <p class="text-sm text-[var(--sam-text-muted)]">{{ 'myData.loading' | translate }}</p>
+  } @else if (notLinked()) {
+    <div class="bg-[var(--sam-surface)] border border-[var(--sam-border)] rounded-[10px] p-6">
+      <p class="m-0 text-sm text-[var(--sam-text-muted)]">{{ 'myData.notLinked' | translate }}</p>
+    </div>
+  } @else if (data(); as own) {
+    <div class="bg-[var(--sam-surface)] border border-[var(--sam-border)] rounded-[10px] p-6">
+      <h2 class="font-[var(--sam-font-display)] text-base font-semibold text-[var(--sam-text)] mt-0 mb-4">{{ 'myData.profile' | translate }}</h2>
+      <dl class="grid gap-x-6 gap-y-3 m-0 [grid-template-columns:max-content_1fr] text-sm">
+        <dt class="text-[var(--sam-text-muted)]">{{ 'members.form.name' | translate }}</dt>
+        <dd class="m-0 font-medium">{{ own.member?.name }}</dd>
+
+        <dt class="text-[var(--sam-text-muted)]">{{ 'members.form.status' | translate }}</dt>
+        <dd class="m-0">
+          @if (own.member?.status; as status) {
+            <p-tag [value]="'members.status.' + status | translate" severity="secondary" />
+          }
+        </dd>
+
+        <dt class="text-[var(--sam-text-muted)]">{{ 'members.form.email' | translate }}</dt>
+        <dd class="m-0">{{ own.member?.contact?.email || '—' }}</dd>
+
+        <dt class="text-[var(--sam-text-muted)]">{{ 'members.form.mobile' | translate }}</dt>
+        <dd class="m-0">{{ own.member?.contact?.mobile || '—' }}</dd>
+
+        <dt class="text-[var(--sam-text-muted)]">{{ 'members.form.notes' | translate }}</dt>
+        <dd class="m-0 whitespace-pre-line">{{ own.member?.contact?.notes || '—' }}</dd>
+
+        <dt class="text-[var(--sam-text-muted)]">{{ 'members.form.instruments' | translate }}</dt>
+        <dd class="m-0">
+          <div class="flex flex-wrap gap-1">
+            @for (instrument of own.member?.instruments ?? []; track instrument.instrumentId) {
+              <p-tag [value]="instrument.instrumentName" [severity]="instrument.primary ? 'info' : 'secondary'" />
+            } @empty {
+              —
+            }
+          </div>
+        </dd>
+      </dl>
+    </div>
+
+    <div class="bg-[var(--sam-surface)] border border-[var(--sam-border)] rounded-[10px] p-6">
+      <h2 class="font-[var(--sam-font-display)] text-base font-semibold text-[var(--sam-text)] mt-0 mb-4">{{ 'myData.seats' | translate }}</h2>
+      <p-table [value]="own.seats ?? []">
+        <ng-template #header>
+          <tr>
+            <th>{{ 'myData.columns.ensemble' | translate }}</th>
+            <th>{{ 'ensembles.members.columns.voice' | translate }}</th>
+            <th>{{ 'ensembles.members.columns.instrument' | translate }}</th>
+            <th>{{ 'ensembles.members.columns.role' | translate }}</th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-seat>
+          <tr>
+            <td class="font-medium">{{ seat.ensembleName }}</td>
+            <td>{{ seat.voiceLabel || '—' }}</td>
+            <td>{{ seat.instrumentName || '—' }}</td>
+            <td>{{ 'ensembles.members.role.' + seat.role | translate }}</td>
+          </tr>
+        </ng-template>
+        <ng-template #emptymessage>
+          <tr>
+            <td colspan="4" class="text-center text-[var(--sam-text-muted)] !p-6">{{ 'myData.noSeats' | translate }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+    <p class="text-xs text-[var(--sam-text-muted)] m-0">{{ 'myData.correction' | translate }}</p>
+  }
+</div>

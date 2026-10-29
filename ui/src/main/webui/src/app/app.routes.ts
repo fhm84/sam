@@ -78,6 +78,10 @@ export const routes: Routes = [
           import('./features/event-logs/event-logs.routes').then((m) => m.EVENT_LOGS_ROUTES),
       },
       {
+        path: 'user/my-data',
+        loadChildren: () => import('./features/my-data/my-data.routes').then((m) => m.MY_DATA_ROUTES),
+      },
+      {
         path: 'user/preferences',
         loadChildren: () =>
           import('./features/user-preferences/user-preferences.routes').then(

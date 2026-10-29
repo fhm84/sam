@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { PaginatedResponse, Person, PersonFilterRequest } from '../../model/datamodels';
+import { PaginatedResponse, Person, PersonCredit, PersonFilterRequest } from '../../model/datamodels';
 
 @Injectable({ providedIn: 'root' })
 export class PersonsApiService {
@@ -23,6 +23,10 @@ export class PersonsApiService {
 
   create(data: Person): Observable<Person> {
     return this.http.post<Person>(this.baseUrl, data);
+  }
+
+  credits(id: string): Observable<PersonCredit[]> {
+    return this.http.get<PersonCredit[]>(`${this.baseUrl}/${id}/credits`);
   }
 
   update(id: string, data: Person): Observable<void> {

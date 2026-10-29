@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Member, MemberFilterRequest, PaginatedResponse } from '../../model/datamodels';
+import { Member, MemberFilterRequest, OwnMemberData, PaginatedResponse } from '../../model/datamodels';
+import { SKIP_ERROR_TOAST } from '../error.interceptor';
 
 @Injectable({ providedIn: 'root' })
 export class MembersApiService {
@@ -40,5 +41,11 @@ export class MembersApiService {
 
   unlinkUser(memberId: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${memberId}/user`);
+  }
+
+  /** The caller's own member data (404 when no member is linked to the login). */
+  own(): Observable<OwnMemberData> {
+    // A login without a member profile is a normal case the page explains, not an error toast
+    return this.http.get<OwnMemberData>('/api/me/member', { context: new HttpContext().set(SKIP_ERROR_TOAST, true) });
   }
 }

@@ -1,10 +1,12 @@
 package de.halbmann.sam.api.boundary;
 
 import de.halbmann.sam.api.entity.persons.Person;
+import de.halbmann.sam.api.entity.persons.PersonCredit;
 import de.halbmann.sam.api.entity.persons.PersonFilterRequest;
 import de.halbmann.sam.api.entity.shared.PaginatedResponse;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import java.util.List;
 
 /**
  * REST API for the person catalogue: everyone credited on sheets as composer or arranger. A person
@@ -43,6 +45,16 @@ public interface PersonsResource {
     @GET
     @Path("{personId}")
     Person load(@PathParam("personId") String personId);
+
+    /**
+     * Lists the sheets that credit the person as composer or arranger, sorted by title.
+     *
+     * @param personId the person ID
+     * @return the person's credits
+     */
+    @GET
+    @Path("{personId}/credits")
+    List<PersonCredit> credits(@PathParam("personId") String personId);
 
     /**
      * Updates an existing person.

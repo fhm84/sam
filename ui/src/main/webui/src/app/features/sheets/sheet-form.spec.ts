@@ -86,48 +86,49 @@ describe('SheetForm', () => {
     expect(component.form.controls.yearOfComposition.value).toBe(1990);
   });
 
-  it('patchFormValues maps composer to composerId', () => {
+  it('patchFormValues maps the composer person', () => {
     const sheet = makeSheet({ composer: makePerson('m1', 'Bach') });
     (component as any).patchFormValues(sheet);
-    expect(component.form.controls.composerId.value).toBe('m1');
+    expect(component.form.controls.composer.value?.id).toBe('m1');
   });
 
-  it('patchFormValues sets composerId to null when no composer', () => {
+  it('patchFormValues sets composer to null when no composer', () => {
     const sheet = makeSheet({ composer: undefined });
     (component as any).patchFormValues(sheet);
-    expect(component.form.controls.composerId.value).toBeNull();
+    expect(component.form.controls.composer.value).toBeNull();
+  });
+
+  // ── person search ────────────────────────────────────
+
+  it('onPersonSearch asks the server for matching persons', () => {
+    personsApi.find.mockReturnValue(paginatedOf([makePerson('m1', 'Brahms')]));
+
+    component.onPersonSearch({ query: ' brah ' } as any);
+
+    expect(personsApi.find).toHaveBeenCalledWith({ name: 'brah', size: 20 });
+    expect((component as any).personSuggestions().map((m: Person) => m.name)).toEqual(['Brahms']);
   });
 
   // ── onPersonCreated ──────────────────────────────────
 
-  it('onPersonCreated adds person to list sorted by name', () => {
-    (component as any).persons.set([makePerson('m1', 'Brahms'), makePerson('m2', 'Wagner')]);
-    const newPerson = makePerson('m3', 'Beethoven');
-
-    component.onPersonCreated(newPerson);
-
-    const names = (component as any).persons().map((m: Person) => m.name);
-    expect(names).toEqual(['Beethoven', 'Brahms', 'Wagner']);
-  });
-
-  it('onPersonCreated sets composerId when target is composer', () => {
+  it('onPersonCreated sets the composer when target is composer', () => {
     (component as any).personDialogTarget = 'composer';
     const newPerson = makePerson('m5', 'Schubert');
 
     component.onPersonCreated(newPerson);
 
-    expect(component.form.controls.composerId.value).toBe('m5');
+    expect(component.form.controls.composer.value?.id).toBe('m5');
     expect((component as any).showPersonDialog).toBe(false);
   });
 
-  it('onPersonCreated sets arrangerId when target is arranger', () => {
+  it('onPersonCreated sets the arranger when target is arranger', () => {
     (component as any).personDialogTarget = 'arranger';
     const newPerson = makePerson('m6', 'Liszt');
 
     component.onPersonCreated(newPerson);
 
-    expect(component.form.controls.arrangerId.value).toBe('m6');
-    expect(component.form.controls.composerId.value).toBeNull();
+    expect(component.form.controls.arranger.value?.id).toBe('m6');
+    expect(component.form.controls.composer.value).toBeNull();
     expect((component as any).showPersonDialog).toBe(false);
   });
 

@@ -9,6 +9,7 @@
     "uploads": "Uploads",
     "members": "Mitglieder",
     "persons": "Personen",
+    "myData": "Meine Daten",
     "shares": "Meine Freigaben",
     "myParts": "Meine Stimmen",
     "profile": "Profil",
@@ -691,7 +692,9 @@
       "linkSuccess": "Benutzerkonto verknüpft",
       "unlinkSuccess": "Verknüpfung aufgehoben",
       "linkError": "Verknüpfung fehlgeschlagen",
-      "unlinkError": "Aufheben der Verknüpfung fehlgeschlagen"
+      "unlinkError": "Aufheben der Verknüpfung fehlgeschlagen",
+      "duplicateHint": "„{name}“ ist schon als Person erfasst (z. B. aus Noten). Ist es dieselbe Person?",
+      "useExistingPerson": "Diese Person verwenden"
     },
     "status": {
       "ACTIVE": "Aktiv",
@@ -711,6 +714,7 @@
     "primaryInstrument": "Hauptinstrument",
     "linkedAccountTooltip": "Mit einem Benutzerkonto verknüpft",
     "search": "Nach Name suchen",
+    "allStatuses": "Alle Status",
     "empty": "Keine Mitglieder gefunden",
     "save": "Speichern",
     "cancel": "Abbrechen"
@@ -733,7 +737,13 @@
       "ipiHint": "Interested Parties Information Code",
       "ipiTooltip": "Interested Parties Information — ein eindeutiger 9-stelliger Code für Musikrechteinhaber. Leer lassen, wenn unbekannt.",
       "birthYear": "Geburtsjahr",
-      "deathYear": "Todesjahr"
+      "deathYear": "Todesjahr",
+      "credits": "Genannt in",
+      "noCredits": "In keinen Noten genannt"
+    },
+    "creditRole": {
+      "COMPOSER": "Komponist",
+      "ARRANGER": "Arrangeur"
     },
     "delete": {
       "confirm": "Möchten Sie die Person \"{name}\" wirklich löschen?",
@@ -749,6 +759,19 @@
     "empty": "Keine Personen gefunden",
     "save": "Speichern",
     "cancel": "Abbrechen"
+  },
+  "myData": {
+    "title": "Meine Daten",
+    "subtitle": "Alles, was SAM über dich als Mitglied gespeichert hat.",
+    "loading": "Wird geladen …",
+    "notLinked": "Mit deinem Login ist kein Mitgliedsprofil verknüpft. Wende dich an den Notenwart, wenn das nicht stimmt.",
+    "profile": "Profil",
+    "seats": "Plätze in Ensembles",
+    "columns": {
+      "ensemble": "Ensemble"
+    },
+    "noSeats": "Keine Plätze in Ensembles",
+    "correction": "Stimmt etwas nicht? Der Notenwart kann deine Daten korrigieren oder löschen."
   },
   "ensembles": {
     "title": "Ensembles",

@@ -61,7 +61,8 @@ The app uses a standard sidebar-plus-content shell:
 | Admin   | Ensembles     | `/admin/ensembles`       | `pi-users`      |
 |         | Instruments   | `/admin/instruments`     | `pi-sliders-h`  |
 |         | Configuration | `/admin/configuration`   | `pi-wrench`     |
-| User    | Preferences   | `/user/preferences`      | —               |
+| User    | My data       | `/user/my-data`          | —               |
+|         | Preferences   | `/user/preferences`      | —               |
 
 The **Admin** group covers reference/configuration data that changes infrequently (instrument
 catalogue, ensemble definitions). The **Main** group covers the day-to-day working area.

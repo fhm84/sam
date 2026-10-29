@@ -60,6 +60,24 @@
     </div>
   </div>
 
+  <!-- Credits (edit only): where the person is printed on the music -->
+  @if (isEdit && credits(); as list) {
+    <div class="flex flex-col gap-2 pt-1 border-t border-[var(--p-surface-200)] dark:border-[var(--p-surface-700)]">
+      <span class="text-sm font-medium text-[var(--sam-text-secondary)] mt-2">{{ 'persons.form.credits' | translate }}</span>
+      @for (credit of list; track $index) {
+        <a
+          [routerLink]="['/sheets', credit.sheetId]"
+          class="flex items-center justify-between gap-2 text-sm no-underline text-[var(--sam-text)] hover:text-[var(--p-primary-color)]"
+        >
+          <span class="truncate">{{ credit.title }}</span>
+          <span class="text-xs text-[var(--sam-text-muted)] shrink-0">{{ 'persons.creditRole.' + credit.role | translate }}</span>
+        </a>
+      } @empty {
+        <span class="text-sm text-[var(--sam-text-muted)]">{{ 'persons.form.noCredits' | translate }}</span>
+      }
+    </div>
+  }
+
   <div class="flex justify-end gap-2 pt-2">
     <p-button
       [label]="t.t('persons.cancel')"

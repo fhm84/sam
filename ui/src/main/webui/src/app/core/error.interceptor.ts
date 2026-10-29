@@ -1,8 +1,11 @@
-import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
+import { HttpContextToken, HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
 import { MessageService } from '@openng/optimus-ui/api';
 import { TranslationService } from './translation.service';
+
+/** Set on a request whose errors the caller shows itself (e.g. an expected 404), so no toast appears. */
+export const SKIP_ERROR_TOAST = new HttpContextToken<boolean>(() => false);
 
 /**
  * The server's own explanation of a refused request (400 validation, 409 conflict such as "still
@@ -20,6 +23,9 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
+      if (req.context.get(SKIP_ERROR_TOAST)) {
+        return throwError(() => error);
+      }
       messageService.add({
         severity: 'error',
         summary: t.t('errors.requestFailed'),

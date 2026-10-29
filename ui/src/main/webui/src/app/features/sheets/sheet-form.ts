@@ -5,7 +5,7 @@ import { InputText } from '@openng/optimus-ui/inputtext';
 import { InputNumber } from '@openng/optimus-ui/inputnumber';
 import { Textarea } from '@openng/optimus-ui/textarea';
 import { Select } from '@openng/optimus-ui/select';
-import { AutoComplete } from '@openng/optimus-ui/autocomplete';
+import { AutoComplete, AutoCompleteCompleteEvent } from '@openng/optimus-ui/autocomplete';
 import { Button } from '@openng/optimus-ui/button';
 import { Dialog } from '@openng/optimus-ui/dialog';
 import { Panel } from '@openng/optimus-ui/panel';
@@ -33,7 +33,8 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
 
   @Input() sheet: SheetMusic | null = null;
 
-  protected readonly persons = signal<Person[]>([]);
+  /** Server-side search results for the composer and arranger fields. */
+  protected readonly personSuggestions = signal<Person[]>([]);
   protected readonly collections = signal<SheetCollection[]>([]);
 
   protected showPersonDialog = false;
@@ -66,8 +67,8 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
   readonly form = new FormGroup({
     title: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     subtitle: new FormControl('', { nonNullable: true }),
-    composerId: new FormControl<string | null>(null),
-    arrangerId: new FormControl<string | null>(null),
+    composer: new FormControl<Person | null>(null),
+    arranger: new FormControl<Person | null>(null),
     genre: new FormControl<Genre | null>(null),
     style: new FormControl<Style | null>(null),
     yearOfComposition: new FormControl<number | null>(null),
@@ -96,11 +97,6 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
   getEntity = () => this.sheet;
 
   ngOnInit(): void {
-    this.personsApi.find({ size: FETCH_ALL_SIZE })
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((res) => {
-        this.persons.set(res.data ?? []);
-      });
     if (!this.isEdit) {
       this.collectionsApi.find({ size: FETCH_ALL_SIZE })
         .pipe(takeUntilDestroyed(this.destroyRef))
@@ -115,8 +111,8 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
     this.form.patchValue({
       title: s.title,
       subtitle: s.subtitle ?? '',
-      composerId: s.composer?.id ?? null,
-      arrangerId: s.arranger?.id ?? null,
+      composer: s.composer ?? null,
+      arranger: s.arranger ?? null,
       genre: s.genre ?? null,
       style: s.style ?? null,
       yearOfComposition: s.yearOfComposition ?? null,
@@ -147,26 +143,28 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
     this.showPersonDialog = true;
   }
 
+  onPersonSearch(event: AutoCompleteCompleteEvent): void {
+    this.personsApi.find({ name: event.query.trim() || undefined, size: 20 })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => this.personSuggestions.set(res.data ?? []),
+        error: () => this.personSuggestions.set([]),
+      });
+  }
+
   onPersonCreated(person: Person): void {
-    this.persons.update((list) => [...list, person].sort((a, b) => a.name.localeCompare(b.name)));
     if (this.personDialogTarget === 'composer') {
-      this.form.patchValue({ composerId: person.id! });
+      this.form.patchValue({ composer: person });
     } else {
-      this.form.patchValue({ arrangerId: person.id! });
+      this.form.patchValue({ arranger: person });
     }
     this.showPersonDialog = false;
   }
 
   buildSaveRequest(): Observable<SheetMusic> {
     const raw = this.form.getRawValue();
-    const allPersons = this.persons();
-
-    const composer = raw.composerId
-      ? allPersons.find((m) => m.id === raw.composerId) ?? null
-      : null;
-    const arranger = raw.arrangerId
-      ? allPersons.find((m) => m.id === raw.arrangerId) ?? null
-      : null;
+    const composer = raw.composer;
+    const arranger = raw.arranger;
 
     const payload: CreateSheetMusic = convertEmptyStringsToNull({
       title: raw.title,

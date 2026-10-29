@@ -40,6 +40,18 @@
         <label for="member-name">{{ 'members.form.name' | translate }}</label>
       </p-floatlabel>
     </div>
+    @if (duplicateCandidate(); as candidate) {
+      <div class="flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm bg-[var(--p-surface-100)] dark:bg-[var(--p-surface-800)]">
+        <span>{{ t.t('members.form.duplicateHint').replace('{name}', candidate.name) }}</span>
+        <p-button
+          [label]="t.t('members.form.useExistingPerson')"
+          size="small"
+          [text]="true"
+          styleClass="whitespace-nowrap shrink-0"
+          (onClick)="useDuplicateCandidate()"
+        />
+      </div>
+    }
   </div>
 
   <!-- Status -->

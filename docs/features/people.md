@@ -20,7 +20,11 @@ A band member is a person with a [member profile](members.md) under the same ID.
 - Paginated list with name search (prefix, substring, trigram and phonetic matching).
 - Referenced from sheets as composer / arranger. Saving a sheet or applying an AI
   classification with a new name creates the person; an existing one is reused by exact name.
-- A person credited on a sheet, or one with a member profile, can't be deleted (409).
+- A person credited on a sheet, or one with a member profile, can't be deleted (409); the error
+  toast shows why.
+- **Credits:** the edit dialog lists the sheets that credit the person (composer / arranger),
+  each linking to the sheet (`GET /api/persons/{id}/credits`).
+- The sheet form's composer and arranger fields search persons on the server as you type.
 
 ## Related
 

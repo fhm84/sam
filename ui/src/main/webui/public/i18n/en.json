@@ -9,6 +9,7 @@
     "uploads": "Uploads",
     "members": "Members",
     "persons": "People",
+    "myData": "My data",
     "shares": "My Shares",
     "myParts": "My Parts",
     "profile": "Profile",
@@ -691,7 +692,9 @@
       "linkSuccess": "User account linked",
       "unlinkSuccess": "User account unlinked",
       "linkError": "Failed to link user account",
-      "unlinkError": "Failed to unlink user account"
+      "unlinkError": "Failed to unlink user account",
+      "duplicateHint": "\"{name}\" is already in the people catalogue (e.g. credited on sheets). Is it the same person?",
+      "useExistingPerson": "Use this person"
     },
     "status": {
       "ACTIVE": "Active",
@@ -711,6 +714,7 @@
     "primaryInstrument": "Primary instrument",
     "linkedAccountTooltip": "Linked to a user account",
     "search": "Search by name",
+    "allStatuses": "All statuses",
     "empty": "No members found",
     "save": "Save",
     "cancel": "Cancel"
@@ -733,7 +737,13 @@
       "ipiHint": "Interested Parties Information code",
       "ipiTooltip": "Interested Parties Information — a unique 9-digit code assigned to music rights holders. Leave empty if unknown.",
       "birthYear": "Birth Year",
-      "deathYear": "Death Year"
+      "deathYear": "Death Year",
+      "credits": "Credited on",
+      "noCredits": "Not credited on any sheet"
+    },
+    "creditRole": {
+      "COMPOSER": "Composer",
+      "ARRANGER": "Arranger"
     },
     "delete": {
       "confirm": "Are you sure you want to delete the person \"{name}\"?",
@@ -749,6 +759,19 @@
     "empty": "No people found",
     "save": "Save",
     "cancel": "Cancel"
+  },
+  "myData": {
+    "title": "My data",
+    "subtitle": "Everything SAM stores about you as a member.",
+    "loading": "Loading …",
+    "notLinked": "No member profile is linked to your login. Ask the music librarian if that is wrong.",
+    "profile": "Profile",
+    "seats": "Ensemble seats",
+    "columns": {
+      "ensemble": "Ensemble"
+    },
+    "noSeats": "No ensemble seats",
+    "correction": "Something wrong? The music librarian can correct or delete your data."
   },
   "ensembles": {
     "title": "Ensembles",
