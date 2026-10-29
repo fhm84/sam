@@ -15,7 +15,22 @@ import java.util.UUID;
 @ApplicationScoped
 public class EventLogRepository implements PanacheRepositoryBase<EventLogEntity, UUID> {
 
+    /** The user ID that replaces an erased member's ID in their entries (the same for everyone). */
+    public static final String ERASED_USER_ID = "erased";
+
     public record PagedResult(List<EventLogEntity> data, long totalCount) {}
+
+    /**
+     * Anonymises the entries of a user: the user ID becomes {@link #ERASED_USER_ID} and the username
+     * is removed. The entries stay, so download counts stay right.
+     *
+     * @return the number of entries anonymised
+     */
+    public int anonymiseUser(final String userId) {
+        return update(
+                "userId = :erased, username = null where userId = :userId",
+                Map.of("erased", ERASED_USER_ID, "userId", userId));
+    }
 
     public PagedResult find(EventLogFilterRequest filter) {
         List<String> conditions = new ArrayList<>();

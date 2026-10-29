@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 4.2.1 on 2026-10-26 22:15:32.
+// Generated using typescript-generator version 4.2.1 on 2026-10-29 23:01:07.
 
 export interface SheetEnrichment {
     suggestedAdditionalNotes?: string;
@@ -377,6 +377,19 @@ export interface MemberInstrument {
     instrumentId?: string;
     instrumentName?: string;
     primary?: boolean;
+}
+
+export interface OwnMemberData {
+    member?: Member;
+    seats?: OwnSeat[];
+}
+
+export interface OwnSeat {
+    ensembleId?: string;
+    ensembleName?: string;
+    instrumentName?: string;
+    role?: EnsembleRole;
+    voiceLabel?: string;
 }
 
 export interface Person {

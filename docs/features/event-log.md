@@ -41,4 +41,5 @@ IP addresses are not stored ([ADR-0004](../architecture/decisions/adr-0004-no-ip
 ## Related
 
 - [Shares & Public Access](shares.md) — share-link access logging
+- [Members](members.md#retention) — entries of a member who leaves or is erased are anonymised (user ID `erased`)
 - [Roadmap](../roadmap.md#6-operational--integration) — retention policy and richer UI still pending

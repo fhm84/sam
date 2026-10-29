@@ -80,7 +80,7 @@ the music. Retention period: **12 months**, the same as the event log
 |---|---|
 | **Erasure request** (Art. 17) or a librarian deletes a member | Delete the member profile, its instruments and ensemble memberships, and its audit rows (`members_AUD`, `member_instruments_AUD`, `ensemble_memberships_AUD`) **immediately**. Anonymise the member's event-log entries: `userId` becomes one fixed placeholder (`erased`, the same for every erased member, not a per-person pseudonym), `username` is cleared; the entries themselves stay, so download counts stay right, and age out with the event-log retention ([event log plan](event-log-retention.md)). The person stays only if it is credited on a sheet (a credit printed on the music is not erased by leaving the band); otherwise it is deleted with its `persons_AUD` rows. The login account in Pocket ID / Keycloak is deleted there by the admin; the UI says so. |
 | **Member pauses** (`PAUSED`) | Nothing is removed; login and access to their parts stay. |
-| **Member leaves** (`FORMER`) | Login link removed at once (no access any more). After `sam.members.retention-months` (default 12) since `leftAt`, the nightly job deletes the profile as above. Setting the member `ACTIVE` again before that stops the clock. |
+| **Member leaves** (`FORMER`) | Login link removed at once (no access any more), and the event-log entries of that login are anonymised as on erasure (afterwards nothing could find them again). After `sam.members.retention-months` (default 12) since `leftAt`, the nightly job deletes the profile as above. Setting the member `ACTIVE` again before that stops the clock. |
 | **Audit history of active members** | The nightly job deletes `members_AUD` rows that have been superseded (`REVEND` set) for longer than the same retention period. Current values and the history of the last 12 months stay, old email addresses and phone numbers do not. |
 | **Right of access** (Art. 15) | `GET /api/me/member`: the caller's own profile, memberships and instruments, shown on a "My data" page next to "My activity" from the event log plan. |
 | **Data minimisation** | `notes` is for organisational notes only. Health data (allergies) is special-category data (Art. 9) and needs explicit consent; the form says "no health data" and the roadmap example goes. |
@@ -105,6 +105,10 @@ offers no deletion of its own, so the job deletes `_AUD` rows with plain SQL.
 | 8 | UI: "People" page (search, edit name/years/IPI, the sheets credited to a person); "Members" page (profiles only, status filter, "make member" from a person, duplicate check when creating one: "Is this the person who arranged …?"); sheet form and classification dialog pick persons with a server-side typeahead (replaces [server-side musician search](../roadmap.md#server-side-musician-search-composerarranger-fields--idea)); role per seat in ensemble memberships; "My data" page; "no health data" hint on notes. Browser-verified. | [#267](https://github.com/fhm84/sam/issues/267) |
 | 9 | Merge persons: librarian-only "merge into" on the People page (repoint sheet credits and a member profile, if only one of the two has one; delete the duplicate). Can be its own pull request. | [#268](https://github.com/fhm84/sam/issues/268) |
 | 10 | Docs: `data-model.md`, `features/musicians.md` → members + people, `features/ensembles-coverage.md` (role per seat), `features/api-surface.md`, `stakeholders.md` Section 6, `concepts/security.md`, `deployment.md` (retention config), `cli/README.md`, `migration/README.md`; amend ADR-0001's wording (`userId` is on the member). | [#269](https://github.com/fhm84/sam/issues/269) |
+
+Task 7 needs no conversion code: the legacy exports name no people (the sheet catalogue has
+no composer or arranger, `ensemble_mkn.json` is an ensemble definition, not a roster); the
+`cli` commands came with tasks 1–5 and their review follow-ups.
 
 Tasks 1–5 go into one pull request (schema, entities and API must change together);
 6–9 can follow separately, 10 goes with whichever task changes the page.
@@ -131,8 +135,6 @@ erased members is state-based (catches up after a failure, also runs at startup)
 and stops on ambiguous names, and person resolution and "instrument IDs of a member" live in
 one place each. Still open:
 
-- **Nightly purge.** Run `MemberAuditPurge.purgeErasedMembers` from the retention job too
-  (task 6, needs the scheduler from the event log plan).
 - **Member lists load persons separately.** `MemberEntity.person` is eager without a fetch
   join; Quarkus' default fetch batch size (16) groups these loads. Fetch-join if lists grow.
 - **Link and unlink toasts don't show.** The member form provides its own `MessageService`

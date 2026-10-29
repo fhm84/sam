@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 import de.halbmann.sam.api.entity.members.Member;
 import de.halbmann.sam.api.entity.members.MembershipStatus;
 import de.halbmann.sam.business.ensembles.boundary.EnsembleMembershipRepository;
+import de.halbmann.sam.business.eventlog.boundary.EventLogRepository;
 import de.halbmann.sam.business.members.boundary.MemberRepository;
 import de.halbmann.sam.business.members.entity.MemberEntity;
 import de.halbmann.sam.business.persons.boundary.PersonRepository;
@@ -41,6 +42,9 @@ class MemberServiceTest {
 
     @Mock
     MemberMapper memberMapper;
+
+    @Mock
+    EventLogRepository eventLogRepository;
 
     @Mock
     Event<MemberErased> memberErased;
@@ -150,6 +154,7 @@ class MemberServiceTest {
         assertEquals(MembershipStatus.FORMER, entity.getMembershipStatus());
         assertEquals(LocalDate.now(), entity.getLeftAt());
         assertNull(entity.getUserId());
+        verify(eventLogRepository).anonymiseUser("user-abc");
     }
 
     @Test
@@ -175,6 +180,7 @@ class MemberServiceTest {
         service.updateMember(id.toString(), dto(MembershipStatus.PAUSED));
 
         assertEquals("user-abc", entity.getUserId());
+        verifyNoInteractions(eventLogRepository);
         assertNull(entity.getLeftAt());
     }
 

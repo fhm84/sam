@@ -19,10 +19,14 @@ since they are data, not configuration):
 
 - `src/migration-data/noten_mkn.json` — sheet music catalogue ("Noten").
   Converted today.
-- `src/migration-data/ensemble_mkn.json` — musicians/ensemble roster
-  ("Ensemble"). **Not converted yet** — there is currently no code path that
-  reads this file. Musicians and ensemble membership need to be entered
-  through the UI/API until this is built.
+- `src/migration-data/ensemble_mkn.json` — an ensemble definition (name and voices
+  with their instrument options). **Not converted yet** — there is currently no code
+  path that reads this file; create the ensemble through the UI/API or `cli importEnsemble`.
+
+Neither export names people: the sheet catalogue has no composer or arranger, and there is
+no member roster. Persons therefore come from sheets imported with a composer or arranger
+name (or `cli importPerson`), and members are entered in the UI or imported with
+`cli importMember`.
 
 ## Conversion: `DataConversion.shouldConvert()`
 
@@ -83,7 +87,7 @@ as "would import").
 
 Imports are **idempotent** — records that already exist on the target are
 skipped, not duplicated (sheets match by exact title + publisher, instruments
-by natural ID, musicians/ensembles by name), so rerunning an import after a
+by natural ID, persons/members/ensembles by name), so rerunning an import after a
 partial failure is safe. Files are also validated locally (Jakarta Bean
 Validation) before anything is sent; `--dry-run` runs exactly that validation
 and nothing else.
@@ -110,7 +114,7 @@ java -jar cli/target/quarkus-app/quarkus-run.jar export ./snapshot
 # optionally scope it: --query <text> matches the same full-text search as `list`
 ```
 
-Instruments, musicians, and ensembles have equivalent commands
+Instruments, persons, members, and ensembles have equivalent commands
 (`exportInstrument`, `exportPerson`, `exportMember`, `exportEnsemble` and their `import*`
 counterparts) — together they snapshot everything needed to seed a fresh
 instance except collections and document files (see "Known gaps").
@@ -165,8 +169,8 @@ The claim the role travels in differs per provider: `scp` on Pocket ID (read by
 ## Known gaps
 
 - **`ensemble_mkn.json` is still not converted** — no code reads the legacy
-  musician/ensemble roster export. However, musicians and ensembles created in
-  a running SAM instance now round-trip via
+  ensemble definition. However, persons, members and ensembles created in
+  a running SAM instance round-trip via `cli exportPerson`/`importPerson`,
   `cli exportMember`/`importMember` and `cli exportEnsemble`/
   `importEnsemble` (ensembles include voices and instrument options;
   memberships and user links are environment-specific and excluded — re-link
