@@ -13,7 +13,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { AdminUsersApiService, InstrumentsApiService, MembersApiService, PersonsApiService } from '../../core/api';
 import { convertEmptyStringsToNull } from '../../shared/utils/object.utils';
 import { Instrument, Member, MemberContact, MemberInstrument, MembershipStatus, Person, UserInfo } from '../../model/datamodels';
-import { forkJoin, map, Observable } from 'rxjs';
+import { debounceTime, distinctUntilChanged, filter, forkJoin, map, Observable, of, switchMap } from 'rxjs';
 import { BaseForm } from '../../shared/base/base-form';
 import { AuthService } from '../../core/auth/auth.service';
 
@@ -22,7 +22,6 @@ const STATUSES: MembershipStatus[] = ['ACTIVE', 'PAUSED', 'FORMER'];
 @Component({
   selector: 'app-member-form',
   imports: [ReactiveFormsModule, FormsModule, FloatLabel, InputText, Select, AutoComplete, Textarea, Button, Tooltip, TranslatePipe],
-  providers: [MessageService],
   changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './member-form.html',
 })
@@ -62,6 +61,45 @@ export class MemberForm extends BaseForm<Member, Member> implements OnChanges {
   // On create: an existing person (e.g. a credited arranger) who gets the profile, instead of a new one
   readonly personSuggestions = signal<Person[]>([]);
   existingPerson: Person | null = null;
+
+  /**
+   * On create: a person in the catalogue with exactly the typed name and no profile yet, e.g. an
+   * arranger who joins the band. Suggesting them avoids a second person of the same name.
+   */
+  readonly duplicateCandidate = signal<Person | null>(null);
+
+  constructor() {
+    super();
+    this.form.controls.name.valueChanges
+      .pipe(
+        map((name) => name.trim()),
+        debounceTime(400),
+        distinctUntilChanged(),
+        filter(() => !this.isEdit),
+        switchMap((name) => (name.length < 2 || this.existingPerson ? of(null) : this.findDuplicate(name))),
+        takeUntilDestroyed(),
+      )
+      .subscribe((candidate) => this.duplicateCandidate.set(candidate));
+  }
+
+  private findDuplicate(name: string): Observable<Person | null> {
+    return forkJoin([this.personsApi.find({ name, size: 10 }), this.api.find({ name, size: 50 })]).pipe(
+      map(([persons, members]) => {
+        const memberIds = new Set((members.data ?? []).map((m) => m.id));
+        return (persons.data ?? []).find(
+          (p) => p.name.toLowerCase() === name.toLowerCase() && !memberIds.has(p.id),
+        ) ?? null;
+      }),
+    );
+  }
+
+  useDuplicateCandidate(): void {
+    const candidate = this.duplicateCandidate();
+    if (candidate) {
+      // Same as picking the person in the field: the profile keeps the person's own spelling
+      this.onPersonSelect(candidate);
+    }
+  }
 
   getEntity = () => this.member;
 
@@ -191,6 +229,7 @@ export class MemberForm extends BaseForm<Member, Member> implements OnChanges {
   }
 
   onPersonSelect(person: Person): void {
+    this.duplicateCandidate.set(null);
     this.existingPerson = person;
     this.form.controls.name.setValue(person.name);
   }

@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 4.2.1 on 2026-10-29 23:01:07.
+// Generated using typescript-generator version 4.2.1 on 2026-10-29 23:12:17.
 
 export interface SheetEnrichment {
     suggestedAdditionalNotes?: string;
@@ -400,6 +400,13 @@ export interface Person {
     name: string;
 }
 
+export interface PersonCredit {
+    role?: CreditRole;
+    sheetId?: string;
+    subtitle?: string;
+    title?: string;
+}
+
 export interface PersonFilterRequest extends PaginationRequest {
     name?: string;
 }
@@ -664,6 +671,8 @@ export type VoiceOptionType = "PRIMARY" | "ALTERNATE" | "FALLBACK";
 export type MembershipStatus = "ACTIVE" | "PAUSED" | "FORMER";
 
 export type OnboardingState = "NONE" | "INVITED" | "LINKED";
+
+export type CreditRole = "COMPOSER" | "ARRANGER";
 
 export type SortOrder = "ASC" | "DESC";
 

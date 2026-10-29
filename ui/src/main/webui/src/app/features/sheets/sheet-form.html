@@ -25,16 +25,19 @@
     <div class="flex flex-col gap-1.5 flex-1 min-w-0">
       <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
         <p-floatlabel variant="on" class="block">
-          <p-select
+          <p-autocomplete
             inputId="sheet-composer"
-            formControlName="composerId"
-            [options]="persons()"
+            formControlName="composer"
+            [suggestions]="personSuggestions()"
             optionLabel="name"
-            optionValue="id"
-            [filter]="true"
+            [forceSelection]="true"
+            [dropdown]="true"
             [showClear]="true"
+            [minLength]="0"
             styleClass="w-full"
             inputStyleClass="w-full"
+            appendTo="body"
+            (completeMethod)="onPersonSearch($event)"
           />
           <label for="sheet-composer">{{ 'sheets.form.composer' | translate }}</label>
         </p-floatlabel>
@@ -52,16 +55,19 @@
     <div class="flex flex-col gap-1.5 flex-1 min-w-0">
       <div class="grid items-center gap-2 [grid-template-columns:1fr_2rem]">
         <p-floatlabel variant="on" class="block">
-          <p-select
+          <p-autocomplete
             inputId="sheet-arranger"
-            formControlName="arrangerId"
-            [options]="persons()"
+            formControlName="arranger"
+            [suggestions]="personSuggestions()"
             optionLabel="name"
-            optionValue="id"
-            [filter]="true"
+            [forceSelection]="true"
+            [dropdown]="true"
             [showClear]="true"
+            [minLength]="0"
             styleClass="w-full"
             inputStyleClass="w-full"
+            appendTo="body"
+            (completeMethod)="onPersonSearch($event)"
           />
           <label for="sheet-arranger">{{ 'sheets.form.arranger' | translate }}</label>
         </p-floatlabel>

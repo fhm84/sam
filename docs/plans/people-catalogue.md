@@ -137,9 +137,6 @@ one place each. Still open:
 
 - **Member lists load persons separately.** `MemberEntity.person` is eager without a fetch
   join; Quarkus' default fetch batch size (16) groups these loads. Fetch-join if lists grow.
-- **Link and unlink toasts don't show.** The member form provides its own `MessageService`
-  but has no `<p-toast>`, so "User account linked / unlinked" and their errors are never
-  displayed (as in the old musician form). Use the app's message service or add a toast.
 - **Smaller items:** the `MEMBER` default is set in several places; `INVITED` can't occur
   until the invite flow writes `lastInviteSentAt`.
 

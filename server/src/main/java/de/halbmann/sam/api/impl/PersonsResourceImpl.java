@@ -2,6 +2,7 @@ package de.halbmann.sam.api.impl;
 
 import de.halbmann.sam.api.boundary.PersonsResource;
 import de.halbmann.sam.api.entity.persons.Person;
+import de.halbmann.sam.api.entity.persons.PersonCredit;
 import de.halbmann.sam.api.entity.persons.PersonFilterRequest;
 import de.halbmann.sam.api.entity.shared.PaginatedResponse;
 import de.halbmann.sam.business.persons.controller.PersonService;
@@ -10,6 +11,7 @@ import io.quarkus.security.Authenticated;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
+import java.util.List;
 
 @Authenticated
 @RequestScoped
@@ -32,6 +34,11 @@ public class PersonsResourceImpl implements PersonsResource {
     @Override
     public Person load(String personId) {
         return personService.getPerson(personId);
+    }
+
+    @Override
+    public List<PersonCredit> credits(String personId) {
+        return personService.getCredits(personId);
     }
 
     @Override

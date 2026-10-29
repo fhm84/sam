@@ -1,4 +1,6 @@
-import { ChangeDetectionStrategy, Component, inject, Input, OnChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, Input, OnChanges, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { RouterLink } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FloatLabel } from '@openng/optimus-ui/floatlabel';
 import { InputText } from '@openng/optimus-ui/inputtext';
@@ -9,12 +11,12 @@ import { map, Observable } from 'rxjs';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { PersonsApiService } from '../../core/api';
 import { convertEmptyStringsToNull } from '../../shared/utils/object.utils';
-import { Person } from '../../model/datamodels';
+import { Person, PersonCredit } from '../../model/datamodels';
 import { BaseForm } from '../../shared/base/base-form';
 
 @Component({
   selector: 'app-person-form',
-  imports: [ReactiveFormsModule, FloatLabel, InputText, InputNumber, Button, Tooltip, TranslatePipe],
+  imports: [ReactiveFormsModule, RouterLink, FloatLabel, InputText, InputNumber, Button, Tooltip, TranslatePipe],
   changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './person-form.html',
 })
@@ -22,6 +24,9 @@ export class PersonForm extends BaseForm<Person, Person> implements OnChanges {
   private readonly api = inject(PersonsApiService);
 
   @Input() person: Person | null = null;
+
+  /** The sheets that credit the person (edit mode). */
+  protected readonly credits = signal<PersonCredit[] | null>(null);
 
   readonly form = new FormGroup({
     name: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
@@ -39,6 +44,10 @@ export class PersonForm extends BaseForm<Person, Person> implements OnChanges {
       birthYear: p.birthYear ?? null,
       deathYear: p.deathYear ?? null,
     });
+    this.credits.set(null);
+    this.api.credits(p.id!)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((credits) => this.credits.set(credits));
   }
 
   buildSaveRequest(): Observable<Person> {

@@ -48,6 +48,7 @@ src/app/
 │   ├── uploads/
 │   ├── members/
 │   ├── persons/
+│   ├── my-data/
 │   ├── ensembles/
 │   ├── instruments/
 │   └── configuration/
@@ -80,6 +81,12 @@ import { SheetsApiService } from '../../core/api';
 
 Singleton services that don't belong to any feature: theme management, auth,
 global error handling.
+
+**Error toasts** (`core/error.interceptor.ts`): every failed request shows "Request failed",
+with the server's `message` as detail for a 400 or 409 (e.g. why a delete was refused). A
+request whose error the page explains itself (an expected 404) sets
+`new HttpContext().set(SKIP_ERROR_TOAST, true)`. Components use the app-wide
+`MessageService` (shown by `<p-toast>` in the layout); don't provide a local one.
 
 **Roles in the UI** (`core/auth/`): the server enforces every role; the UI only hides
 what a user can't use. `AuthService` re-reads the roles whenever the OIDC library stores new
@@ -145,7 +152,7 @@ The `core/api/` services cover the full backend API:
 | `SheetsApiService`          | `/api/sheets`                                          | CRUD + coverage   |
 | `InstrumentationsApiService`| `/api/sheets/{sheetId}/instrumentations`               | CRUD + bulk       |
 | `DocumentsApiService`       | `/api/documents`, also sub-resource of sheets/instrum. | list, download, upload |
-| `MembersApiService`         | `/api/members`                                         | CRUD, login link  |
+| `MembersApiService`         | `/api/members`, `/api/me/member`                       | CRUD, login link, own data |
 | `PersonsApiService`         | `/api/persons`                                         | CRUD              |
 | `InstrumentsApiService`     | `/api/instruments`                                     | CRUD              |
 | `EnsemblesApiService`       | `/api/ensembles`                                       | CRUD + voices + voice options |

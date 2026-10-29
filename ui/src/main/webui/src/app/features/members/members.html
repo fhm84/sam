@@ -7,6 +7,17 @@
       </div>
     </ng-template>
     <ng-template #end>
+      <p-select
+        [options]="statusOptions()"
+        [ngModel]="statusFilter"
+        (ngModelChange)="onStatusFilter($event)"
+        optionLabel="label"
+        optionValue="value"
+        [showClear]="true"
+        [placeholder]="t.t('members.allStatuses')"
+        styleClass="min-w-36"
+        appendTo="body"
+      />
       <p-iconfield>
         <p-inputicon styleClass="pi pi-search" />
         <input

@@ -1311,16 +1311,11 @@ shown in the Claude Design `Sheets Overview (PrimeNG).html`. Task breakdown: [pl
 
 ---
 
-### Server-side musician search (composer/arranger fields) — `idea`
+### Server-side musician search (composer/arranger fields) — `done`
 
-The composer/arranger pickers in the sheet create/edit form (`sheet-form.html`) use a
-PrimeNG `p-select` with `[filter]="true"` — it loads the *entire* musician list up front
-and filters client-side, not a real typeahead against the backend. Fine at today's scale;
-will get slow to load and unwieldy to scroll once the musician table grows.
-
-Replace with `p-autocomplete` backed by a debounced `GET /musicians?search=...` call
-(the search infrastructure — trigram/phonetic matching — already exists for sheets and
-could be reused/extended for musicians).
+**Done** with the [person catalogue](plans/people-catalogue.md): the composer and arranger
+fields of the sheet form are a `p-autocomplete` against `GET /api/persons?name=…` (prefix,
+substring, trigram and phonetic matching) instead of a select loading every person.
 
 **Stakeholders:** S1 (music librarian)
 **Effort:** Low (existing search patterns to reuse; swap one form control)

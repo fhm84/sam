@@ -30,11 +30,14 @@ The role in an ensemble (member, guest, substitute, conductor) is per seat, see
 - **Delete erases** the profile, its instruments and ensemble seats and, after commit, their
   audit history (GDPR Art. 17). The person stays when it is credited on a sheet, otherwise it
   goes too. The login account at the login provider is deleted there by the admin.
-- Paginated list sorted by name, filterable by name and status; shows instruments (primary
+- **Duplicate hint:** when the name of a new member matches a person in the catalogue that has
+  no profile yet, the form suggests using that person ("Is it the same person?").
+- Paginated list sorted by name, filterable by name and status (select in the toolbar); shows instruments (primary
   highlighted) and status to everyone, contact data only in the librarian's form.
 - Can be given seats in ensembles (see [Ensembles & Coverage](ensembles-coverage.md)).
 - **Own data:** `GET /api/me/member` returns the caller's own profile with all personal data and
-  their seats (GDPR Art. 15); 404 when no member is linked to the login.
+  their seats (GDPR Art. 15); 404 when no member is linked to the login. The **My data** page
+  (`/user/my-data`, user menu) shows it.
 
 ## Retention
 

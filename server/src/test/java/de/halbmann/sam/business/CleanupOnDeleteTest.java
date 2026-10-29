@@ -87,6 +87,11 @@ class CleanupOnDeleteTest {
                 given().get("/api/sheets/{id}", sheetId).then().extract().path("composer.id");
 
         given().delete("/api/persons/{id}", composerId).then().statusCode(409);
+        given().get("/api/persons/{id}/credits", composerId)
+                .then()
+                .statusCode(200)
+                .body("sheetId", org.hamcrest.Matchers.contains(sheetId))
+                .body("role", org.hamcrest.Matchers.contains("COMPOSER"));
 
         given().delete("/api/sheets/{id}", sheetId).then().statusCode(204);
         given().delete("/api/persons/{id}", composerId).then().statusCode(204);
