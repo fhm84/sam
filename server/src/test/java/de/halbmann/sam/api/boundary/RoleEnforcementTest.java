@@ -75,6 +75,7 @@ class RoleEnforcementTest {
                 "POST /api/persons",
                 "PUT /api/persons/" + ID,
                 "DELETE /api/persons/" + ID,
+                "POST /api/persons/" + ID + "/merge-into/" + ID,
                 "POST /api/members",
                 "PUT /api/members/" + ID,
                 "DELETE /api/members/" + ID,

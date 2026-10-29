@@ -25,6 +25,11 @@ A band member is a person with a [member profile](members.md) under the same ID.
 - **Credits:** the edit dialog lists the sheets that credit the person (composer / arranger),
   each linking to the sheet (`GET /api/persons/{id}/credits`).
 - The sheet form's composer and arranger fields search persons on the server as you type.
+- **Merge duplicates** ("Merge into …", librarian and admin): the duplicate's credits move to
+  the person you keep and the duplicate is deleted
+  (`POST /api/persons/{id}/merge-into/{targetId}`). If only the duplicate has a member
+  profile, its record stays (seats and login hang on its ID) and takes over the kept person's
+  name, years and IPI. Two members can't be merged (409).
 
 ## Related
 

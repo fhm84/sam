@@ -726,7 +726,8 @@ yet decided on):
 | See someone else's `PRIVATE` collection (draft) | ✅ | ❌ (404; ✅ if no creator recorded) | ❌ (404) | ➖ (only through a share link to it) |
 | Create/edit/delete sheets, instrumentations, documents; run AI classify/apply/enrich | ✅ | ✅ | ❌ | ❌ |
 | Create/edit/delete collections & setlist items; use the AI setlist assistant (suggest items, draft text) | ✅ | ✅ | ❌ | ❌ |
-| Create/edit/delete persons, members & instruments (deleting a member erases their personal data and its history) | ✅ | ✅ | ❌ | ❌ |
+| Create/edit/delete/merge persons, members & instruments (deleting a member erases their personal data and its history) | ✅ | ✅ | ❌ | ❌ |
+| See own member data (My data, `GET /api/me/member`) | ✅ | ✅ | ✅ (if linked) | ❌ |
 | Create/edit/delete ensembles, voices, voice options, members; compute coverage | ✅ | ✅ | ❌ | ❌ |
 | Link/unlink a `Member` to a login; search the login provider's users | ✅ | ❌ | ❌ | ❌ |
 | Create share tokens | ✅ | ✅ | ❌ | ❌ |

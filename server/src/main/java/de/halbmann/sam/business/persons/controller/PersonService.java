@@ -107,6 +107,43 @@ public class PersonService {
         });
     }
 
+    /** See {@code PersonsResource.mergeInto}. */
+    public Person mergeInto(final String duplicateId, final String keepId) {
+        if (duplicateId.equals(keepId)) {
+            throw new ValidationException("A person can't be merged into itself");
+        }
+        final PersonEntity duplicate = find(duplicateId);
+        final PersonEntity keep = find(keepId);
+        final boolean duplicateIsMember =
+                memberRepository.findByIdOptional(duplicate.getId()).isPresent();
+        final boolean keepIsMember =
+                memberRepository.findByIdOptional(keep.getId()).isPresent();
+        if (duplicateIsMember && keepIsMember) {
+            throw new ConflictException("'" + duplicate.getName() + "' and '" + keep.getName()
+                    + "' both have a member profile; delete one of the profiles first");
+        }
+        // The record with a member profile stays (its seats and login hang on its ID) and takes
+        // over the data of the person chosen to keep
+        final PersonEntity survivor = duplicateIsMember ? duplicate : keep;
+        final PersonEntity removed = duplicateIsMember ? keep : duplicate;
+        if (duplicateIsMember) {
+            survivor.setName(keep.getName());
+            survivor.setBirthYear(keep.getBirthYear());
+            survivor.setDeathYear(keep.getDeathYear());
+            survivor.setIpi(keep.getIpi());
+        }
+        sheetRepository.list("composer = ?1 or arranger = ?1", removed).forEach(sheet -> {
+            if (isPerson(sheet.getComposer(), removed)) {
+                sheet.setComposer(survivor);
+            }
+            if (isPerson(sheet.getArranger(), removed)) {
+                sheet.setArranger(survivor);
+            }
+        });
+        personRepository.delete(removed);
+        return personMapper.toDto(survivor);
+    }
+
     /** The sheets that credit the person, one entry per credit, sorted by title. */
     public List<PersonCredit> getCredits(final String personId) {
         final PersonEntity person = find(personId);

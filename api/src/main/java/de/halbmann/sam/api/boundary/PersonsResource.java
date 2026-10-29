@@ -67,6 +67,21 @@ public interface PersonsResource {
     void update(@PathParam("personId") String personId, Person person);
 
     /**
+     * Merges a duplicate into the person to keep: the duplicate's credits move to the kept person
+     * and the duplicate is deleted. If only the duplicate has a member profile, its record is the
+     * one that stays and takes over the kept person's name, years and IPI, so the profile, its
+     * seats and login stay intact. Two members can't be merged (409).
+     *
+     * @param personId the duplicate
+     * @param targetId the person to keep
+     * @return the remaining person
+     */
+    @POST
+    @Path("{personId}/merge-into/{targetId}")
+    @Consumes(MediaType.WILDCARD)
+    Person mergeInto(@PathParam("personId") String personId, @PathParam("targetId") String targetId);
+
+    /**
      * Deletes a person that is neither credited on a sheet nor a member.
      *
      * @param personId the person ID

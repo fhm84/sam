@@ -45,4 +45,4 @@ arranges another; the role belongs to the credit on the sheet.
 - [ADR-0005](adr-0005-single-name-field.md) still holds; the single name moves to the
   person.
 
-Plan: [Person catalogue and member profiles](../../plans/people-catalogue.md).
+Features: [Members](../../features/members.md) (incl. retention), [People](../../features/people.md).

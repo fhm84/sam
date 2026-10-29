@@ -49,6 +49,12 @@ public class PersonsResourceImpl implements PersonsResource {
 
     @Override
     @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
+    public Person mergeInto(String personId, String targetId) {
+        return personService.mergeInto(personId, targetId);
+    }
+
+    @Override
+    @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public void delete(String personId) {
         personService.deletePerson(personId);
     }
