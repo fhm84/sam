@@ -176,7 +176,7 @@ create table instrumentations_AUD
     primary key (REV, id)
 );
 
-create table musicians
+create table persons
 (
     id         uuid    not null,
     created    timestamp(6),
@@ -189,7 +189,7 @@ create table musicians
     primary key (id)
 );
 
-create table musicians_AUD
+create table persons_AUD
 (
     id        uuid    not null,
     REV       integer not null,
@@ -492,12 +492,12 @@ alter table if exists instrumentations_AUD
         foreign key (REVEND)
             references REVINFO;
 
-alter table if exists musicians_AUD
+alter table if exists persons_AUD
     add constraint FK876qddpd1vyaw20vw671br8on
         foreign key (REV)
             references REVINFO;
 
-alter table if exists musicians_AUD
+alter table if exists persons_AUD
     add constraint FKoxw5pir5jim35a07shdmtpywh
         foreign key (REVEND)
             references REVINFO;
@@ -545,12 +545,12 @@ alter table if exists sheet_collections_collection_sheets_AUD
 alter table if exists sheets
     add constraint FKj842n7cjarxm49gekxa9qt67x
         foreign key (arranger_id)
-            references musicians;
+            references persons;
 
 alter table if exists sheets
     add constraint FK6f2n9r0kx7yst0dwsx51xo0gt
         foreign key (composer_id)
-            references musicians;
+            references persons;
 
 alter table if exists sheets
     add constraint UKfcbv63f6xe2tib2tl6xty2qv9 unique (fingerprint);

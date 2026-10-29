@@ -1,5 +1,6 @@
 import {
   Component,
+  computed,
   inject,
   Input,
   OnChanges,
@@ -16,7 +17,6 @@ import { ConfirmationService, MenuItem, MessageService } from '@openng/optimus-u
 import { Button } from '@openng/optimus-ui/button';
 import { Tag } from '@openng/optimus-ui/tag';
 import { Select } from '@openng/optimus-ui/select';
-import { Checkbox } from '@openng/optimus-ui/checkbox';
 import { Tooltip } from '@openng/optimus-ui/tooltip';
 import { IconField } from '@openng/optimus-ui/iconfield';
 import { InputIcon } from '@openng/optimus-ui/inputicon';
@@ -24,8 +24,10 @@ import { InputText } from '@openng/optimus-ui/inputtext';
 import { FloatLabel } from '@openng/optimus-ui/floatlabel';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../core/translation.service';
-import { EnsemblesApiService, InstrumentsApiService, MusiciansApiService } from '../../core/api';
-import { CreateEnsembleMembership, EnsembleMembership, EnsembleVoice, Instrument, Musician } from '../../model/datamodels';
+import { EnsemblesApiService, InstrumentsApiService, MembersApiService, PersonsApiService } from '../../core/api';
+import { CreateEnsembleMembership, EnsembleMembership, EnsembleRole, EnsembleVoice, Instrument, Member, Person } from '../../model/datamodels';
+
+const ROLES: EnsembleRole[] = ['MEMBER', 'GUEST', 'SUBSTITUTE', 'CONDUCTOR'];
 import { FETCH_ALL_SIZE } from '../../shared/constants';
 import { instrumentLabel } from '../../shared/utils/format.utils';
 import { RowActions } from '../../shared/components/row-actions/row-actions';
@@ -42,7 +44,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     Button,
     Tag,
     Select,
-    Checkbox,
     Tooltip,
     IconField,
     InputIcon,
@@ -59,7 +60,8 @@ export class EnsembleMemberships implements OnChanges, OnInit {
 
   protected readonly t = inject(TranslationService);
   private readonly api = inject(EnsemblesApiService);
-  private readonly musiciansApi = inject(MusiciansApiService);
+  private readonly membersApi = inject(MembersApiService);
+  private readonly personsApi = inject(PersonsApiService);
   private readonly instrumentsApi = inject(InstrumentsApiService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly messageService = inject(MessageService);
@@ -72,22 +74,26 @@ export class EnsembleMemberships implements OnChanges, OnInit {
 
   // ── Reference data ────────────────────────────────────
   protected readonly voices = signal<EnsembleVoice[]>([]);
-  private readonly allMusicians = signal<Musician[]>([]);
-  protected readonly filteredMusicians = signal<Musician[]>([]);
+  private readonly allMembers = signal<Member[]>([]);
+  protected readonly filteredMembers = signal<Member[]>([]);
   protected readonly instrumentOptions = signal<{ label: string; value: string }[]>([]);
+
+  protected readonly roleOptions = computed(() =>
+    ROLES.map((r) => ({ label: this.t.t(`ensembles.members.role.${r}`), value: r })),
+  );
 
   // ── Voice options for Select ──────────────────────────
   protected voiceOptions: { label: string; value: string | null }[] = [];
 
   // ── Add dialog ────────────────────────────────────────
   protected addDialogVisible = false;
-  protected selectedMusician: Musician | null = null;
+  protected selectedMember: Member | null = null;
   protected saving = false;
 
   protected readonly addForm = new FormGroup({
     voiceId: new FormControl<string | null>(null),
     instrumentId: new FormControl<string | null>(null),
-    conductor: new FormControl(false, { nonNullable: true }),
+    role: new FormControl<EnsembleRole>('MEMBER', { nonNullable: true }),
   });
 
   // ── Edit dialog ───────────────────────────────────────
@@ -97,16 +103,16 @@ export class EnsembleMemberships implements OnChanges, OnInit {
   protected readonly editForm = new FormGroup({
     voiceId: new FormControl<string | null>(null),
     instrumentId: new FormControl<string | null>(null),
-    conductor: new FormControl(false, { nonNullable: true }),
+    role: new FormControl<EnsembleRole>('MEMBER', { nonNullable: true }),
   });
 
   ngOnInit(): void {
-    this.musiciansApi.find({ size: FETCH_ALL_SIZE })
+    this.membersApi.find({ size: FETCH_ALL_SIZE })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((res) => {
-        const musicians = res.data ?? [];
-        this.allMusicians.set(musicians);
-        this.filteredMusicians.set(musicians);
+        const members = res.data ?? [];
+        this.allMembers.set(members);
+        this.filteredMembers.set(members);
       });
     this.instrumentsApi.find({ size: FETCH_ALL_SIZE })
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -124,61 +130,93 @@ export class EnsembleMemberships implements OnChanges, OnInit {
     }
   }
 
-  // ── Musician filter ───────────────────────────────────
-  protected readonly musicianFilterQuery = signal('');
-  protected creatingMusician = false;
+  // ── Member filter ───────────────────────────────────
+  protected readonly memberFilterQuery = signal('');
+  protected creatingMember = false;
 
-  protected onMusicianFilterInput(event: Event): void {
+  /** Persons matching the filter who have no member profile yet, e.g. an arranger who joins the band. */
+  protected readonly personCandidates = signal<Person[]>([]);
+
+  protected onMemberFilterInput(event: Event): void {
     const raw = (event.target as HTMLInputElement).value;
-    this.musicianFilterQuery.set(raw);
+    this.memberFilterQuery.set(raw);
     const query = raw.toLowerCase();
-    this.filteredMusicians.set(
-      this.allMusicians().filter((m) => m.name.toLowerCase().includes(query)),
+    this.filteredMembers.set(
+      this.allMembers().filter((m) => m.name.toLowerCase().includes(query)),
     );
+    this.searchPersonCandidates(raw.trim());
   }
 
-  protected createMusician(): void {
-    const name = this.musicianFilterQuery().trim();
+  private searchPersonCandidates(query: string): void {
+    if (query.length < 2) {
+      this.personCandidates.set([]);
+      return;
+    }
+    this.personsApi.find({ name: query, size: 10 })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((res) => {
+        // A late answer for an older query must not replace the current candidates
+        if (this.memberFilterQuery().trim() !== query) return;
+        const memberIds = new Set(this.allMembers().map((m) => m.id));
+        this.personCandidates.set((res.data ?? []).filter((p) => !memberIds.has(p.id)));
+      });
+  }
+
+  protected createMember(): void {
+    const name = this.memberFilterQuery().trim();
     if (!name) return;
-    this.creatingMusician = true;
-    this.musiciansApi.create({ name } as Musician)
+    this.saveNewMember({ name } as Member);
+  }
+
+  /** Gives an existing person a member profile (same ID), so their credits and seats stay one record. */
+  protected makeMember(person: Person): void {
+    this.saveNewMember({ id: person.id, name: person.name } as Member);
+  }
+
+  private saveNewMember(member: Member): void {
+    this.creatingMember = true;
+    this.membersApi.create(member)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (created) => {
-          this.creatingMusician = false;
-          this.allMusicians.update((list) => [...list, created]);
-          this.filteredMusicians.update((list) => [...list, created]);
-          this.selectedMusician = created;
+          this.creatingMember = false;
+          this.allMembers.update((list) => [...list, created]);
+          this.filteredMembers.update((list) => [...list, created]);
+          this.personCandidates.update((list) => list.filter((p) => p.id !== created.id));
+          this.selectMember(created);
           this.messageService.add({
             severity: 'success',
-            summary: this.t
-              .t('ensembles.members.musician.createWithName')
-              .replace('{name}', created.name),
+            summary: this.t.t('ensembles.members.messages.memberCreated').replace('{name}', created.name),
           });
         },
         error: () => {
-          this.creatingMusician = false;
+          this.creatingMember = false;
         },
       });
   }
 
-  protected selectMusician(musician: Musician): void {
-    this.selectedMusician = musician;
+  protected selectMember(member: Member): void {
+    this.selectedMember = member;
+    // A member's voice seats share one role: start from the role they already have here
+    const voiceSeat = this.members().find((m) => m.member.id === member.id && m.voiceId);
+    this.addForm.controls.role.setValue(voiceSeat?.role ?? 'MEMBER');
   }
 
-  protected isMusicianSelected(musician: Musician): boolean {
-    return this.selectedMusician?.id === musician.id;
+  protected isMemberSelected(member: Member): boolean {
+    return this.selectedMember?.id === member.id;
   }
 
   protected get canAdd(): boolean {
-    return this.selectedMusician !== null;
+    return this.selectedMember !== null;
   }
 
   // ── Add ───────────────────────────────────────────────
   protected openAdd(): void {
-    this.selectedMusician = null;
-    this.filteredMusicians.set(this.allMusicians());
-    this.addForm.reset({ voiceId: null, instrumentId: null, conductor: false });
+    this.selectedMember = null;
+    this.filteredMembers.set(this.allMembers());
+    this.memberFilterQuery.set('');
+    this.personCandidates.set([]);
+    this.addForm.reset({ voiceId: null, instrumentId: null, role: 'MEMBER' });
     this.addDialogVisible = true;
   }
 
@@ -186,10 +224,10 @@ export class EnsembleMemberships implements OnChanges, OnInit {
     if (!this.canAdd) return;
     const raw = this.addForm.getRawValue();
     const payload: CreateEnsembleMembership = {
-      musicianId: this.selectedMusician!.id!,
+      memberId: this.selectedMember!.id!,
       voiceId: raw.voiceId ?? undefined,
       instrumentId: raw.instrumentId ?? undefined,
-      conductor: raw.conductor,
+      role: raw.role,
     };
     this.saving = true;
     this.api.addMember(this.ensembleId, payload)
@@ -216,7 +254,7 @@ export class EnsembleMemberships implements OnChanges, OnInit {
     this.editForm.reset({
       voiceId: member.voiceId ?? null,
       instrumentId: member.instrumentId ?? null,
-      conductor: member.conductor,
+      role: member.role ?? 'MEMBER',
     });
     this.editDialogVisible = true;
   }
@@ -225,10 +263,10 @@ export class EnsembleMemberships implements OnChanges, OnInit {
     if (!this.editingMember) return;
     const raw = this.editForm.getRawValue();
     const payload: EnsembleMembership = {
-      musician: this.editingMember.musician,
+      member: this.editingMember.member,
       voiceId: raw.voiceId ?? undefined,
       instrumentId: raw.instrumentId ?? undefined,
-      conductor: raw.conductor,
+      role: raw.role,
     };
     this.saving = true;
     this.api.updateMember(this.ensembleId, this.editingMember.id!, payload)
@@ -254,7 +292,7 @@ export class EnsembleMemberships implements OnChanges, OnInit {
     this.confirmationService.confirm({
       message: this.t
         .t('ensembles.members.delete.confirm')
-        .replace('{name}', member.musician.name),
+        .replace('{name}', member.member.name),
       header: this.t.t('ensembles.members.delete.header'),
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',

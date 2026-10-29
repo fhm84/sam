@@ -26,11 +26,13 @@ java -jar cli/target/quarkus-app/quarkus-run.jar <command> [options]
 | `show <sheetId> [-j]` | Show one sheet (`-j` prints the full JSON) |
 | `import <file-or-dir>... [-d]` | Import sheets from `SheetMusic` JSON files; creates the sheet, then its instrumentations |
 | `importInstrument <file-or-dir>... [-d]` | Import instruments from `CreateInstrument` JSON files |
-| `importMusician <file-or-dir>... [-d]` | Import musicians (env-specific `userId`/`membership` are ignored) |
+| `importPerson <file-or-dir>... [-d]` | Import persons (composers, arrangers) |
+| `importMember <file-or-dir>... [-d]` | Import members; a member whose name matches an existing person becomes that person's profile (env-specific `userId` and invite time are ignored) |
 | `importEnsemble <file-or-dir>... [-d]` | Import ensembles including voices and their instrument options |
 | `export <dir> [-q <query>]` | Export every sheet (optionally full-text filtered) as one `SheetMusic` JSON file |
 | `exportInstrument <dir>` | Export all instruments (filename = natural ID, e.g. `TROMPETE_BB.json`) |
-| `exportMusician <dir>` | Export all musicians, stripped of env-specific `userId`/`membership` |
+| `exportPerson <dir>` | Export all persons |
+| `exportMember <dir>` | Export all members, stripped of env-specific `userId` and invite time |
 | `exportEnsemble <dir>` | Export all ensembles with voices + options (instrument refs are natural IDs) |
 
 Every export format is exactly what the matching import command reads back in,
@@ -113,8 +115,8 @@ java -jar cli/target/quarkus-app/quarkus-run.jar \
   and resolving by title instead is guessable but fragile.
 - Documents/attachments are metadata-only in exported JSON and ignored on
   import; the actual files never move. See `migration/README.md`, "Known gaps".
-- Musician import strips `userId` (OIDC subject) and `membership` — re-link
-  users and ensemble memberships in the target environment.
+- Member export and import strip `userId` (OIDC subject) and the invite time — re-link
+  users in the target environment. Ensemble seats are not part of the member export.
 
 ## Diagnostics
 

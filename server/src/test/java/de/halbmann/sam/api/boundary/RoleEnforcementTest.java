@@ -72,9 +72,12 @@ class RoleEnforcementTest {
                 "POST /api/instruments",
                 "PUT /api/instruments/FLUTE_C",
                 "DELETE /api/instruments/FLUTE_C",
-                "POST /api/musicians",
-                "PUT /api/musicians/" + ID,
-                "DELETE /api/musicians/" + ID,
+                "POST /api/persons",
+                "PUT /api/persons/" + ID,
+                "DELETE /api/persons/" + ID,
+                "POST /api/members",
+                "PUT /api/members/" + ID,
+                "DELETE /api/members/" + ID,
                 "POST /api/shares");
     }
 
@@ -85,8 +88,8 @@ class RoleEnforcementTest {
                 "GET /api/admin/users",
                 "GET /api/admin/users/directory",
                 "GET /api/admin/users/some-user",
-                "PUT /api/musicians/" + ID + "/user/some-user",
-                "DELETE /api/musicians/" + ID + "/user");
+                "PUT /api/members/" + ID + "/user/some-user",
+                "DELETE /api/members/" + ID + "/user");
     }
 
     private static Response call(String endpoint) {

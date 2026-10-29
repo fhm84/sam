@@ -28,7 +28,7 @@
           <p-select
             inputId="sheet-composer"
             formControlName="composerId"
-            [options]="musicians()"
+            [options]="persons()"
             optionLabel="name"
             optionValue="id"
             [filter]="true"
@@ -43,9 +43,9 @@
           [rounded]="true"
           [text]="true"
           size="small"
-          [pTooltip]="t.t('musicians.new')"
+          [pTooltip]="t.t('persons.new')"
           tooltipPosition="top"
-          (onClick)="openMusicianDialog('composer')"
+          (onClick)="openPersonDialog('composer')"
         />
       </div>
     </div>
@@ -55,7 +55,7 @@
           <p-select
             inputId="sheet-arranger"
             formControlName="arrangerId"
-            [options]="musicians()"
+            [options]="persons()"
             optionLabel="name"
             optionValue="id"
             [filter]="true"
@@ -70,9 +70,9 @@
           [rounded]="true"
           [text]="true"
           size="small"
-          [pTooltip]="t.t('musicians.new')"
+          [pTooltip]="t.t('persons.new')"
           tooltipPosition="top"
-          (onClick)="openMusicianDialog('arranger')"
+          (onClick)="openPersonDialog('arranger')"
         />
       </div>
     </div>
@@ -532,16 +532,16 @@
 </form>
 
 <p-dialog
-  [header]="t.t('musicians.new')"
-  [(visible)]="showMusicianDialog"
+  [header]="t.t('persons.new')"
+  [(visible)]="showPersonDialog"
   [modal]="true"
   [style]="{ width: '28rem' }"
 >
-  @if (showMusicianDialog) {
-    <app-musician-form
-      [musician]="null"
-      (saved)="onMusicianCreated($event)"
-      (cancelled)="showMusicianDialog = false"
+  @if (showPersonDialog) {
+    <app-person-form
+      [person]="null"
+      (saved)="onPersonCreated($event)"
+      (cancelled)="showPersonDialog = false"
     />
   }
 </p-dialog>

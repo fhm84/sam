@@ -161,7 +161,7 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
             params.put("favorite", filters.favorite());
         }
         if (filters.composer() != null && !filters.composer().isBlank()) {
-            // composer_name is kept in sync with musicians.name by a trigger (V1.0.1)
+            // composer_name is kept in sync with persons.name by a trigger (V1.0.1)
             conditions.add("s.composer_name = :composer");
             params.put("composer", filters.composer());
         }

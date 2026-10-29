@@ -24,7 +24,7 @@ describe('Home (rendered per role)', () => {
   it('shows a plain musician only the reading areas', () => {
     const links = linksFor([]);
 
-    expect(links).toEqual(['/sheets', '/collections', '/musicians', '/shares']);
+    expect(links).toEqual(['/sheets', '/collections', '/members', '/shares']);
   });
 
   it('shows the music librarian the upload and management areas, not the admin pages', () => {

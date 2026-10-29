@@ -9,7 +9,8 @@ they implement, and `_AUD` tables are left out.
 
 ```mermaid
 erDiagram
-    musicians |o--o{ sheets : "composer, arranger"
+    persons |o--o{ sheets : "composer, arranger"
+    persons ||--o| members : "member profile (same id)"
     sheets ||--o{ instrumentations : "parts"
     instruments ||--o{ instrumentations : "instrument"
     sheets |o--o{ attachments : "sheet files"
@@ -32,11 +33,11 @@ erDiagram
     ensemble_voices ||--o{ voice_options : "options"
     instruments ||--o{ voice_options : "instrument"
     ensembles ||--o{ ensemble_memberships : "members"
-    musicians ||--o{ ensemble_memberships : "membership"
+    members ||--o{ ensemble_memberships : "seat"
     ensemble_voices |o--o{ ensemble_memberships : "voice played"
     instruments |o--o{ ensemble_memberships : "instrument played"
-    musicians ||--o{ musician_instruments : "plays"
-    instruments ||--o{ musician_instruments : "instrument"
+    members ||--o{ member_instruments : "plays"
+    instruments ||--o{ member_instruments : "instrument"
     ensembles ||--o{ coverage_snapshots : "evaluated for"
     sheets ||--o{ coverage_snapshots : "cached coverage"
     ensembles |o--o{ sheet_collections : "AI suggestion scope"
@@ -54,8 +55,9 @@ entities.
 | `instrumentations` | UUID | sheet (FK), instrument (FK), partLabel, clef, notationType, **pages**, physicalLocation, physicalCondition |
 | `instruments` | String | name, displayName, transposition, **family**, **defaultClef**, **catalogSection**, **catalogPosition** |
 | `instrument_aliases` | (instrument_id, alias_order) | alias strings for OCR matching; ordered list per instrument |
-| `musicians` | UUID | name, birthYear, deathYear, ipi, **userId** (OIDC subject — null for external/historical musicians), **email**, **mobile**, **notes**, **status**, **role**, **lastInviteSentAt** |
-| `musician_instruments` | UUID | musician (FK), instrument (FK), isPrimary — instrument assignments driving "My Parts" personalisation |
+| `persons` | UUID | name, birthYear, deathYear, ipi — everyone credited on sheets, band members included ([ADR-0015](decisions/adr-0015-person-catalogue-and-member-profile.md)) |
+| `members` | UUID (= the person's id, FK → persons) | **email**, **mobile**, **notes**, **membershipStatus** (ACTIVE/PAUSED/FORMER), **leftAt**, **lastInviteSentAt**, **userId** (OIDC subject, unique) — the personal data of a band member |
+| `member_instruments` | UUID | member (FK), instrument (FK), isPrimary — instruments a member can play |
 | `documents` | UUID | filename, path, sha256, mimeType, size, refCount |
 | `attachments` | UUID | document (FK), type, displayName |
 | `sheet_collections` | UUID | name, description, type (FOLDER/SETLIST), date, **visibility**, **coverColor**, **coverImageId** (FK → documents), **ensembleId** (FK → ensembles, nullable, ON DELETE SET NULL — scopes coverage-aware AI suggestions), **createdBy** (OIDC `sub` of the creator, nullable for older collections — makes `PRIVATE` a creator's draft) |
@@ -63,7 +65,7 @@ entities.
 | `ensembles` | UUID | name, description |
 | `ensemble_voices` | UUID | ensemble (FK), label, weight, required |
 | `voice_options` | UUID | voice (FK), instrument (FK), type, factor |
-| `ensemble_memberships` | UUID | musician (FK), ensemble (FK), voice (FK, nullable), instrument (FK, nullable), conductor (bool) — one row per musician per voice per ensemble |
+| `ensemble_memberships` | UUID | member (FK), ensemble (FK), voice (FK, nullable), instrument (FK, nullable), **role** (MEMBER/GUEST/SUBSTITUTE/CONDUCTOR) — one row (seat) per member per voice per ensemble; a member's voice seats in one ensemble share the role, driving "My Parts" personalisation |
 | `shares` | UUID | creatorUserId, resourceType, resourceId, expiresAt, revokedAt, createdAt |
 | `event_log` | UUID | occurredAt, userId, username, eventType, entityType, entityId, metadata (JSONB), shareTokenId |
 | `classifications` | UUID | attachment (FK, unique), status — AI classification request for an uploaded document not yet linked to a sheet |

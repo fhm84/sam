@@ -3,7 +3,7 @@ package de.halbmann.sam.api.boundary;
 import static io.restassured.RestAssured.given;
 
 import de.halbmann.sam.api.entity.ensembles.CreateEnsemble;
-import de.halbmann.sam.api.entity.musicians.Musician;
+import de.halbmann.sam.api.entity.members.Member;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.security.TestSecurity;
 import io.restassured.http.ContentType;
@@ -52,13 +52,13 @@ class SecurityEnforcementTest {
     }
 
     @Test
-    void unauthenticated_postMusician_returns401() throws Exception {
+    void unauthenticated_postMember_returns401() throws Exception {
         try (Jsonb jsonb = JsonbBuilder.newBuilder().build()) {
-            Musician musician = new Musician();
-            musician.setName("Unauthorized Musician");
+            Member member = new Member();
+            member.setName("Unauthorized Member");
             given().contentType(ContentType.JSON)
-                    .body(jsonb.toJson(musician))
-                    .post("/api/musicians")
+                    .body(jsonb.toJson(member))
+                    .post("/api/members")
                     .then()
                     .statusCode(401);
         }
@@ -86,13 +86,13 @@ class SecurityEnforcementTest {
     @TestSecurity(
             user = "musician1",
             roles = {})
-    void authenticated_noRole_postMusician_returns403() throws Exception {
+    void authenticated_noRole_postMember_returns403() throws Exception {
         try (Jsonb jsonb = JsonbBuilder.newBuilder().build()) {
-            Musician musician = new Musician();
-            musician.setName("Forbidden Musician");
+            Member member = new Member();
+            member.setName("Forbidden Member");
             given().contentType(ContentType.JSON)
-                    .body(jsonb.toJson(musician))
-                    .post("/api/musicians")
+                    .body(jsonb.toJson(member))
+                    .post("/api/members")
                     .then()
                     .statusCode(403);
         }
@@ -111,22 +111,35 @@ class SecurityEnforcementTest {
     @TestSecurity(
             user = "musician1",
             roles = {})
-    void authenticated_noRole_getMusicians_returns200() {
-        given().get("/api/musicians").then().statusCode(200);
+    void authenticated_noRole_getMembers_returns200() {
+        given().get("/api/members").then().statusCode(200);
     }
 
-    // ── Admin-only: musician user-link endpoints ───────────────────────────
+    @Test
+    @TestSecurity(
+            user = "musician1",
+            roles = {})
+    void authenticated_noRole_getPersons_returns200() {
+        given().get("/api/persons").then().statusCode(200);
+    }
 
     @Test
-    void unauthenticated_linkMusicianUser_returns401() {
-        given().put("/api/musicians/00000000-0000-0000-0000-000000000001/user/some-user-id")
+    void unauthenticated_getPersons_returns401() {
+        given().get("/api/persons").then().statusCode(401);
+    }
+
+    // ── Admin-only: member user-link endpoints ───────────────────────────
+
+    @Test
+    void unauthenticated_linkMemberUser_returns401() {
+        given().put("/api/members/00000000-0000-0000-0000-000000000001/user/some-user-id")
                 .then()
                 .statusCode(401);
     }
 
     @Test
-    void unauthenticated_unlinkMusicianUser_returns401() {
-        given().delete("/api/musicians/00000000-0000-0000-0000-000000000001/user")
+    void unauthenticated_unlinkMemberUser_returns401() {
+        given().delete("/api/members/00000000-0000-0000-0000-000000000001/user")
                 .then()
                 .statusCode(401);
     }
@@ -135,8 +148,8 @@ class SecurityEnforcementTest {
     @TestSecurity(
             user = "librarian1",
             roles = {"music_librarian"})
-    void musicLibrarian_linkMusicianUser_returns403() {
-        given().put("/api/musicians/00000000-0000-0000-0000-000000000001/user/some-user-id")
+    void musicLibrarian_linkMemberUser_returns403() {
+        given().put("/api/members/00000000-0000-0000-0000-000000000001/user/some-user-id")
                 .then()
                 .statusCode(403);
     }
@@ -145,8 +158,8 @@ class SecurityEnforcementTest {
     @TestSecurity(
             user = "librarian1",
             roles = {"music_librarian"})
-    void musicLibrarian_unlinkMusicianUser_returns403() {
-        given().delete("/api/musicians/00000000-0000-0000-0000-000000000001/user")
+    void musicLibrarian_unlinkMemberUser_returns403() {
+        given().delete("/api/members/00000000-0000-0000-0000-000000000001/user")
                 .then()
                 .statusCode(403);
     }
@@ -244,13 +257,13 @@ class SecurityEnforcementTest {
     @TestSecurity(
             user = "admin1",
             roles = {"admin"})
-    void admin_postMusician_succeeds() throws Exception {
+    void admin_postMember_succeeds() throws Exception {
         try (Jsonb jsonb = JsonbBuilder.newBuilder().build()) {
-            Musician musician = new Musician();
-            musician.setName("Admin Musician");
+            Member member = new Member();
+            member.setName("Admin Member");
             given().contentType(ContentType.JSON)
-                    .body(jsonb.toJson(musician))
-                    .post("/api/musicians")
+                    .body(jsonb.toJson(member))
+                    .post("/api/members")
                     .then()
                     .statusCode(200);
         }

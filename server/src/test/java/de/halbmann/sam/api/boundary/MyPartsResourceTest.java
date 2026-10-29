@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Integration tests for {@code GET /api/me/parts}.
  *
- * <p>Tests authentication enforcement and the empty-response path when no musician record is
+ * <p>Tests authentication enforcement and the empty-response path when no member record is
  * linked to the authenticated user. OIDC is disabled in the test profile; {@code @TestSecurity}
  * provides mock identities. Because {@code @TestSecurity} does not inject a real JWT,
  * {@code CurrentUserService.getUserId()} returns {@code null}, which causes {@code MyPartsService} to
@@ -28,7 +28,7 @@ class MyPartsResourceTest {
     @TestSecurity(
             user = "musician1",
             roles = {})
-    void authenticated_noLinkedMusician_returnsEmptyPaginatedResponse() {
+    void authenticated_noLinkedMember_returnsEmptyPaginatedResponse() {
         given().get("/api/me/parts")
                 .then()
                 .statusCode(200)

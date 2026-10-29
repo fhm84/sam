@@ -7,7 +7,8 @@
     "sheets": "Noten",
     "collections": "Sammlungen",
     "uploads": "Uploads",
-    "musicians": "Musiker",
+    "members": "Mitglieder",
+    "persons": "Personen",
     "shares": "Meine Freigaben",
     "myParts": "Meine Stimmen",
     "profile": "Profil",
@@ -60,7 +61,7 @@
       "sheets": "Alle Stücke des Archivs durchsuchen und verwalten",
       "collections": "Noten in Ordner und Setlists organisieren",
       "uploads": "Dokumente verwalten, die noch keinem Notenblatt zugeordnet sind",
-      "musicians": "Komponisten, Arrangeure und andere Mitwirkende",
+      "members": "Die Mitglieder der Band: Kontakt, Instrumente und Login",
       "shares": "Geteilte Links zu Noten, Stimmen und Sammlungen"
     },
     "adminTitle": "Verwaltung",
@@ -656,40 +657,32 @@
     "empty": "Keine nicht verknüpften Dokumente gefunden",
     "activeUploads": "Aktive Uploads"
   },
-  "musicians": {
-    "title": "Musiker",
-    "subtitle": "Komponisten, Arrangeure und andere kreative Beteiligte, die in Ihren Noten referenziert werden.",
-    "new": "Neuer Musiker",
-    "edit": "Musiker bearbeiten",
+  "members": {
+    "title": "Mitglieder",
+    "subtitle": "Die Mitglieder der Band mit Kontaktdaten, Instrumenten und Login.",
+    "new": "Neues Mitglied",
+    "edit": "Mitglied bearbeiten",
     "columns": {
       "name": "Name",
-      "ipi": "IPI",
-      "birthYear": "Geburtsjahr",
-      "deathYear": "Todesjahr",
       "instruments": "Instrumente",
-      "role": "Rolle",
       "status": "Status",
       "actions": "Aktionen"
     },
     "form": {
+      "existingPerson": "Vorhandene Person (optional)",
+      "existingPersonTooltip": "Wenn die Person schon in Noten genannt ist (z. B. als Arrangeur), hier auswählen: Sie bekommt das Mitgliedsprofil, statt dass eine zweite Person entsteht.",
       "name": "Name",
-      "ipi": "IPI",
-      "ipiHint": "Interested Parties Information Code",
-      "ipiTooltip": "Interested Parties Information — ein eindeutiger 9-stelliger Code für Musikrechteinhaber. Leer lassen, wenn unbekannt.",
-      "birthYear": "Geburtsjahr",
-      "deathYear": "Todesjahr",
       "status": "Status",
-      "role": "Rolle",
       "email": "E-Mail",
       "mobile": "Mobilnummer",
       "instruments": "Instrumente",
       "instrumentsHint": "Instrumente suchen und hinzufügen…",
-      "instrumentsTooltip": "Instrumente, die dieser Musiker spielt. Das zuerst hinzugefügte wird als Hauptinstrument markiert.",
+      "instrumentsTooltip": "Instrumente, die dieses Mitglied spielt. Das zuerst hinzugefügte wird als Hauptinstrument markiert.",
       "notes": "Notizen",
-      "notesTooltip": "Interne Notizen zu diesem Musiker, nicht öffentlich sichtbar.",
+      "notesTooltip": "Interne, organisatorische Notizen zu diesem Mitglied, nur für Notenwart und Admin sichtbar. Keine Gesundheitsdaten (z. B. Allergien).",
       "linkedUser": "Verknüpftes Benutzerkonto",
       "linkedUserHint": "Nach Name oder E-Mail suchen…",
-      "linkedUserTooltip": "Verknüpft diesen Musiker mit einem authentifizierten Benutzerkonto und ermöglicht die personalisierte Meine Stimmen-Ansicht.",
+      "linkedUserTooltip": "Verknüpft dieses Mitglied mit einem authentifizierten Benutzerkonto und ermöglicht die personalisierte Meine Stimmen-Ansicht.",
       "linkedUserNone": "Kein Konto verknüpft",
       "linkedUserIdHint": "Benutzer-ID",
       "linkedUserIdHelp": "Die Benutzersuche ist nicht eingerichtet. Kopiere die ID des Benutzers aus der Benutzerliste des Login-Anbieters (Pocket ID: Benutzer → Seite des Benutzers).",
@@ -702,30 +695,58 @@
     },
     "status": {
       "ACTIVE": "Aktiv",
-      "INACTIVE": "Inaktiv",
-      "INVITED": "Eingeladen",
-      "PENDING": "Ausstehend"
-    },
-    "role": {
-      "MEMBER": "Mitglied",
-      "GUEST": "Gast",
-      "SUBSTITUTE": "Aushilfe",
-      "CONDUCTOR": "Dirigent"
+      "PAUSED": "Pausiert",
+      "FORMER": "Ausgeschieden"
     },
     "delete": {
-      "confirm": "Möchten Sie den Musiker \"{name}\" wirklich löschen?",
+      "confirm": "Möchten Sie das Mitglied \"{name}\" wirklich löschen? Kontaktdaten, Instrumente, Ensemble-Plätze und deren Verlauf werden gelöscht. Ist die Person in Noten genannt, bleibt sie dort erhalten.",
       "header": "Löschen bestätigen"
     },
     "messages": {
-      "created": "Musiker erfolgreich erstellt",
-      "updated": "Musiker erfolgreich aktualisiert",
-      "deleted": "Musiker erfolgreich gelöscht",
+      "created": "Mitglied erfolgreich erstellt",
+      "updated": "Mitglied erfolgreich aktualisiert",
+      "deleted": "Mitglied erfolgreich gelöscht",
       "error": "Ein Fehler ist aufgetreten"
     },
     "primaryInstrument": "Hauptinstrument",
     "linkedAccountTooltip": "Mit einem Benutzerkonto verknüpft",
     "search": "Nach Name suchen",
-    "empty": "Keine Musiker gefunden",
+    "empty": "Keine Mitglieder gefunden",
+    "save": "Speichern",
+    "cancel": "Abbrechen"
+  },
+  "persons": {
+    "title": "Personen",
+    "subtitle": "Komponisten, Arrangeure und andere Beteiligte, die in Ihren Noten genannt werden.",
+    "new": "Neue Person",
+    "edit": "Person bearbeiten",
+    "columns": {
+      "name": "Name",
+      "ipi": "IPI",
+      "birthYear": "Geburtsjahr",
+      "deathYear": "Todesjahr",
+      "actions": "Aktionen"
+    },
+    "form": {
+      "name": "Name",
+      "ipi": "IPI",
+      "ipiHint": "Interested Parties Information Code",
+      "ipiTooltip": "Interested Parties Information — ein eindeutiger 9-stelliger Code für Musikrechteinhaber. Leer lassen, wenn unbekannt.",
+      "birthYear": "Geburtsjahr",
+      "deathYear": "Todesjahr"
+    },
+    "delete": {
+      "confirm": "Möchten Sie die Person \"{name}\" wirklich löschen?",
+      "header": "Löschen bestätigen"
+    },
+    "messages": {
+      "created": "Person erfolgreich erstellt",
+      "updated": "Person erfolgreich aktualisiert",
+      "deleted": "Person erfolgreich gelöscht",
+      "error": "Ein Fehler ist aufgetreten"
+    },
+    "search": "Nach Name suchen",
+    "empty": "Keine Personen gefunden",
     "save": "Speichern",
     "cancel": "Abbrechen"
   },
@@ -837,21 +858,26 @@
       "title": "Mitglieder",
       "new": "Mitglied hinzufügen",
       "edit": "Mitglied bearbeiten",
-      "conductorLabel": "Dirigent",
       "columns": {
-        "musician": "Musiker",
+        "member": "Mitglied",
         "voice": "Stimme",
         "instrument": "Instrument",
-        "conductor": "Dirigent",
+        "role": "Rolle",
         "actions": "Aktionen"
       },
       "form": {
-        "musician": "Musiker",
-        "musicianPlaceholder": "Musiker suchen…",
-        "noResults": "Keine Musiker gefunden",
+        "member": "Mitglied",
+        "memberPlaceholder": "Mitglieder suchen…",
+        "noResults": "Keine Mitglieder gefunden",
         "voice": "Stimme",
         "instrument": "Instrument",
-        "conductor": "Dirigent"
+        "role": "Rolle"
+      },
+      "role": {
+        "MEMBER": "Mitglied",
+        "GUEST": "Gast",
+        "SUBSTITUTE": "Aushilfe",
+        "CONDUCTOR": "Dirigent"
       },
       "delete": {
         "confirm": "Möchten Sie \"{name}\" wirklich aus diesem Ensemble entfernen?",
@@ -860,10 +886,13 @@
       "messages": {
         "created": "Mitglied erfolgreich hinzugefügt",
         "updated": "Mitglied erfolgreich aktualisiert",
-        "deleted": "Mitglied erfolgreich entfernt"
+        "deleted": "Mitglied erfolgreich entfernt",
+        "memberCreated": "Mitglied „{name}“ erstellt"
       },
-      "musician": {
-        "createWithName": "Musiker \"{name}\" erstellen"
+      "member": {
+        "createWithName": "Mitglied \"{name}\" erstellen",
+        "existingPersons": "Bereits als Person erfasst:",
+        "makeMember": "„{name}“ als Mitglied aufnehmen"
       },
       "empty": "Noch keine Mitglieder"
     }

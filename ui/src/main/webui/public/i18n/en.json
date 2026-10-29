@@ -7,7 +7,8 @@
     "sheets": "Sheets",
     "collections": "Collections",
     "uploads": "Uploads",
-    "musicians": "Musicians",
+    "members": "Members",
+    "persons": "People",
     "shares": "My Shares",
     "myParts": "My Parts",
     "profile": "Profile",
@@ -60,7 +61,7 @@
       "sheets": "Browse and manage all pieces in your archive",
       "collections": "Organize sheets into folders and setlists",
       "uploads": "Manage documents not yet linked to a sheet",
-      "musicians": "Composers, arrangers, and other contributors",
+      "members": "The band's members: contact details, instruments and login",
       "shares": "Shared links to sheets, parts, and collections"
     },
     "adminTitle": "Administration",
@@ -656,40 +657,32 @@
     "empty": "No unlinked documents found",
     "activeUploads": "Active Uploads"
   },
-  "musicians": {
-    "title": "Musicians",
-    "subtitle": "Composers, arrangers, and other creative contributors referenced across your sheet music.",
-    "new": "New musician",
-    "edit": "Edit musician",
+  "members": {
+    "title": "Members",
+    "subtitle": "The band's members with their contact details, instruments and login.",
+    "new": "New member",
+    "edit": "Edit member",
     "columns": {
       "name": "Name",
-      "ipi": "IPI",
-      "birthYear": "Birth Year",
-      "deathYear": "Death Year",
       "instruments": "Instruments",
-      "role": "Role",
       "status": "Status",
       "actions": "Actions"
     },
     "form": {
+      "existingPerson": "Existing person (optional)",
+      "existingPersonTooltip": "If the person is already credited on sheets (e.g. as arranger), pick them here: they get the member profile instead of a second person being created.",
       "name": "Name",
-      "ipi": "IPI",
-      "ipiHint": "Interested Parties Information code",
-      "ipiTooltip": "Interested Parties Information — a unique 9-digit code assigned to music rights holders. Leave empty if unknown.",
-      "birthYear": "Birth Year",
-      "deathYear": "Death Year",
       "status": "Status",
-      "role": "Role",
       "email": "Email",
       "mobile": "Mobile",
       "instruments": "Instruments",
       "instrumentsHint": "Search and add instruments…",
-      "instrumentsTooltip": "Instruments this musician plays. The first added is marked as primary.",
+      "instrumentsTooltip": "Instruments this member plays. The first added is marked as primary.",
       "notes": "Notes",
-      "notesTooltip": "Internal notes about this musician, not shown publicly.",
+      "notesTooltip": "Internal, organisational notes about this member, visible only to the music librarian and the admin. No health data (e.g. allergies).",
       "linkedUser": "Linked user account",
       "linkedUserHint": "Search by name or email…",
-      "linkedUserTooltip": "Links this musician to an authenticated user account, enabling the My Parts personalised view.",
+      "linkedUserTooltip": "Links this member to an authenticated user account, enabling the My Parts personalised view.",
       "linkedUserNone": "No account linked",
       "linkedUserIdHint": "User ID",
       "linkedUserIdHelp": "User search is not configured. Copy the user's ID from the login provider's user list (Pocket ID: Users → the user's page).",
@@ -702,30 +695,58 @@
     },
     "status": {
       "ACTIVE": "Active",
-      "INACTIVE": "Inactive",
-      "INVITED": "Invited",
-      "PENDING": "Pending"
-    },
-    "role": {
-      "MEMBER": "Member",
-      "GUEST": "Guest",
-      "SUBSTITUTE": "Substitute",
-      "CONDUCTOR": "Conductor"
+      "PAUSED": "Paused",
+      "FORMER": "Former"
     },
     "delete": {
-      "confirm": "Are you sure you want to delete the musician \"{name}\"?",
+      "confirm": "Are you sure you want to delete the member \"{name}\"? Contact details, instruments, ensemble seats and their history are deleted. If the person is credited on sheets, it stays there.",
       "header": "Confirm deletion"
     },
     "messages": {
-      "created": "Musician created successfully",
-      "updated": "Musician updated successfully",
-      "deleted": "Musician deleted successfully",
+      "created": "Member created successfully",
+      "updated": "Member updated successfully",
+      "deleted": "Member deleted successfully",
       "error": "An error occurred"
     },
     "primaryInstrument": "Primary instrument",
     "linkedAccountTooltip": "Linked to a user account",
     "search": "Search by name",
-    "empty": "No musicians found",
+    "empty": "No members found",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "persons": {
+    "title": "People",
+    "subtitle": "Composers, arrangers and others credited across your sheet music.",
+    "new": "New person",
+    "edit": "Edit person",
+    "columns": {
+      "name": "Name",
+      "ipi": "IPI",
+      "birthYear": "Birth Year",
+      "deathYear": "Death Year",
+      "actions": "Actions"
+    },
+    "form": {
+      "name": "Name",
+      "ipi": "IPI",
+      "ipiHint": "Interested Parties Information code",
+      "ipiTooltip": "Interested Parties Information — a unique 9-digit code assigned to music rights holders. Leave empty if unknown.",
+      "birthYear": "Birth Year",
+      "deathYear": "Death Year"
+    },
+    "delete": {
+      "confirm": "Are you sure you want to delete the person \"{name}\"?",
+      "header": "Confirm deletion"
+    },
+    "messages": {
+      "created": "Person created successfully",
+      "updated": "Person updated successfully",
+      "deleted": "Person deleted successfully",
+      "error": "An error occurred"
+    },
+    "search": "Search by name",
+    "empty": "No people found",
     "save": "Save",
     "cancel": "Cancel"
   },
@@ -837,21 +858,26 @@
       "title": "Members",
       "new": "Add member",
       "edit": "Edit member",
-      "conductorLabel": "Conductor",
       "columns": {
-        "musician": "Musician",
+        "member": "Member",
         "voice": "Voice",
         "instrument": "Instrument",
-        "conductor": "Conductor",
+        "role": "Role",
         "actions": "Actions"
       },
       "form": {
-        "musician": "Musician",
-        "musicianPlaceholder": "Search musicians…",
-        "noResults": "No musicians found",
+        "member": "Member",
+        "memberPlaceholder": "Search members…",
+        "noResults": "No members found",
         "voice": "Voice",
         "instrument": "Instrument",
-        "conductor": "Conductor"
+        "role": "Role"
+      },
+      "role": {
+        "MEMBER": "Member",
+        "GUEST": "Guest",
+        "SUBSTITUTE": "Substitute",
+        "CONDUCTOR": "Conductor"
       },
       "delete": {
         "confirm": "Are you sure you want to remove \"{name}\" from this ensemble?",
@@ -860,10 +886,13 @@
       "messages": {
         "created": "Member added successfully",
         "updated": "Member updated successfully",
-        "deleted": "Member removed successfully"
+        "deleted": "Member removed successfully",
+        "memberCreated": "Member \"{name}\" created"
       },
-      "musician": {
-        "createWithName": "Create musician \"{name}\""
+      "member": {
+        "createWithName": "Create member \"{name}\"",
+        "existingPersons": "Already in the people catalogue:",
+        "makeMember": "Make \"{name}\" a member"
       },
       "empty": "No members yet"
     }

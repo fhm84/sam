@@ -44,7 +44,8 @@ export class AppMenu {
             routerLink: ['/uploads'],
             roles: AREA_ROLES.uploads,
           },
-          { label: this.i18n.t('nav.musicians'), icon: 'pi pi-user', routerLink: ['/musicians'] },
+          { label: this.i18n.t('nav.members'), icon: 'pi pi-users', routerLink: ['/members'] },
+          { label: this.i18n.t('nav.persons'), icon: 'pi pi-user', routerLink: ['/persons'] },
           { label: this.i18n.t('nav.shares'), icon: 'pi pi-share-alt', routerLink: ['/shares'] },
           {
             label: this.i18n.t('nav.myParts'),

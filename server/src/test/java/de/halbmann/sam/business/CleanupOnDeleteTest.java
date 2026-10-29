@@ -4,7 +4,7 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.halbmann.sam.api.entity.musicians.Musician;
+import de.halbmann.sam.api.entity.persons.Person;
 import de.halbmann.sam.api.entity.shares.ShareType;
 import de.halbmann.sam.api.entity.sheets.SheetMusic;
 import de.halbmann.sam.business.collections.boundary.CollectionItemRepository;
@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Deleting things must not leave debris behind or fail on foreign keys: collection items and
- * their attachments go with the collection, musicians still in use are refused with 409 instead of
+ * their attachments go with the collection, persons still credited are refused with 409 instead of
  * a constraint-violation 500, and share links to a deleted resource are revoked.
  */
 @QuarkusTest
@@ -80,16 +80,16 @@ class CleanupOnDeleteTest {
     }
 
     @Test
-    void deleteMusician_stillUsedAsComposer_returns409() {
+    void deletePerson_stillCreditedAsComposer_returns409() {
         String composerName = "Busy Composer " + UUID.randomUUID();
         String sheetId = createSheet(composerName);
         String composerId =
                 given().get("/api/sheets/{id}", sheetId).then().extract().path("composer.id");
 
-        given().delete("/api/musicians/{id}", composerId).then().statusCode(409);
+        given().delete("/api/persons/{id}", composerId).then().statusCode(409);
 
         given().delete("/api/sheets/{id}", sheetId).then().statusCode(204);
-        given().delete("/api/musicians/{id}", composerId).then().statusCode(204);
+        given().delete("/api/persons/{id}", composerId).then().statusCode(204);
     }
 
     @Test
@@ -118,7 +118,7 @@ class CleanupOnDeleteTest {
         SheetMusic sheet = new SheetMusic();
         sheet.setTitle("Sheet " + UUID.randomUUID());
         if (composerName != null) {
-            Musician composer = new Musician();
+            Person composer = new Person();
             composer.setName(composerName);
             sheet.setComposer(composer);
         }

@@ -1,15 +1,15 @@
 # Plan: Person Catalogue and Member Profiles
 
-Roadmap: [Person catalogue and member profiles](../roadmap.md#person-catalogue-and-member-profiles--planned)
+Roadmap: [Person catalogue and member profiles](../roadmap.md#person-catalogue-and-member-profiles--in-progress)
 · Tracking issue: [#259](https://github.com/fhm84/sam/issues/259) (milestone [Go-live](https://github.com/fhm84/sam/milestone/1))
 · Decision: [ADR-0015](../architecture/decisions/adr-0015-person-catalogue-and-member-profile.md)
-· Features: [Musicians](../features/musicians.md), [Sheets](../features/sheets.md)
+· Features: [Members](../features/members.md), [People](../features/people.md), [Sheets](../features/sheets.md)
 · Related: [Event log retention](event-log-retention.md) (shares the retention job)
 
-**Why now:** before go-live, the `musicians` table is still small and holds hardly any
-real personal data. Once band members log in and the roster is maintained in production,
-the split needs a data migration of personal data and its audit history, and the GDPR
-rules below must already apply.
+**Why now:** before go-live nothing runs in production, so the existing migrations can
+simply be changed and no data has to be migrated. Once band members log in and the roster
+is maintained in production, the split would need a data migration of personal data and
+its audit history, and the GDPR rules below must already apply.
 
 ## Target model
 
@@ -37,15 +37,14 @@ erDiagram
   `persons` / `/persons` / `Person`, `members` / `/members` / `Member`,
   `member_instruments`, `ensemble_memberships.member_id`. UI labels (DE/EN):
   "Personen" / "People" and "Mitglieder" / "Members".
-- **Shared primary key.** `members.id` is the person's id (`@MapsId`). Existing ids stay
-  valid for both, the migration copies no keys, and a member never exists without a
-  person.
-- **The existing table becomes `persons`.** Rename `musicians` → `persons` (sheet foreign
-  keys, the trigram index and the phonetic trigger move along), then create `members`
-  and move the member columns over. Rows get a member profile if they have any of:
-  `userId`, email, mobile, notes, status, role, `lastInviteSentAt`, an instrument or an
-  ensemble membership. `member_instruments` and `ensemble_memberships` then point at
-  `members` (same ids, only the constraints change).
+- **Shared primary key.** `members.id` is the person's id (an assigned `@Id` plus a
+  read-only `@OneToOne @PrimaryKeyJoinColumn` to the person, `@NotAudited`; `@MapsId` was
+  avoided because of its history with Envers). A member never exists without a person.
+- **The existing migrations are changed, not followed by a new one.** Nothing is live, so
+  `V1.0.0` / `V1.0.1` / `V1.0.6` create `persons` instead of `musicians`, `V1.0.5`
+  creates `members` and the seats with a role, `V1.1.2` adds the member fields. Existing
+  databases (dev, test installations) are recreated and their data re-imported with the
+  `cli`; dev repairs the checksums at start (`repair-at-start`).
 - **The API breaks without an alias.** The only clients are the UI and the `cli`, built
   from the same commit, and nothing is in production yet.
 - **Only persons are created implicitly.** Sheet saves and AI classification resolve or
@@ -57,8 +56,10 @@ erDiagram
 - **Role per ensemble.** `MusicianRole` (`MEMBER` / `GUEST` / `SUBSTITUTE` /
   `CONDUCTOR`) moves onto `ensemble_memberships` as `EnsembleRole` and replaces the
   `conductor` flag. One member can be a regular member of the main band and a substitute
-  in the youth band. A member with two voices in one ensemble has two rows; both must
-  carry the same role (validated in `EnsembleMembershipService`).
+  in the youth band. A member with two voices in one ensemble has two rows; they share the
+  role: setting it on one voice seat sets it on the others (`EnsembleMembershipService`),
+  so a per-row edit in the UI can never get stuck on a validation error. The seat without
+  a voice (the conductor's) keeps its own role, since a conductor may also play.
 - **Two statuses instead of one.**
   - `MembershipStatus`, stored: `ACTIVE` · `PAUSED` (temporarily not playing, data kept)
     · `FORMER` (left the band; `leftAt` is set and starts the retention clock).
@@ -94,7 +95,7 @@ offers no deletion of its own, so the job deletes `_AUD` rows with plain SQL.
 
 | # | Task | Status |
 |---|------|--------|
-| 1 | Flyway migration: rename `musicians` (+ `_AUD`) to `persons`; create `members` (+ `_AUD`) with the shared key, move the member columns, rows and audit history; rename `musician_instruments` → `member_instruments`, `ensemble_memberships.musician_id` → `member_id`; add `ensemble_memberships.role` (filled from the conductor flag and the old global role), drop `conductor`; map the old status (`ACTIVE` → `ACTIVE`, `INACTIVE` → `FORMER` with `leftAt` = migration date, `INVITED` / `PENDING` → `ACTIVE`). Test with seeded rows of every kind (credit only, member only, both); `FlywaySchemaValidationTest` must pass. | [#260](https://github.com/fhm84/sam/issues/260) |
+| 1 | Flyway: change the existing migrations in place (nothing is live): `persons` instead of `musicians` (`V1.0.0`, `V1.0.1` triggers, `V1.0.6` search), `members` (+ `_AUD`) with the shared key and `ensemble_memberships.member_id` + `role` instead of `conductor` (`V1.0.5`), the member fields and `member_instruments` (`V1.1.2`). Existing databases are recreated. `FlywaySchemaValidationTest` must pass. | [#260](https://github.com/fhm84/sam/issues/260) |
 | 2 | Entities and repositories: `PersonEntity` (`business/persons/`), `MemberEntity` (`business/members/`, `@MapsId`), `SheetMusicEntity.composer/arranger` → `PersonEntity`, `EnsembleMembershipEntity.member` + `role`. Name search (`searchByName`, `findMusicianByName`, finding #6 of the 2026-10 review) moves to `PersonRepository`. | [#261](https://github.com/fhm84/sam/issues/261) |
 | 3 | API: `Person` + `PersonsResource` (`/persons`: search, load, create, update, delete); `Member` (person name written through, contact, `membershipStatus`, `leftAt`, derived onboarding state, instruments, `userId`) + `MembersResource` (`/members`, link/unlink login); `SheetMusic` / `CreateSheetMusic` reference `Person`; `EnsembleMembership` gets `role`. Regenerate the TS types (`/sync-datamodels`). | [#262](https://github.com/fhm84/sam/issues/262) |
 | 4 | Services: sheets and classification resolve persons; `MemberService.add` takes an existing person or creates one (closes the dedupe FIXME); delete per the GDPR table; `PersonalDataAccess` only in the member mapper; GEMA setlist and fingerprints read the person; same-role validation for a member's rows in one ensemble. | [#263](https://github.com/fhm84/sam/issues/263) |
@@ -108,10 +109,41 @@ offers no deletion of its own, so the job deletes `_AUD` rows with plain SQL.
 Tasks 1–5 go into one pull request (schema, entities and API must change together);
 6–9 can follow separately, 10 goes with whichever task changes the page.
 
+The pull request for tasks 1–5 also had to keep the `cli` and the UI working on the new
+API, so it already brought: the `cli` person and member commands (task 7, without the
+`migration` module), and in the UI a Members page (status, no role), a basic People page
+(name, years, IPI), persons in the sheet form and classification dialog, a role select per
+ensemble seat and the "no health data" hint (parts of task 8), plus most of the docs
+(task 10, without `deployment.md`). The audit purge on member deletion (GDPR table, first
+row) is in it too; the event-log anonymisation stays with task 6.
+
 ## Open questions
 
 None left; decided on 2026-10-25: 12 months retention, anonymised event-log entries,
 `PAUSED` members keep their access.
+
+## Follow-ups from the code review
+
+Found while reviewing tasks 1–5, not fixed there:
+
+- **Audit purge can fail silently.** `MemberAuditPurge` runs after commit; a failure is only
+  logged. Make it state-based (delete `_aud` rows whose id has no `members` row) and run it
+  from the nightly retention job too (task 6).
+- **`cli` file names.** `exportPerson` and `exportMember` write the same file names (a
+  member and its person share name and id), and `importMember` accepts person files.
+  Prefix the file names and reject files without a member-only field (task 7).
+- **`importMember` with two persons of the same name** attaches to whichever the search
+  returns first; resolve by exact name, oldest first, or carry the source id (task 7).
+- **Lazy person on the member.** `MemberEntity.person` is eager without a fetch join, so
+  member lists load each person separately; make it lazy and fetch-join where needed.
+- **Duplicated logic.** "Find or create person by name" exists in `SheetService` and
+  `DocumentClassificationService` (and behaves differently for stale ids), "instrument ids
+  of a member" in `MyPartsService` and `SheetCollectionService`; move each into one place.
+- **409 messages in the UI.** A refused delete (credited person) only shows "Request
+  failed"; show the server's message.
+- **Smaller items:** the seat endpoints ignore `{ensembleId}` on update and delete; the
+  `MEMBER` default is set in several places; `INVITED` can't occur until the invite flow
+  writes `lastInviteSentAt`.
 
 ## Later
 
@@ -129,7 +161,7 @@ None left; decided on 2026-10-25: 12 months retention, anonymised event-log entr
 - `server/src/main/java/de/halbmann/sam/business/collections/controller/GemaSetlistService.java`
 - `server/src/main/java/de/halbmann/sam/business/myparts/MyPartsService.java`
 - `server/src/main/java/de/halbmann/sam/security/PersonalDataAccess.java`
-- `server/src/main/resources/db/migration/` (`V1.0.0`, `V1.0.6__MusicianSearch.sql`, `V1.1.2__MusicianFields.sql`)
+- `server/src/main/resources/db/migration/` (`V1.0.0`, `V1.0.1`, `V1.0.5__EnsembleMemberships.sql`, `V1.0.6__PersonSearch.sql`, `V1.1.2__MemberFields.sql`)
 - `api/src/main/java/de/halbmann/sam/api/entity/musicians/`, `api/.../entity/ensembles/`, `api/.../boundary/MusiciansResource.java`
 - `cli/src/main/java/de/halbmann/sam/cli/` (`MusicianImporter`, `ExportMusiciansCommand`, `ImportMusicianCommand`)
 - `ui/src/main/webui/src/app/features/musicians/`, `features/sheets/sheet-form.ts`,

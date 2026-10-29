@@ -3,7 +3,7 @@ package de.halbmann.sam.api.boundary;
 import de.halbmann.sam.api.entity.instruments.Clef;
 import de.halbmann.sam.api.entity.instruments.CreateInstrument;
 import de.halbmann.sam.api.entity.instruments.InstrumentTransposing;
-import de.halbmann.sam.api.entity.musicians.Musician;
+import de.halbmann.sam.api.entity.persons.Person;
 import de.halbmann.sam.api.entity.sheets.*;
 
 /**
@@ -20,15 +20,15 @@ public class ObjectMother {
         return sheetMusic;
     }
 
-    public static Musician createComposer() {
-        final Musician composer = new Musician();
+    public static Person createComposer() {
+        final Person composer = new Person();
         composer.setName("Klaus Badelt");
         composer.setBirthYear(1967);
         return composer;
     }
 
-    public static Musician createArranger() {
-        final Musician arranger = new Musician();
+    public static Person createArranger() {
+        final Person arranger = new Person();
         arranger.setName("John Wasson");
         return arranger;
     }
@@ -37,20 +37,20 @@ public class ObjectMother {
         return createSheetMusicWithComposerAndArranger(createComposer(), createArranger());
     }
 
-    public static CreateSheetMusic createSheetMusicWithComposer(final Musician composer) {
+    public static CreateSheetMusic createSheetMusicWithComposer(final Person composer) {
         final CreateSheetMusic sheetMusic = createSimpleSheetMusic();
         sheetMusic.setComposer(composer);
         return sheetMusic;
     }
 
-    public static CreateSheetMusic createSheetMusicWithArranger(final Musician arranger) {
+    public static CreateSheetMusic createSheetMusicWithArranger(final Person arranger) {
         final CreateSheetMusic sheetMusic = createSimpleSheetMusic();
         sheetMusic.setArranger(arranger);
         return sheetMusic;
     }
 
     public static CreateSheetMusic createSheetMusicWithComposerAndArranger(
-            final Musician composer, final Musician arranger) {
+            final Person composer, final Person arranger) {
         final CreateSheetMusic sheetMusic = createSimpleSheetMusic();
         sheetMusic.setComposer(composer);
         sheetMusic.setArranger(arranger);

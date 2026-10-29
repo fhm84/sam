@@ -12,8 +12,8 @@ import de.halbmann.sam.api.entity.sheets.SheetWithMyParts;
 import de.halbmann.sam.business.ensembles.boundary.EnsembleMembershipRepository;
 import de.halbmann.sam.business.ensembles.entity.EnsembleMembershipEntity;
 import de.halbmann.sam.business.instruments.entity.InstrumentEntity;
-import de.halbmann.sam.business.musicians.boundary.MusicianRepository;
-import de.halbmann.sam.business.musicians.entity.MusicianEntity;
+import de.halbmann.sam.business.members.boundary.MemberRepository;
+import de.halbmann.sam.business.members.entity.MemberEntity;
 import de.halbmann.sam.business.sheets.boundary.SheetRepository;
 import de.halbmann.sam.business.sheets.controller.InstrumentationMapper;
 import de.halbmann.sam.business.sheets.controller.SheetMusicMapper;
@@ -32,7 +32,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class MyPartsServiceTest {
 
     @Mock
-    MusicianRepository musicianRepository;
+    MemberRepository memberRepository;
 
     @Mock
     EnsembleMembershipRepository membershipRepository;
@@ -59,14 +59,14 @@ class MyPartsServiceTest {
 
         assertEquals(0, result.getData().size());
         assertEquals(0L, result.getTotalCount());
-        verifyNoInteractions(musicianRepository, membershipRepository, sheetRepository);
+        verifyNoInteractions(memberRepository, membershipRepository, sheetRepository);
     }
 
-    // ── no linked musician ─────────────────────────────────────────────────
+    // ── no linked member ─────────────────────────────────────────────────
 
     @Test
-    void noLinkedMusician_returnsEmpty() {
-        when(musicianRepository.findByUserId("user-1")).thenReturn(Optional.empty());
+    void noLinkedMember_returnsEmpty() {
+        when(memberRepository.findByUserId("user-1")).thenReturn(Optional.empty());
         PaginationRequest filter = new PaginationRequest();
 
         PaginatedResponse<SheetWithMyParts> result = service.getMyParts("user-1", filter);
@@ -75,15 +75,15 @@ class MyPartsServiceTest {
         verifyNoInteractions(membershipRepository, sheetRepository);
     }
 
-    // ── conductor-only musician (no instrument) ────────────────────────────
+    // ── conductor-only member (no instrument) ────────────────────────────
 
     @Test
     void conductorOnly_noInstrument_returnsEmpty() {
-        MusicianEntity musician = musician("user-2");
-        when(musicianRepository.findByUserId("user-2")).thenReturn(Optional.of(musician));
+        MemberEntity member = member("user-2");
+        when(memberRepository.findByUserId("user-2")).thenReturn(Optional.of(member));
 
         EnsembleMembershipEntity conductorMembership = new EnsembleMembershipEntity();
-        conductorMembership.setMusician(musician);
+        conductorMembership.setMember(member);
         conductorMembership.setInstrument(null);
 
         when(membershipRepository.list(anyString(), anyMap())).thenReturn(List.of(conductorMembership));
@@ -99,14 +99,14 @@ class MyPartsServiceTest {
 
     @Test
     void matchingInstruments_returnsSheetWithFilteredInstrumentations() {
-        MusicianEntity musician = musician("user-3");
-        when(musicianRepository.findByUserId("user-3")).thenReturn(Optional.of(musician));
+        MemberEntity member = member("user-3");
+        when(memberRepository.findByUserId("user-3")).thenReturn(Optional.of(member));
 
         InstrumentEntity trumpet = instrument("trumpet-bb");
         InstrumentEntity trombone = instrument("trombone");
 
         EnsembleMembershipEntity membership = new EnsembleMembershipEntity();
-        membership.setMusician(musician);
+        membership.setMember(member);
         membership.setInstrument(trumpet);
 
         when(membershipRepository.list(anyString(), anyMap())).thenReturn(List.of(membership));
@@ -141,22 +141,22 @@ class MyPartsServiceTest {
         verify(instrumentationMapper, never()).toDto(nonMatchingPart);
     }
 
-    // ── musician doubling two instruments — both parts returned ────────────
+    // ── member doubling two instruments — both parts returned ────────────
 
     @Test
     void doubling_bothInstrumentsIncluded() {
-        MusicianEntity musician = musician("user-4");
-        when(musicianRepository.findByUserId("user-4")).thenReturn(Optional.of(musician));
+        MemberEntity member = member("user-4");
+        when(memberRepository.findByUserId("user-4")).thenReturn(Optional.of(member));
 
         InstrumentEntity trumpet = instrument("trumpet-bb");
         InstrumentEntity flugelhorn = instrument("flugelhorn");
 
         EnsembleMembershipEntity m1 = new EnsembleMembershipEntity();
-        m1.setMusician(musician);
+        m1.setMember(member);
         m1.setInstrument(trumpet);
 
         EnsembleMembershipEntity m2 = new EnsembleMembershipEntity();
-        m2.setMusician(musician);
+        m2.setMember(member);
         m2.setInstrument(flugelhorn);
 
         when(membershipRepository.list(anyString(), anyMap())).thenReturn(List.of(m1, m2));
@@ -191,8 +191,8 @@ class MyPartsServiceTest {
 
     // ── helpers ────────────────────────────────────────────────────────────
 
-    private MusicianEntity musician(String userId) {
-        MusicianEntity m = new MusicianEntity();
+    private MemberEntity member(String userId) {
+        MemberEntity m = new MemberEntity();
         m.setUserId(userId);
         return m;
     }

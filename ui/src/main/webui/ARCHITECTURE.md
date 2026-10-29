@@ -24,7 +24,8 @@ src/app/
 │   │   ├── sheets-api.service.ts
 │   │   ├── instrumentations-api.service.ts
 │   │   ├── documents-api.service.ts
-│   │   ├── musicians-api.service.ts
+│   │   ├── members-api.service.ts
+│   │   ├── persons-api.service.ts
 │   │   ├── instruments-api.service.ts
 │   │   ├── ensembles-api.service.ts
 │   │   ├── collections-api.service.ts
@@ -45,7 +46,8 @@ src/app/
 │   ├── sheets/
 │   ├── collections/
 │   ├── uploads/
-│   ├── musicians/
+│   ├── members/
+│   ├── persons/
 │   ├── ensembles/
 │   ├── instruments/
 │   └── configuration/
@@ -143,7 +145,8 @@ The `core/api/` services cover the full backend API:
 | `SheetsApiService`          | `/api/sheets`                                          | CRUD + coverage   |
 | `InstrumentationsApiService`| `/api/sheets/{sheetId}/instrumentations`               | CRUD + bulk       |
 | `DocumentsApiService`       | `/api/documents`, also sub-resource of sheets/instrum. | list, download, upload |
-| `MusiciansApiService`       | `/api/musicians`                                       | CRUD              |
+| `MembersApiService`         | `/api/members`                                         | CRUD, login link  |
+| `PersonsApiService`         | `/api/persons`                                         | CRUD              |
 | `InstrumentsApiService`     | `/api/instruments`                                     | CRUD              |
 | `EnsemblesApiService`       | `/api/ensembles`                                       | CRUD + voices + voice options |
 | `CollectionsApiService`     | `/api/sheet-collections`                               | CRUD + sheets     |

@@ -42,9 +42,14 @@ export const routes: Routes = [
           import('./features/my-parts/my-parts.routes').then((m) => m.MY_PARTS_ROUTES),
       },
       {
-        path: 'musicians',
+        path: 'members',
         loadChildren: () =>
-          import('./features/musicians/musicians.routes').then((m) => m.MUSICIANS_ROUTES),
+          import('./features/members/members.routes').then((m) => m.MEMBERS_ROUTES),
+      },
+      {
+        path: 'persons',
+        loadChildren: () =>
+          import('./features/persons/persons.routes').then((m) => m.PERSONS_ROUTES),
       },
       {
         path: 'admin/ensembles',

@@ -42,7 +42,7 @@ flowchart LR
 ## Inside the Server
 
 The `server` module is layered per domain area: `business/<area>/` (sheets, collections,
-documents, ensembles, instruments, musicians, shares, eventlog, myparts) has `boundary/`
+documents, ensembles, instruments, members, persons, shares, eventlog, myparts) has `boundary/`
 for Panache repositories, `controller/` for services and MapStruct mappers, and `entity/`
 for the Hibernate entities. The REST layer and the cross-cutting packages sit around it:
 

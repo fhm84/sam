@@ -24,7 +24,7 @@ import de.halbmann.sam.business.documents.entity.AttachmentEntity;
 import de.halbmann.sam.business.ensembles.boundary.EnsembleMembershipRepository;
 import de.halbmann.sam.business.ensembles.entity.EnsembleMembershipEntity;
 import de.halbmann.sam.business.instruments.entity.InstrumentEntity;
-import de.halbmann.sam.business.musicians.boundary.MusicianRepository;
+import de.halbmann.sam.business.members.boundary.MemberRepository;
 import de.halbmann.sam.business.shared.event.ResourcesDeleted;
 import de.halbmann.sam.business.sheets.boundary.SheetRepository;
 import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
@@ -78,7 +78,7 @@ public class SheetCollectionService {
     AttachmentRepository attachmentRepository;
 
     @Inject
-    MusicianRepository musicianRepository;
+    MemberRepository memberRepository;
 
     @Inject
     EnsembleMembershipRepository membershipRepository;
@@ -197,14 +197,13 @@ public class SheetCollectionService {
     }
 
     private Set<String> resolveInstrumentIds(final String userId) {
-        return musicianRepository
+        return memberRepository
                 .findByUserId(userId)
-                .map(musician ->
-                        membershipRepository.list("musician = :musician", Map.of("musician", musician)).stream()
-                                .map(EnsembleMembershipEntity::getInstrument)
-                                .filter(Objects::nonNull)
-                                .map(InstrumentEntity::getId)
-                                .collect(Collectors.toSet()))
+                .map(member -> membershipRepository.list("member = :member", Map.of("member", member)).stream()
+                        .map(EnsembleMembershipEntity::getInstrument)
+                        .filter(Objects::nonNull)
+                        .map(InstrumentEntity::getId)
+                        .collect(Collectors.toSet()))
                 .orElse(Set.of());
     }
 

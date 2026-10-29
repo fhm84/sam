@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * Admin-only endpoint for looking up the OIDC provider's users (Pocket ID or Keycloak). Used to
- * link musicians to user accounts.
+ * link members to user accounts.
  */
 @Path("admin/users")
 @Produces(MediaType.APPLICATION_JSON)

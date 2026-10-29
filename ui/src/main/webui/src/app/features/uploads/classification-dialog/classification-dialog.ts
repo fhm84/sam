@@ -28,7 +28,7 @@ import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../../core/translation.service';
 import { DocumentsApiService } from '../../../core/api/documents-api.service';
 import { SheetsApiService } from '../../../core/api/sheets-api.service';
-import { MusiciansApiService } from '../../../core/api/musicians-api.service';
+import { PersonsApiService } from '../../../core/api/persons-api.service';
 import { InstrumentationsApiService } from '../../../core/api/instrumentations-api.service';
 import { DocumentPreviewService } from '../../../core/document-preview.service';
 import {
@@ -39,7 +39,7 @@ import {
   DocumentDownload,
   Genre,
   Instrumentation,
-  Musician,
+  Person,
   NotationType,
   SheetClassification,
   SheetMusicSearchResult,
@@ -81,7 +81,7 @@ export class ClassificationDialog implements OnDestroy {
   protected readonly t = inject(TranslationService);
   private readonly documentsApi = inject(DocumentsApiService);
   private readonly sheetsApi = inject(SheetsApiService);
-  private readonly musiciansApi = inject(MusiciansApiService);
+  private readonly personsApi = inject(PersonsApiService);
   private readonly instrumentationsApi = inject(InstrumentationsApiService);
   private readonly previewService = inject(DocumentPreviewService);
   private readonly messageService = inject(MessageService);
@@ -117,11 +117,11 @@ export class ClassificationDialog implements OnDestroy {
   protected sheetSearchModel: SheetMusicSearchResult | null = null;
   protected readonly sheetSuggestions = signal<SheetMusicSearchResult[]>([]);
 
-  protected composerModel: Musician | null = null;
-  protected readonly composerSuggestions = signal<Musician[]>([]);
+  protected composerModel: Person | null = null;
+  protected readonly composerSuggestions = signal<Person[]>([]);
 
-  protected arrangerModel: Musician | null = null;
-  protected readonly arrangerSuggestions = signal<Musician[]>([]);
+  protected arrangerModel: Person | null = null;
+  protected readonly arrangerSuggestions = signal<Person[]>([]);
 
   // ── Sheet fields ───────────────────────────────────────────────────
   protected sheetTitle = '';
@@ -286,7 +286,7 @@ export class ClassificationDialog implements OnDestroy {
 
     if (s.composerId) {
       this.composerMode = 'existing';
-      this.composerModel = { id: s.composerId, name: c.composer ?? '' } as Musician;
+      this.composerModel = { id: s.composerId, name: c.composer ?? '' } as Person;
     } else if (s.composerName) {
       this.composerMode = 'new';
       this.composerName = s.composerName;
@@ -297,7 +297,7 @@ export class ClassificationDialog implements OnDestroy {
 
     if (s.arrangerId) {
       this.arrangerMode = 'existing';
-      this.arrangerModel = { id: s.arrangerId, name: c.arranger ?? '' } as Musician;
+      this.arrangerModel = { id: s.arrangerId, name: c.arranger ?? '' } as Person;
     } else if (s.arrangerName) {
       this.arrangerMode = 'new';
       this.arrangerName = s.arrangerName;
@@ -487,8 +487,8 @@ export class ClassificationDialog implements OnDestroy {
     });
   }
 
-  protected onMusicianSearch(event: AutoCompleteCompleteEvent, role: 'composer' | 'arranger'): void {
-    this.musiciansApi.find({ name: event.query || undefined, size: 10 })
+  protected onPersonSearch(event: AutoCompleteCompleteEvent, role: 'composer' | 'arranger'): void {
+    this.personsApi.find({ name: event.query || undefined, size: 10 })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {

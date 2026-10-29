@@ -26,9 +26,13 @@ public interface SamResources {
     @Path("instruments")
     InstrumentsResource instruments();
 
-    /** {@return the sub-resource for managing musician records} */
-    @Path("musicians")
-    MusiciansResource musicians();
+    /** {@return the sub-resource for the person catalogue (composers, arrangers, members)} */
+    @Path("persons")
+    PersonsResource persons();
+
+    /** {@return the sub-resource for managing the band's members} */
+    @Path("members")
+    MembersResource members();
 
     /** {@return the sub-resource for managing sheet music collections (setlists, songbooks, etc.)} */
     @Path("sheet-collections")
@@ -46,7 +50,7 @@ public interface SamResources {
     @Path("event-logs")
     EventLogResource eventLogs();
 
-    /** {@return the sub-resource listing sheets that match the calling musician's instrument assignments} */
+    /** {@return the sub-resource listing sheets that match the calling member's instrument assignments} */
     @Path("me/parts")
     MyPartsResource myParts();
 }

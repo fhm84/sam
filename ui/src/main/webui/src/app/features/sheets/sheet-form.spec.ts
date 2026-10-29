@@ -6,11 +6,11 @@ import { of } from 'rxjs';
 import { MessageService } from '@openng/optimus-ui/api';
 
 import { SheetForm } from './sheet-form';
-import { SheetsApiService, MusiciansApiService, CollectionsApiService } from '../../core/api';
+import { SheetsApiService, PersonsApiService, CollectionsApiService } from '../../core/api';
 import { TranslationService } from '../../core/translation.service';
-import { Musician, SheetMusic } from '../../model/datamodels';
+import { Person, SheetMusic } from '../../model/datamodels';
 
-function makeMusician(id: string, name: string): Musician {
+function makePerson(id: string, name: string): Person {
   return { id, name } as any;
 }
 
@@ -24,12 +24,12 @@ function paginatedOf<T>(data: T[]) {
 
 describe('SheetForm', () => {
   let component: SheetForm;
-  let musiciansApi: { find: ReturnType<typeof vi.fn> };
+  let personsApi: { find: ReturnType<typeof vi.fn> };
   let collectionsApi: { find: ReturnType<typeof vi.fn> };
   let sheetsApi: { create: ReturnType<typeof vi.fn>; update: ReturnType<typeof vi.fn> };
 
   beforeEach(async () => {
-    musiciansApi = { find: vi.fn().mockReturnValue(paginatedOf([])) };
+    personsApi = { find: vi.fn().mockReturnValue(paginatedOf([])) };
     collectionsApi = { find: vi.fn().mockReturnValue(paginatedOf([])) };
     sheetsApi = {
       create: vi.fn().mockReturnValue(of(makeSheet())),
@@ -49,7 +49,7 @@ describe('SheetForm', () => {
           provideNoopAnimations(),
           MessageService,
           { provide: SheetsApiService, useValue: sheetsApi },
-          { provide: MusiciansApiService, useValue: musiciansApi },
+          { provide: PersonsApiService, useValue: personsApi },
           { provide: CollectionsApiService, useValue: collectionsApi },
           {
             provide: TranslationService,
@@ -87,7 +87,7 @@ describe('SheetForm', () => {
   });
 
   it('patchFormValues maps composer to composerId', () => {
-    const sheet = makeSheet({ composer: makeMusician('m1', 'Bach') });
+    const sheet = makeSheet({ composer: makePerson('m1', 'Bach') });
     (component as any).patchFormValues(sheet);
     expect(component.form.controls.composerId.value).toBe('m1');
   });
@@ -98,50 +98,50 @@ describe('SheetForm', () => {
     expect(component.form.controls.composerId.value).toBeNull();
   });
 
-  // ── onMusicianCreated ──────────────────────────────────
+  // ── onPersonCreated ──────────────────────────────────
 
-  it('onMusicianCreated adds musician to list sorted by name', () => {
-    (component as any).musicians.set([makeMusician('m1', 'Brahms'), makeMusician('m2', 'Wagner')]);
-    const newMusician = makeMusician('m3', 'Beethoven');
+  it('onPersonCreated adds person to list sorted by name', () => {
+    (component as any).persons.set([makePerson('m1', 'Brahms'), makePerson('m2', 'Wagner')]);
+    const newPerson = makePerson('m3', 'Beethoven');
 
-    component.onMusicianCreated(newMusician);
+    component.onPersonCreated(newPerson);
 
-    const names = (component as any).musicians().map((m: Musician) => m.name);
+    const names = (component as any).persons().map((m: Person) => m.name);
     expect(names).toEqual(['Beethoven', 'Brahms', 'Wagner']);
   });
 
-  it('onMusicianCreated sets composerId when target is composer', () => {
-    (component as any).musicianDialogTarget = 'composer';
-    const newMusician = makeMusician('m5', 'Schubert');
+  it('onPersonCreated sets composerId when target is composer', () => {
+    (component as any).personDialogTarget = 'composer';
+    const newPerson = makePerson('m5', 'Schubert');
 
-    component.onMusicianCreated(newMusician);
+    component.onPersonCreated(newPerson);
 
     expect(component.form.controls.composerId.value).toBe('m5');
-    expect((component as any).showMusicianDialog).toBe(false);
+    expect((component as any).showPersonDialog).toBe(false);
   });
 
-  it('onMusicianCreated sets arrangerId when target is arranger', () => {
-    (component as any).musicianDialogTarget = 'arranger';
-    const newMusician = makeMusician('m6', 'Liszt');
+  it('onPersonCreated sets arrangerId when target is arranger', () => {
+    (component as any).personDialogTarget = 'arranger';
+    const newPerson = makePerson('m6', 'Liszt');
 
-    component.onMusicianCreated(newMusician);
+    component.onPersonCreated(newPerson);
 
     expect(component.form.controls.arrangerId.value).toBe('m6');
     expect(component.form.controls.composerId.value).toBeNull();
-    expect((component as any).showMusicianDialog).toBe(false);
+    expect((component as any).showPersonDialog).toBe(false);
   });
 
-  it('onMusicianCreated closes the musician dialog', () => {
-    (component as any).showMusicianDialog = true;
-    component.onMusicianCreated(makeMusician('m7', 'Handel'));
-    expect((component as any).showMusicianDialog).toBe(false);
+  it('onPersonCreated closes the person dialog', () => {
+    (component as any).showPersonDialog = true;
+    component.onPersonCreated(makePerson('m7', 'Handel'));
+    expect((component as any).showPersonDialog).toBe(false);
   });
 
-  // ── openMusicianDialog ─────────────────────────────────
+  // ── openPersonDialog ─────────────────────────────────
 
-  it('openMusicianDialog sets target and shows dialog', () => {
-    component.openMusicianDialog('arranger');
-    expect((component as any).musicianDialogTarget).toBe('arranger');
-    expect((component as any).showMusicianDialog).toBe(true);
+  it('openPersonDialog sets target and shows dialog', () => {
+    component.openPersonDialog('arranger');
+    expect((component as any).personDialogTarget).toBe('arranger');
+    expect((component as any).showPersonDialog).toBe(true);
   });
 });

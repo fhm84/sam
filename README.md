@@ -50,7 +50,8 @@ An overview — each area links to its page in the [feature reference](docs/feat
 - **[Sheet music](docs/features/sheets.md)** — title, composer, arranger, publisher, genre, difficulty, ISWC, GEMA work number and more; [search](docs/features/search-discovery.md) with full-text, trigram (fuzzy) and phonetic matching; content fingerprints against duplicates
 - **[Instrumentations](docs/features/instrumentations.md)** — the parts of a sheet, each linked to the [instrument catalogue](docs/features/instruments.md) (transposition, clef, notation type), with physical location and condition
 - **[Documents](docs/features/documents.md)** — upload with a staging area, content-addressed storage (SHA-256 deduplication) on the local filesystem or S3, attachments typed as full score, part, cover, lyrics, MIDI, audio, …
-- **[Musicians](docs/features/musicians.md)** — composers, arrangers, and ensemble members
+- **[Members](docs/features/members.md)** — the band's members with contact details, instruments and login
+- **[People](docs/features/people.md)** — composers, arrangers and everyone else credited on sheets
 - **[Collections & setlists](docs/features/collections.md)** — folders and dated concert programmes, with a table-of-contents PDF and a GEMA setlist export; *booklets are planned*
 - **[Ensembles & coverage](docs/features/ensembles-coverage.md)** — weighted voice definitions and a score of how well the line-up can play a sheet (Complete / Playable / Incomplete)
 - **AI assistance** — [classification](docs/features/ai-classification.md) of uploads (text extraction first, vision fallback for scans), [metadata enrichment](docs/features/ai-enrichment.md), and a [setlist assistant](docs/features/ai-setlist-assistant.md), via LangChain4j (OpenAI or a local Ollama)

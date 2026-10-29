@@ -1,6 +1,6 @@
 package de.halbmann.sam.business.sheets.controller;
 
-import de.halbmann.sam.business.musicians.entity.MusicianEntity;
+import de.halbmann.sam.business.persons.entity.PersonEntity;
 import de.halbmann.sam.business.sheets.entity.FingerprintEntity;
 import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
 import de.halbmann.sam.core.controller.FingerprintService;
@@ -17,10 +17,10 @@ public class FingerprintFactory {
                 sheet.getTitle(),
                 sheet.getPublisher(),
                 Optional.ofNullable(sheet.getComposer())
-                        .map(MusicianEntity::getName)
+                        .map(PersonEntity::getName)
                         .orElse(null),
                 Optional.ofNullable(sheet.getArranger())
-                        .map(MusicianEntity::getName)
+                        .map(PersonEntity::getName)
                         .orElse(null)));
         return fingerprint;
     }

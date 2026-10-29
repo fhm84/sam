@@ -8,8 +8,8 @@ The central entity. Each sheet represents one piece of music in the archive.
 |-------|------|-------|
 | Title | String (required) | |
 | Subtitle | String | |
-| Composer | Musician reference | Linked to the [musicians](musicians.md) catalogue |
-| Arranger | Musician reference | Linked to the [musicians](musicians.md) catalogue |
+| Composer | Person reference | Linked to the [people](people.md) catalogue |
+| Arranger | Person reference | Linked to the [people](people.md) catalogue |
 | Original by | String | Original band / artist for covers/arrangements |
 | Genre | Enum (required) | Structural form: March, Suite, Overture, etc. — see [Genre enum](#genre) |
 | Style | Enum | Stylistic character: Classical, Swing, Pop, etc. — see [Style enum](#style) |
