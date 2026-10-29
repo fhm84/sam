@@ -21,5 +21,5 @@ first/last split is artificial or wrong.
 - Sorting by last name is not reliably possible — accepted for catalogue sizes
   in the hundreds.
 
-See [Musicians feature](../../features/musicians.md) and the musician
+See [People feature](../../features/people.md) and the musician
 profile enrichment entry in the [Roadmap](../../roadmap.md#3-musician-facing).

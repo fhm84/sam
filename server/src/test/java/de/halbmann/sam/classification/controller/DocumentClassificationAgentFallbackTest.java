@@ -10,8 +10,8 @@ import de.halbmann.sam.business.documents.boundary.DocumentRepository;
 import de.halbmann.sam.business.documents.entity.DocumentEntity;
 import de.halbmann.sam.business.instruments.boundary.InstrumentRepository;
 import de.halbmann.sam.business.instruments.entity.InstrumentEntity;
-import de.halbmann.sam.business.musicians.boundary.MusicianRepository;
-import de.halbmann.sam.business.musicians.entity.MusicianEntity;
+import de.halbmann.sam.business.persons.boundary.PersonRepository;
+import de.halbmann.sam.business.persons.entity.PersonEntity;
 import de.halbmann.sam.business.sheets.boundary.SheetRepository;
 import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
 import de.halbmann.sam.classification.boundary.ClassificationAgent;
@@ -39,7 +39,7 @@ class DocumentClassificationAgentFallbackTest {
 
     ClassificationAgent agent;
 
-    MusicianRepository musicianRepository;
+    PersonRepository personRepository;
 
     InstrumentRepository instrumentRepository;
 
@@ -77,13 +77,13 @@ class DocumentClassificationAgentFallbackTest {
                         new SheetAnalyzerResult.InstrumentationAnalyzerResult(
                                 "Flugelhorn", "1", null, null, null, null)));
 
-        musicianRepository = mock(MusicianRepository.class);
+        personRepository = mock(PersonRepository.class);
         instrumentRepository = mock(InstrumentRepository.class);
         sheetRepository = mock(SheetRepository.class);
-        service.musicianRepository = musicianRepository;
+        service.personRepository = personRepository;
         service.instrumentRepository = instrumentRepository;
         service.sheetRepository = sheetRepository;
-        when(musicianRepository.findMusicianByName(anyString())).thenReturn(Optional.empty());
+        when(personRepository.findByName(anyString())).thenReturn(Optional.empty());
         when(instrumentRepository.findCandidates(anyString(), anyDouble(), anyInt()))
                 .thenReturn(List.of());
         when(sheetRepository.findByTitle(anyString())).thenReturn(Optional.empty());
@@ -101,7 +101,7 @@ class DocumentClassificationAgentFallbackTest {
         fromAgent.setInstrumentId("invented-instrument");
         when(agent.resolve(anyString())).thenReturn(fromAgent);
         when(sheetRepository.findByIdOptional(any())).thenReturn(Optional.empty());
-        when(musicianRepository.findByIdOptional(any())).thenReturn(Optional.empty());
+        when(personRepository.findByIdOptional(any())).thenReturn(Optional.empty());
         when(instrumentRepository.findByIdOptional(anyString())).thenReturn(Optional.empty());
 
         ClassificationApplyRequest suggested = service.classify(DOCUMENT_ID).suggested();
@@ -123,7 +123,7 @@ class DocumentClassificationAgentFallbackTest {
         fromAgent.setInstrumentId("flugelhorn");
         when(agent.resolve(anyString())).thenReturn(fromAgent);
         when(sheetRepository.findByIdOptional(sheetId)).thenReturn(Optional.of(new SheetMusicEntity()));
-        when(musicianRepository.findByIdOptional(composerId)).thenReturn(Optional.of(new MusicianEntity()));
+        when(personRepository.findByIdOptional(composerId)).thenReturn(Optional.of(new PersonEntity()));
         when(instrumentRepository.findByIdOptional("flugelhorn")).thenReturn(Optional.of(new InstrumentEntity()));
 
         ClassificationApplyRequest suggested = service.classify(DOCUMENT_ID).suggested();

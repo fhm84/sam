@@ -9,7 +9,7 @@ import de.halbmann.sam.business.collections.boundary.SheetCollectionRepository;
 import de.halbmann.sam.business.collections.entity.SheetCollectionEntity;
 import de.halbmann.sam.business.collections.entity.SheetCollectionItemEntity;
 import de.halbmann.sam.business.collections.entity.TextCollectionItemEntity;
-import de.halbmann.sam.business.musicians.entity.MusicianEntity;
+import de.halbmann.sam.business.persons.entity.PersonEntity;
 import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
 import de.halbmann.sam.core.exception.EntityNotFoundException;
 import de.halbmann.sam.core.exception.ValidationException;
@@ -141,7 +141,7 @@ class ProgrammeTextDraftServiceTest {
         SheetMusicEntity s = new SheetMusicEntity();
         s.setId(UUID.randomUUID());
         s.setTitle(title);
-        MusicianEntity composer = new MusicianEntity();
+        PersonEntity composer = new PersonEntity();
         composer.setName("Test Composer");
         s.setComposer(composer);
         return s;

@@ -13,22 +13,24 @@
   <p-table [value]="members()" [loading]="loading()" [scrollable]="true">
     <ng-template #header>
       <tr>
-        <th>{{ 'ensembles.members.columns.musician' | translate }}</th>
+        <th>{{ 'ensembles.members.columns.member' | translate }}</th>
         <th>{{ 'ensembles.members.columns.voice' | translate }}</th>
         <th>{{ 'ensembles.members.columns.instrument' | translate }}</th>
-        <th>{{ 'ensembles.members.columns.conductor' | translate }}</th>
+        <th>{{ 'ensembles.members.columns.role' | translate }}</th>
         <th pFrozenColumn alignFrozen="right">{{ 'ensembles.members.columns.actions' | translate }}</th>
       </tr>
     </ng-template>
 
     <ng-template #body let-member>
       <tr>
-        <td class="font-medium">{{ member.musician.name }}</td>
+        <td class="font-medium">{{ member.member.name }}</td>
         <td class="text-[var(--sam-text-secondary)]">{{ member.voiceLabel ?? '—' }}</td>
         <td class="text-[var(--sam-text-secondary)]">{{ member.instrumentName ?? '—' }}</td>
         <td>
-          @if (member.conductor) {
-            <p-tag severity="info" [value]="t.t('ensembles.members.conductorLabel')" icon="pi pi-star" />
+          @if (member.role === 'CONDUCTOR') {
+            <p-tag severity="info" [value]="t.t('ensembles.members.role.CONDUCTOR')" icon="pi pi-star" />
+          } @else if (member.role && member.role !== 'MEMBER') {
+            <p-tag severity="secondary" [value]="t.t('ensembles.members.role.' + member.role)" />
           }
         </td>
         <td pFrozenColumn alignFrozen="right">
@@ -79,14 +81,14 @@
   @if (addDialogVisible) {
     <form [formGroup]="addForm" (ngSubmit)="onAdd()" class="flex flex-col gap-4">
 
-      <!-- Selected musician indicator + other fields (shown once musician chosen) -->
-      @if (selectedMusician) {
+      <!-- Selected member indicator + other fields (shown once member chosen) -->
+      @if (selectedMember) {
         <div class="flex flex-col gap-4 p-3 rounded border border-[var(--sam-border)] bg-[var(--sam-surface-raised,var(--sam-surface))]">
           <div class="flex flex-col gap-0.5">
             <span class="text-xs font-medium uppercase tracking-wide text-[var(--sam-text-secondary)]">
-              {{ 'ensembles.members.form.musician' | translate }}
+              {{ 'ensembles.members.form.member' | translate }}
             </span>
-            <span class="font-medium text-[var(--sam-text)]">{{ selectedMusician.name }}</span>
+            <span class="font-medium text-[var(--sam-text)]">{{ selectedMember.name }}</span>
           </div>
 
           <div class="flex flex-wrap gap-4">
@@ -119,39 +121,47 @@
               <label for="add-instrument">{{ 'ensembles.members.form.instrument' | translate }}</label>
             </p-floatlabel>
 
-            <div class="flex items-center gap-2 self-center">
-              <p-checkbox inputId="add-conductor" formControlName="conductor" [binary]="true" />
-              <label for="add-conductor">{{ 'ensembles.members.form.conductor' | translate }}</label>
-            </div>
+            <p-floatlabel variant="on" class="flex-1 min-w-40 block">
+              <p-select
+                inputId="add-role"
+                formControlName="role"
+                [options]="roleOptions()"
+                optionLabel="label"
+                optionValue="value"
+                styleClass="w-full"
+                appendTo="body"
+              />
+              <label for="add-role">{{ 'ensembles.members.form.role' | translate }}</label>
+            </p-floatlabel>
           </div>
         </div>
       }
 
-      <!-- Musician search + picker -->
+      <!-- Member search + picker -->
       <p-iconfield class="w-full">
         <p-inputicon styleClass="pi pi-search" />
         <input
           pInputText
           type="text"
-          [placeholder]="t.t('ensembles.members.form.musicianPlaceholder')"
-          (input)="onMusicianFilterInput($event)"
+          [placeholder]="t.t('ensembles.members.form.memberPlaceholder')"
+          (input)="onMemberFilterInput($event)"
         />
       </p-iconfield>
 
-      <p-table [value]="filteredMusicians()" [rowHover]="true" styleClass="musician-select-table">
+      <p-table [value]="filteredMembers()" [rowHover]="true" styleClass="member-select-table">
         <ng-template #header>
           <tr>
-            <th>{{ 'ensembles.members.columns.musician' | translate }}</th>
+            <th>{{ 'ensembles.members.columns.member' | translate }}</th>
           </tr>
         </ng-template>
 
-        <ng-template #body let-musician>
+        <ng-template #body let-member>
           <tr
             class="cursor-pointer"
-            [class.bg-[var(--p-highlight-background)]]="isMusicianSelected(musician)"
-            (click)="selectMusician(musician)"
+            [class.bg-[var(--p-highlight-background)]]="isMemberSelected(member)"
+            (click)="selectMember(member)"
           >
-            <td>{{ musician.name }}</td>
+            <td>{{ member.name }}</td>
           </tr>
         </ng-template>
 
@@ -164,14 +174,32 @@
         </ng-template>
       </p-table>
 
-      @if (musicianFilterQuery().trim()) {
+      @if (personCandidates().length > 0) {
+        <div class="flex flex-col gap-2">
+          <span class="text-sm text-[var(--sam-text-muted)]">{{ 'ensembles.members.member.existingPersons' | translate }}</span>
+          @for (person of personCandidates(); track person.id) {
+            <p-button
+              [label]="t.t('ensembles.members.member.makeMember').replace('{name}', person.name)"
+              icon="pi pi-user-plus"
+              severity="secondary"
+              [outlined]="true"
+              [loading]="creatingMember"
+              [disabled]="creatingMember"
+              (onClick)="makeMember(person)"
+              styleClass="w-full"
+            />
+          }
+        </div>
+      }
+
+      @if (memberFilterQuery().trim()) {
         <p-button
-          [label]="t.t('ensembles.members.musician.createWithName').replace('{name}', musicianFilterQuery().trim())"
+          [label]="t.t('ensembles.members.member.createWithName').replace('{name}', memberFilterQuery().trim())"
           icon="pi pi-plus"
           severity="secondary"
-          [loading]="creatingMusician"
-          [disabled]="creatingMusician"
-          (onClick)="createMusician()"
+          [loading]="creatingMember"
+          [disabled]="creatingMember"
+          (onClick)="createMember()"
           styleClass="w-full"
         />
       }
@@ -205,9 +233,9 @@
     <form [formGroup]="editForm" (ngSubmit)="onUpdate()" class="flex flex-col gap-5">
       <div class="flex flex-col gap-0.5 p-3 rounded border border-[var(--sam-border)] bg-[var(--sam-surface-raised,var(--sam-surface))]">
         <span class="text-xs font-medium uppercase tracking-wide text-[var(--sam-text-secondary)]">
-          {{ 'ensembles.members.form.musician' | translate }}
+          {{ 'ensembles.members.form.member' | translate }}
         </span>
-        <span class="font-medium text-[var(--sam-text)]">{{ editingMember.musician.name }}</span>
+        <span class="font-medium text-[var(--sam-text)]">{{ editingMember.member.name }}</span>
       </div>
 
       <p-floatlabel variant="on" class="block">
@@ -239,10 +267,18 @@
         <label for="edit-instrument">{{ 'ensembles.members.form.instrument' | translate }}</label>
       </p-floatlabel>
 
-      <div class="flex items-center gap-2">
-        <p-checkbox inputId="edit-conductor" formControlName="conductor" [binary]="true" />
-        <label for="edit-conductor">{{ 'ensembles.members.form.conductor' | translate }}</label>
-      </div>
+      <p-floatlabel variant="on" class="block">
+        <p-select
+          inputId="edit-role"
+          formControlName="role"
+          [options]="roleOptions()"
+          optionLabel="label"
+          optionValue="value"
+          styleClass="w-full"
+          appendTo="body"
+        />
+        <label for="edit-role">{{ 'ensembles.members.form.role' | translate }}</label>
+      </p-floatlabel>
     </form>
   }
 

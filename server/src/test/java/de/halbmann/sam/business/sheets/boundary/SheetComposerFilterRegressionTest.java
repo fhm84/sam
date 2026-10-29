@@ -3,7 +3,7 @@ package de.halbmann.sam.business.sheets.boundary;
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.halbmann.sam.api.entity.musicians.Musician;
+import de.halbmann.sam.api.entity.persons.Person;
 import de.halbmann.sam.api.entity.sheets.Genre;
 import de.halbmann.sam.api.entity.sheets.SheetMusic;
 import io.quarkus.test.junit.QuarkusTest;
@@ -93,7 +93,7 @@ class SheetComposerFilterRegressionTest {
     }
 
     private String createSheet(String title, String composerName, Genre genre) {
-        Musician composer = new Musician();
+        Person composer = new Person();
         composer.setName(composerName);
         SheetMusic sheet = new SheetMusic();
         sheet.setTitle(title);

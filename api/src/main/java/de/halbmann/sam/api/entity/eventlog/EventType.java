@@ -27,7 +27,7 @@ public enum EventType {
     /** AI classification was run on a document, producing a {@code SheetClassification} result. */
     DOCUMENT_CLASSIFIED,
 
-    /** A reviewed AI classification was applied, creating or updating sheet/musician/instrument entities. */
+    /** A reviewed AI classification was applied, creating or updating sheet/person/instrument entities. */
     DOCUMENT_CLASSIFICATION_APPLIED,
 
     /** A share token was created by an authenticated user to grant external access to a resource. */

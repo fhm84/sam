@@ -5,7 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import de.halbmann.sam.api.entity.musicians.Musician;
+import de.halbmann.sam.api.entity.persons.Person;
 import de.halbmann.sam.api.entity.sheets.DifficultyLevel;
 import de.halbmann.sam.api.entity.sheets.Genre;
 import de.halbmann.sam.api.entity.sheets.SheetMusic;
@@ -32,9 +32,9 @@ class SheetsResourceTest {
         sheet.setDifficultyLevel(DifficultyLevel.EASY);
         sheet.setPublisher("Who knows");
         sheet.setYearOfComposition(1875);
-        final Musician musician = new Musician();
-        musician.setName("This crazy guy");
-        sheet.setComposer(musician);
+        final Person composer = new Person();
+        composer.setName("This crazy guy");
+        sheet.setComposer(composer);
 
         try (Jsonb jsonb = JsonbBuilder.newBuilder().build()) {
             given().contentType(ContentType.JSON)
@@ -48,7 +48,7 @@ class SheetsResourceTest {
                     .body("difficultyLevel", equalTo(sheet.getDifficultyLevel().getGrade()))
                     .body("publisher", equalTo(sheet.getPublisher()))
                     .body("yearOfComposition", equalTo(sheet.getYearOfComposition()))
-                    .body("composer.name", equalTo(musician.getName()));
+                    .body("composer.name", equalTo(composer.getName()));
         }
     }
 

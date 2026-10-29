@@ -6,7 +6,7 @@ import static org.mockito.Mockito.when;
 import de.halbmann.sam.api.entity.collections.CollectionItem;
 import de.halbmann.sam.api.entity.collections.CollectionItemType;
 import de.halbmann.sam.api.entity.collections.SheetCollection;
-import de.halbmann.sam.api.entity.musicians.Musician;
+import de.halbmann.sam.api.entity.persons.Person;
 import de.halbmann.sam.api.entity.sheets.SheetMusic;
 import de.halbmann.sam.business.sheets.controller.ExportResult;
 import de.halbmann.sam.business.sheets.controller.SheetService;
@@ -105,8 +105,8 @@ class GemaSetlistServiceTest {
     }
 
     @Test
-    void splitNameNullMusicianReturnsEmpties() {
-        String[] parts = service.splitName((Musician) null);
+    void splitNameNullPersonReturnsEmpties() {
+        String[] parts = service.splitName((Person) null);
         assertEquals("", parts[0]);
         assertEquals("", parts[1]);
     }
@@ -278,7 +278,7 @@ class GemaSetlistServiceTest {
         s.setIswc(iswc);
         s.setDuration(duration);
         if (composerName != null) {
-            Musician m = new Musician();
+            Person m = new Person();
             m.setName(composerName);
             s.setComposer(m);
         }

@@ -16,6 +16,9 @@ either has a login or doesn't — there is no separate `User` entity. Linking is
 admin-only via dedicated endpoints; the general musician update intentionally
 ignores `userId` so a form save can never clear an existing link.
 
+Since [ADR-0015](adr-0015-person-catalogue-and-member-profile.md) the musician record is the
+*member profile* (`Member.userId`); the decision itself is unchanged.
+
 ## Consequences
 
 - Personalisation (My Parts) resolves the caller's `sub` to a `Musician` and

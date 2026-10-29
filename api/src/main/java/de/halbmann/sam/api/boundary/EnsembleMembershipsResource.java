@@ -7,8 +7,8 @@ import jakarta.ws.rs.core.MediaType;
 import java.util.List;
 
 /**
- * RESTful API for managing ensemble memberships. A membership links a musician to an ensemble,
- * optionally specifying the voice and instrument they play.
+ * RESTful API for managing ensemble memberships. A membership is a member's seat in an ensemble,
+ * optionally specifying the voice and instrument they play and their role.
  */
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -17,13 +17,13 @@ public interface EnsembleMembershipsResource {
     /**
      * Lists all members of the ensemble.
      *
-     * @return all memberships for this ensemble, sorted by musician name
+     * @return all memberships for this ensemble, sorted by member name
      */
     @GET
     List<EnsembleMembership> list();
 
     /**
-     * Adds a musician to the ensemble.
+     * Adds a member to the ensemble.
      *
      * @param membership the membership to create
      * @return the created membership with generated ID
@@ -32,7 +32,8 @@ public interface EnsembleMembershipsResource {
     EnsembleMembership add(CreateEnsembleMembership membership);
 
     /**
-     * Updates an existing membership (voice, instrument, conductor flag).
+     * Updates an existing membership (voice, instrument, role). A new role applies to all of
+     * the member's voice seats in this ensemble.
      *
      * @param memberId the ID of the membership to update
      * @param membership the updated membership data
@@ -43,7 +44,7 @@ public interface EnsembleMembershipsResource {
     EnsembleMembership update(@PathParam("memberId") String memberId, EnsembleMembership membership);
 
     /**
-     * Removes a musician from the ensemble.
+     * Removes a seat from the ensemble.
      *
      * @param memberId the ID of the membership to delete
      */

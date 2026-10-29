@@ -70,6 +70,7 @@ hs_err_pid*.log
 /docs/reviews/code-review-findings.md
 /docs/reviews/code-review-findings-2026-10.md
 /docs/reviews/security-review-findings.md
+/docs/reviews/code-review-findings-person-member-split.md
 
 # Obsidian vault state (docs/ opened as a vault)
 /docs/.obsidian/

@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 4.1.1 on 2026-08-18 17:43:45.
+// Generated using typescript-generator version 4.2.1 on 2026-10-26 22:15:32.
 
 export interface SheetEnrichment {
     suggestedAdditionalNotes?: string;
@@ -10,6 +10,11 @@ export interface SheetEnrichment {
     suggestedYearOfComposition?: number;
 }
 
+export interface UserDirectoryInfo {
+    provider: string;
+    searchable?: boolean;
+}
+
 export interface UserInfo {
     displayLabel?: string;
     email?: string;
@@ -17,11 +22,6 @@ export interface UserInfo {
     id: string;
     lastName?: string;
     username: string;
-}
-
-export interface UserDirectoryInfo {
-    provider: string;
-    searchable: boolean;
 }
 
 export interface DraftTextResult {
@@ -215,9 +215,9 @@ export interface CreateEnsemble {
 }
 
 export interface CreateEnsembleMembership {
-    conductor?: boolean;
     instrumentId?: string;
-    musicianId: string;
+    memberId: string;
+    role?: EnsembleRole;
     voiceId?: string;
 }
 
@@ -247,11 +247,11 @@ export interface EnsembleFilterRequest extends PaginationRequest {
 }
 
 export interface EnsembleMembership {
-    conductor?: boolean;
     id?: string;
     instrumentId?: string;
     instrumentName?: string;
-    musician: Musician;
+    member: Member;
+    role?: EnsembleRole;
     voiceId?: string;
     voiceLabel?: string;
 }
@@ -350,44 +350,51 @@ export interface VoiceOption {
     type?: VoiceOptionType;
 }
 
-export interface Musician {
-    birthYear?: number;
-    contact?: MusicianContact;
-    deathYear?: number;
+export interface Member {
+    contact?: MemberContact;
     id?: string;
-    instruments?: MusicianInstrument[];
-    ipi?: string;
-    membership?: MusicianMembership;
+    instruments?: MemberInstrument[];
+    lastInviteSentAt?: Date;
+    leftAt?: Date;
     name: string;
+    onboarding?: OnboardingState;
+    status?: MembershipStatus;
     userId?: string;
 }
 
-export interface MusicianContact {
+export interface MemberContact {
     email?: string;
     mobile?: string;
     notes?: string;
 }
 
-export interface MusicianFilterRequest extends PaginationRequest {
+export interface MemberFilterRequest extends PaginationRequest {
     name?: string;
+    status?: MembershipStatus;
 }
 
-export interface MusicianInstrument {
+export interface MemberInstrument {
     instrumentId?: string;
     instrumentName?: string;
     primary?: boolean;
 }
 
-export interface MusicianMatch {
+export interface Person {
+    birthYear?: number;
+    deathYear?: number;
+    id?: string;
+    ipi?: string;
+    name: string;
+}
+
+export interface PersonFilterRequest extends PaginationRequest {
+    name?: string;
+}
+
+export interface PersonMatch {
     id?: string;
     name?: string;
     score?: number;
-}
-
-export interface MusicianMembership {
-    lastInviteSentAt?: Date;
-    role?: MusicianRole;
-    status?: MusicianStatus;
 }
 
 export interface PaginatedResponse<T> {
@@ -492,9 +499,9 @@ export interface CreateSheetMusic {
     additionalNotes?: string;
     arrangementPublisher?: string;
     arrangementRightsUntil?: number;
-    arranger?: Musician;
+    arranger?: Person;
     collectionId?: string;
-    composer?: Musician;
+    composer?: Person;
     copyright?: string;
     difficultyLevel?: short;
     duration?: long;
@@ -564,9 +571,9 @@ export interface SheetMusic {
     additionalNotes?: string;
     arrangementPublisher?: string;
     arrangementRightsUntil?: number;
-    arranger?: Musician;
+    arranger?: Person;
     attachments?: Attachment[];
-    composer?: Musician;
+    composer?: Person;
     copyright?: string;
     difficultyLevel?: short;
     duration?: long;
@@ -629,6 +636,8 @@ export type AttachmentType = "FULL_SCORE" | "PART" | "COVER" | "LYRICS" | "MIDI"
 
 export type CoverageStatus = "COMPLETE" | "PLAYABLE" | "INCOMPLETE";
 
+export type EnsembleRole = "MEMBER" | "GUEST" | "SUBSTITUTE" | "CONDUCTOR";
+
 export type EventType = "DOCUMENT_DOWNLOAD" | "DOCUMENT_BATCH_DOWNLOAD" | "SHEET_EXPORT" | "COLLECTION_EXPORT" | "COLLECTION_TOC_GENERATED" | "GEMA_SETLIST_GENERATED" | "DOCUMENT_CLASSIFIED" | "DOCUMENT_CLASSIFICATION_APPLIED" | "SHARE_CREATED" | "SHARE_ACCESSED" | "SHARE_REVOKED" | "SETLIST_AI_SUGGESTION_GENERATED" | "SETLIST_AI_TEXT_DRAFTED";
 
 export type Clef = "TREBLE" | "ALTO" | "TENOR" | "BASS";
@@ -639,9 +648,9 @@ export type InstrumentTransposing = "C" | "D" | "Eb" | "F" | "G" | "A" | "Ab" | 
 
 export type VoiceOptionType = "PRIMARY" | "ALTERNATE" | "FALLBACK";
 
-export type MusicianRole = "MEMBER" | "GUEST" | "SUBSTITUTE" | "CONDUCTOR";
+export type MembershipStatus = "ACTIVE" | "PAUSED" | "FORMER";
 
-export type MusicianStatus = "ACTIVE" | "INACTIVE" | "INVITED" | "PENDING";
+export type OnboardingState = "NONE" | "INVITED" | "LINKED";
 
 export type SortOrder = "ASC" | "DESC";
 

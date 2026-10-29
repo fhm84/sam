@@ -56,20 +56,20 @@ once in the [Coverage Evaluation concept](../architecture/concepts/coverage.md).
 
 ## Ensemble members
 
-Each ensemble has a **membership roster** — the list of musicians who play in it.
+Each ensemble has a **membership roster** — the seats of the [members](members.md) who play in it.
 
 `GET /ensembles/{id}/members` · `POST /ensembles/{id}/members` · `PUT /ensembles/{id}/members/{memberId}` · `DELETE /ensembles/{id}/members/{memberId}`
 
 | Field | Type | Notes |
 |-------|------|-------|
-| Musician | Musician reference | Required |
-| Voice | EnsembleVoice reference | Optional — which voice/part the musician fills |
+| Member | Member reference | Required |
+| Voice | EnsembleVoice reference | Optional — which voice/part the member fills |
 | Instrument | Instrument reference | Optional — instrument played in this ensemble |
-| Conductor | Boolean | Marks the ensemble conductor |
+| Role | Enum | `MEMBER` (default) · `GUEST` · `SUBSTITUTE` · `CONDUCTOR` — per ensemble, so someone can be a member of one band and a substitute in another |
 
-A musician may appear multiple times in the same ensemble (once per voice, for players who double on multiple parts). The `voice_id IS NULL` case is unique per musician per ensemble (prevents duplicate conductor entries). Each member can be linked to a Musician entity that has a `userId` (OIDC subject). A musician may belong to the roster without a login (`userId = null`). For authenticated musicians, ensemble membership is the foundation for the [My Parts](my-parts.md) view.
+A member may have several seats in the same ensemble (one per voice, for players who double on multiple parts); these voice seats share one role: a new voice seat without an explicit role takes the role of the member's other voice seats, and changing the role of one voice seat changes the others. The seat without a voice (`voice_id IS NULL`, e.g. the conductor's) is unique per member per ensemble and keeps its own role. A member may be on the roster without a login (`userId = null`). For members with a login, their seats are the foundation for the [My Parts](my-parts.md) view.
 
-When the musician search filter contains text that matches no existing musician, the Add Member dialog shows a **"Create musician '…'"** button. Clicking it calls `POST /musicians` with the typed name, appends the new musician to the local list, auto-selects them, and shows a success toast — no page navigation required.
+When the member search filter contains text that matches no existing member, the Add Member dialog shows a **"Create member '…'"** button. Clicking it calls `POST /members` with the typed name, appends the new member to the local list, auto-selects them, and shows a success toast — no page navigation required. Persons matching the filter who have no member profile yet (e.g. a credited arranger) are offered as **"Make '…' a member"**, which gives that person the profile instead of creating a second one.
 
 ## Related
 

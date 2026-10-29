@@ -3,7 +3,7 @@ package de.halbmann.sam.business.sheets.controller;
 import de.halbmann.sam.api.entity.collections.CollectionItemType;
 import de.halbmann.sam.api.entity.collections.CreateCollectionItem;
 import de.halbmann.sam.api.entity.ensembles.CoverageSnapshotSummary;
-import de.halbmann.sam.api.entity.musicians.Musician;
+import de.halbmann.sam.api.entity.persons.Person;
 import de.halbmann.sam.api.entity.shared.PaginatedResponse;
 import de.halbmann.sam.api.entity.shared.PaginationRequest;
 import de.halbmann.sam.api.entity.shared.SearchResultMetrics;
@@ -18,8 +18,8 @@ import de.halbmann.sam.business.collections.controller.SheetCollectionService;
 import de.halbmann.sam.business.documents.controller.AttachmentLinkService;
 import de.halbmann.sam.business.ensembles.controller.CoverageSnapshotService;
 import de.halbmann.sam.business.instruments.boundary.InstrumentRepository;
-import de.halbmann.sam.business.musicians.boundary.MusicianRepository;
-import de.halbmann.sam.business.musicians.entity.MusicianEntity;
+import de.halbmann.sam.business.persons.boundary.PersonRepository;
+import de.halbmann.sam.business.persons.entity.PersonEntity;
 import de.halbmann.sam.business.shared.event.ResourcesDeleted;
 import de.halbmann.sam.business.sheets.boundary.SheetRepository;
 import de.halbmann.sam.business.sheets.entity.InstrumentationCountCriterion;
@@ -42,7 +42,7 @@ public class SheetService {
     SheetRepository sheetRepository;
 
     @Inject
-    MusicianRepository musicianRepository;
+    PersonRepository personRepository;
 
     @Inject
     InstrumentRepository instrumentRepository;
@@ -268,8 +268,8 @@ public class SheetService {
 
     public SheetMusic addSheet(final CreateSheetMusic sheetMusic) {
         final SheetMusicEntity entity = sheetMusicMapper.fromDto(sheetMusic);
-        entity.setComposer(resolveOrCreateMusician(sheetMusic.getComposer()));
-        entity.setArranger(resolveOrCreateMusician(sheetMusic.getArranger()));
+        entity.setComposer(resolveOrCreatePerson(sheetMusic.getComposer()));
+        entity.setArranger(resolveOrCreatePerson(sheetMusic.getArranger()));
         sheetRepository.persistAndFlush(entity);
         if (sheetMusic.getCollectionId() != null) {
             final CreateCollectionItem item = new CreateCollectionItem();
@@ -285,27 +285,26 @@ public class SheetService {
                 .findByIdOptional(UUID.fromString(sheetId))
                 .orElseThrow(() -> new EntityNotFoundException("SheetMusic", sheetId));
         sheetMusicMapper.update(entity, sheetMusic);
-        entity.setComposer(resolveOrCreateMusician(sheetMusic.getComposer()));
-        entity.setArranger(resolveOrCreateMusician(sheetMusic.getArranger()));
+        entity.setComposer(resolveOrCreatePerson(sheetMusic.getComposer()));
+        entity.setArranger(resolveOrCreatePerson(sheetMusic.getArranger()));
     }
 
-    private MusicianEntity resolveOrCreateMusician(final Musician dto) {
+    private PersonEntity resolveOrCreatePerson(final Person dto) {
         if (dto == null) {
             return null;
         }
         if (dto.getId() != null) {
-            MusicianEntity found =
-                    musicianRepository.findByIdOptional(dto.getId()).orElse(null);
+            PersonEntity found = personRepository.findByIdOptional(dto.getId()).orElse(null);
             if (found != null) {
                 return found;
             }
         }
         if (dto.getName() != null && !dto.getName().isBlank()) {
-            return musicianRepository.findMusicianByName(dto.getName()).orElseGet(() -> {
-                MusicianEntity m = new MusicianEntity();
-                m.setName(dto.getName().trim());
-                musicianRepository.persist(m);
-                return m;
+            return personRepository.findByName(dto.getName()).orElseGet(() -> {
+                PersonEntity p = new PersonEntity();
+                p.setName(dto.getName().trim());
+                personRepository.persist(p);
+                return p;
             });
         }
         return null;

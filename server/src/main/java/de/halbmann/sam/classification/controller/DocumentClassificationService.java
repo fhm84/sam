@@ -14,8 +14,8 @@ import de.halbmann.sam.business.documents.entity.AttachmentEntity;
 import de.halbmann.sam.business.documents.entity.DocumentEntity;
 import de.halbmann.sam.business.instruments.boundary.InstrumentRepository;
 import de.halbmann.sam.business.instruments.entity.InstrumentEntity;
-import de.halbmann.sam.business.musicians.boundary.MusicianRepository;
-import de.halbmann.sam.business.musicians.entity.MusicianEntity;
+import de.halbmann.sam.business.persons.boundary.PersonRepository;
+import de.halbmann.sam.business.persons.entity.PersonEntity;
 import de.halbmann.sam.business.sheets.boundary.InstrumentationRepository;
 import de.halbmann.sam.business.sheets.boundary.SheetRepository;
 import de.halbmann.sam.business.sheets.entity.InstrumentationEntity;
@@ -74,7 +74,7 @@ public class DocumentClassificationService {
     FileSystemWrapper filesystem;
 
     @Inject
-    MusicianRepository musicianRepository;
+    PersonRepository personRepository;
 
     @Inject
     InstrumentRepository instrumentRepository;
@@ -121,9 +121,9 @@ public class DocumentClassificationService {
 
         log.info("Classification result for {}: title={}, composer={}", documentId, result.title(), result.composer());
 
-        // Pre-match existing musicians
-        UUID matchedComposerId = matchMusician(result.composer());
-        UUID matchedArrangerId = matchMusician(result.arranger());
+        // Pre-match existing persons
+        UUID matchedComposerId = matchPerson(result.composer());
+        UUID matchedArrangerId = matchPerson(result.arranger());
 
         // Pre-match existing instruments via trigram similarity
         SheetAnalyzerResult.InstrumentationAnalyzerResult instr = result.instrumentation();
@@ -185,8 +185,8 @@ public class DocumentClassificationService {
                 .findByIdOptional(documentId)
                 .orElseThrow(() -> new EntityNotFoundException("Document", documentId));
 
-        MusicianEntity composer = resolveMusician(request.getComposerId(), request.getComposerName());
-        MusicianEntity arranger = resolveMusician(request.getArrangerId(), request.getArrangerName());
+        PersonEntity composer = resolvePerson(request.getComposerId(), request.getComposerName());
+        PersonEntity arranger = resolvePerson(request.getArrangerId(), request.getArrangerName());
         SheetMusicEntity sheet = resolveSheet(request, composer, arranger);
         InstrumentEntity instrument = resolveInstrument(request.getInstrumentId(), request.getInstrumentName());
 
@@ -350,7 +350,7 @@ public class DocumentClassificationService {
             resolved.setSheetId(fallback.getSheetId());
         }
         if (resolved.getComposerId() != null
-                && musicianRepository.findByIdOptional(resolved.getComposerId()).isEmpty()) {
+                && personRepository.findByIdOptional(resolved.getComposerId()).isEmpty()) {
             warnUnknownId("composer", resolved.getComposerId());
             resolved.setComposerId(fallback.getComposerId());
             if (resolved.getComposerName() == null) {
@@ -358,7 +358,7 @@ public class DocumentClassificationService {
             }
         }
         if (resolved.getArrangerId() != null
-                && musicianRepository.findByIdOptional(resolved.getArrangerId()).isEmpty()) {
+                && personRepository.findByIdOptional(resolved.getArrangerId()).isEmpty()) {
             warnUnknownId("arranger", resolved.getArrangerId());
             resolved.setArrangerId(fallback.getArrangerId());
             if (resolved.getArrangerName() == null) {
@@ -424,33 +424,30 @@ public class DocumentClassificationService {
     // Entity resolution helpers
     // -------------------------------------------------------------------------
 
-    private UUID matchMusician(String name) {
+    private UUID matchPerson(String name) {
         if (name == null || name.isBlank()) {
             return null;
         }
-        return musicianRepository
-                .findMusicianByName(name)
-                .map(MusicianEntity::getId)
-                .orElse(null);
+        return personRepository.findByName(name).map(PersonEntity::getId).orElse(null);
     }
 
-    private MusicianEntity resolveMusician(UUID id, String name) {
+    private PersonEntity resolvePerson(UUID id, String name) {
         if (id != null) {
-            return musicianRepository.findByIdOptional(id).orElse(null);
+            return personRepository.findByIdOptional(id).orElse(null);
         }
         if (name != null && !name.isBlank()) {
-            return musicianRepository.findMusicianByName(name).orElseGet(() -> {
-                MusicianEntity m = new MusicianEntity();
-                m.setName(name.trim());
-                musicianRepository.persist(m);
-                return m;
+            return personRepository.findByName(name).orElseGet(() -> {
+                PersonEntity p = new PersonEntity();
+                p.setName(name.trim());
+                personRepository.persist(p);
+                return p;
             });
         }
         return null;
     }
 
     private SheetMusicEntity resolveSheet(
-            ClassificationApplyRequest request, MusicianEntity composer, MusicianEntity arranger) {
+            ClassificationApplyRequest request, PersonEntity composer, PersonEntity arranger) {
         if (request.getSheetId() != null) {
             return sheetRepository
                     .findByIdOptional(request.getSheetId())

@@ -112,7 +112,7 @@ There are two sub-variants with different access expectations:
 - **S3a — Authenticated musician:** A registered ensemble member with a personal login.
   Can browse and download from the full archive like any authenticated user (there is no
   per-ensemble read restriction today — see [Section 6](#6-access-control-model)). Their
-  user account may be linked to an existing `Musician` entity in the data model, which
+  user account may be linked to their `Member` profile in the data model, which
   unlocks the personalised My Parts view (UC-M5).
 - **S3b — Guest musician (anonymous):** Uses a shared link or a public URL to access
   a specific sheet or collection. No account required. Access is intentionally limited
@@ -153,7 +153,7 @@ ensemble member.
 - Instruments catalogue management
 - Ensemble and voice definition management
 - Coverage snapshot recomputation
-- Login-provider user lookup (`AdminUsersResource`, admin-only) and linking a `Musician` record
+- Login-provider user lookup (`AdminUsersResource`, admin-only) and linking a `Member` profile
   to a login (`linkUser` / `unlinkUser`, admin-only) — the only two genuinely
   admin-exclusive actions in the system today
 - Content visibility / sharing settings — share links are implemented (see S5); a per-collection
@@ -476,18 +476,18 @@ expired or revoked token shows an error instead of the resource.
 **Goal:** See only the sheets that contain a part for an instrument they actually play,
 without manually filtering the full archive
 
-**Precondition:** An admin has linked the musician's login to their `Musician` record
-(`linkUser`), and that `Musician` has at least one `EnsembleMembership` with an instrument
-assigned
+**Precondition:** An admin has linked the musician's login to their `Member` profile
+(`linkUser`), and that member has at least one ensemble seat (`EnsembleMembership`) with an
+instrument assigned
 
 **Main flow**
 1. Logs in to SAM, opens */my-parts* ("Meine Stimmen").
-2. SAM resolves the logged-in user to a `Musician`, collects every instrument from their
-   ensemble membership(s) (across all ensembles, doubling instruments included), and
+2. SAM resolves the logged-in user to a `Member`, collects every instrument from their
+   ensemble seat(s) (across all ensembles, doubling instruments included), and
    returns sheets containing at least one matching instrumentation.
 3. Each row shows the sheet plus only the matching instrumentation(s) as chips.
 
-**Empty-state cases:** no `Musician` linked to this login; musician on the roster with no
+**Empty-state cases:** no `Member` linked to this login; musician on the roster with no
 instrument assigned (e.g. conductor-only); or no sheets match their instrument(s) — each
 shows a distinct empty state with a hint to contact the Music librarian.
 
@@ -726,13 +726,13 @@ yet decided on):
 | See someone else's `PRIVATE` collection (draft) | ✅ | ❌ (404; ✅ if no creator recorded) | ❌ (404) | ➖ (only through a share link to it) |
 | Create/edit/delete sheets, instrumentations, documents; run AI classify/apply/enrich | ✅ | ✅ | ❌ | ❌ |
 | Create/edit/delete collections & setlist items; use the AI setlist assistant (suggest items, draft text) | ✅ | ✅ | ❌ | ❌ |
-| Create/edit/delete musicians & instruments | ✅ | ✅ | ❌ | ❌ |
+| Create/edit/delete persons, members & instruments (deleting a member erases their personal data and its history) | ✅ | ✅ | ❌ | ❌ |
 | Create/edit/delete ensembles, voices, voice options, members; compute coverage | ✅ | ✅ | ❌ | ❌ |
-| Link/unlink a `Musician` to a login; search the login provider's users | ✅ | ❌ | ❌ | ❌ |
+| Link/unlink a `Member` to a login; search the login provider's users | ✅ | ❌ | ❌ | ❌ |
 | Create share tokens | ✅ | ✅ | ❌ | ❌ |
 | List/revoke **own** share tokens | ✅ | ✅ | ✅ | ❌ |
 | Mark/unmark **own** favourite sheets | ✅ | ✅ | ✅ | ❌ |
-| See musicians' contact details, linked login, last invite (also embedded in sheets and members) | ✅ | ✅ | ❌ | ❌ |
+| See members' contact details, linked login, last invite, onboarding state (also embedded in ensemble seats; sheets' composers are persons without personal data) | ✅ | ✅ | ❌ | ❌ |
 | Browse the upload inbox (`/documents/unlinked`); generate the GEMA setlist | ✅ | ✅ | ❌ | ❌ |
 | View My Parts (own personalised view, if linked) | ✅ | ✅ | ✅ | ❌ |
 | View event log (`GET /api/event-logs`) | ✅ | ❌ | ❌ | ❌ |

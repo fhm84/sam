@@ -8,8 +8,8 @@ import de.halbmann.sam.api.entity.sheets.SheetWithMyParts;
 import de.halbmann.sam.business.ensembles.boundary.EnsembleMembershipRepository;
 import de.halbmann.sam.business.ensembles.entity.EnsembleMembershipEntity;
 import de.halbmann.sam.business.instruments.entity.InstrumentEntity;
-import de.halbmann.sam.business.musicians.boundary.MusicianRepository;
-import de.halbmann.sam.business.musicians.entity.MusicianEntity;
+import de.halbmann.sam.business.members.boundary.MemberRepository;
+import de.halbmann.sam.business.members.entity.MemberEntity;
 import de.halbmann.sam.business.sheets.boundary.SheetRepository;
 import de.halbmann.sam.business.sheets.controller.InstrumentationMapper;
 import de.halbmann.sam.business.sheets.controller.SheetMusicMapper;
@@ -30,7 +30,7 @@ import java.util.Set;
 public class MyPartsService {
 
     @Inject
-    MusicianRepository musicianRepository;
+    MemberRepository memberRepository;
 
     @Inject
     EnsembleMembershipRepository membershipRepository;
@@ -49,20 +49,19 @@ public class MyPartsService {
             return emptyResponse(filter);
         }
 
-        Optional<MusicianEntity> musicianOpt = musicianRepository.findByUserId(userId);
-        if (musicianOpt.isEmpty()) {
+        Optional<MemberEntity> memberOpt = memberRepository.findByUserId(userId);
+        if (memberOpt.isEmpty()) {
             return emptyResponse(filter);
         }
 
-        MusicianEntity musician = musicianOpt.get();
+        MemberEntity member = memberOpt.get();
 
-        List<String> instrumentIds =
-                membershipRepository.list("musician = :musician", Map.of("musician", musician)).stream()
-                        .map(EnsembleMembershipEntity::getInstrument)
-                        .filter(Objects::nonNull)
-                        .map(InstrumentEntity::getId)
-                        .distinct()
-                        .toList();
+        List<String> instrumentIds = membershipRepository.list("member = :member", Map.of("member", member)).stream()
+                .map(EnsembleMembershipEntity::getInstrument)
+                .filter(Objects::nonNull)
+                .map(InstrumentEntity::getId)
+                .distinct()
+                .toList();
 
         if (instrumentIds.isEmpty()) {
             return emptyResponse(filter);

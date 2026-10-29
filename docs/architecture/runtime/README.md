@@ -33,7 +33,7 @@ sequenceDiagram
         Server->>LLM: vision fallback
         LLM-->>Server: detected metadata
     end
-    Server->>Server: match musicians/instruments<br/>(pg_trgm trigram similarity)
+    Server->>Server: match persons/instruments<br/>(pg_trgm trigram similarity)
     Server-->>UI: SheetClassification
     UI-->>Lib: review form pre-filled
 

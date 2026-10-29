@@ -111,7 +111,7 @@ java -jar cli/target/quarkus-app/quarkus-run.jar export ./snapshot
 ```
 
 Instruments, musicians, and ensembles have equivalent commands
-(`exportInstrument`, `exportMusician`, `exportEnsemble` and their `import*`
+(`exportInstrument`, `exportPerson`, `exportMember`, `exportEnsemble` and their `import*`
 counterparts) — together they snapshot everything needed to seed a fresh
 instance except collections and document files (see "Known gaps").
 
@@ -167,7 +167,7 @@ The claim the role travels in differs per provider: `scp` on Pocket ID (read by
 - **`ensemble_mkn.json` is still not converted** — no code reads the legacy
   musician/ensemble roster export. However, musicians and ensembles created in
   a running SAM instance now round-trip via
-  `cli exportMusician`/`importMusician` and `cli exportEnsemble`/
+  `cli exportMember`/`importMember` and `cli exportEnsemble`/
   `importEnsemble` (ensembles include voices and instrument options;
   memberships and user links are environment-specific and excluded — re-link
   in the target). Instruments round-trip via `exportInstrument`/

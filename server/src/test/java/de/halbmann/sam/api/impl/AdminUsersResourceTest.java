@@ -12,7 +12,7 @@ import io.quarkus.test.security.TestSecurity;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-/** User search for musician linking against a stubbed Pocket ID with an API key. */
+/** User search for member linking against a stubbed Pocket ID with an API key. */
 @QuarkusTest
 @TestProfile(AdminUsersResourceTest.WithPocketIdKey.class)
 class AdminUsersResourceTest {

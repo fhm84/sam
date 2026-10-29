@@ -11,7 +11,7 @@ reference — for the technical/developer architecture see [`ARCHITECTURE.md`](.
 1. [App Shell & Navigation](#1-app-shell--navigation)
 2. [Sheets](#2-sheets)
 3. [Collections](#3-collections)
-4. [Musicians](#4-musicians)
+4. [Members & People](#4-members--people)
 5. [Ensembles](#5-ensembles)
 6. [Instruments](#6-instruments)
 7. [Uploads](#7-uploads)
@@ -56,7 +56,8 @@ The app uses a standard sidebar-plus-content shell:
 | Main    | Sheets        | `/sheets`                | `pi-file`       |
 |         | Collections   | `/collections`           | `pi-folder`     |
 |         | Uploads       | `/uploads`               | `pi-upload`     |
-|         | Musicians     | `/musicians`             | `pi-user`       |
+|         | Members       | `/members`               | `pi-users`      |
+|         | People        | `/persons`               | `pi-user`       |
 | Admin   | Ensembles     | `/admin/ensembles`       | `pi-users`      |
 |         | Instruments   | `/admin/instruments`     | `pi-sliders-h`  |
 |         | Configuration | `/admin/configuration`   | `pi-wrench`     |
@@ -176,8 +177,8 @@ Full-page form with no max-width constraint.
 |---------------------|----------------------------------------|----------|
 | Title               | Text input                             | Yes      |
 | Subtitle            | Text input                             | No       |
-| Composer            | Autocomplete (against musicians list)  | No       |
-| Arranger            | Autocomplete (against musicians list)  | No       |
+| Composer            | Autocomplete (against persons list)    | No       |
+| Arranger            | Autocomplete (against persons list)    | No       |
 | Genre               | Select (translated enum)               | No       |
 | Style               | Select (translated enum)               | No       |
 | Year of composition | Number input                           | No       |
@@ -274,26 +275,23 @@ Read-only metadata card showing the linked sheet's full details.
 
 ---
 
-## 4. Musicians
+## 4. Members & People
 
-The musician catalogue is primarily reference data used as autocomplete values in the
-sheet form (Composer, Arranger fields).
+The person catalogue is primarily reference data used as autocomplete values in the
+sheet form (Composer, Arranger fields); members are the band's roster with their personal data.
 
-### List Page (`/musicians`)
+### List Pages (`/persons`, `/members`)
 
 Table-only (no card view).
 
-| Column     | Notes                                          |
-|------------|------------------------------------------------|
-| Name       | Required                                       |
-| IPI        | International Standard Name Identifier (ISNI variant) |
-| Birth year | Optional                                       |
-| Death year | Optional                                       |
-| Actions    | Edit, delete                                   |
+| Page      | Columns                                        |
+|-----------|------------------------------------------------|
+| People    | Name, IPI, birth year, death year, actions (edit, delete) |
+| Members   | Name, instruments, status, actions (edit, delete) |
 
 **Search:** Name-based, debounced.
 
-**Create / Edit:** Dialog (28 rem). No separate detail page — musicians are supporting data.
+**Create / Edit:** Dialog (28 rem). No separate detail page — members and persons are supporting data.
 
 ---
 
@@ -442,7 +440,7 @@ the toolbar.
 A landing/dashboard page with two groups of navigation cards:
 
 **Main:**
-- Sheets, Collections, Uploads, Musicians
+- Sheets, Collections, Uploads, Members, People
 
 **Admin:**
 - Ensembles, Instruments, Configuration
@@ -458,7 +456,7 @@ the corresponding route.
 
 | Tier | Pattern | Used by |
 |------|---------|---------|
-| Simple | Dialog create/edit, table-only list | Musicians, Instruments |
+| Simple | Dialog create/edit, table-only list | Members, People, Instruments |
 | Moderate | Dual-view list (cards/table), dialog create/edit, separate detail page | Collections, Ensembles |
 | Complex | Dual-view list, full-page form, detail drawer + full-page detail | Sheets |
 
@@ -513,7 +511,7 @@ result set. This prevents the user from selecting a combination that would retur
 ## 11. Data Model Relationships
 
 ```
-Musician ◄──────────── SheetMusic ────────────► Attachment (Document)
+Person   ◄──────────── SheetMusic ────────────► Attachment (Document)
                composer/arranger         │
                                          │
                                Instrumentation
@@ -537,8 +535,8 @@ SheetCollection ──── CollectionSheet ──► SheetMusic
 
 | Relationship | Cardinality | Notes |
 |---|---|---|
-| SheetMusic → Musician (composer) | many-to-one | Optional; resolved via autocomplete |
-| SheetMusic → Musician (arranger) | many-to-one | Optional; resolved via autocomplete |
+| SheetMusic → Person (composer) | many-to-one | Optional; resolved via autocomplete |
+| SheetMusic → Person (arranger) | many-to-one | Optional; resolved via autocomplete |
 | SheetMusic → Instrumentation | one-to-many | Which instruments play which parts |
 | Instrumentation → Instrument | many-to-one | Required |
 | SheetMusic → Attachment | one-to-many | PDF scores, parts, etc. |

@@ -160,7 +160,7 @@
             <p-autocomplete
               [(ngModel)]="composerModel"
               [suggestions]="composerSuggestions()"
-              (completeMethod)="onMusicianSearch($event, 'composer')"
+              (completeMethod)="onPersonSearch($event, 'composer')"
               optionLabel="name"
               [minLength]="1"
               styleClass="w-full"
@@ -192,7 +192,7 @@
             <p-autocomplete
               [(ngModel)]="arrangerModel"
               [suggestions]="arrangerSuggestions()"
-              (completeMethod)="onMusicianSearch($event, 'arranger')"
+              (completeMethod)="onPersonSearch($event, 'arranger')"
               optionLabel="name"
               [minLength]="1"
               styleClass="w-full"

@@ -2,7 +2,7 @@ package de.halbmann.sam.business.collections.controller;
 
 import de.halbmann.sam.api.entity.collections.CollectionItemType;
 import de.halbmann.sam.api.entity.collections.SheetCollection;
-import de.halbmann.sam.api.entity.musicians.Musician;
+import de.halbmann.sam.api.entity.persons.Person;
 import de.halbmann.sam.api.entity.sheets.SheetMusic;
 import de.halbmann.sam.business.shared.controller.FilenameUtils;
 import de.halbmann.sam.business.sheets.controller.ExportResult;
@@ -206,14 +206,14 @@ public class GemaSetlistService {
     }
 
     /**
-     * Splits a musician's full name into [lastName, firstName] by the last space.
+     * Splits a person's full name into [lastName, firstName] by the last space.
      * Returns ["", ""] for null/blank input.
      */
-    String[] splitName(final Musician musician) {
-        if (musician == null || musician.getName() == null) {
+    String[] splitName(final Person person) {
+        if (person == null || person.getName() == null) {
             return new String[] {"", ""};
         }
-        return splitName(musician.getName().trim());
+        return splitName(person.getName().trim());
     }
 
     String[] splitName(final String fullName) {

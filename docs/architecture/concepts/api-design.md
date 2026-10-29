@@ -40,7 +40,7 @@ mappers in `server/.../api/impl/exception/`:
 | `ValidationException` | 400 | Invalid request parameters or content (e.g. an image that cannot be decoded for classification) |
 | `IllegalArgumentException` from `UUID.fromString` | 400 | Malformed ID in the path; any other `IllegalArgumentException` is a bug and stays a logged 500 |
 | `EntityNotFoundException` | 404 | Referenced entity does not exist |
-| `ConflictException` | 409 | The request conflicts with existing data (e.g. deleting a document that is still linked, or a musician who is still referenced) |
+| `ConflictException` | 409 | The request conflicts with existing data (e.g. deleting a document that is still linked, or a person who is still credited) |
 | `StorageException` | 500 | The file store failed |
 
 Services throw these exceptions rather than building JAX-RS `Response`s. Some resource methods

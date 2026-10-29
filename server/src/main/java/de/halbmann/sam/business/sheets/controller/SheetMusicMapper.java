@@ -3,7 +3,7 @@ package de.halbmann.sam.business.sheets.controller;
 import de.halbmann.sam.api.entity.sheets.CreateSheetMusic;
 import de.halbmann.sam.api.entity.sheets.SheetMusic;
 import de.halbmann.sam.business.documents.controller.AttachmentMapper;
-import de.halbmann.sam.business.musicians.controller.MusicianMapper;
+import de.halbmann.sam.business.persons.controller.PersonMapper;
 import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
 import java.util.Locale;
 import java.util.Set;
@@ -11,7 +11,7 @@ import org.mapstruct.*;
 
 @Mapper(
         componentModel = MappingConstants.ComponentModel.JAKARTA_CDI,
-        uses = {MusicianMapper.class, InstrumentationMapper.class, AttachmentMapper.class},
+        uses = {PersonMapper.class, InstrumentationMapper.class, AttachmentMapper.class},
         unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface SheetMusicMapper {
 

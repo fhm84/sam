@@ -11,33 +11,33 @@ import { Dialog } from '@openng/optimus-ui/dialog';
 import { Panel } from '@openng/optimus-ui/panel';
 import { Tooltip } from '@openng/optimus-ui/tooltip';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
-import { SheetsApiService, MusiciansApiService, CollectionsApiService } from '../../core/api';
+import { SheetsApiService, PersonsApiService, CollectionsApiService } from '../../core/api';
 import { convertEmptyStringsToNull } from '../../shared/utils/object.utils';
-import { CreateSheetMusic, GemaReportable, Genre, Musician, RightsStatus, SheetCollection, SheetMusic, Style, Tonality } from '../../model/datamodels';
+import { CreateSheetMusic, GemaReportable, Genre, Person, RightsStatus, SheetCollection, SheetMusic, Style, Tonality } from '../../model/datamodels';
 import { map, Observable } from 'rxjs';
 import { BaseForm } from '../../shared/base/base-form';
 import { DIFFICULTY_LEVELS, FETCH_ALL_SIZE, GEMA_REPORTABLE_VALUES, GENRES, RIGHTS_STATUSES, STYLES, TONALITIES } from '../../shared/constants';
-import { MusicianForm } from '../musicians/musician-form';
+import { PersonForm } from '../persons/person-form';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-sheet-form',
-  imports: [ReactiveFormsModule, FloatLabel, InputText, InputNumber, Textarea, Select, AutoComplete, Button, Dialog, Tooltip, TranslatePipe, MusicianForm],
+  imports: [ReactiveFormsModule, FloatLabel, InputText, InputNumber, Textarea, Select, AutoComplete, Button, Dialog, Tooltip, TranslatePipe, PersonForm],
   changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './sheet-form.html',
 })
 export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnInit {
   private readonly api = inject(SheetsApiService);
-  private readonly musiciansApi = inject(MusiciansApiService);
+  private readonly personsApi = inject(PersonsApiService);
   private readonly collectionsApi = inject(CollectionsApiService);
 
   @Input() sheet: SheetMusic | null = null;
 
-  protected readonly musicians = signal<Musician[]>([]);
+  protected readonly persons = signal<Person[]>([]);
   protected readonly collections = signal<SheetCollection[]>([]);
 
-  protected showMusicianDialog = false;
-  protected musicianDialogTarget: 'composer' | 'arranger' = 'composer';
+  protected showPersonDialog = false;
+  protected personDialogTarget: 'composer' | 'arranger' = 'composer';
 
   protected readonly genreOptions = computed(() =>
     GENRES.map((g) => ({ label: this.t.t(`sheets.genres.${g}`), value: g })),
@@ -96,10 +96,10 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
   getEntity = () => this.sheet;
 
   ngOnInit(): void {
-    this.musiciansApi.find({ size: FETCH_ALL_SIZE })
+    this.personsApi.find({ size: FETCH_ALL_SIZE })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((res) => {
-        this.musicians.set(res.data ?? []);
+        this.persons.set(res.data ?? []);
       });
     if (!this.isEdit) {
       this.collectionsApi.find({ size: FETCH_ALL_SIZE })
@@ -142,30 +142,30 @@ export class SheetForm extends BaseForm<SheetMusic, SheetMusic> implements OnIni
     });
   }
 
-  openMusicianDialog(target: 'composer' | 'arranger'): void {
-    this.musicianDialogTarget = target;
-    this.showMusicianDialog = true;
+  openPersonDialog(target: 'composer' | 'arranger'): void {
+    this.personDialogTarget = target;
+    this.showPersonDialog = true;
   }
 
-  onMusicianCreated(musician: Musician): void {
-    this.musicians.update((list) => [...list, musician].sort((a, b) => a.name.localeCompare(b.name)));
-    if (this.musicianDialogTarget === 'composer') {
-      this.form.patchValue({ composerId: musician.id! });
+  onPersonCreated(person: Person): void {
+    this.persons.update((list) => [...list, person].sort((a, b) => a.name.localeCompare(b.name)));
+    if (this.personDialogTarget === 'composer') {
+      this.form.patchValue({ composerId: person.id! });
     } else {
-      this.form.patchValue({ arrangerId: musician.id! });
+      this.form.patchValue({ arrangerId: person.id! });
     }
-    this.showMusicianDialog = false;
+    this.showPersonDialog = false;
   }
 
   buildSaveRequest(): Observable<SheetMusic> {
     const raw = this.form.getRawValue();
-    const allMusicians = this.musicians();
+    const allPersons = this.persons();
 
     const composer = raw.composerId
-      ? allMusicians.find((m) => m.id === raw.composerId) ?? null
+      ? allPersons.find((m) => m.id === raw.composerId) ?? null
       : null;
     const arranger = raw.arrangerId
-      ? allMusicians.find((m) => m.id === raw.arrangerId) ?? null
+      ? allPersons.find((m) => m.id === raw.arrangerId) ?? null
       : null;
 
     const payload: CreateSheetMusic = convertEmptyStringsToNull({

@@ -7,7 +7,7 @@ import de.halbmann.sam.api.entity.sheets.RightsStatus;
 import de.halbmann.sam.api.entity.sheets.Style;
 import de.halbmann.sam.api.entity.sheets.Tonality;
 import de.halbmann.sam.business.documents.entity.AttachmentEntity;
-import de.halbmann.sam.business.musicians.entity.MusicianEntity;
+import de.halbmann.sam.business.persons.entity.PersonEntity;
 import de.halbmann.sam.business.shared.entity.AbstractEntity;
 import de.halbmann.sam.business.sheets.controller.FingerprintFactory;
 import jakarta.persistence.*;
@@ -66,13 +66,13 @@ public class SheetMusicEntity extends AbstractEntity {
      * The composer of the music sheet.
      */
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    MusicianEntity composer;
+    PersonEntity composer;
 
     /**
      * The arranger of the music sheet.
      */
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    MusicianEntity arranger;
+    PersonEntity arranger;
 
     /**
      * Optional (e.g., original band or composer)

@@ -8,7 +8,7 @@ import de.halbmann.sam.api.entity.ensembles.CoverageSnapshotSummary;
 import de.halbmann.sam.api.entity.ensembles.CoverageStatus;
 import de.halbmann.sam.api.entity.sheets.Genre;
 import de.halbmann.sam.business.ensembles.controller.CoverageSnapshotService;
-import de.halbmann.sam.business.musicians.entity.MusicianEntity;
+import de.halbmann.sam.business.persons.entity.PersonEntity;
 import de.halbmann.sam.business.sheets.boundary.SheetRepository;
 import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
 import java.time.Duration;
@@ -108,7 +108,7 @@ class SetlistCandidateToolTest {
         SheetMusicEntity s = new SheetMusicEntity();
         s.setId(UUID.randomUUID());
         s.setTitle(title);
-        MusicianEntity composer = new MusicianEntity();
+        PersonEntity composer = new PersonEntity();
         composer.setName("Test Composer");
         s.setComposer(composer);
         s.setDuration(Duration.ofMinutes(4));

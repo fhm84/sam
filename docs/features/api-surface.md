@@ -12,7 +12,8 @@ Business endpoints are under the `/api` base path. Ops/diagnostic endpoints
 | Sheet documents | `/api/sheets/{id}/documents` | Sub-resource |
 | Instrumentation documents | `/api/sheets/{sid}/instrumentations/{iid}/documents` | Sub-resource |
 | Global documents | `/api/documents` | Unlinked pool (`/unlinked`), `/batch` download by attachment IDs (ZIP or merged PDF), `/{id}/link`, `/{id}/classify`, `/{id}/apply` |
-| Musicians | `/api/musicians` | Contact details, linked login and last invite time only for `music_librarian` / `admin` |
+| People | `/api/persons` | Name, years, IPI; writes for `music_librarian` / `admin`; a credited person or a member can't be deleted (409) |
+| Members | `/api/members` | Contact details, linked login, last invite time and onboarding state only for `music_librarian` / `admin`; `DELETE` erases the profile, seats and their audit history |
 | Instruments | `/api/instruments` | |
 | Sheet collections | `/api/sheet-collections` | Including `/items` sub-resource, `/{id}/toc` (PDF), `/{id}/gema-setlist` (xlsx), `/{id}/export`, and `/{id}/ai/suggest-items` (AI setlist assistant) |
 | Collection items | `/api/sheet-collections/{id}/items` | Sub-resource; including `/{itemId}/ai/draft-text` (AI programme-text drafting) |
@@ -22,7 +23,7 @@ Business endpoints are under the `/api` base path. Ops/diagnostic endpoints
 | Ensemble members | `/api/ensembles/{id}/members` | Sub-resource |
 | Shares | `/api/shares` | Authenticated share management (create, list, revoke) |
 | Public share | `/api/public/shares/{token}` | Unauthenticated; token-validated (`/download`, `/toc`, `/download/{instrumentationId}`, `/sheet/{attachmentId}`) — see [Shares](shares.md) |
-| Admin users | `/api/admin/users` | `admin` only; user search for musician–account linking through the OIDC provider (Pocket ID or Keycloak); `/directory` tells whether search is available (501 without a Pocket ID API key) |
+| Admin users | `/api/admin/users` | `admin` only; user search for member–account linking through the OIDC provider (Pocket ID or Keycloak); `/directory` tells whether search is available (501 without a Pocket ID API key) |
 | Event log | `/api/event-logs` | Read-only; `admin` only |
 | My parts | `/api/me/parts` | Authenticated; paginated sheets for the calling user's instruments |
 | App info | `/q/info` | Unauthenticated; management port (`:9000`), not `/api`. Git branch/commit, build timestamp, Quarkus/Java/OS versions |
@@ -57,8 +58,8 @@ Endpoints not listed (writes) keep their `@RolesAllowed` as today.
 | Sheet and instrumentation `…/documents`, `/documents/{id}`, `/documents/batch` (GET and POST by IDs) | any | any — musicians need their parts | |
 | `/documents` without sheet context (always empty) | any | any | |
 | `/documents/unlinked` (upload inbox, not yet reviewed) | librarian + admin | librarian + admin | done |
-| `/musicians`, `/musicians/{id}` | any | any; `contact` (email, mobile, notes), `membership.lastInviteSentAt` and `userId` only for librarian + admin; also on sheets' `composer` / `arranger` | done |
-| `/ensembles/{id}/members` | any | any; the nested `musician` stripped as above | done |
+| `/members`, `/members/{id}` | any | any; `contact` (email, mobile, notes), `lastInviteSentAt`, `onboarding` and `userId` only for librarian + admin (sheets' `composer` / `arranger` are persons and carry no personal data) | done |
+| `/ensembles/{id}/members` | any | any; the nested `member` stripped as above | done |
 | `/instruments`, `/instruments/{id}` | any | any | |
 | `/ensembles`, `/ensembles/{id}`, `/voices`, `/voices/{vid}/options`, `/coverage/status` | any | any | |
 | `/sheet-collections`, `/{id}`, `/{id}/items`, `/{id}/toc`, `/{id}/export` | any | any, filtered by `visibility`: `WHOLE_ENSEMBLE` any, `ADMINS_ONLY` librarian + admin, `PRIVATE` creator + admin (+ librarians if no creator is recorded); a hidden one answers 404, also to writes; also filters a sheet's `/collections` | done |
@@ -73,7 +74,7 @@ UI routes, enforced by `roleGuard` and the menu's `roles` (sheet create/edit for
 
 | Route | Who |
 |---|---|
-| `sheets`, `collections`, `my-parts`, `shares`, `musicians`, `user/preferences` | any |
+| `sheets`, `collections`, `my-parts`, `shares`, `members`, `persons`, `user/preferences` | any |
 | `uploads`, `admin/ensembles`, `admin/instruments` | librarian + admin |
 | `admin/configuration`, `admin/event-logs` | admin |
 

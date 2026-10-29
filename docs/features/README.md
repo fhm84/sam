@@ -9,7 +9,8 @@ for planned work see the [roadmap](../roadmap.md).
 - [Sheet Music](sheets.md) — the central entity: metadata, enums, actions
 - [Instrumentations](instrumentations.md) — per-instrument parts, physical location & condition
 - [Documents & Attachments](documents.md) — upload, staging area, content-addressed storage
-- [Musicians](musicians.md) — composers, arrangers, ensemble members
+- [Members](members.md) — the band's members: contact details, instruments, login
+- [People](people.md) — everyone credited on sheets (composers, arrangers)
 - [Instruments](instruments.md) — canonical instrument catalogue
 - [Collections & Setlists](collections.md) — folders, concert programmes, exports
 - [Ensembles & Coverage](ensembles-coverage.md) — voice definitions, playability evaluation, members

@@ -5,7 +5,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 /**
- * Decides whether the caller may see other people's personal data (musician contact details,
+ * Decides whether the caller may see other people's personal data (member contact details,
  * linked login, invite timestamps). Only the music librarian and the admin may; every other
  * login, and the anonymous share-link path, gets it removed.
  */

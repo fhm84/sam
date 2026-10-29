@@ -1,32 +1,62 @@
 -- ============================================================
--- Ensemble Memberships
--- Links musicians to ensembles with optional voice and instrument
--- assignments. Also adds userId to musicians for OIDC auth linking.
+-- Members and Ensemble Memberships
+-- A member is the profile of a person who belongs to the band
+-- (ADR-0015); it shares the person's id and carries the OIDC
+-- userId for auth linking. Ensemble memberships are a member's
+-- seats in an ensemble with optional voice and instrument and a
+-- role per seat.
 -- ============================================================
 
-alter table musicians
-    add column userId varchar(255) unique;
+create table members
+(
+    id         uuid    not null,
+    created    timestamp(6),
+    lastUpdate timestamp(6),
+    version    integer not null,
+    userId     varchar(255) unique,
+    primary key (id)
+);
 
-alter table musicians_aud
-    add column userId varchar(255);
+alter table if exists members
+    add constraint FK_members_person
+        foreign key (id) references persons;
+
+-- Envers audit table
+create table members_aud
+(
+    id      uuid    not null,
+    REV     integer not null,
+    REVTYPE smallint,
+    REVEND  integer,
+    userId  varchar(255),
+    primary key (REV, id)
+);
+
+alter table if exists members_aud
+    add constraint FK_members_aud_rev
+        foreign key (REV) references REVINFO;
+
+alter table if exists members_aud
+    add constraint FK_members_aud_revend
+        foreign key (REVEND) references REVINFO;
 
 create table ensemble_memberships
 (
-    id            uuid    not null,
+    id            uuid        not null,
     created       timestamp(6),
     lastUpdate    timestamp(6),
-    version       integer not null,
-    musician_id   uuid    not null,
-    ensemble_id   uuid    not null,
+    version       integer     not null,
+    member_id     uuid        not null,
+    ensemble_id   uuid        not null,
     voice_id      uuid,
     instrument_id varchar(255),
-    conductor     boolean not null default false,
+    role          varchar(32) not null default 'MEMBER',
     primary key (id)
 );
 
 alter table if exists ensemble_memberships
-    add constraint FK_ensemble_memberships_musician
-        foreign key (musician_id) references musicians;
+    add constraint FK_ensemble_memberships_member
+        foreign key (member_id) references members;
 
 alter table if exists ensemble_memberships
     add constraint FK_ensemble_memberships_ensemble
@@ -40,14 +70,14 @@ alter table if exists ensemble_memberships
     add constraint FK_ensemble_memberships_instrument
         foreign key (instrument_id) references instruments;
 
--- Multiple voice memberships per musician/ensemble allowed (e.g. doubles on two instruments).
--- At most one conductor/role-only entry per musician/ensemble (voice_id IS NULL).
-create unique index ux_em_musician_ensemble_voice
-    on ensemble_memberships (musician_id, ensemble_id, voice_id)
+-- Multiple voice seats per member/ensemble allowed (e.g. doubles on two instruments).
+-- At most one seat without a voice (conductor/role-only entry) per member/ensemble.
+create unique index ux_em_member_ensemble_voice
+    on ensemble_memberships (member_id, ensemble_id, voice_id)
     where voice_id is not null;
 
-create unique index ux_em_musician_ensemble_no_voice
-    on ensemble_memberships (musician_id, ensemble_id)
+create unique index ux_em_member_ensemble_no_voice
+    on ensemble_memberships (member_id, ensemble_id)
     where voice_id is null;
 
 -- Envers audit table
@@ -60,11 +90,11 @@ create table ensemble_memberships_aud
     created       timestamp(6),
     lastUpdate    timestamp(6),
     version       integer,
-    musician_id   uuid,
+    member_id     uuid,
     ensemble_id   uuid,
     voice_id      uuid,
     instrument_id varchar(255),
-    conductor     boolean,
+    role          varchar(32),
     primary key (id, REV)
 );
 

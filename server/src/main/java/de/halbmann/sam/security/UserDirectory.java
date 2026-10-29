@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * The active OIDC provider's user accounts, for linking musicians to logins (ADR-0001). User IDs
+ * The active OIDC provider's user accounts, for linking members to logins (ADR-0001). User IDs
  * are the provider's {@code sub}.
  *
  * <p>One implementation per provider, picked by {@code sam.oidc.provider} via

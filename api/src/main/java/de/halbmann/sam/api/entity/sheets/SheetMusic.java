@@ -1,7 +1,7 @@
 package de.halbmann.sam.api.entity.sheets;
 
 import de.halbmann.sam.api.entity.documents.Attachment;
-import de.halbmann.sam.api.entity.musicians.Musician;
+import de.halbmann.sam.api.entity.persons.Person;
 import jakarta.json.bind.annotation.JsonbTypeAdapter;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -48,13 +48,13 @@ public class SheetMusic {
      * The composer of the music sheet.
      */
     @Valid
-    Musician composer;
+    Person composer;
 
     /**
      * The arranger of the music sheet.
      */
     @Valid
-    Musician arranger;
+    Person arranger;
 
     /**
      * Optional (e.g., original band or composer)

@@ -19,11 +19,13 @@ import picocli.CommandLine;
             ShowSheetCommand.class,
             ImportSheetCommand.class,
             ImportInstrumentCommand.class,
-            ImportMusicianCommand.class,
+            ImportPersonCommand.class,
+            ImportMemberCommand.class,
             ImportEnsembleCommand.class,
             ExportSheetsCommand.class,
             ExportInstrumentsCommand.class,
-            ExportMusiciansCommand.class,
+            ExportPersonsCommand.class,
+            ExportMembersCommand.class,
             ExportEnsemblesCommand.class
         })
 public class SamCliCommand implements Runnable {

@@ -8,7 +8,7 @@ import de.halbmann.sam.api.entity.documents.DocumentDownload;
 import de.halbmann.sam.api.entity.sheets.Genre;
 import de.halbmann.sam.api.entity.sheets.Style;
 import de.halbmann.sam.business.instruments.entity.InstrumentEntity;
-import de.halbmann.sam.business.musicians.entity.MusicianEntity;
+import de.halbmann.sam.business.persons.entity.PersonEntity;
 import de.halbmann.sam.business.sheets.entity.InstrumentationEntity;
 import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
 import java.io.ByteArrayInputStream;
@@ -62,8 +62,8 @@ class PdfMetadataEnricherTest {
         return s;
     }
 
-    private static MusicianEntity musician(String name) {
-        MusicianEntity m = new MusicianEntity();
+    private static PersonEntity person(String name) {
+        PersonEntity m = new PersonEntity();
         m.setName(name);
         return m;
     }
@@ -103,8 +103,8 @@ class PdfMetadataEnricherTest {
     @Test
     void authorContainsBothComposerAndArranger() throws IOException {
         SheetMusicEntity s = sheet("Test");
-        s.setComposer(musician("Anton Gälle"));
-        s.setArranger(musician("Mathias Gronert"));
+        s.setComposer(person("Anton Gälle"));
+        s.setArranger(person("Mathias Gronert"));
 
         DocumentDownload result = enricher.enrich(downloadFor(minimalPdf(), "application/pdf"), s, null);
         PDDocumentInformation info = readInfo(readAll(result.stream()));
@@ -114,7 +114,7 @@ class PdfMetadataEnricherTest {
     @Test
     void authorIsComposerAloneWhenNoArranger() throws IOException {
         SheetMusicEntity s = sheet("Test");
-        s.setComposer(musician("Anton Gälle"));
+        s.setComposer(person("Anton Gälle"));
 
         DocumentDownload result = enricher.enrich(downloadFor(minimalPdf(), "application/pdf"), s, null);
         PDDocumentInformation info = readInfo(readAll(result.stream()));
@@ -189,7 +189,7 @@ class PdfMetadataEnricherTest {
     @Test
     void returnedSizeMatchesActualEnrichedByteLength() throws IOException {
         SheetMusicEntity s = sheet("Size Check");
-        s.setComposer(musician("Some Composer"));
+        s.setComposer(person("Some Composer"));
 
         DocumentDownload result = enricher.enrich(downloadFor(minimalPdf(), "application/pdf"), s, null);
         byte[] enrichedBytes = readAll(result.stream());

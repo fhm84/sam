@@ -1,6 +1,6 @@
 --------------------------------------------------------
 -- set-up for google-like searching:
---    denormalized musician names
+--    denormalized person names (composer, arranger)
 --    generated full-text
 --    trigram fuzzy-search
 --    phonetic (dmetaphone) fallback
@@ -21,33 +21,33 @@ ALTER TABLE sheets
 ALTER TABLE sheets
     ADD COLUMN IF NOT EXISTS arranger_phonetic TEXT;
 
--- synchronize musician names
-CREATE OR REPLACE FUNCTION sync_sheet_musicians()
+-- synchronize person names
+CREATE OR REPLACE FUNCTION sync_sheet_persons()
     RETURNS trigger AS
 $$
 BEGIN
     SELECT name
     INTO NEW.composer_name
-    FROM musicians
+    FROM persons
     WHERE id = NEW.composer_id;
 
     SELECT name
     INTO NEW.arranger_name
-    FROM musicians
+    FROM persons
     WHERE id = NEW.arranger_id;
 
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER sheets_sync_musicians
+CREATE TRIGGER sheets_sync_persons
     BEFORE INSERT OR UPDATE OF composer_id, arranger_id
     ON sheets
     FOR EACH ROW
-EXECUTE FUNCTION sync_sheet_musicians();
+EXECUTE FUNCTION sync_sheet_persons();
 
--- on update of musician name
-CREATE OR REPLACE FUNCTION propagate_musician_name()
+-- on update of person name
+CREATE OR REPLACE FUNCTION propagate_person_name()
     RETURNS trigger AS
 $$
 BEGIN
@@ -63,11 +63,11 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER musician_name_update
+CREATE TRIGGER person_name_update
     AFTER UPDATE OF name
-    ON musicians
+    ON persons
     FOR EACH ROW
-EXECUTE FUNCTION propagate_musician_name();
+EXECUTE FUNCTION propagate_person_name();
 
 -- phonetic code (DMetaphone)
 CREATE OR REPLACE FUNCTION update_phonetics()

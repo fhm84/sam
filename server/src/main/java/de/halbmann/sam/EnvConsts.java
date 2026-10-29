@@ -35,7 +35,7 @@ public class EnvConsts {
     /**
      * Pocket ID API key for user search. It acts with full admin rights on Pocket ID, so it is set
      * only in the server's env ({@code SAM_OIDC_POCKET_ID_API_KEY}) and never logged. Absent → user
-     * search is off and admins link musicians by user ID.
+     * search is off and admins link members by user ID.
      */
     public static final String POCKET_ID_API_KEY = "sam.oidc.pocket-id.api-key";
 
@@ -54,7 +54,7 @@ public class EnvConsts {
 
     /**
      * When {@code true}, a second AI pass using {@code ClassificationAgent} autonomously resolves
-     * entity references (sheet, musicians, instruments) after initial classification before
+     * entity references (sheet, persons, instruments) after initial classification before
      * returning the suggestion to the UI. Default: {@code false}.
      */
     public static final String CLASSIFICATION_AGENTIC = "sam.classification.agentic";

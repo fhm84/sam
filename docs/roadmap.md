@@ -42,7 +42,7 @@ unprioritised backlog.
 5. [Pocket ID as default OIDC provider](#pocket-id-as-default-oidc-provider--in-progress):
    lighter login stack with passkeys, Keycloak stays optional
    → [plan](plans/pocket-id-provider.md) · [#210](https://github.com/fhm84/sam/issues/210)
-6. [Person catalogue and member profiles](#person-catalogue-and-member-profiles--planned):
+6. [Person catalogue and member profiles](#person-catalogue-and-member-profiles--in-progress):
    split credited people from band members, with GDPR deletion and retention, while the
    roster holds no real personal data yet
    → [plan](plans/people-catalogue.md) · [#259](https://github.com/fhm84/sam/issues/259)
@@ -373,9 +373,9 @@ grounding data source yet — would just be hallucination).
 
 ### Musician profile enrichment — `done`
 
-**Done:** all fields shipped (migration `V1.1.2__MusicianFields.sql`, `MusicianStatus`,
+**Done:** all fields shipped (migration `V1.1.2__MusicianFields.sql`, now `V1.1.2__MemberFields.sql`, `MusicianStatus`,
 `MusicianRole`, `musician_instruments` junction table) together with the Angular musician
-form. See [Musicians](features/musicians.md). The contact fields are returned only to the
+form. See [Members](features/members.md). The contact fields are returned only to the
 music librarian and the admin ([read access by role](features/api-surface.md#read-access-by-role)).
 
 Added missing fields to the `Musician` entity surfaced in the Claude Design mockup
@@ -403,7 +403,7 @@ Fields added:
 
 ---
 
-### Person catalogue and member profiles — `planned`
+### Person catalogue and member profiles — `in progress`
 
 One `musicians` table holds both the people credited on sheets (composers, arrangers) and
 the band members with their contact data, login and memberships. Split it into a `persons`
@@ -996,7 +996,7 @@ vocal pieces, and some pieces have two arrangers. Replace the two keys with
 `LYRICIST`, keep `originalBy` as text. The GEMA setlist, fingerprints, search and the
 classification then read credits.
 
-**Depends on:** [Person catalogue and member profiles](#person-catalogue-and-member-profiles--planned)
+**Depends on:** [Person catalogue and member profiles](#person-catalogue-and-member-profiles--in-progress)
 **Stakeholders:** S1 (music librarian)
 **Effort:** Medium
 
