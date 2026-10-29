@@ -53,4 +53,8 @@ public interface SamResources {
     /** {@return the sub-resource listing sheets that match the calling member's instrument assignments} */
     @Path("me/parts")
     MyPartsResource myParts();
+
+    /** {@return the sub-resource with the calling member's own data} */
+    @Path("me/member")
+    MyMemberResource myMember();
 }

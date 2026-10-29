@@ -5,8 +5,11 @@ import de.halbmann.sam.api.entity.members.MemberContact;
 import de.halbmann.sam.api.entity.members.MemberFilterRequest;
 import de.halbmann.sam.api.entity.members.MemberInstrument;
 import de.halbmann.sam.api.entity.members.MembershipStatus;
+import de.halbmann.sam.api.entity.members.OwnMemberData;
+import de.halbmann.sam.api.entity.members.OwnSeat;
 import de.halbmann.sam.api.entity.shared.PaginatedResponse;
 import de.halbmann.sam.business.ensembles.boundary.EnsembleMembershipRepository;
+import de.halbmann.sam.business.eventlog.boundary.EventLogRepository;
 import de.halbmann.sam.business.instruments.boundary.InstrumentRepository;
 import de.halbmann.sam.business.instruments.entity.InstrumentEntity;
 import de.halbmann.sam.business.members.boundary.MemberRepository;
@@ -25,6 +28,7 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @ApplicationScoped
@@ -50,6 +54,9 @@ public class MemberService {
     EnsembleMembershipRepository membershipRepository;
 
     @Inject
+    EventLogRepository eventLogRepository;
+
+    @Inject
     Event<MemberErased> memberErased;
 
     public PaginatedResponse<Member> findMembers(final MemberFilterRequest filterRequest) {
@@ -64,6 +71,29 @@ public class MemberService {
 
     public Member getMember(final String memberId) {
         return memberMapper.toDto(find(memberId));
+    }
+
+    /** Everything stored about the member linked to {@code userId}, personal data included. */
+    public OwnMemberData getOwnData(final String userId) {
+        final MemberEntity entity = (userId == null
+                        ? Optional.<MemberEntity>empty()
+                        : memberRepository.findByUserId(userId))
+                .orElseThrow(() -> new EntityNotFoundException("Member linked to the login", String.valueOf(userId)));
+        final OwnMemberData data = new OwnMemberData();
+        data.setMember(memberMapper.toUnredactedDto(entity));
+        data.setSeats(membershipRepository.list("member", entity).stream()
+                .map(seat -> {
+                    final OwnSeat own = new OwnSeat();
+                    own.setEnsembleId(seat.getEnsemble().getId());
+                    own.setEnsembleName(seat.getEnsemble().getName());
+                    own.setVoiceLabel(seat.getVoice() != null ? seat.getVoice().getLabel() : null);
+                    own.setInstrumentName(
+                            seat.getInstrument() != null ? seat.getInstrument().getName() : null);
+                    own.setRole(seat.getRole());
+                    return own;
+                })
+                .toList());
+        return data;
     }
 
     /**
@@ -129,6 +159,7 @@ public class MemberService {
     public void deleteMember(final String memberId) {
         final MemberEntity entity = find(memberId);
         final PersonEntity person = entity.getPerson();
+        endLogin(entity);
         membershipRepository.list("member", entity).forEach(membershipRepository::delete);
         memberRepository.delete(entity);
         final boolean deletePerson = personService.countCredits(person) == 0;
@@ -159,9 +190,20 @@ public class MemberService {
             } else if (entity.getLeftAt() == null) {
                 entity.setLeftAt(LocalDate.now());
             }
-            entity.setUserId(null);
+            endLogin(entity);
         } else {
             entity.setLeftAt(null);
+        }
+    }
+
+    /**
+     * Removes the login link of a member who leaves or is erased, and anonymises what the event log
+     * recorded under that login: once the link is gone, nothing could find those entries again.
+     */
+    private void endLogin(final MemberEntity entity) {
+        if (entity.getUserId() != null) {
+            eventLogRepository.anonymiseUser(entity.getUserId());
+            entity.setUserId(null);
         }
     }
 

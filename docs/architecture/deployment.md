@@ -67,6 +67,7 @@ Copy `.env.example` → `.env` and fill in before running `docker compose -f doc
 | `KEYCLOAK_REALM` | sam-server | `sam` | Keycloak only: realm name |
 | `KEYCLOAK_BACKEND_CLIENT_ID` | sam-server | `sam-backend` | Keycloak only: service account client ID |
 | `SAM_FILESYSTEM_BASE_PATH` | sam-server | `/data/sam` | Mount point for sheet music file storage |
+| `SAM_MEMBERS_RETENTION_MONTHS` | sam-server | `12` | Months after leaving until a former member's data is erased, and the age at which superseded audit rows of member profiles are deleted (nightly, 03:30); `0` turns it off ([members](../features/members.md#retention)) |
 | `GRAFANA_ADMIN_PASSWORD` | grafana | — | `monitoring` profile only, required there: Grafana's admin password (first start only) |
 | `SAM_IMAGE_TAG` | compose | `latest` | Image tag, e.g. a pinned `sha-<short>` or a version |
 

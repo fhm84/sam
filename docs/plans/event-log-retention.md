@@ -31,8 +31,10 @@ Admin-only access to the full log shipped with role-aware access ([#131](https:/
 
 The [member profiles plan](people-catalogue.md#gdpr-dsgvo) reuses the nightly job from
 task 1 for former members and old audit rows, and the "My data" page sits next to "My
-activity" from task 4. When a member is erased, their entries here are anonymised (fixed
-placeholder `userId`, no `username`) rather than deleted, and age out as usual.
+activity" from task 4. When a member leaves or is erased, their entries here are anonymised
+(fixed placeholder `userId`, no `username`) rather than deleted, and age out as usual. The
+`quarkus-scheduler` extension is already in place (member retention job), so task 1 only needs
+its own `@Scheduled` method.
 
 ## Key files
 

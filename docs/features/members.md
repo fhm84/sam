@@ -33,6 +33,23 @@ The role in an ensemble (member, guest, substitute, conductor) is per seat, see
 - Paginated list sorted by name, filterable by name and status; shows instruments (primary
   highlighted) and status to everyone, contact data only in the librarian's form.
 - Can be given seats in ensembles (see [Ensembles & Coverage](ensembles-coverage.md)).
+- **Own data:** `GET /api/me/member` returns the caller's own profile with all personal data and
+  their seats (GDPR Art. 15); 404 when no member is linked to the login.
+
+## Retention
+
+A nightly job (`MemberRetention`, 03:30) applies `sam.members.retention-months` (default 12,
+env var `SAM_MEMBERS_RETENTION_MONTHS`, `0` turns it off):
+
+- `FORMER` members whose leaving date is older than the period are erased like a delete.
+- Superseded audit rows of member profiles older than the period are deleted, so old contact
+  details don't pile up; the current values and recent history stay.
+- The audit history of members that no longer exist is purged again (catches up on a purge
+  that failed after a deletion).
+
+When a login link ends because the member leaves (`FORMER`) or is deleted, the event-log
+entries recorded under that login are anonymised: the user ID becomes `erased`, the username
+goes, the entries stay so download counts stay right. Unlinking a login by hand keeps them.
 
 ## Related
 
