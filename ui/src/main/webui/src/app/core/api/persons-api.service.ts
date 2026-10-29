@@ -29,6 +29,11 @@ export class PersonsApiService {
     return this.http.get<PersonCredit[]>(`${this.baseUrl}/${id}/credits`);
   }
 
+  /** Merges the duplicate `id` into `targetId`; returns the remaining person. */
+  mergeInto(id: string, targetId: string): Observable<Person> {
+    return this.http.post<Person>(`${this.baseUrl}/${id}/merge-into/${targetId}`, null);
+  }
+
   update(id: string, data: Person): Observable<void> {
     return this.http.put<void>(`${this.baseUrl}/${id}`, data);
   }

@@ -749,6 +749,15 @@
       "confirm": "Are you sure you want to delete the person \"{name}\"?",
       "header": "Confirm deletion"
     },
+    "merge": {
+      "action": "Merge into …",
+      "header": "Merge duplicate person",
+      "intro": "\"{name}\" will be merged into the person you keep: all its credits move there and \"{name}\" is deleted.",
+      "target": "Person to keep",
+      "hint": "If only one of the two has a member profile, that profile stays and takes over the chosen person's name, years and IPI. Two members can't be merged.",
+      "confirm": "Merge",
+      "success": "Merged \"{source}\" into \"{target}\""
+    },
     "messages": {
       "created": "Person created successfully",
       "updated": "Person updated successfully",

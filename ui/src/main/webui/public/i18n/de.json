@@ -749,6 +749,15 @@
       "confirm": "Möchten Sie die Person \"{name}\" wirklich löschen?",
       "header": "Löschen bestätigen"
     },
+    "merge": {
+      "action": "Zusammenführen …",
+      "header": "Doppelte Person zusammenführen",
+      "intro": "„{name}“ wird mit der Person zusammengeführt, die bleiben soll: alle Nennungen in Noten gehen auf sie über, „{name}“ wird gelöscht.",
+      "target": "Person, die bleibt",
+      "hint": "Hat nur eine der beiden ein Mitgliedsprofil, bleibt dieses erhalten und übernimmt Name, Jahre und IPI der gewählten Person. Zwei Mitglieder lassen sich nicht zusammenführen.",
+      "confirm": "Zusammenführen",
+      "success": "„{source}“ wurde mit „{target}“ zusammengeführt"
+    },
     "messages": {
       "created": "Person erfolgreich erstellt",
       "updated": "Person erfolgreich aktualisiert",

@@ -12,7 +12,7 @@ Business endpoints are under the `/api` base path. Ops/diagnostic endpoints
 | Sheet documents | `/api/sheets/{id}/documents` | Sub-resource |
 | Instrumentation documents | `/api/sheets/{sid}/instrumentations/{iid}/documents` | Sub-resource |
 | Global documents | `/api/documents` | Unlinked pool (`/unlinked`), `/batch` download by attachment IDs (ZIP or merged PDF), `/{id}/link`, `/{id}/classify`, `/{id}/apply` |
-| People | `/api/persons` | Name, years, IPI; writes for `music_librarian` / `admin`; a credited person or a member can't be deleted (409); `/{id}/credits` lists the sheets crediting the person |
+| People | `/api/persons` | Name, years, IPI; writes for `music_librarian` / `admin`; a credited person or a member can't be deleted (409); `/{id}/credits` lists the sheets crediting the person; `POST /{id}/merge-into/{targetId}` merges a duplicate (librarian / admin) |
 | Members | `/api/members` | Contact details, linked login, last invite time and onboarding state only for `music_librarian` / `admin`; `DELETE` erases the profile, seats and their audit history |
 | Instruments | `/api/instruments` | |
 | Sheet collections | `/api/sheet-collections` | Including `/items` sub-resource, `/{id}/toc` (PDF), `/{id}/gema-setlist` (xlsx), `/{id}/export`, and `/{id}/ai/suggest-items` (AI setlist assistant) |

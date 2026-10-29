@@ -42,10 +42,6 @@ unprioritised backlog.
 5. [Pocket ID as default OIDC provider](#pocket-id-as-default-oidc-provider--in-progress):
    lighter login stack with passkeys, Keycloak stays optional
    → [plan](plans/pocket-id-provider.md) · [#210](https://github.com/fhm84/sam/issues/210)
-6. [Person catalogue and member profiles](#person-catalogue-and-member-profiles--in-progress):
-   split credited people from band members, with GDPR deletion and retention, while the
-   roster holds no real personal data yet
-   → [plan](plans/people-catalogue.md) · [#259](https://github.com/fhm84/sam/issues/259)
 
 **Next: everyday use for the music librarian**
 
@@ -385,7 +381,7 @@ Fields added:
 - **email** and **mobile** — contact details for self-service folder access and
   part distribution
 - **notes** — free-text textarea, librarian/admin-visible only (vacation patterns,
-  instrument quirks; no health data, see the [member profiles plan](plans/people-catalogue.md#gdpr-dsgvo))
+  instrument quirks; no health data, see [members](features/members.md))
 - **status** — enum (`ACTIVE` / `INACTIVE` / `INVITED` / `PENDING`); drives the
   "Active member" toggle in the UI
 - **lastInviteSentAt** — timestamp tracking whether an invite email was sent for
@@ -403,16 +399,21 @@ Fields added:
 
 ---
 
-### Person catalogue and member profiles — `in progress`
+### Person catalogue and member profiles — `done`
 
-One `musicians` table holds both the people credited on sheets (composers, arrangers) and
-the band members with their contact data, login and memberships. Split it into a `persons`
-catalogue and an optional `members` profile with the same id, so a conductor who arranges
-stays one record and personal data lives in one place, where GDPR deletion and retention
-apply ([ADR-0015](architecture/decisions/adr-0015-person-catalogue-and-member-profile.md)).
-The role (member, guest, substitute, conductor) moves onto each ensemble membership, and
-the status splits into membership status and a derived onboarding state.
-→ [plan](plans/people-catalogue.md)
+**Done** (#259): the `musicians` table became a `persons` catalogue (everyone credited on
+sheets) and an optional `members` profile with the same id, so a conductor who arranges stays
+one record and personal data lives in one place
+([ADR-0015](architecture/decisions/adr-0015-person-catalogue-and-member-profile.md)). The
+role moved onto each ensemble seat, the status split into membership status and a derived
+onboarding state; deleting a member erases the profile and its audit history, former members
+are erased after the retention period, own data is on the My data page, duplicates can be
+merged. See [Members](features/members.md) and [People](features/people.md).
+
+**Open follow-ups:** member lists load each person separately (eager `@OneToOne` without a
+fetch join; Quarkus batches 16 at a time) — fetch-join if lists grow; the `MEMBER` role
+default is set in several places; `INVITED` can't occur until an invite flow writes
+`lastInviteSentAt`.
 
 **Stakeholders:** S1 (music librarian), S3 (Musiker)
 **Effort:** Medium to large (schema, API, `cli`, UI)
@@ -996,7 +997,7 @@ vocal pieces, and some pieces have two arrangers. Replace the two keys with
 `LYRICIST`, keep `originalBy` as text. The GEMA setlist, fingerprints, search and the
 classification then read credits.
 
-**Depends on:** [Person catalogue and member profiles](#person-catalogue-and-member-profiles--in-progress)
+**Depends on:** [Person catalogue and member profiles](#person-catalogue-and-member-profiles--done)
 **Stakeholders:** S1 (music librarian)
 **Effort:** Medium
 
@@ -1313,7 +1314,7 @@ shown in the Claude Design `Sheets Overview (PrimeNG).html`. Task breakdown: [pl
 
 ### Server-side musician search (composer/arranger fields) — `done`
 
-**Done** with the [person catalogue](plans/people-catalogue.md): the composer and arranger
+**Done** with the [person catalogue](#person-catalogue-and-member-profiles--done): the composer and arranger
 fields of the sheet form are a `p-autocomplete` against `GET /api/persons?name=…` (prefix,
 substring, trigram and phonetic matching) instead of a select loading every person.
 

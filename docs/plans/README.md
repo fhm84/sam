@@ -33,7 +33,6 @@ Conventions:
 | [Document store hardening](document-store-hardening.md) | Document store hardening | [#154](https://github.com/fhm84/sam/issues/154) | — |
 | [Storage encryption](storage-encryption.md), phase A only | Encryption of stored documents (backup encryption) | [#162](https://github.com/fhm84/sam/issues/162) | — |
 | [Pocket ID as default OIDC provider](pocket-id-provider.md) | Pocket ID as default OIDC provider | [#210](https://github.com/fhm84/sam/issues/210) | — |
-| [Person catalogue and member profiles](people-catalogue.md) | Person catalogue and member profiles | [#259](https://github.com/fhm84/sam/issues/259) | — |
 
 ## Next: everyday use for the music librarian
 
