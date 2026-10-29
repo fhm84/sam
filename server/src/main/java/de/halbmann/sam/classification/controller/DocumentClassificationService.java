@@ -15,6 +15,7 @@ import de.halbmann.sam.business.documents.entity.DocumentEntity;
 import de.halbmann.sam.business.instruments.boundary.InstrumentRepository;
 import de.halbmann.sam.business.instruments.entity.InstrumentEntity;
 import de.halbmann.sam.business.persons.boundary.PersonRepository;
+import de.halbmann.sam.business.persons.controller.PersonService;
 import de.halbmann.sam.business.persons.entity.PersonEntity;
 import de.halbmann.sam.business.sheets.boundary.InstrumentationRepository;
 import de.halbmann.sam.business.sheets.boundary.SheetRepository;
@@ -75,6 +76,9 @@ public class DocumentClassificationService {
 
     @Inject
     PersonRepository personRepository;
+
+    @Inject
+    PersonService personService;
 
     @Inject
     InstrumentRepository instrumentRepository;
@@ -185,8 +189,8 @@ public class DocumentClassificationService {
                 .findByIdOptional(documentId)
                 .orElseThrow(() -> new EntityNotFoundException("Document", documentId));
 
-        PersonEntity composer = resolvePerson(request.getComposerId(), request.getComposerName());
-        PersonEntity arranger = resolvePerson(request.getArrangerId(), request.getArrangerName());
+        PersonEntity composer = personService.resolveOrCreate(request.getComposerId(), request.getComposerName());
+        PersonEntity arranger = personService.resolveOrCreate(request.getArrangerId(), request.getArrangerName());
         SheetMusicEntity sheet = resolveSheet(request, composer, arranger);
         InstrumentEntity instrument = resolveInstrument(request.getInstrumentId(), request.getInstrumentName());
 
@@ -429,21 +433,6 @@ public class DocumentClassificationService {
             return null;
         }
         return personRepository.findByName(name).map(PersonEntity::getId).orElse(null);
-    }
-
-    private PersonEntity resolvePerson(UUID id, String name) {
-        if (id != null) {
-            return personRepository.findByIdOptional(id).orElse(null);
-        }
-        if (name != null && !name.isBlank()) {
-            return personRepository.findByName(name).orElseGet(() -> {
-                PersonEntity p = new PersonEntity();
-                p.setName(name.trim());
-                personRepository.persist(p);
-                return p;
-            });
-        }
-        return null;
     }
 
     private SheetMusicEntity resolveSheet(

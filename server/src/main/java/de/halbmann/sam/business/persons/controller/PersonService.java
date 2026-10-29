@@ -14,6 +14,7 @@ import de.halbmann.sam.core.exception.ValidationException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import java.util.Optional;
 import java.util.UUID;
 
 @ApplicationScoped
@@ -76,6 +77,28 @@ public class PersonService {
                     "Person '" + entity.getName() + "' is a member; delete the member profile instead");
         }
         personRepository.delete(entity);
+    }
+
+    /**
+     * The person a credit refers to: by ID while that person exists, otherwise by exact (trimmed)
+     * name, otherwise a new person with that name. {@code null} when there is neither.
+     */
+    public PersonEntity resolveOrCreate(final UUID id, final String name) {
+        if (id != null) {
+            final Optional<PersonEntity> found = personRepository.findByIdOptional(id);
+            if (found.isPresent()) {
+                return found.get();
+            }
+        }
+        if (name == null || name.isBlank()) {
+            return null;
+        }
+        return personRepository.findByName(name).orElseGet(() -> {
+            final PersonEntity person = new PersonEntity();
+            person.setName(name.trim());
+            personRepository.persist(person);
+            return person;
+        });
     }
 
     /** Number of sheets that credit the person as composer or arranger. */

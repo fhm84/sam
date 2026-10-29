@@ -178,6 +178,36 @@ class EnsembleMembershipsResourceTest {
     }
 
     @Test
+    void updateAndDelete_throughAnotherEnsemble_returns404() throws Exception {
+        String seatId = addSeat(seat(null, EnsembleRole.MEMBER));
+        CreateEnsemble other = new CreateEnsemble();
+        other.setName("Other Ensemble");
+        String otherId = given().contentType(ContentType.JSON)
+                .body(toJson(other))
+                .post("/api/ensembles")
+                .then()
+                .statusCode(200)
+                .extract()
+                .path("id");
+
+        EnsembleMembership update = new EnsembleMembership();
+        update.setRole(EnsembleRole.GUEST);
+        given().contentType(ContentType.JSON)
+                .body(toJson(update))
+                .put("/api/ensembles/{ensembleId}/members/{seatId}", otherId, seatId)
+                .then()
+                .statusCode(404);
+        given().delete("/api/ensembles/{ensembleId}/members/{seatId}", otherId, seatId)
+                .then()
+                .statusCode(404);
+
+        given().get("/api/ensembles/{id}/members", ensembleId)
+                .then()
+                .body("find { it.id == '" + seatId + "' }.role", equalTo("MEMBER"));
+        given().delete("/api/ensembles/{id}", otherId);
+    }
+
+    @Test
     void deleteMember_removesFromList() throws Exception {
         String seatId = addSeat(seat(null, null));
 

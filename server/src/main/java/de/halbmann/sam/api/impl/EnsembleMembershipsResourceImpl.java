@@ -36,12 +36,12 @@ public class EnsembleMembershipsResourceImpl implements EnsembleMembershipsResou
     @Override
     @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public EnsembleMembership update(final String memberId, final EnsembleMembership membership) {
-        return membershipService.updateMember(memberId, membership);
+        return membershipService.updateMember(ensembleId, memberId, membership);
     }
 
     @Override
     @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public void delete(final String memberId) {
-        membershipService.deleteMember(memberId);
+        membershipService.deleteMember(ensembleId, memberId);
     }
 }

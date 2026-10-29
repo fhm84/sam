@@ -34,7 +34,8 @@ public class ExportPersonsCommand extends AbstractExportCommand<Person> {
 
     @Override
     protected String filenameFor(final Person person, final Set<String> usedNames) {
-        return FilenameUtils.uniqueFilename(person.getName(), person.getId(), usedNames);
+        // A member shares name and ID with its person: the prefix keeps both exports apart
+        return "person-" + FilenameUtils.uniqueFilename(person.getName(), person.getId(), usedNames);
     }
 
     @Override

@@ -18,7 +18,7 @@ import de.halbmann.sam.business.collections.controller.SheetCollectionService;
 import de.halbmann.sam.business.documents.controller.AttachmentLinkService;
 import de.halbmann.sam.business.ensembles.controller.CoverageSnapshotService;
 import de.halbmann.sam.business.instruments.boundary.InstrumentRepository;
-import de.halbmann.sam.business.persons.boundary.PersonRepository;
+import de.halbmann.sam.business.persons.controller.PersonService;
 import de.halbmann.sam.business.persons.entity.PersonEntity;
 import de.halbmann.sam.business.shared.event.ResourcesDeleted;
 import de.halbmann.sam.business.sheets.boundary.SheetRepository;
@@ -42,7 +42,7 @@ public class SheetService {
     SheetRepository sheetRepository;
 
     @Inject
-    PersonRepository personRepository;
+    PersonService personService;
 
     @Inject
     InstrumentRepository instrumentRepository;
@@ -290,24 +290,7 @@ public class SheetService {
     }
 
     private PersonEntity resolveOrCreatePerson(final Person dto) {
-        if (dto == null) {
-            return null;
-        }
-        if (dto.getId() != null) {
-            PersonEntity found = personRepository.findByIdOptional(dto.getId()).orElse(null);
-            if (found != null) {
-                return found;
-            }
-        }
-        if (dto.getName() != null && !dto.getName().isBlank()) {
-            return personRepository.findByName(dto.getName()).orElseGet(() -> {
-                PersonEntity p = new PersonEntity();
-                p.setName(dto.getName().trim());
-                personRepository.persist(p);
-                return p;
-            });
-        }
-        return null;
+        return dto == null ? null : personService.resolveOrCreate(dto.getId(), dto.getName());
     }
 
     public List<String> getDistinctGenres() {
