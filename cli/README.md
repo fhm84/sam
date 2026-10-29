@@ -27,12 +27,12 @@ java -jar cli/target/quarkus-app/quarkus-run.jar <command> [options]
 | `import <file-or-dir>... [-d]` | Import sheets from `SheetMusic` JSON files; creates the sheet, then its instrumentations |
 | `importInstrument <file-or-dir>... [-d]` | Import instruments from `CreateInstrument` JSON files |
 | `importPerson <file-or-dir>... [-d]` | Import persons (composers, arrangers) |
-| `importMember <file-or-dir>... [-d]` | Import members; a member whose name matches an existing person becomes that person's profile (env-specific `userId` and invite time are ignored) |
+| `importMember <file-or-dir>... [-d]` | Import members; a member whose name matches exactly one existing person becomes that person's profile, several persons of that name stop the import of that file (env-specific `userId` and invite time are ignored; person files are rejected) |
 | `importEnsemble <file-or-dir>... [-d]` | Import ensembles including voices and their instrument options |
 | `export <dir> [-q <query>]` | Export every sheet (optionally full-text filtered) as one `SheetMusic` JSON file |
 | `exportInstrument <dir>` | Export all instruments (filename = natural ID, e.g. `TROMPETE_BB.json`) |
-| `exportPerson <dir>` | Export all persons |
-| `exportMember <dir>` | Export all members, stripped of env-specific `userId` and invite time |
+| `exportPerson <dir>` | Export all persons (`person-*.json`) |
+| `exportMember <dir>` | Export all members (`member-*.json`), stripped of env-specific `userId` and invite time |
 | `exportEnsemble <dir>` | Export all ensembles with voices + options (instrument refs are natural IDs) |
 
 Every export format is exactly what the matching import command reads back in,

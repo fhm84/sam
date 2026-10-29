@@ -124,26 +124,22 @@ None left; decided on 2026-10-25: 12 months retention, anonymised event-log entr
 
 ## Follow-ups from the code review
 
-Found while reviewing tasks 1–5, not fixed there:
+Found while reviewing tasks 1–5. Fixed in a follow-up pull request: the seat endpoints check
+the ensemble in the path, refused requests show the server's message, the audit purge of
+erased members is state-based (catches up after a failure, also runs at startup),
+`exportPerson` / `exportMember` prefix their file names, `importMember` rejects person files
+and stops on ambiguous names, and person resolution and "instrument IDs of a member" live in
+one place each. Still open:
 
-- **Audit purge can fail silently.** `MemberAuditPurge` runs after commit; a failure is only
-  logged. Make it state-based (delete `_aud` rows whose id has no `members` row) and run it
-  from the nightly retention job too (task 6).
-- **`cli` file names.** `exportPerson` and `exportMember` write the same file names (a
-  member and its person share name and id), and `importMember` accepts person files.
-  Prefix the file names and reject files without a member-only field (task 7).
-- **`importMember` with two persons of the same name** attaches to whichever the search
-  returns first; resolve by exact name, oldest first, or carry the source id (task 7).
-- **Lazy person on the member.** `MemberEntity.person` is eager without a fetch join, so
-  member lists load each person separately; make it lazy and fetch-join where needed.
-- **Duplicated logic.** "Find or create person by name" exists in `SheetService` and
-  `DocumentClassificationService` (and behaves differently for stale ids), "instrument ids
-  of a member" in `MyPartsService` and `SheetCollectionService`; move each into one place.
-- **409 messages in the UI.** A refused delete (credited person) only shows "Request
-  failed"; show the server's message.
-- **Smaller items:** the seat endpoints ignore `{ensembleId}` on update and delete; the
-  `MEMBER` default is set in several places; `INVITED` can't occur until the invite flow
-  writes `lastInviteSentAt`.
+- **Nightly purge.** Run `MemberAuditPurge.purgeErasedMembers` from the retention job too
+  (task 6, needs the scheduler from the event log plan).
+- **Member lists load persons separately.** `MemberEntity.person` is eager without a fetch
+  join; Quarkus' default fetch batch size (16) groups these loads. Fetch-join if lists grow.
+- **Link and unlink toasts don't show.** The member form provides its own `MessageService`
+  but has no `<p-toast>`, so "User account linked / unlinked" and their errors are never
+  displayed (as in the old musician form). Use the app's message service or add a toast.
+- **Smaller items:** the `MEMBER` default is set in several places; `INVITED` can't occur
+  until the invite flow writes `lastInviteSentAt`.
 
 ## Later
 

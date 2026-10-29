@@ -6,8 +6,6 @@ import de.halbmann.sam.api.entity.sheets.Instrumentation;
 import de.halbmann.sam.api.entity.sheets.SheetMusic;
 import de.halbmann.sam.api.entity.sheets.SheetWithMyParts;
 import de.halbmann.sam.business.ensembles.boundary.EnsembleMembershipRepository;
-import de.halbmann.sam.business.ensembles.entity.EnsembleMembershipEntity;
-import de.halbmann.sam.business.instruments.entity.InstrumentEntity;
 import de.halbmann.sam.business.members.boundary.MemberRepository;
 import de.halbmann.sam.business.members.entity.MemberEntity;
 import de.halbmann.sam.business.sheets.boundary.SheetRepository;
@@ -20,8 +18,6 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -56,12 +52,7 @@ public class MyPartsService {
 
         MemberEntity member = memberOpt.get();
 
-        List<String> instrumentIds = membershipRepository.list("member = :member", Map.of("member", member)).stream()
-                .map(EnsembleMembershipEntity::getInstrument)
-                .filter(Objects::nonNull)
-                .map(InstrumentEntity::getId)
-                .distinct()
-                .toList();
+        List<String> instrumentIds = membershipRepository.instrumentIdsOf(member);
 
         if (instrumentIds.isEmpty()) {
             return emptyResponse(filter);

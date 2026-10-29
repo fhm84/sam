@@ -22,8 +22,6 @@ import de.halbmann.sam.business.documents.controller.AttachmentLinkService;
 import de.halbmann.sam.business.documents.controller.DocumentStore;
 import de.halbmann.sam.business.documents.entity.AttachmentEntity;
 import de.halbmann.sam.business.ensembles.boundary.EnsembleMembershipRepository;
-import de.halbmann.sam.business.ensembles.entity.EnsembleMembershipEntity;
-import de.halbmann.sam.business.instruments.entity.InstrumentEntity;
 import de.halbmann.sam.business.members.boundary.MemberRepository;
 import de.halbmann.sam.business.shared.event.ResourcesDeleted;
 import de.halbmann.sam.business.sheets.boundary.SheetRepository;
@@ -43,11 +41,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @ApplicationScoped
 @Transactional
@@ -199,11 +194,7 @@ public class SheetCollectionService {
     private Set<String> resolveInstrumentIds(final String userId) {
         return memberRepository
                 .findByUserId(userId)
-                .map(member -> membershipRepository.list("member = :member", Map.of("member", member)).stream()
-                        .map(EnsembleMembershipEntity::getInstrument)
-                        .filter(Objects::nonNull)
-                        .map(InstrumentEntity::getId)
-                        .collect(Collectors.toSet()))
+                .map(member -> Set.copyOf(membershipRepository.instrumentIdsOf(member)))
                 .orElse(Set.of());
     }
 

@@ -7,6 +7,7 @@ import de.halbmann.sam.api.entity.persons.Person;
 import de.halbmann.sam.api.entity.persons.PersonFilterRequest;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
@@ -32,6 +33,14 @@ public class MemberImporter extends AbstractImporter<Member> {
         return member.getName();
     }
 
+    /** A person file parses as a member too (unknown fields are ignored), but has no status. */
+    @Override
+    protected List<String> extraValidation(final Member member) {
+        return member.getStatus() == null
+                ? List.of("status missing: not a member export (persons are imported with importPerson)")
+                : List.of();
+    }
+
     @Override
     protected boolean exists(final Member member) {
         // The server stores names trimmed, so compare them trimmed too
@@ -55,13 +64,22 @@ public class MemberImporter extends AbstractImporter<Member> {
         System.out.println("  ✓ Imported: " + created.getName() + " (ID: " + created.getId() + ")");
     }
 
+    /**
+     * The person with exactly this name, if there is one. With several, picking one would be a
+     * guess that can give a composer someone else's contact data, so the import stops instead.
+     */
     private Optional<UUID> existingPersonId(final String name) {
         PersonFilterRequest filter = new PersonFilterRequest();
         filter.setName(name);
         filter.setSize(-1);
-        return client.persons().findPersons(filter).getData().stream()
+        List<UUID> ids = client.persons().findPersons(filter).getData().stream()
                 .filter(person -> name.equalsIgnoreCase(person.getName()))
                 .map(Person::getId)
-                .findFirst();
+                .toList();
+        if (ids.size() > 1) {
+            throw new IllegalStateException(ids.size() + " persons are named '" + name
+                    + "'; create this member in the UI and pick the right person there");
+        }
+        return ids.stream().findFirst();
     }
 }

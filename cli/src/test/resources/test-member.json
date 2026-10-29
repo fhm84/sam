@@ -1,0 +1,5 @@
+{
+  "name": "Hans Example",
+  "status": "ACTIVE",
+  "contact": { "email": "hans@example.org" }
+}

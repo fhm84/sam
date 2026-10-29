@@ -9,6 +9,7 @@ import de.halbmann.sam.api.entity.members.Member;
 import de.halbmann.sam.api.entity.members.MemberContact;
 import de.halbmann.sam.api.entity.persons.Person;
 import de.halbmann.sam.api.entity.sheets.SheetMusic;
+import de.halbmann.sam.business.members.controller.MemberAuditPurge;
 import io.quarkus.narayana.jta.QuarkusTransaction;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.security.TestSecurity;
@@ -34,6 +35,9 @@ class MemberErasureTest {
 
     @Inject
     EntityManager entityManager;
+
+    @Inject
+    MemberAuditPurge memberAuditPurge;
 
     private final List<String> ensembleIds = new ArrayList<>();
 
@@ -78,6 +82,25 @@ class MemberErasureTest {
 
         given().delete("/api/sheets/{id}", sheetId).then().statusCode(204);
         given().delete("/api/persons/{id}", memberId).then().statusCode(204);
+    }
+
+    @Test
+    void purge_catchesUpOnHistoryLeftByAFailedPurge() {
+        // Make sure a revision exists to attach the rows to
+        given().delete("/api/members/{id}", createMemberWithHistory()).then().statusCode(204);
+        // Audit rows of a member who no longer exists, as a failed purge would leave them
+        UUID erased = UUID.randomUUID();
+        QuarkusTransaction.requiringNew()
+                .run(() -> entityManager
+                        .createNativeQuery("insert into members_aud (id, REV, REVTYPE, email)"
+                                + " select :id, max(REV), 0, 'left-behind@example.org' from REVINFO")
+                        .setParameter("id", erased)
+                        .executeUpdate());
+        assertEquals(1, auditRows("members_aud", "id", erased.toString()));
+
+        memberAuditPurge.purgeErasedMembers();
+
+        assertEquals(0, auditRows("members_aud", "id", erased.toString()));
     }
 
     /** A member whose contact changed once and who has a seat in an ensemble. */

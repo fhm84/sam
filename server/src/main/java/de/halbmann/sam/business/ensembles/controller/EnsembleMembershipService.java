@@ -86,10 +86,9 @@ public class EnsembleMembershipService {
         return membershipMapper.toDto(entity);
     }
 
-    public EnsembleMembership updateMember(final String memberId, final EnsembleMembership dto) {
-        final EnsembleMembershipEntity entity = membershipRepository
-                .findByIdOptional(UUID.fromString(memberId))
-                .orElseThrow(() -> new EntityNotFoundException("EnsembleMembership", memberId));
+    public EnsembleMembership updateMember(
+            final String ensembleId, final String memberId, final EnsembleMembership dto) {
+        final EnsembleMembershipEntity entity = findSeat(ensembleId, memberId);
 
         final EnsembleRole previousRole = entity.getRole();
         membershipMapper.update(entity, dto);
@@ -112,11 +111,16 @@ public class EnsembleMembershipService {
         return membershipMapper.toDto(entity);
     }
 
-    public void deleteMember(final String memberId) {
-        final EnsembleMembershipEntity entity = membershipRepository
+    public void deleteMember(final String ensembleId, final String memberId) {
+        membershipRepository.delete(findSeat(ensembleId, memberId));
+    }
+
+    /** The seat, if it belongs to the ensemble named in the path; a seat of another ensemble is a 404. */
+    private EnsembleMembershipEntity findSeat(final String ensembleId, final String memberId) {
+        return membershipRepository
                 .findByIdOptional(UUID.fromString(memberId))
+                .filter(seat -> seat.getEnsemble().getId().equals(UUID.fromString(ensembleId)))
                 .orElseThrow(() -> new EntityNotFoundException("EnsembleMembership", memberId));
-        membershipRepository.delete(entity);
     }
 
     /**

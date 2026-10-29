@@ -10,7 +10,6 @@ import de.halbmann.sam.api.entity.sheets.Instrumentation;
 import de.halbmann.sam.api.entity.sheets.SheetMusic;
 import de.halbmann.sam.api.entity.sheets.SheetWithMyParts;
 import de.halbmann.sam.business.ensembles.boundary.EnsembleMembershipRepository;
-import de.halbmann.sam.business.ensembles.entity.EnsembleMembershipEntity;
 import de.halbmann.sam.business.instruments.entity.InstrumentEntity;
 import de.halbmann.sam.business.members.boundary.MemberRepository;
 import de.halbmann.sam.business.members.entity.MemberEntity;
@@ -82,11 +81,8 @@ class MyPartsServiceTest {
         MemberEntity member = member("user-2");
         when(memberRepository.findByUserId("user-2")).thenReturn(Optional.of(member));
 
-        EnsembleMembershipEntity conductorMembership = new EnsembleMembershipEntity();
-        conductorMembership.setMember(member);
-        conductorMembership.setInstrument(null);
-
-        when(membershipRepository.list(anyString(), anyMap())).thenReturn(List.of(conductorMembership));
+        // Only a seat without an instrument: no instrument ids
+        when(membershipRepository.instrumentIdsOf(member)).thenReturn(List.of());
         PaginationRequest filter = new PaginationRequest();
 
         PaginatedResponse<SheetWithMyParts> result = service.getMyParts("user-2", filter);
@@ -105,11 +101,7 @@ class MyPartsServiceTest {
         InstrumentEntity trumpet = instrument("trumpet-bb");
         InstrumentEntity trombone = instrument("trombone");
 
-        EnsembleMembershipEntity membership = new EnsembleMembershipEntity();
-        membership.setMember(member);
-        membership.setInstrument(trumpet);
-
-        when(membershipRepository.list(anyString(), anyMap())).thenReturn(List.of(membership));
+        when(membershipRepository.instrumentIdsOf(member)).thenReturn(List.of("trumpet-bb"));
 
         InstrumentationEntity matchingPart = new InstrumentationEntity();
         matchingPart.setInstrument(trumpet);
@@ -151,15 +143,7 @@ class MyPartsServiceTest {
         InstrumentEntity trumpet = instrument("trumpet-bb");
         InstrumentEntity flugelhorn = instrument("flugelhorn");
 
-        EnsembleMembershipEntity m1 = new EnsembleMembershipEntity();
-        m1.setMember(member);
-        m1.setInstrument(trumpet);
-
-        EnsembleMembershipEntity m2 = new EnsembleMembershipEntity();
-        m2.setMember(member);
-        m2.setInstrument(flugelhorn);
-
-        when(membershipRepository.list(anyString(), anyMap())).thenReturn(List.of(m1, m2));
+        when(membershipRepository.instrumentIdsOf(member)).thenReturn(List.of("trumpet-bb", "flugelhorn"));
 
         InstrumentationEntity trumpetPart = new InstrumentationEntity();
         trumpetPart.setInstrument(trumpet);
