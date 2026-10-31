@@ -2,7 +2,6 @@ package de.halbmann.sam.api.entity.sheets;
 
 import de.halbmann.sam.api.entity.persons.Person;
 import jakarta.json.bind.annotation.JsonbTypeAdapter;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import java.time.Duration;
 import java.util.HashSet;
@@ -42,15 +41,14 @@ public class CreateSheetMusic {
     String publisherIpi;
 
     /**
-     * The composer of the music sheet.
+     * The composer of the music sheet: a reference, either the ID of an existing person or a name
+     * (found or created). Not cascaded with {@code @Valid}: an ID-only reference has no name.
      */
-    @Valid
     Person composer;
 
     /**
-     * The arranger of the music sheet.
+     * The arranger of the music sheet, referenced like {@link #composer}.
      */
-    @Valid
     Person arranger;
 
     /**

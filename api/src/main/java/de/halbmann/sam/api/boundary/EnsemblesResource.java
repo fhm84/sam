@@ -5,6 +5,7 @@ import de.halbmann.sam.api.entity.ensembles.Ensemble;
 import de.halbmann.sam.api.entity.ensembles.EnsembleCoverageStatus;
 import de.halbmann.sam.api.entity.ensembles.EnsembleFilterRequest;
 import de.halbmann.sam.api.entity.shared.PaginatedResponse;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 
@@ -33,7 +34,7 @@ public interface EnsemblesResource {
      * @return the created ensemble with generated ID
      */
     @POST
-    Ensemble add(CreateEnsemble ensemble);
+    Ensemble add(@Valid CreateEnsemble ensemble);
 
     /**
      * Loads a specific ensemble by its ID, including all voices and their options.

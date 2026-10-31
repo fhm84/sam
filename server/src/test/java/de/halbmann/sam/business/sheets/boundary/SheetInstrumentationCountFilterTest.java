@@ -352,7 +352,9 @@ class SheetInstrumentationCountFilterTest {
 
     private String createInstrument(String name) {
         CreateInstrument instrument = new CreateInstrument();
-        String id = (name.toUpperCase(java.util.Locale.ROOT) + "_" + UUID.randomUUID()).replace("-", "_");
+        String id = (name + "_" + UUID.randomUUID())
+                .toUpperCase(java.util.Locale.ROOT)
+                .replace("-", "_");
         instrument.setId(id);
         instrument.setName(name);
         given().contentType(ContentType.JSON)

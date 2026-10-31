@@ -15,7 +15,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 /**
  * Every endpoint with {@code @RolesAllowed}, called by a user who lacks the role, answers 403, and
  * a user who holds it gets past the role check (whatever the random IDs and empty body then cause:
- * 404, 400, and 500 on a few endpoints that don't validate the body yet).
+ * 404 or 400, never 500).
  * A dropped {@code @RolesAllowed} fails here. Keep the lists in sync with the {@code *ResourceImpl}
  * classes and the "Read access by role" table in {@code docs/features/api-surface.md}.
  */
@@ -123,6 +123,6 @@ class RoleEnforcementTest {
             user = "librarian1",
             roles = {"music_librarian"})
     void librarian_passesTheRoleCheck(String endpoint) {
-        call(endpoint).then().statusCode(not(oneOf(401, 403)));
+        call(endpoint).then().statusCode(not(oneOf(401, 403, 500)));
     }
 }
