@@ -6,6 +6,7 @@ import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import io.quarkus.panache.common.Page;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +31,25 @@ public class EventLogRepository implements PanacheRepositoryBase<EventLogEntity,
         return update(
                 "userId = :erased, username = null where userId = :userId",
                 Map.of("erased", ERASED_USER_ID, "userId", userId));
+    }
+
+    /** One user's entries, newest first; the user ID is required (see {@code EventLogService.findOwn}). */
+    public PagedResult findByUser(final String userId, final int page, final int size) {
+        final Map<String, Object> params = Map.of("userId", userId);
+        final long total = count("userId = :userId", params);
+        final List<EventLogEntity> data = find("userId = :userId", Sort.descending("occurredAt"), params)
+                .page(Page.of(page, size))
+                .list();
+        return new PagedResult(data, total);
+    }
+
+    /**
+     * Deletes all entries that occurred before {@code cutoff}, in one statement.
+     *
+     * @return the number of entries deleted
+     */
+    public long deleteOlderThan(final OffsetDateTime cutoff) {
+        return delete("occurredAt < ?1", cutoff);
     }
 
     public PagedResult find(EventLogFilterRequest filter) {

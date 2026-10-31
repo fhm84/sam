@@ -20,4 +20,10 @@ export class EventLogsApiService {
     if (filter.userId) params = params.set('userId', filter.userId);
     return this.http.get<PaginatedResponse<EventLogEntry>>(this.baseUrl, { params });
   }
+
+  /** The caller's own entries, newest first (GDPR right of access). */
+  own(page: number, size: number): Observable<PaginatedResponse<EventLogEntry>> {
+    const params = new HttpParams().set('page', page).set('size', size);
+    return this.http.get<PaginatedResponse<EventLogEntry>>('/api/me/event-logs', { params });
+  }
 }

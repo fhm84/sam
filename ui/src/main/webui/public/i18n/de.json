@@ -10,6 +10,7 @@
     "members": "Mitglieder",
     "persons": "Personen",
     "myData": "Meine Daten",
+    "myActivity": "Meine Aktivität",
     "shares": "Meine Freigaben",
     "myParts": "Meine Stimmen",
     "profile": "Profil",
@@ -781,6 +782,12 @@
     },
     "noSeats": "Keine Plätze in Ensembles",
     "correction": "Stimmt etwas nicht? Der Notenwart kann deine Daten korrigieren oder löschen."
+  },
+  "myActivity": {
+    "title": "Meine Aktivität",
+    "subtitle": "Was SAM unter deinem Login aufgezeichnet hat, zum Beispiel Downloads, Exporte und Freigaben.",
+    "empty": "Für deinen Login ist nichts aufgezeichnet.",
+    "retention": "Einträge werden nach Ablauf der Aufbewahrungsfrist automatisch gelöscht (12 Monate, sofern der Administrator nichts anderes eingestellt hat)."
   },
   "ensembles": {
     "title": "Ensembles",

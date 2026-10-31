@@ -30,16 +30,13 @@ unprioritised backlog.
 1. [Automatic coverage snapshot invalidation](#automatic-coverage-snapshot-invalidation--planned)
    → [plan](plans/coverage-snapshot-invalidation.md) · [#137](https://github.com/fhm84/sam/issues/137)
    (needs open question #5: [#138](https://github.com/fhm84/sam/issues/138))
-2. [Event log retention + own-history view](#document-access-log--partial)
-   → [plan](plans/event-log-retention.md) · [#146](https://github.com/fhm84/sam/issues/146)
-   (needs open question #9: [#147](https://github.com/fhm84/sam/issues/147))
-3. [Document store hardening](#document-store-hardening--in-progress): the upload bugs
+2. [Document store hardening](#document-store-hardening--in-progress): the upload bugs
    (same-name corruption, S3) are fixed; left are random storage paths, deleting files
    only after commit, and an integrity check for files damaged before the fix
    → [plan](plans/document-store-hardening.md) · [#154](https://github.com/fhm84/sam/issues/154)
-4. Encrypted backups (phase A of [encryption of stored documents](#encryption-of-stored-documents--planned))
+3. Encrypted backups (phase A of [encryption of stored documents](#encryption-of-stored-documents--planned))
    → [plan](plans/storage-encryption.md) · [#162](https://github.com/fhm84/sam/issues/162)
-5. [Pocket ID as default OIDC provider](#pocket-id-as-default-oidc-provider--in-progress):
+4. [Pocket ID as default OIDC provider](#pocket-id-as-default-oidc-provider--in-progress):
    lighter login stack with passkeys, Keycloak stays optional
    → [plan](plans/pocket-id-provider.md) · [#210](https://github.com/fhm84/sam/issues/210)
 
@@ -1178,6 +1175,11 @@ Each event captures: `occurredAt`, `userId` (OIDC subject), `username` (snapshot
 links below). A read-only UI page is available at `/admin/event-logs` with filtering
 by event type (multi-select), user ID, and entity type.
 
+**Done (#146):** entries older than 12 months (configurable, `0` turns it off) are deleted
+every night, and every user sees their own entries on *My activity*
+(`GET /api/me/event-logs`, GDPR right of access). The production setup has a
+[privacy policy note](architecture/production-setup.md#privacy-policy-note) to adapt.
+
 IP addresses are deliberately not stored — the `userId`+`username` pair gives
 unambiguous attribution for all authenticated users, and IP logging would add GDPR
 compliance obligations without meaningful benefit for an ensemble-management context.
@@ -1185,15 +1187,6 @@ compliance obligations without meaningful benefit for an ensemble-management con
 **Still pending:**
 
 - Richer UI (charts, per-entity history panel, date-range filter)
-- Retention policy (auto-delete entries older than N months)
-- Users viewing their own access history (GDPR right of access)
-
-**Privacy / GDPR:**
-
-Once named user accounts exist, this log constitutes personal data:
-- Retention policy (e.g. auto-delete entries older than 12 months)
-- Users can view their own access history (right of access)
-- Document the log in the ensemble's privacy policy
 
 **Stakeholders:** S1 (music librarian), S4 (Administrator), S2 (Dirigent)
 **Depends on:** Authentication (for meaningful `userId`)
@@ -1499,7 +1492,7 @@ answered before the relevant implementation work begins.
 | 6 | Should lending / checkout be tracked per instrumentation or per physical copy? (Relevant if multiple copies per instrumentation are ever supported) | Lending, physical archive | Open |
 | 7 | Which OIDC provider? Self-hosted (Keycloak) or SaaS (Auth0, Google)? | Auth implementation | **Resolved:** Self-hosted Keycloak 26. **Revisited 2026-10-17:** self-hosted Pocket ID as the default, Keycloak stays supported ([plan](plans/pocket-id-provider.md), [ADR-0016](architecture/decisions/adr-0016-pocket-id-default-provider.md)). |
 | 8 | Should IP addresses be stored in the document access log, or omitted/anonymised? Requires GDPR/privacy policy decision. | Document access log | **Resolved: not stored.** `userId` (OIDC sub) + snapshotted `username` give unambiguous attribution; IP adds GDPR obligations without meaningful benefit in an ensemble context. |
-| 9 | What retention period for the document access log? (e.g. 12 months) | Document access log | Open: **blocks a Now item.** Proposed: 12 months, configurable ([plan](plans/event-log-retention.md)) |
+| 9 | What retention period for the document access log? (e.g. 12 months) | Document access log | **Resolved:** 12 months, configurable via `SAM_EVENT_LOG_RETENTION_MONTHS` (`0` turns deletion off); share-link entries follow the same rule ([event log](features/event-log.md#retention), [#147](https://github.com/fhm84/sam/issues/147)) |
 | 10 | All Claude Design files have now been reviewed for data model gaps. Resulting plans are in [implementation plans](plans/README.md) (open ones) and the roadmap. | Multiple | **Resolved** |
 | 11 | May users request a Pocket ID login code by email themselves, or do only admins send them? | Pocket ID login recovery | **Resolved:** admin only at first; revisit if it becomes a burden ([#222](https://github.com/fhm84/sam/issues/222)) |
 | 12 | Should the default OIDC tenant enforce the token audience, so tokens Pocket ID issued to other apps are rejected? | Pocket ID provider, token validation | **Resolved:** yes; Pocket ID requires `sam-ui`, Keycloak `urn:sam:api` via an audience mapper ([plan](plans/pocket-id-provider.md#open-questions)) |

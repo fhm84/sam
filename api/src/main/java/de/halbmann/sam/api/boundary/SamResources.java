@@ -57,4 +57,8 @@ public interface SamResources {
     /** {@return the sub-resource with the calling member's own data} */
     @Path("me/member")
     MyMemberResource myMember();
+
+    /** {@return the sub-resource with the calling user's own event-log entries} */
+    @Path("me/event-logs")
+    MyEventLogResource myEventLogs();
 }

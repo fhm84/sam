@@ -26,6 +26,7 @@ Business endpoints are under the `/api` base path. Ops/diagnostic endpoints
 | Admin users | `/api/admin/users` | `admin` only; user search for member–account linking through the OIDC provider (Pocket ID or Keycloak); `/directory` tells whether search is available (501 without a Pocket ID API key) |
 | Event log | `/api/event-logs` | Read-only; `admin` only |
 | My parts | `/api/me/parts` | Authenticated; paginated sheets for the calling user's instruments |
+| My activity | `/api/me/event-logs` | Authenticated; paginated, the caller's own event-log entries (never share-link or other users' entries) |
 | My member data | `/api/me/member` | Authenticated; the caller's own member profile with personal data and seats (404 without a linked member) |
 | App info | `/q/info` | Unauthenticated; management port (`:9000`), not `/api`. Git branch/commit, build timestamp, Quarkus/Java/OS versions |
 | Metrics | `/q/metrics` | Unauthenticated; management port (`:9000`), not `/api`. Prometheus scrape endpoint |
@@ -68,7 +69,8 @@ Endpoints not listed (writes) keep their `@RolesAllowed` as today.
 | `/shares` | own shares | own shares | |
 | `/me/parts` | own | own | |
 | `/me/member` | own | own | |
-| `/event-logs` | admin | admin | done; own history in [#146](https://github.com/fhm84/sam/issues/146) |
+| `/me/event-logs` | own | own | done |
+| `/event-logs` | admin | admin | done |
 | `/admin/users` | admin | admin | |
 | `/oidc-config.json`, `/public/shares/{token}/…` | public | public | |
 
