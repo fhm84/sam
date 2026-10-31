@@ -628,6 +628,7 @@
       "TRANSCRIPTION": "Transcription",
       "EXTERNAL_LINK": "External Link",
       "MUSIC_XML": "MusicXML",
+      "PROGRAM_NOTE": "Programme Note",
       "OTHER": "Other",
       "UNSPECIFIED": "Unspecified"
     },

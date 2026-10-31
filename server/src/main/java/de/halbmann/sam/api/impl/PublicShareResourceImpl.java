@@ -8,9 +8,11 @@ import de.halbmann.sam.api.entity.shares.ShareType;
 import de.halbmann.sam.business.collections.boundary.SheetCollectionRepository;
 import de.halbmann.sam.business.collections.controller.CollectionTocService;
 import de.halbmann.sam.business.collections.entity.SheetCollectionEntity;
+import de.halbmann.sam.business.documents.boundary.AttachmentRepository;
 import de.halbmann.sam.business.documents.controller.AttachmentLinkService;
 import de.halbmann.sam.business.documents.controller.DocumentBundleService;
 import de.halbmann.sam.business.documents.controller.DocumentStore;
+import de.halbmann.sam.business.documents.controller.DownloadNames;
 import de.halbmann.sam.business.documents.controller.MergedPdfEntry;
 import de.halbmann.sam.business.documents.controller.StreamWriter;
 import de.halbmann.sam.business.documents.entity.AttachmentEntity;
@@ -24,12 +26,15 @@ import jakarta.annotation.security.PermitAll;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 
@@ -61,6 +66,20 @@ public class PublicShareResourceImpl implements PublicShareResource {
 
     @Inject
     SheetRepository sheetRepository;
+
+    @Inject
+    DownloadNames downloadNames;
+
+    @Inject
+    AttachmentRepository attachmentRepository;
+
+    @Context
+    HttpHeaders headers;
+
+    /** The language for download names: the app's (or the browser's) {@code Accept-Language}. */
+    private Locale locale() {
+        return DownloadNames.locale(headers != null ? headers.getAcceptableLanguages() : null);
+    }
 
     @Override
     public PublicShareInfo getInfo(UUID token) {
@@ -133,8 +152,11 @@ public class PublicShareResourceImpl implements PublicShareResource {
         if (dl == null) {
             return Response.noContent().build();
         }
-        String encodedFilename =
-                URLEncoder.encode(dl.filename(), StandardCharsets.UTF_8).replace("+", "%20");
+        String name = attachmentRepository
+                .findByIdOptional(attachmentId)
+                .map(a -> downloadNames.forAttachment(a, locale()))
+                .orElse(dl.filename());
+        String encodedFilename = URLEncoder.encode(name, StandardCharsets.UTF_8).replace("+", "%20");
         final StreamingOutput streamingOutput = output -> {
             try (InputStream in = dl.stream()) {
                 in.transferTo(output);
@@ -158,7 +180,7 @@ public class PublicShareResourceImpl implements PublicShareResource {
         String title = sheet != null ? sheet.getTitle() : "sheet";
         String encodedFilename =
                 URLEncoder.encode(title + ".zip", StandardCharsets.UTF_8).replace("+", "%20");
-        StreamWriter zip = documentBundleService.buildZipForSheetInstrumentations(sheetId.toString(), type);
+        StreamWriter zip = documentBundleService.buildZipForSheetInstrumentations(sheetId.toString(), type, locale());
         return Response.ok((StreamingOutput) zip::write)
                 .type("application/zip")
                 .header("Content-Disposition", "attachment; filename*=utf-8''" + encodedFilename)
@@ -167,7 +189,8 @@ public class PublicShareResourceImpl implements PublicShareResource {
     }
 
     private Response buildCollectionAllResponse(UUID collectionId, AttachmentType type) {
-        StreamWriter zip = documentBundleService.buildZipForCollectionInstrumentations(collectionId.toString(), type);
+        StreamWriter zip =
+                documentBundleService.buildZipForCollectionInstrumentations(collectionId.toString(), type, locale());
         if (zip == null) {
             return Response.noContent().build();
         }
@@ -190,13 +213,14 @@ public class PublicShareResourceImpl implements PublicShareResource {
         }
 
         if (entries.size() == 1) {
-            DocumentDownload dl = documentStore.loadAttachment(
-                    entries.get(0).attachment().getId().toString());
+            AttachmentEntity only = entries.get(0).attachment();
+            DocumentDownload dl = documentStore.loadAttachment(only.getId().toString());
             if (dl == null) {
                 return Response.noContent().build();
             }
-            String encodedFilename =
-                    URLEncoder.encode(dl.filename(), StandardCharsets.UTF_8).replace("+", "%20");
+            String encodedFilename = URLEncoder.encode(
+                            downloadNames.forAttachment(only, locale()), StandardCharsets.UTF_8)
+                    .replace("+", "%20");
             final StreamingOutput streamingOutput = output -> {
                 try (InputStream in = dl.stream()) {
                     in.transferTo(output);
@@ -213,10 +237,10 @@ public class PublicShareResourceImpl implements PublicShareResource {
         List<AttachmentEntity> attachments =
                 entries.stream().map(MergedPdfEntry::attachment).toList();
         InstrumentationEntity instr = instrumentationRepository.findById(instrumentationId);
-        String baseName = instr != null && instr.getInstrument() != null
-                ? instr.getInstrument().getName()
+        String baseName = instr != null && instr.getSheet() != null
+                ? downloadNames.forBundle(instr.getSheet(), instr, null, locale())
                 : "instrumentation";
-        StreamWriter zip = documentBundleService.buildZip(attachments, baseName);
+        StreamWriter zip = documentBundleService.buildZip(attachments, locale());
         String encodedFilename =
                 URLEncoder.encode(baseName + ".zip", StandardCharsets.UTF_8).replace("+", "%20");
         return Response.ok((StreamingOutput) zip::write)

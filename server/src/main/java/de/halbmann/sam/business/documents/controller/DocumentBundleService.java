@@ -49,6 +49,9 @@ public class DocumentBundleService {
     @Inject
     AttachmentRepository attachmentRepository;
 
+    @Inject
+    DownloadNames downloadNames;
+
     public List<MergedPdfEntry> buildMergeEntriesForSheet(
             String sheetId, AttachmentType type, boolean includeInstrumentations) {
         SheetMusicEntity sheet = sheetRepository.findById(UUID.fromString(sheetId));
@@ -104,18 +107,27 @@ public class DocumentBundleService {
                 .toList();
     }
 
-    public StreamWriter buildZip(List<AttachmentEntity> attachments, String zipFilename) {
+    /** A ZIP of the given attachments, each named by {@link DownloadNames}. */
+    public StreamWriter buildZip(List<AttachmentEntity> attachments, Locale locale) {
+        List<NamedFile> files = attachments.stream()
+                .filter(att -> att.getDocument() != null)
+                .map(att -> new NamedFile(
+                        downloadNames.forAttachment(att, locale),
+                        att.getDocument().getPath()))
+                .toList();
+        return zipOf(files);
+    }
+
+    /** A ZIP entry: its name and the stored file it holds. */
+    private record NamedFile(String name, String path) {}
+
+    private StreamWriter zipOf(List<NamedFile> files) {
         return outputStream -> {
             try (ZipOutputStream zip = new ZipOutputStream(outputStream)) {
                 Set<String> usedNames = new LinkedHashSet<>();
-                for (AttachmentEntity att : attachments) {
-                    if (att.getDocument() == null) {
-                        continue;
-                    }
-                    String entryName = FilenameUtils.uniqueZipName(att.getDisplayName(), usedNames);
-                    zip.putNextEntry(new ZipEntry(entryName));
-                    try (InputStream in =
-                            filesystem.openForRead(att.getDocument().getPath())) {
+                for (NamedFile file : files) {
+                    zip.putNextEntry(new ZipEntry(FilenameUtils.uniqueZipName(file.name(), usedNames)));
+                    try (InputStream in = filesystem.openForRead(file.path())) {
                         in.transferTo(zip);
                     }
                     zip.closeEntry();
@@ -124,89 +136,53 @@ public class DocumentBundleService {
         };
     }
 
-    public StreamWriter buildZipForSheetInstrumentations(String sheetId, AttachmentType type) {
+    public StreamWriter buildZipForSheetInstrumentations(String sheetId, AttachmentType type, Locale locale) {
         SheetMusicEntity sheet = sheetRepository.findById(UUID.fromString(sheetId));
         if (sheet == null) {
             return outputStream -> {};
         }
-        record LabeledAttachment(String label, AttachmentEntity attachment) {}
-        List<LabeledAttachment> sheetEntries = sheet.getAttachments().stream()
+        List<NamedFile> sheetFiles = sheet.getAttachments().stream()
                 .filter(a -> type == null || type == a.getType())
                 .filter(a -> a.getDocument() != null)
-                .map(a -> new LabeledAttachment(null, a))
+                .map(a -> new NamedFile(
+                        downloadNames.forSheet(sheet, a, locale),
+                        a.getDocument().getPath()))
                 .toList();
-        List<LabeledAttachment> instrEntries = sheet.getInstrumentations().stream()
-                .sorted(Comparator.comparing(
-                                (InstrumentationEntity i) -> i.getInstrument().getName())
-                        .thenComparing(
-                                i -> Optional.ofNullable(i.getPartLabel()).orElse("")))
-                .flatMap(instr -> {
-                    String label = instrumentLabel(instr);
-                    return instr.getAttachments().stream()
-                            .filter(a -> type == null || type == a.getType())
-                            .filter(a -> a.getDocument() != null)
-                            .map(a -> new LabeledAttachment(label, a));
-                })
+        List<NamedFile> instrumentationFiles = sheet.getInstrumentations().stream()
+                .sorted(INSTRUMENTATION_ORDER)
+                .flatMap(instr -> instr.getAttachments().stream()
+                        .filter(a -> type == null || type == a.getType())
+                        .filter(a -> a.getDocument() != null)
+                        .map(a -> new NamedFile(
+                                downloadNames.forInstrumentation(sheet, instr, a, locale),
+                                a.getDocument().getPath())))
                 .toList();
-        List<LabeledAttachment> entries =
-                Stream.concat(sheetEntries.stream(), instrEntries.stream()).toList();
-        return outputStream -> {
-            try (ZipOutputStream zip = new ZipOutputStream(outputStream)) {
-                Set<String> usedNames = new LinkedHashSet<>();
-                for (LabeledAttachment entry : entries) {
-                    String rawName = entry.label() != null
-                            ? entry.label() + "_" + entry.attachment().getDisplayName()
-                            : entry.attachment().getDisplayName();
-                    String entryName = FilenameUtils.uniqueZipName(rawName, usedNames);
-                    zip.putNextEntry(new ZipEntry(entryName));
-                    try (InputStream in = filesystem.openForRead(
-                            entry.attachment().getDocument().getPath())) {
-                        in.transferTo(zip);
-                    }
-                    zip.closeEntry();
-                }
-            }
-        };
+        return zipOf(Stream.concat(sheetFiles.stream(), instrumentationFiles.stream())
+                .toList());
     }
 
-    public StreamWriter buildZipForCollectionInstrumentations(String collectionId, AttachmentType type) {
+    public StreamWriter buildZipForCollectionInstrumentations(String collectionId, AttachmentType type, Locale locale) {
         SheetCollectionEntity collection = sheetCollectionRepository.findById(UUID.fromString(collectionId));
         if (collection == null) {
             return null;
         }
-        record LabeledAttachment(String label, AttachmentEntity attachment) {}
-        List<LabeledAttachment> entries = collection.getItems().stream()
+        List<NamedFile> files = collection.getItems().stream()
                 .filter(SheetCollectionItemEntity.class::isInstance)
                 .map(SheetCollectionItemEntity.class::cast)
                 .map(SheetCollectionItemEntity::getSheet)
                 .flatMap(sheet -> sheet.getInstrumentations().stream()
-                        .sorted(Comparator.comparing((InstrumentationEntity i) ->
-                                        i.getInstrument().getName())
-                                .thenComparing(i ->
-                                        Optional.ofNullable(i.getPartLabel()).orElse("")))
+                        .sorted(INSTRUMENTATION_ORDER)
                         .flatMap(instr -> instr.getAttachments().stream()
                                 .filter(a -> type == null || type == a.getType())
                                 .filter(a -> a.getDocument() != null)
-                                .map(a -> new LabeledAttachment(sheet.getTitle() + " - " + instrumentLabel(instr), a))))
+                                .map(a -> new NamedFile(
+                                        downloadNames.forInstrumentation(sheet, instr, a, locale),
+                                        a.getDocument().getPath()))))
                 .toList();
-        if (entries.isEmpty()) {
+        if (files.isEmpty()) {
             return null;
         }
-        return outputStream -> {
-            try (ZipOutputStream zip = new ZipOutputStream(outputStream)) {
-                Set<String> usedNames = new LinkedHashSet<>();
-                for (LabeledAttachment entry : entries) {
-                    String entryName = FilenameUtils.uniqueZipName(
-                            entry.label() + "_" + entry.attachment().getDisplayName(), usedNames);
-                    zip.putNextEntry(new ZipEntry(entryName));
-                    try (InputStream in = filesystem.openForRead(
-                            entry.attachment().getDocument().getPath())) {
-                        in.transferTo(zip);
-                    }
-                    zip.closeEntry();
-                }
-            }
-        };
+        return zipOf(files);
     }
 
     public StreamWriter buildMergedPdf(List<MergedPdfEntry> entries) {
@@ -276,8 +252,10 @@ public class DocumentBundleService {
     }
 
     private String instrumentLabel(InstrumentationEntity instr) {
-        String name = Optional.ofNullable(instr.getInstrument().getDisplayName())
-                .orElse(instr.getInstrument().getName());
-        return instr.getPartLabel() != null ? name + " " + instr.getPartLabel() : name;
+        return DownloadNames.instrumentLabel(instr);
     }
+
+    private static final Comparator<InstrumentationEntity> INSTRUMENTATION_ORDER = Comparator.comparing(
+                    (InstrumentationEntity i) -> i.getInstrument().getName())
+            .thenComparing(i -> Optional.ofNullable(i.getPartLabel()).orElse(""));
 }
