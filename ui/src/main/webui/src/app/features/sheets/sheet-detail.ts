@@ -1,3 +1,4 @@
+import { saveDownload } from '../../shared/utils/download.utils';
 import { Component, computed, EventEmitter, HostBinding, inject, Input, OnChanges, Output, signal, ChangeDetectionStrategy } from '@angular/core';
 import { forkJoin } from 'rxjs';
 import { TableModule } from '@openng/optimus-ui/table';
@@ -495,17 +496,7 @@ export class SheetDetail extends DocumentHandler implements OnChanges {
     this.documentsApi.downloadBatchByIds(ids, format, baseName)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (response) => {
-          const blob = response.body!;
-          const disposition = response.headers.get('Content-Disposition');
-          const serverFilename = disposition?.match(/filename\*?=(?:utf-8'')?([^;]+)/i)?.[1];
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = serverFilename ? decodeURIComponent(serverFilename) : filename;
-          a.click();
-          URL.revokeObjectURL(url);
-        },
+        next: (response) => saveDownload(response, filename),
       });
   }
 

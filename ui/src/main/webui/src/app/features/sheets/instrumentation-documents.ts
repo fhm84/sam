@@ -1,3 +1,4 @@
+import { saveDownload } from '../../shared/utils/download.utils';
 import { Component, Input, OnChanges, Output, EventEmitter, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
 import { Button } from '@openng/optimus-ui/button';
 import { Tooltip } from '@openng/optimus-ui/tooltip';
@@ -82,15 +83,7 @@ export class InstrumentationDocuments extends DocumentHandler implements OnChang
     this.documentsApi.download(this.getDocumentBasePath(), doc.id!)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (response) => {
-          const blob = response.body!;
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = doc.displayName ?? 'download';
-          a.click();
-          URL.revokeObjectURL(url);
-        },
+        next: (response) => saveDownload(response, doc.displayName ?? 'download'),
       });
   }
 }
