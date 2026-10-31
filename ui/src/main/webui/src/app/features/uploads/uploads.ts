@@ -1,3 +1,4 @@
+import { saveDownload } from '../../shared/utils/download.utils';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -448,15 +449,7 @@ export class Uploads implements OnInit, OnDestroy {
     this.documentsApi.download(this.topLevelPath, doc.id!)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (response) => {
-          const blob = response.body!;
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = doc.filename ?? 'download';
-          a.click();
-          URL.revokeObjectURL(url);
-        },
+        next: (response) => saveDownload(response, doc.filename ?? 'download'),
       });
   }
 

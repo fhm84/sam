@@ -1,3 +1,4 @@
+import { saveDownload } from '../../shared/utils/download.utils';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -116,17 +117,7 @@ export class CollectionDetailPage implements OnInit {
 
   protected generateToc(): void {
     this.api.downloadToc(this.collectionId()).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (response) => {
-        const disposition = response.headers.get('Content-Disposition');
-        const serverFilename = disposition?.match(/filename="?([^";]+)"?/i)?.[1];
-        const filename = serverFilename ?? `toc-${this.collectionId()}.pdf`;
-        const url = URL.createObjectURL(response.body!);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        a.click();
-        URL.revokeObjectURL(url);
-      },
+      next: (response) => saveDownload(response, `toc-${this.collectionId()}.pdf`),
       error: () => {
         this.messageService.add({
           severity: 'error',
@@ -181,12 +172,5 @@ export class CollectionDetailPage implements OnInit {
 }
 
 function triggerDownload(response: HttpResponse<Blob>): void {
-  const disposition = response.headers.get('Content-Disposition');
-  const filename = disposition?.match(/filename="?([^";]+)"?/i)?.[1] ?? 'export';
-  const url = URL.createObjectURL(response.body!);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
+  saveDownload(response, 'export');
 }

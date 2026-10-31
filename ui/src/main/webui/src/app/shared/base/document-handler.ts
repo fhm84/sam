@@ -3,8 +3,9 @@ import { ConfirmationService, MessageService } from '@openng/optimus-ui/api';
 import { AuthService } from '../../core/auth/auth.service';
 import { TranslationService } from '../../core/translation.service';
 import { DocumentsApiService } from '../../core/api/documents-api.service';
-import { Attachment, DocumentDownload } from '../../model/datamodels';
+import { Attachment } from '../../model/datamodels';
 import { formatSize } from '../utils/format.utils';
+import { saveDownload } from '../utils/download.utils';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Directive()
@@ -25,23 +26,16 @@ export abstract class DocumentHandler {
 
   protected abstract getDocumentBasePath(): string;
 
-  protected downloadDocument(doc: DocumentDownload): void {
+  /** Saves the file under its original name (from the response), else the attachment's display name. */
+  protected downloadDocument(doc: Attachment): void {
     this.documentsApi.download(this.getDocumentBasePath(), doc.id!)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (response) => {
-          const blob = response.body!;
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = doc.filename ?? 'download';
-          a.click();
-          URL.revokeObjectURL(url);
-        },
+        next: (response) => saveDownload(response, doc.displayName ?? 'download'),
       });
   }
 
-  protected confirmDeleteDocument(doc: DocumentDownload): void {
+  protected confirmDeleteDocument(doc: Attachment): void {
     this.confirmationService.confirm({
       message: this.t.t('sheets.detail.deleteDocument.confirm'),
       header: this.t.t('sheets.detail.deleteDocument.header'),

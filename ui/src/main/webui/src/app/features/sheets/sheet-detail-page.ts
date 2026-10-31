@@ -1,3 +1,4 @@
+import { saveDownload } from '../../shared/utils/download.utils';
 import { Component, DestroyRef, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -121,12 +122,5 @@ export class SheetDetailPage implements OnInit {
 }
 
 function triggerDownload(response: import('@angular/common/http').HttpResponse<Blob>): void {
-  const disposition = response.headers.get('Content-Disposition');
-  const filename = disposition?.match(/filename="?([^";]+)"?/i)?.[1] ?? 'export';
-  const url = URL.createObjectURL(response.body!);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
+  saveDownload(response, 'export');
 }

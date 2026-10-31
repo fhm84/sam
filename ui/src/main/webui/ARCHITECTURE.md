@@ -193,3 +193,8 @@ it at three different locations (top-level, under sheets, under instrumentations
   `@openng/optimus-ui/api` in the component, and keep the `ng-template` a direct child of
   `p-panel` — Panel collects its templates once, so one inside `@if` never shows. Put the
   `@if` inside the template instead.
+- **File downloads:** request the blob with `observe: 'response'` and save it with
+  `saveDownload(response, fallbackName)` from `shared/utils/download.utils`. It takes the name
+  from `Content-Disposition` (the encoded `filename*=utf-8''…` the document download sends, or
+  the plain `filename="…"` of the exports) and uses the fallback only when the server names none.
+  An attachment's file name comes from the server or its `displayName`; it has no `filename` field.
