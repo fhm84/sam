@@ -198,3 +198,5 @@ it at three different locations (top-level, under sheets, under instrumentations
   from `Content-Disposition` (the encoded `filename*=utf-8''…` the document download sends, or
   the plain `filename="…"` of the exports) and uses the fallback only when the server names none.
   An attachment's file name comes from the server or its `displayName`; it has no `filename` field.
+  The server builds document names itself ("<title> – <instrument>"), in the app language that
+  `core/locale.interceptor.ts` sends as `Accept-Language` on every `/api/` request.

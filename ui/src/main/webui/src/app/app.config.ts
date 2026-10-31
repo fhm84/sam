@@ -1,3 +1,4 @@
+import { localeInterceptor } from './core/locale.interceptor';
 import { ApplicationConfig, provideBrowserGlobalErrorListeners, APP_INITIALIZER, inject } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
@@ -19,7 +20,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideAnimationsAsync(),
-    provideHttpClient(withXhr(), withInterceptors([authInterceptor(), errorInterceptor])),
+    provideHttpClient(withXhr(), withInterceptors([authInterceptor(), localeInterceptor, errorInterceptor])),
     MessageService,
     provideOptimus({
       theme: {

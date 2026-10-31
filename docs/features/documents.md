@@ -32,6 +32,7 @@ Files are uploaded to a **staging area** (unlinked pool) or directly to a sheet 
 - **ETag-based HTTP caching** on download.
 - **Linking & relinking** — a document in the unlinked pool can be assigned to a sheet or instrumentation at any time. Existing links can be edited (target sheet, target instrumentation, attachment type).
 - **Batch download** — select multiple documents for download as a ZIP archive or as a **merged PDF** (when all selected files are PDFs).
+- **Download names** — a downloaded file is named after the sheet, not the scanner: a part as `<title> – <instrument>` (`1000 Träume weit – Tenorhorn in B 1.pdf`, with `(<type>)` added for non-parts such as audio), a document of the sheet as `<title> – <type>` (`… – Partitur.pdf`). The same names apply to single downloads, share links and the files inside ZIPs; the type follows the app's language (sent as `Accept-Language`). Umlauts stay, characters file systems reject are replaced. A document not attached anywhere keeps its original file name. Built in `DownloadNames`.
 - **Unlinked pool** (`/uploads`) — staging area showing all documents not yet assigned, with classify and assign actions.
 
 ## Related

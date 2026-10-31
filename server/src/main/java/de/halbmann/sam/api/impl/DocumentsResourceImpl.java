@@ -9,13 +9,19 @@ import de.halbmann.sam.api.entity.eventlog.EventType;
 import de.halbmann.sam.api.entity.shared.PaginatedResponse;
 import de.halbmann.sam.api.entity.sheets.BatchDownloadRequest;
 import de.halbmann.sam.api.entity.sheets.DownloadFormat;
+import de.halbmann.sam.business.documents.boundary.AttachmentRepository;
 import de.halbmann.sam.business.documents.controller.AttachmentLinkService;
 import de.halbmann.sam.business.documents.controller.DocumentBundleService;
 import de.halbmann.sam.business.documents.controller.DocumentStore;
+import de.halbmann.sam.business.documents.controller.DownloadNames;
 import de.halbmann.sam.business.documents.controller.MergedPdfEntry;
 import de.halbmann.sam.business.documents.controller.StreamWriter;
 import de.halbmann.sam.business.documents.entity.AttachmentEntity;
 import de.halbmann.sam.business.eventlog.controller.EventLogService;
+import de.halbmann.sam.business.sheets.boundary.InstrumentationRepository;
+import de.halbmann.sam.business.sheets.boundary.SheetRepository;
+import de.halbmann.sam.business.sheets.entity.InstrumentationEntity;
+import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
 import de.halbmann.sam.classification.controller.DocumentClassificationService;
 import de.halbmann.sam.security.Roles;
 import io.quarkus.security.Authenticated;
@@ -24,6 +30,8 @@ import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
 import java.io.IOException;
@@ -55,6 +63,21 @@ public class DocumentsResourceImpl implements DocumentsResource {
 
     @Inject
     EventLogService eventLogService;
+
+    @Inject
+    DownloadNames downloadNames;
+
+    @Inject
+    AttachmentRepository attachmentRepository;
+
+    @Inject
+    SheetRepository sheetRepository;
+
+    @Inject
+    InstrumentationRepository instrumentationRepository;
+
+    @Context
+    HttpHeaders headers;
 
     @PathParam("instrumentationId")
     String instrumentationId;
@@ -103,10 +126,14 @@ public class DocumentsResourceImpl implements DocumentsResource {
 
         if (instrumentationId != null) {
             entries = documentBundleService.buildMergeEntriesForInstrumentation(instrumentationId, type);
-            zipName = "instrumentation-" + instrumentationId;
+            InstrumentationEntity instr = instrumentationRepository.findById(UUID.fromString(instrumentationId));
+            zipName = instr != null && instr.getSheet() != null
+                    ? downloadNames.forBundle(instr.getSheet(), instr, null, locale())
+                    : "instrumentation-" + instrumentationId;
         } else if (sheetId != null) {
             entries = documentBundleService.buildMergeEntriesForSheet(sheetId, type, includeInstrumentations);
-            zipName = "sheet-" + sheetId + (type != null ? "-" + type.name().toLowerCase(Locale.ROOT) : "");
+            SheetMusicEntity sheet = sheetRepository.findById(UUID.fromString(sheetId));
+            zipName = sheet != null ? downloadNames.forBundle(sheet, null, type, locale()) : "sheet-" + sheetId;
         } else {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
@@ -168,7 +195,7 @@ public class DocumentsResourceImpl implements DocumentsResource {
 
         List<AttachmentEntity> attachments =
                 entries.stream().map(MergedPdfEntry::attachment).toList();
-        StreamWriter zip = documentBundleService.buildZip(attachments, baseName);
+        StreamWriter zip = documentBundleService.buildZip(attachments, locale());
         String filename =
                 URLEncoder.encode(baseName + ".zip", StandardCharsets.UTF_8).replace("+", "%20");
         return Response.ok((StreamingOutput) zip::write)
@@ -197,6 +224,7 @@ public class DocumentsResourceImpl implements DocumentsResource {
         }
 
         String etagValue = "\"sha256:" + attachment.checksumSha256() + "\"";
+        String downloadName = downloadName(docIdentifier, attachment.filename());
 
         // If-None-Match handling
         if (etagMatches(ifNoneMatch, etagValue)) {
@@ -212,12 +240,14 @@ public class DocumentsResourceImpl implements DocumentsResource {
                     in.transferTo(output);
                 }
             };
-            final String encodedFilename = URLEncoder.encode(attachment.filename(), StandardCharsets.UTF_8);
+            final String encodedFilename = URLEncoder.encode(downloadName, StandardCharsets.UTF_8);
             return Response.ok(streamingOutput)
                     .type(attachment.mimeType())
                     .header("Content-Length", attachment.size())
                     .header("X-Checksum-SHA256", attachment.checksumSha256())
                     .header("Cache-Control", "private, max-age=3600")
+                    // The file name's type label follows the language: don't reuse it across languages
+                    .header("Vary", "Accept-Language")
                     .header(
                             "Content-Disposition",
                             "inline; filename*=utf-8''" + encodedFilename.replaceAll("\\+", "%20"))
@@ -329,5 +359,25 @@ public class DocumentsResourceImpl implements DocumentsResource {
                 || Arrays.stream(ifNoneMatch.split(","))
                         .map(String::trim)
                         .anyMatch(tag -> tag.equals(currentEtag) || tag.equals("W/" + currentEtag));
+    }
+
+    /** The language for download names: the app's language, sent as {@code Accept-Language}. */
+    private Locale locale() {
+        return DownloadNames.locale(headers != null ? headers.getAcceptableLanguages() : null);
+    }
+
+    /**
+     * The name a document is downloaded under: by its attachment's sheet and instrument; the stored
+     * file name for a document that isn't attached (the identifier is then a document ID).
+     */
+    private String downloadName(String identifier, String fallback) {
+        try {
+            return attachmentRepository
+                    .findByIdOptional(UUID.fromString(identifier))
+                    .map(a -> downloadNames.forAttachment(a, locale()))
+                    .orElse(fallback);
+        } catch (IllegalArgumentException notAnId) {
+            return fallback;
+        }
     }
 }
