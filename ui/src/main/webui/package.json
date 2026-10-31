@@ -40,7 +40,7 @@
   },
   "dependencies": {
     "@angular/animations": "^22.2.3",
-    "@angular/cdk": "^22.2.3",
+    "@angular/cdk": "^22.2.4",
     "@angular/common": "^22.2.3",
     "@angular/compiler": "^22.2.3",
     "@angular/core": "^22.2.3",
@@ -55,11 +55,11 @@
     "tslib": "^2.3.0"
   },
   "devDependencies": {
-    "@angular/build": "^22.2.3",
-    "@angular/cli": "^22.2.3",
+    "@angular/build": "^22.2.4",
+    "@angular/cli": "^22.2.4",
     "@angular/compiler-cli": "^22.2.3",
     "@vitest/coverage-v8": "^5.0.5",
-    "autoprefixer": "^10.6.1",
+    "autoprefixer": "^10.6.2",
     "jsdom": "^27.1.0",
     "tailwindcss": "^3.4.19",
     "typescript": "~6.0",
