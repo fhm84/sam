@@ -19,7 +19,8 @@ import org.eclipse.microprofile.health.Readiness;
 @ApplicationScoped
 public class StorageReadinessCheck implements HealthCheck {
 
-    static final String PROBE_PATH = ".health-probe";
+    /** Written and deleted on every check; the integrity check doesn't count it as an orphan. */
+    public static final String PROBE_PATH = ".health-probe";
 
     private final FileSystemWrapper filesystem;
 

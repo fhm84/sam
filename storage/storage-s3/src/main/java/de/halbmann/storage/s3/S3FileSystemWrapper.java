@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.Stream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
@@ -114,12 +115,6 @@ public class S3FileSystemWrapper implements FileSystemWrapper {
     }
 
     @Override
-    public Path resolve(String relativePath) {
-        // Pseudo-path (for logging/debugging only)
-        return Path.of("s3://" + bucket + "/" + key(relativePath));
-    }
-
-    @Override
     public void move(String sourceRelativePath, String targetRelativePath) throws IOException {
         String sourceKey = key(sourceRelativePath);
         String targetKey = key(targetRelativePath);
@@ -147,6 +142,24 @@ public class S3FileSystemWrapper implements FileSystemWrapper {
                     .build());
         } catch (S3Exception e) {
             throw new IOException("Failed to delete S3 object", e);
+        }
+    }
+
+    @Override
+    public Stream<String> list() throws IOException {
+        try {
+            return s3
+                    .listObjectsV2Paginator(ListObjectsV2Request.builder()
+                            .bucket(bucket)
+                            .prefix(basePrefix)
+                            .build())
+                    .contents()
+                    .stream()
+                    .map(S3Object::key)
+                    .filter(k -> !k.endsWith("/"))
+                    .map(k -> k.substring(basePrefix.length()));
+        } catch (S3Exception e) {
+            throw new IOException("Failed to list S3 objects", e);
         }
     }
 }

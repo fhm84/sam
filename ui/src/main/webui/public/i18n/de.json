@@ -1032,7 +1032,27 @@
     "requestFailed": "Anfrage fehlgeschlagen"
   },
   "configuration": {
-    "title": "Konfiguration"
+    "title": "Konfiguration",
+    "storage": {
+      "title": "Integrität des Speichers",
+      "description": "Liest jede gespeicherte Datei einmal, vergleicht sie mit der Prüfsumme in der Datenbank und listet Dateien, auf die kein Dokument verweist. Die Prüfung meldet nur und ändert nichts. Bei einem großen Archiv dauert sie eine Weile; am besten, wenn niemand hochlädt.",
+      "run": "Prüfung starten",
+      "running": "Alle gespeicherten Dateien werden gelesen …",
+      "failed": "Die Prüfung konnte nicht ausgeführt werden. Details stehen im Server-Log.",
+      "clean": "Keine Probleme gefunden",
+      "problems": "Probleme gefunden",
+      "documents": "Dokumente",
+      "files": "Dateien im Speicher",
+      "broken": "Beschädigte oder fehlende Dateien",
+      "orphaned": "Dateien ohne Dokument",
+      "orphanedHint": "Meist Reste eines fehlgeschlagenen Uploads. Sie können nach Prüfung auf dem Server gelöscht werden.",
+      "leftoverTemp": "Upload-Reste älterer Versionen",
+      "columns": {
+        "filename": "Datei",
+        "problem": "Problem",
+        "path": "Speicherpfad"
+      }
+    }
   },
   "eventLogs": {
     "title": "Ereignisprotokoll",

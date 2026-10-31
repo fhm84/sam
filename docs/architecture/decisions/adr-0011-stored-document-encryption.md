@@ -38,7 +38,8 @@ Alternatives considered:
 - **File format:** a short SAM magic header with a version byte, followed by the Tink
   ciphertext. The file's **storage path is used as associated data**, so encrypted files
   cannot be swapped between documents. As a result, a file's path must never change
-  after it has been written (see [document store hardening](../../plans/document-store-hardening.md)).
+  after it has been written (new files get a random path that never changes, see
+  [storage](../concepts/storage-and-deduplication.md#document-storage)).
 - **Key:** a Tink keyset file mounted as a Docker secret. It is **never** placed in the
   database, in `.env` or in the backup set, and it is backed up offline separately (for
   example in a password manager). The keyset may hold several keys: new files use the

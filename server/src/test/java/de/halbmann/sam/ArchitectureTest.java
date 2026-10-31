@@ -51,6 +51,21 @@ class ArchitectureTest {
             .because("transaction ownership belongs to the service layer, not repositories");
 
     /**
+     * Stored files are read and written through {@code FileSystemWrapper}'s streams only, so the
+     * code works the same on local disk, S3 and (later) an encrypting store. The local wrapper's
+     * {@code resolve} is for tests and the storage module itself.
+     */
+    @ArchTest
+    static final ArchRule noLocalFileAccessToStoredFiles = noClasses()
+            .that()
+            .resideInAPackage("de.halbmann.sam..")
+            .and()
+            .haveSimpleNameNotEndingWith("Test")
+            .should()
+            .callMethod("de.halbmann.storage.local.LocalFileSystemWrapper", "resolve", "java.lang.String")
+            .because("stored files must be accessed through the FileSystemWrapper streams, not local paths");
+
+    /**
      * Same constraint for the classification and enrichment sub-systems.
      */
     @ArchTest

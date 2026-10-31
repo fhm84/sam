@@ -732,6 +732,7 @@ yet decided on):
 | See own activity (My activity, `GET /api/me/event-logs`) | ✅ | ✅ | ✅ | ❌ |
 | Create/edit/delete ensembles, voices, voice options, members; compute coverage | ✅ | ✅ | ❌ | ❌ |
 | Link/unlink a `Member` to a login; search the login provider's users | ✅ | ❌ | ❌ | ❌ |
+| Run the storage integrity check (Configuration page) | ✅ | ❌ | ❌ | ❌ |
 | Create share tokens | ✅ | ✅ | ❌ | ❌ |
 | List/revoke **own** share tokens | ✅ | ✅ | ✅ | ❌ |
 | Mark/unmark **own** favourite sheets | ✅ | ✅ | ✅ | ❌ |

@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import de.halbmann.storage.api.FileSystemWrapper;
 import de.halbmann.storage.local.LocalFileSystemProvider;
+import de.halbmann.storage.local.LocalFileSystemWrapper;
 import de.halbmann.storage.spi.StorageLocation;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
@@ -31,14 +32,16 @@ class LocalStorageLocationTest {
 
         assertTrue(provider.supports(location));
         FileSystemWrapper fs = provider.create(location);
-        assertEquals(Path.of("target/uploads", "ab/file.pdf").toAbsolutePath().normalize(), fs.resolve("ab/file.pdf"));
+        assertEquals(
+                Path.of("target/uploads", "ab/file.pdf").toAbsolutePath().normalize(),
+                ((LocalFileSystemWrapper) fs).resolve("ab/file.pdf"));
     }
 
     @Test
     void absolutePath_isUsedAsIs() {
         FileSystemWrapper fs = provider.create(StorageLocation.parse(tempDir.toString()));
 
-        assertEquals(tempDir.resolve("x.txt"), fs.resolve("x.txt"));
+        assertEquals(tempDir.resolve("x.txt"), ((LocalFileSystemWrapper) fs).resolve("x.txt"));
     }
 
     @Test
@@ -46,7 +49,7 @@ class LocalStorageLocationTest {
         FileSystemWrapper fs =
                 provider.create(StorageLocation.parse(tempDir.toUri().toString()));
 
-        assertEquals(tempDir.resolve("x.txt"), fs.resolve("x.txt"));
+        assertEquals(tempDir.resolve("x.txt"), ((LocalFileSystemWrapper) fs).resolve("x.txt"));
     }
 
     @Test

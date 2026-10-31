@@ -3,6 +3,7 @@ package de.halbmann.sam.storage;
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.halbmann.storage.api.FileSystemWrapper;
+import de.halbmann.storage.local.LocalFileSystemWrapper;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import java.nio.file.Path;
@@ -24,7 +25,7 @@ class ConfiguredStoragePathTest {
         Path expectedBase = Path.of("target/uploads").toAbsolutePath().normalize();
 
         assertTrue(
-                filesystem.resolve("probe.txt").startsWith(expectedBase),
-                filesystem.resolve("probe.txt") + " is not under " + expectedBase);
+                ((LocalFileSystemWrapper) filesystem).resolve("probe.txt").startsWith(expectedBase),
+                ((LocalFileSystemWrapper) filesystem).resolve("probe.txt") + " is not under " + expectedBase);
     }
 }

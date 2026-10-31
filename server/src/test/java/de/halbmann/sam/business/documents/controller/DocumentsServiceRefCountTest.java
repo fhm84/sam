@@ -56,6 +56,9 @@ class DocumentsServiceRefCountTest {
     @Mock
     DocumentMapper documentMapper;
 
+    @Mock
+    StoredFileCleanup storedFiles;
+
     @InjectMocks
     DocumentStore documentStore;
 

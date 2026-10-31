@@ -1032,7 +1032,27 @@
     "requestFailed": "Request failed"
   },
   "configuration": {
-    "title": "Configuration"
+    "title": "Configuration",
+    "storage": {
+      "title": "Storage integrity",
+      "description": "Reads every stored file once, compares it with the checksum in the database, and lists files no document points to. It only reports and changes nothing. With a large archive it takes a while; run it when nobody is uploading.",
+      "run": "Run check",
+      "running": "Reading all stored files …",
+      "failed": "The check could not be run. See the server log.",
+      "clean": "No problems found",
+      "problems": "Problems found",
+      "documents": "documents",
+      "files": "files in storage",
+      "broken": "Damaged or missing files",
+      "orphaned": "Files without a document",
+      "orphanedHint": "Usually left over from an upload that failed. They can be deleted on the server after checking.",
+      "leftoverTemp": "Leftover upload files from older versions",
+      "columns": {
+        "filename": "File",
+        "problem": "Problem",
+        "path": "Storage path"
+      }
+    }
   },
   "eventLogs": {
     "title": "Event Logs",

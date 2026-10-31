@@ -1,6 +1,7 @@
 package de.halbmann.storage.local;
 
 import de.halbmann.storage.api.FileSystemWrapper;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -8,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.util.stream.Stream;
 
 public class LocalFileSystemWrapper implements FileSystemWrapper {
 
@@ -17,7 +19,10 @@ public class LocalFileSystemWrapper implements FileSystemWrapper {
         this.basePath = basePath;
     }
 
-    @Override
+    /**
+     * The local file behind a relative path, checked against path traversal. Not part of {@link
+     * FileSystemWrapper}: application code reads and writes through the streams only.
+     */
     public Path resolve(String relativePath) {
         Path resolved = basePath.resolve(relativePath).normalize();
         if (!resolved.startsWith(basePath)) {
@@ -58,5 +63,15 @@ public class LocalFileSystemWrapper implements FileSystemWrapper {
     @Override
     public void delete(String relativePath) throws IOException {
         Files.deleteIfExists(resolve(relativePath));
+    }
+
+    @Override
+    public Stream<String> list() throws IOException {
+        if (!Files.isDirectory(basePath)) {
+            return Stream.empty();
+        }
+        return Files.walk(basePath)
+                .filter(Files::isRegularFile)
+                .map(p -> basePath.relativize(p).toString().replace(File.separatorChar, '/'));
     }
 }

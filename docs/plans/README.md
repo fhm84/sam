@@ -29,7 +29,6 @@ Conventions:
 | Plan | Roadmap item | Issue | Blocked on |
 |---|---|---|---|
 | [Coverage snapshot invalidation](coverage-snapshot-invalidation.md) | Automatic coverage snapshot invalidation | [#137](https://github.com/fhm84/sam/issues/137) | Open question #5 ([#138](https://github.com/fhm84/sam/issues/138)) |
-| [Document store hardening](document-store-hardening.md) | Document store hardening | [#154](https://github.com/fhm84/sam/issues/154) | — |
 | [Storage encryption](storage-encryption.md), phase A only | Encryption of stored documents (backup encryption) | [#162](https://github.com/fhm84/sam/issues/162) | — |
 | [Pocket ID as default OIDC provider](pocket-id-provider.md) | Pocket ID as default OIDC provider | [#210](https://github.com/fhm84/sam/issues/210) | — |
 

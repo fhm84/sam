@@ -61,4 +61,8 @@ public interface SamResources {
     /** {@return the sub-resource with the calling user's own event-log entries} */
     @Path("me/event-logs")
     MyEventLogResource myEventLogs();
+
+    /** {@return the admin-only sub-resource for maintaining the document file store} */
+    @Path("admin/storage")
+    AdminStorageResource adminStorage();
 }
