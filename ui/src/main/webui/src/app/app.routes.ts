@@ -82,6 +82,11 @@ export const routes: Routes = [
         loadChildren: () => import('./features/my-data/my-data.routes').then((m) => m.MY_DATA_ROUTES),
       },
       {
+        path: 'user/my-activity',
+        loadChildren: () =>
+          import('./features/my-activity/my-activity.routes').then((m) => m.MY_ACTIVITY_ROUTES),
+      },
+      {
         path: 'user/preferences',
         loadChildren: () =>
           import('./features/user-preferences/user-preferences.routes').then(

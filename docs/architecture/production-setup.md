@@ -101,6 +101,12 @@ The member opens it, is signed in, and adds a passkey under *My account*. After 
 - Keycloak: open the admin console through the SSH tunnel (see above) as the bootstrap admin, switch to the `sam` realm, create your own user and assign the `admin` (and `music_librarian`) role. Then use that user, not the bootstrap account.
 - For the bulk import, configure the `cli` with the `sam-cli` secret from `.env` (see `migration/README.md`, "Authentication") and import the scanned archive from your own machine (see `cli/README.md`).
 
+### Privacy policy note
+
+SAM stores personal data, so the ensemble's privacy policy should say so before real members log in. A template to adapt (periods are the defaults; change them if you set `SAM_EVENT_LOG_RETENTION_MONTHS` or `SAM_MEMBERS_RETENTION_MONTHS`):
+
+> **Sheet music archive (SAM).** To give members access to sheet music, we store your name, your login (user ID and username at the login provider), and the contact details and ensemble seats the music librarian records. When you download or export sheet music, we log who did it, what, and when; we do not log IP addresses. These log entries are deleted after 12 months. Data of former members is deleted 12 months after they leave. You can see your member data under *My data* and your logged activity under *My activity*; for corrections or deletion, contact the music librarian.
+
 ## 5. Backups (a second machine pulls from the server)
 
 The backup machine **pulls**; the server never has credentials for it. A compromised server therefore cannot delete or encrypt the backup history, and no VPN or open port on the backup machine's network is needed (it only makes outbound SSH connections).

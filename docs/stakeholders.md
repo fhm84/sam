@@ -627,8 +627,9 @@ already filled in.
 3. Reviews matching entries — each shows timestamp, actor (`username`, or "via share
    link" with the token ID for unauthenticated access), event type, and target entity.
 
-**Note:** `GET /api/event-logs` is `admin` only, since it shows who downloaded what. Each
-user's own history is planned with [event log retention](plans/event-log-retention.md).
+**Note:** `GET /api/event-logs` is `admin` only, since it shows who downloaded what. Every
+user sees their own entries on *My activity* (`GET /api/me/event-logs`). Entries are deleted
+after the retention period (12 months by default; see [event log](features/event-log.md#retention)).
 
 ---
 
@@ -728,6 +729,7 @@ yet decided on):
 | Create/edit/delete collections & setlist items; use the AI setlist assistant (suggest items, draft text) | ✅ | ✅ | ❌ | ❌ |
 | Create/edit/delete/merge persons, members & instruments (deleting a member erases their personal data and its history) | ✅ | ✅ | ❌ | ❌ |
 | See own member data (My data, `GET /api/me/member`) | ✅ | ✅ | ✅ (if linked) | ❌ |
+| See own activity (My activity, `GET /api/me/event-logs`) | ✅ | ✅ | ✅ | ❌ |
 | Create/edit/delete ensembles, voices, voice options, members; compute coverage | ✅ | ✅ | ❌ | ❌ |
 | Link/unlink a `Member` to a login; search the login provider's users | ✅ | ❌ | ❌ | ❌ |
 | Create share tokens | ✅ | ✅ | ❌ | ❌ |

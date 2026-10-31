@@ -36,10 +36,17 @@ IP addresses are not stored ([ADR-0004](../architecture/decisions/adr-0004-no-ip
 
 ## Event log UI
 
-`/admin/event-logs` — read-only page with filtering by event type (multi-select), user ID, and entity type. `GET /api/event-logs` is `admin` only; a user's own history is planned with [event log retention](../plans/event-log-retention.md).
+`/admin/event-logs` — read-only page with filtering by event type (multi-select), user ID, and entity type. `GET /api/event-logs` is `admin` only.
+
+**My activity** (`/user/my-activity`, user menu next to My data) shows every user their own entries: `GET /api/me/event-logs` (paginated, newest first) returns only the entries whose `userId` is the caller's token subject, never share-link entries or other users' (GDPR Art. 15). A login without a subject gets an empty page, not the whole log.
+
+## Retention
+
+A nightly job (`EventLogRetention`, 03:15) deletes entries older than `sam.event-log.retention-months` (default 12, env var `SAM_EVENT_LOG_RETENTION_MONTHS`; `0` turns it off, a negative value stops the server at startup), share-link entries included, in one `DELETE`. The time is `sam.event-log.retention-cron` (`SAM_EVENT_LOG_RETENTION_CRON`). Entries of a member who leaves or is erased are anonymised first and then age out the same way.
 
 ## Related
 
 - [Shares & Public Access](shares.md) — share-link access logging
 - [Members](members.md#retention) — entries of a member who leaves or is erased are anonymised (user ID `erased`)
-- [Roadmap](../roadmap.md#6-operational--integration) — retention policy and richer UI still pending
+- [Production setup](../architecture/production-setup.md#privacy-policy-note) — what to put into the ensemble's privacy policy
+- [Roadmap](../roadmap.md#document-access-log--partial) — richer UI still pending

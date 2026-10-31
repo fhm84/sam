@@ -1,0 +1,19 @@
+<div class="flex flex-col gap-4">
+  <div>
+    <h1 class="font-[var(--sam-font-display)] text-2xl font-bold text-[var(--sam-text)] mt-0 mb-1">{{ 'myActivity.title' | translate }}</h1>
+    <p class="text-sm text-[var(--sam-text-muted)] m-0">{{ 'myActivity.subtitle' | translate }}</p>
+  </div>
+
+  <app-event-log-table
+    [entries]="entries()"
+    [totalCount]="totalCount()"
+    [loading]="loading()"
+    [rows]="rows"
+    [page]="page()"
+    [showUser]="false"
+    emptyKey="myActivity.empty"
+    (pageChange)="onPage($event)"
+  />
+
+  <p class="text-sm text-[var(--sam-text-muted)] m-0">{{ 'myActivity.retention' | translate }}</p>
+</div>

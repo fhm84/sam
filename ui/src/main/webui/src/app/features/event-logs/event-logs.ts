@@ -6,15 +6,13 @@ import {
   signal,
   DestroyRef,
 } from '@angular/core';
-import { DatePipe, JsonPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TableModule, TablePageEvent } from '@openng/optimus-ui/table';
-import { Tag } from '@openng/optimus-ui/tag';
 import { MultiSelect } from '@openng/optimus-ui/multiselect';
 import { InputText } from '@openng/optimus-ui/inputtext';
 import { Button } from '@openng/optimus-ui/button';
 import { Toolbar } from '@openng/optimus-ui/toolbar';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { EventLogTable } from '../../shared/components/event-log-table/event-log-table';
 import { EventLogsApiService } from '../../core/api';
 import { EventLogEntry, EventLogFilterRequest, EventType } from '../../model/datamodels';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -37,7 +35,7 @@ const ALL_EVENT_TYPES: EventType[] = [
 
 @Component({
   selector: 'app-event-logs',
-  imports: [TableModule, Tag, MultiSelect, InputText, Button, Toolbar, FormsModule, TranslatePipe, DatePipe, JsonPipe],
+  imports: [EventLogTable, MultiSelect, InputText, Button, Toolbar, FormsModule, TranslatePipe],
   templateUrl: './event-logs.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -61,8 +59,8 @@ export class EventLogs implements OnInit {
     this.loadData();
   }
 
-  protected onPage(event: TablePageEvent): void {
-    this.currentPage = Math.floor(event.first / event.rows);
+  protected onPage(page: number): void {
+    this.currentPage = page;
     this.loadData();
   }
 
@@ -98,35 +96,7 @@ export class EventLogs implements OnInit {
     });
   }
 
-  protected tagSeverity(eventType: EventType | undefined): 'info' | 'warn' | 'success' | 'secondary' {
-    switch (eventType) {
-      case 'DOCUMENT_DOWNLOAD':
-        return 'info';
-      case 'DOCUMENT_BATCH_DOWNLOAD':
-        return 'warn';
-      case 'SHEET_EXPORT':
-      case 'COLLECTION_EXPORT':
-        return 'secondary';
-      case 'COLLECTION_TOC_GENERATED':
-      case 'GEMA_SETLIST_GENERATED':
-        return 'warn';
-      case 'DOCUMENT_CLASSIFIED':
-      case 'DOCUMENT_CLASSIFICATION_APPLIED':
-      case 'SETLIST_AI_SUGGESTION_GENERATED':
-      case 'SETLIST_AI_TEXT_DRAFTED':
-        return 'success';
-      case 'SHARE_CREATED':
-      case 'SHARE_ACCESSED':
-        return 'info';
-      case 'SHARE_REVOKED':
-        return 'warn';
-      default:
-        return 'info';
-    }
-  }
-
   protected eventTypeLabel(eventType: EventType | undefined): string {
-    if (!eventType) return '';
-    return `eventLogs.eventTypes.${eventType}`;
+    return eventType ? `eventLogs.eventTypes.${eventType}` : '';
   }
 }

@@ -10,6 +10,7 @@
     "members": "Members",
     "persons": "People",
     "myData": "My data",
+    "myActivity": "My activity",
     "shares": "My Shares",
     "myParts": "My Parts",
     "profile": "Profile",
@@ -781,6 +782,12 @@
     },
     "noSeats": "No ensemble seats",
     "correction": "Something wrong? The music librarian can correct or delete your data."
+  },
+  "myActivity": {
+    "title": "My activity",
+    "subtitle": "What SAM recorded under your login, for example downloads, exports and shares.",
+    "empty": "Nothing recorded for your login.",
+    "retention": "Entries are deleted automatically after the retention period (12 months unless the administrator set another)."
   },
   "ensembles": {
     "title": "Ensembles",

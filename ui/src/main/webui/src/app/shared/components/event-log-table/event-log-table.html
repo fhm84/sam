@@ -1,0 +1,48 @@
+<p-table
+  [value]="entries()"
+  [first]="page() * rows()"
+  [rows]="rows()"
+  [totalRecords]="totalCount()"
+  [loading]="loading()"
+  [lazy]="true"
+  [paginator]="true"
+  (onPage)="onPage($event)"
+  styleClass="p-datatable-sm"
+>
+  <ng-template #header>
+    <tr>
+      <th>{{ 'eventLogs.columns.occurredAt' | translate }}</th>
+      <th>{{ 'eventLogs.columns.eventType' | translate }}</th>
+      <th>{{ 'eventLogs.columns.entityType' | translate }}</th>
+      <th>{{ 'eventLogs.columns.entityId' | translate }}</th>
+      @if (showUser()) {
+        <th>{{ 'eventLogs.columns.username' | translate }}</th>
+      }
+      <th>{{ 'eventLogs.columns.metadata' | translate }}</th>
+    </tr>
+  </ng-template>
+  <ng-template #body let-entry>
+    <tr>
+      <td>{{ entry.occurredAt | date: 'short' }}</td>
+      <td>
+        <p-tag
+          [value]="eventTypeLabel(entry.eventType) | translate"
+          [severity]="tagSeverity(entry.eventType)"
+        />
+      </td>
+      <td>{{ entry.entityType ?? '—' }}</td>
+      <td class="font-mono text-sm">{{ entry.entityId ?? '—' }}</td>
+      @if (showUser()) {
+        <td [title]="entry.shareTokenId ? ('eventLogs.viaShareLink' | translate) + ' ' + entry.shareTokenId : (entry.userId ?? '')">
+          {{ entry.shareTokenId ? ('eventLogs.viaShareLink' | translate) : (entry.username ?? entry.userId ?? '—') }}
+        </td>
+      }
+      <td class="text-sm text-[var(--sam-text-muted)]">{{ entry.metadata | json }}</td>
+    </tr>
+  </ng-template>
+  <ng-template #emptymessage>
+    <tr>
+      <td [attr.colspan]="showUser() ? 6 : 5" class="text-center py-6">{{ emptyKey() | translate }}</td>
+    </tr>
+  </ng-template>
+</p-table>

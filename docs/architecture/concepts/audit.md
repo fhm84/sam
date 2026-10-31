@@ -10,7 +10,9 @@ Read events (document downloads, exports, AI classification, share-link access) 
 
 Share-link access is logged with `shareTokenId` set and `userId`/`username` as `null`. IP addresses are deliberately not stored (see [ADR-0004](../decisions/adr-0004-no-ip-logging.md)).
 
+Entries are personal data: a nightly job deletes them after the retention period (12 months by default), and each user can read their own on *My activity* ([Event Log feature](../../features/event-log.md#retention)).
+
 ## Related
 
-- [Event Log feature](../../features/event-log.md) — recorded event types and the admin UI
+- [Event Log feature](../../features/event-log.md) — recorded event types, the admin UI, My activity and retention
 - [Data Model](../data-model.md) — `event_log` table fields

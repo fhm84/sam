@@ -35,6 +35,7 @@ export class AppTopbar {
     '/admin/configuration': ['nav.admin.title', 'nav.admin.configuration'],
     '/user/preferences': ['nav.userPreferences'],
     '/user/my-data': ['nav.myData'],
+    '/user/my-activity': ['nav.myActivity'],
   };
 
   protected readonly breadcrumbItems = computed<MenuItem[]>(() => {
@@ -71,6 +72,11 @@ export class AppTopbar {
         label: this.i18n.t('nav.myData'),
         icon: 'pi pi-id-card',
         command: () => this.router.navigate(['/user/my-data']),
+      },
+      {
+        label: this.i18n.t('nav.myActivity'),
+        icon: 'pi pi-history',
+        command: () => this.router.navigate(['/user/my-activity']),
       },
       {
         label: this.i18n.t('nav.userPreferences'),
