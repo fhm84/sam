@@ -6,6 +6,7 @@ import de.halbmann.sam.api.entity.ensembles.CoverageResult;
 import de.halbmann.sam.api.entity.shared.PaginatedResponse;
 import de.halbmann.sam.api.entity.shared.PaginationRequest;
 import de.halbmann.sam.api.entity.sheets.*;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -37,7 +38,7 @@ public interface SheetsResource {
      * @return the added sheet music
      */
     @POST
-    SheetMusic add(CreateSheetMusic sheetMusic);
+    SheetMusic add(@Valid CreateSheetMusic sheetMusic);
 
     /**
      * Loads a specific sheet music by its ID.

@@ -4,6 +4,7 @@ import de.halbmann.sam.api.entity.instruments.CreateInstrument;
 import de.halbmann.sam.api.entity.instruments.Instrument;
 import de.halbmann.sam.api.entity.instruments.InstrumentFilterRequest;
 import de.halbmann.sam.api.entity.shared.PaginatedResponse;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 
@@ -32,7 +33,7 @@ public interface InstrumentsResource {
      * @return the persisted instrument including its generated ID
      */
     @POST
-    Instrument add(CreateInstrument instrument);
+    Instrument add(@Valid CreateInstrument instrument);
 
     /**
      * Loads a single instrument by its ID.
