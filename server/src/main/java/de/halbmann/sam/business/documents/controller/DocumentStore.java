@@ -9,7 +9,6 @@ import de.halbmann.sam.core.entity.PaginatedEntities;
 import de.halbmann.sam.core.exception.ConflictException;
 import de.halbmann.sam.core.exception.EntityNotFoundException;
 import de.halbmann.sam.core.exception.StorageException;
-import de.halbmann.sam.core.storage.MimeTypeUtils;
 import de.halbmann.sam.core.storage.malware.VirusScanner;
 import de.halbmann.sam.core.storage.upload.UploadContext;
 import de.halbmann.sam.core.storage.upload.UploadPolicy;
@@ -23,7 +22,6 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Path;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -40,11 +38,17 @@ public class DocumentStore {
 
     private static final Tika TIKA = new Tika();
 
-    /** Storage-relative directory for in-flight uploads; files here never outlive {@link #upload}. */
+    /**
+     * Where uploads were staged before they were moved to a content-addressed path. Uploads no
+     * longer use it; the integrity check reports files left there by older versions.
+     */
     static final String TEMP_DIR = ".upload-tmp";
 
     @Inject
     FileSystemWrapper filesystem;
+
+    @Inject
+    StoredFileCleanup storedFiles;
 
     @Inject
     VirusScanner virusScanner;
@@ -135,13 +139,7 @@ public class DocumentStore {
             throw new ConflictException("Document is still linked to " + doc.getRefCount() + " attachment(s)");
         }
 
-        try {
-            filesystem.delete(doc.getPath());
-        } catch (IOException e) {
-            throw new StorageException("Failed to delete physical file", e);
-        }
-
-        documentRepository.delete(doc);
+        delete(doc);
     }
 
     void deleteIfUnlinked(DocumentEntity doc) {
@@ -149,85 +147,77 @@ public class DocumentStore {
             return;
         }
 
-        try {
-            filesystem.delete(doc.getPath());
-        } catch (IOException e) {
-            throw new StorageException("Failed to delete physical file", e);
-        }
+        delete(doc);
+    }
 
+    /** The row goes now, the file only once that has committed: a rollback keeps both. */
+    private void delete(DocumentEntity doc) {
         documentRepository.delete(doc);
+        storedFiles.deleteAfterCommit(doc.getPath());
     }
 
     DocumentEntity upload(String filename, InputStream uploadStream) throws IOException, NoSuchAlgorithmException {
         MessageDigest sha256Digest = MessageDigest.getInstance("SHA-256");
-        // Unique per upload: a name derived from the user's filename let concurrent or repeated
-        // uploads of e.g. "scan0001.pdf" share (and corrupt) the same temp file.
-        String tempKey = TEMP_DIR + "/" + UUID.randomUUID() + ".tmp";
-        boolean moved = false;
+        // Written straight to its final, random path: no temp file, no move, and the path never
+        // changes after the write (an encrypting store binds the ciphertext to it, ADR-0011)
+        String path = newStoragePath();
+        boolean kept = false;
 
         try {
             long fileSize;
             try (InputStream scanned = virusScanner.scan(uploadStream);
                     DigestInputStream digestIn = new DigestInputStream(scanned, sha256Digest);
-                    OutputStream rawOut = filesystem.openForWrite(tempKey);
+                    OutputStream rawOut = filesystem.openForWrite(path);
                     CountingOutputStream countingOut = new CountingOutputStream(rawOut)) {
                 digestIn.transferTo(countingOut);
                 fileSize = countingOut.getBytesWritten();
             }
 
-            // Read back through the wrapper (not resolve().toFile()) so this also works for S3
+            // Read back through the wrapper (not a local file) so this also works for S3
             String mimeType;
-            try (InputStream in = new BufferedInputStream(filesystem.openForRead(tempKey))) {
+            try (InputStream in = new BufferedInputStream(filesystem.openForRead(path))) {
                 mimeType = TIKA.detect(in, filename);
             }
 
-            UploadContext context = new UploadContext(uploadStream, filename, fileSize, Path.of(tempKey), mimeType);
-
+            UploadContext context = new UploadContext(filename, fileSize, mimeType);
             for (UploadPolicy policy : policies) {
                 policy.verify(context);
             }
 
             String sha256Hex = HexFormat.of().formatHex(sha256Digest.digest());
 
+            // Deduplication stays on the hash in the database; the new copy is dropped below
             Optional<DocumentEntity> existing = documentRepository.findBySha256(sha256Hex);
             if (existing.isPresent()) {
                 return existing.get();
             }
 
-            String extension = MimeTypeUtils.resolveExtension(mimeType, filename);
-
-            String finalPath = String.format(
-                    "%s/%s/%s/%s.%s",
-                    sha256Hex.substring(0, 2),
-                    sha256Hex.substring(2, 4),
-                    sha256Hex.substring(4, 6),
-                    sha256Hex,
-                    extension);
-
-            filesystem.move(tempKey, finalPath);
-            moved = true;
-
             DocumentEntity doc = new DocumentEntity();
             doc.setFilename(filename);
-            doc.setPath(finalPath);
+            doc.setPath(path);
             doc.setSize(fileSize);
             doc.setMimeType(mimeType);
             doc.setSha256(sha256Hex);
             doc.setRefCount(0);
             documentRepository.persist(doc);
+            kept = true;
+            // The row may still roll back with the rest of the request; then the file goes too
+            storedFiles.deleteOnRollback(path);
             return doc;
         } finally {
-            if (!moved) {
-                deleteTempQuietly(tempKey);
+            if (!kept) {
+                storedFiles.deleteQuietly(path);
             }
         }
     }
 
-    private void deleteTempQuietly(String tempKey) {
-        try {
-            filesystem.delete(tempKey);
-        } catch (IOException | RuntimeException e) {
-            log.warn("Failed to delete temporary upload file {}", tempKey, e);
-        }
+    /**
+     * A new random storage path, {@code <uuid[0:2]>/<uuid[2:4]>/<uuid>}: it says nothing about the
+     * content (unlike the hash paths of older rows, which stay as they are) and spreads files over
+     * directories.
+     */
+    static String newStoragePath() {
+        String id = UUID.randomUUID().toString();
+        return id.substring(0, 2) + "/" + id.substring(2, 4) + "/" + id;
     }
 }

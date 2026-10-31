@@ -26,7 +26,8 @@ Files are uploaded to a **staging area** (unlinked pool) or directly to a sheet 
 
 ## Document features
 
-- **Content-addressed storage** — files are identified by SHA-256 checksum. Uploading the same file twice increments a reference count instead of duplicating storage (see [Storage & Deduplication](../architecture/concepts/storage-and-deduplication.md)).
+- **Deduplicated storage** — each file is stored once under a random path; its SHA-256 checksum identifies it, so uploading the same file twice reuses the stored document instead of duplicating it (see [Storage & Deduplication](../architecture/concepts/storage-and-deduplication.md)).
+- **Integrity check** — admins can re-hash every stored file on the Configuration page and see damaged, missing and orphaned files (`POST /api/admin/storage/integrity-check`).
 - **Pluggable storage backend** — local filesystem or AWS S3.
 - **ETag-based HTTP caching** on download.
 - **Linking & relinking** — a document in the unlinked pool can be assigned to a sheet or instrumentation at any time. Existing links can be edited (target sheet, target instrumentation, attachment type).

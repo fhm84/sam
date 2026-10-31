@@ -89,6 +89,7 @@ class RoleEnforcementTest {
                 "GET /api/admin/users",
                 "GET /api/admin/users/directory",
                 "GET /api/admin/users/some-user",
+                "POST /api/admin/storage/integrity-check",
                 "PUT /api/members/" + ID + "/user/some-user",
                 "DELETE /api/members/" + ID + "/user");
     }

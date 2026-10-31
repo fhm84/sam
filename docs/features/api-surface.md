@@ -23,6 +23,7 @@ Business endpoints are under the `/api` base path. Ops/diagnostic endpoints
 | Ensemble members | `/api/ensembles/{id}/members` | Sub-resource |
 | Shares | `/api/shares` | Authenticated share management (create, list, revoke) |
 | Public share | `/api/public/shares/{token}` | Unauthenticated; token-validated (`/download`, `/toc`, `/download/{instrumentationId}`, `/sheet/{attachmentId}`) — see [Shares](shares.md) |
+| Admin storage | `/api/admin/storage/integrity-check` | `admin` only; `POST` re-hashes every stored file and reports damaged, missing, orphaned and leftover temp files (read-only) |
 | Admin users | `/api/admin/users` | `admin` only; user search for member–account linking through the OIDC provider (Pocket ID or Keycloak); `/directory` tells whether search is available (501 without a Pocket ID API key) |
 | Event log | `/api/event-logs` | Read-only; `admin` only |
 | My parts | `/api/me/parts` | Authenticated; paginated sheets for the calling user's instruments |
@@ -72,13 +73,14 @@ Endpoints not listed (writes) keep their `@RolesAllowed` as today.
 | `/me/event-logs` | own | own | done |
 | `/event-logs` | admin | admin | done |
 | `/admin/users` | admin | admin | |
+| `/admin/storage/integrity-check` | admin | admin | |
 | `/oidc-config.json`, `/public/shares/{token}/…` | public | public | |
 
 UI routes, enforced by `roleGuard` and the menu's `roles` (sheet create/edit forms count as librarian + admin):
 
 | Route | Who |
 |---|---|
-| `sheets`, `collections`, `my-parts`, `shares`, `members`, `persons`, `user/preferences` | any |
+| `sheets`, `collections`, `my-parts`, `shares`, `members`, `persons`, `user/preferences`, `user/my-data`, `user/my-activity` | any |
 | `uploads`, `admin/ensembles`, `admin/instruments` | librarian + admin |
 | `admin/configuration`, `admin/event-logs` | admin |
 

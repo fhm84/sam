@@ -1,5 +1,6 @@
 export { SheetsApiService } from './sheets-api.service';
 export { AdminUsersApiService } from './admin-users-api.service';
+export { AdminStorageApiService } from './admin-storage-api.service';
 export { InstrumentationsApiService } from './instrumentations-api.service';
 export { DocumentsApiService } from './documents-api.service';
 export { MembersApiService } from './members-api.service';

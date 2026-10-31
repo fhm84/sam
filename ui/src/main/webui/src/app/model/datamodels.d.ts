@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 4.2.1 on 2026-10-29 23:12:17.
+// Generated using typescript-generator version 4.2.1 on 2026-10-31 22:39:29.
 
 export interface SheetEnrichment {
     suggestedAdditionalNotes?: string;
@@ -8,6 +8,22 @@ export interface SheetEnrichment {
     suggestedStyle?: Style;
     suggestedTags?: string[];
     suggestedYearOfComposition?: number;
+}
+
+export interface StorageIntegrityReport {
+    checkedDocuments?: number;
+    leftoverTempFiles?: string[];
+    mismatches?: StorageIssue[];
+    missingFiles?: StorageIssue[];
+    orphanedFiles?: string[];
+    storedFiles?: number;
+}
+
+export interface StorageIssue {
+    detail?: string;
+    documentId?: string;
+    filename?: string;
+    path?: string;
 }
 
 export interface UserDirectoryInfo {

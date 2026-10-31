@@ -30,13 +30,9 @@ unprioritised backlog.
 1. [Automatic coverage snapshot invalidation](#automatic-coverage-snapshot-invalidation--planned)
    → [plan](plans/coverage-snapshot-invalidation.md) · [#137](https://github.com/fhm84/sam/issues/137)
    (needs open question #5: [#138](https://github.com/fhm84/sam/issues/138))
-2. [Document store hardening](#document-store-hardening--in-progress): the upload bugs
-   (same-name corruption, S3) are fixed; left are random storage paths, deleting files
-   only after commit, and an integrity check for files damaged before the fix
-   → [plan](plans/document-store-hardening.md) · [#154](https://github.com/fhm84/sam/issues/154)
-3. Encrypted backups (phase A of [encryption of stored documents](#encryption-of-stored-documents--planned))
+2. Encrypted backups (phase A of [encryption of stored documents](#encryption-of-stored-documents--planned))
    → [plan](plans/storage-encryption.md) · [#162](https://github.com/fhm84/sam/issues/162)
-4. [Pocket ID as default OIDC provider](#pocket-id-as-default-oidc-provider--in-progress):
+3. [Pocket ID as default OIDC provider](#pocket-id-as-default-oidc-provider--in-progress):
    lighter login stack with passkeys, Keycloak stays optional
    → [plan](plans/pocket-id-provider.md) · [#210](https://github.com/fhm84/sam/issues/210)
 
@@ -901,18 +897,17 @@ This is already noted as a known gap in the [coverage concept](architecture/conc
 
 ---
 
-### Document store hardening — `in progress`
+### Document store hardening — `done`
 
-Fix `DocumentStore.upload`: leftover temp files named after the uploaded file could
-silently corrupt later uploads with the same file name, and uploads to S3 failed because MIME
-detection read a local file (both fixed in d2d1646). Still open: storage paths no longer derived from the content
-hash, file deletion only after commit, and an integrity check that compares stored
-files with their recorded SHA-256. Prerequisite for
-[encryption of stored documents](#encryption-of-stored-documents--planned).
+**Done** (#154): leftover temp files named after the uploaded file could silently corrupt later
+uploads with the same name, and uploads to S3 failed (both fixed in d2d1646). New files now go
+straight to a random path that never changes, files are deleted only after the commit (and a
+rolled-back upload leaves none), code reaches files only through the storage streams, and an
+admin integrity check (Configuration page) re-hashes every file and lists damaged, missing and
+orphaned files. See [storage](architecture/concepts/storage-and-deduplication.md#document-storage).
+Prerequisite for [encryption of stored documents](#encryption-of-stored-documents--planned).
 
 **Stakeholders:** S1 (music librarian), S4 (Administrator)
-**Effort:** Small to medium
-→ [plan](plans/document-store-hardening.md)
 
 ---
 
@@ -927,7 +922,7 @@ protect against licence leaks by legitimate users; for that see
 
 **Stakeholders:** S4 (Administrator), S1 (music librarian)
 **Effort:** Medium
-**Depends on:** [Document store hardening](#document-store-hardening--in-progress)
+**Depends on:** [Document store hardening](#document-store-hardening--done) (done)
 → [plan](plans/storage-encryption.md) · [ADR-0011](architecture/decisions/adr-0011-stored-document-encryption.md)
 
 ---

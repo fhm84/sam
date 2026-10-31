@@ -100,6 +100,7 @@ The member opens it, is signed in, and adds a passkey under *My account*. After 
 - Pocket ID: put your admin account into `sam-admin` (and `sam-music-librarian`) and sign in to SAM with it.
 - Keycloak: open the admin console through the SSH tunnel (see above) as the bootstrap admin, switch to the `sam` realm, create your own user and assign the `admin` (and `music_librarian`) role. Then use that user, not the bootstrap account.
 - For the bulk import, configure the `cli` with the `sam-cli` secret from `.env` (see `migration/README.md`, "Authentication") and import the scanned archive from your own machine (see `cli/README.md`).
+- After the import, and once after updating an archive that already held files, run *Configuration → Storage integrity → Run check* as admin while nobody uploads. Damaged files (uploaded before the temp-file fix) need to be uploaded again; files without a document and old `.tmp` leftovers can be deleted on the server after a look ([storage](concepts/storage-and-deduplication.md#document-storage)).
 
 ### Privacy policy note
 
