@@ -157,8 +157,16 @@ public class AttachmentLinkService {
                 .toList();
     }
 
+    /**
+     * Deletes the attachments (when their sheet or instrumentation goes); their documents stay in the
+     * upload pool with one reference less.
+     */
     public void unlinkAttachments(Collection<AttachmentEntity> attachments) {
         for (AttachmentEntity attachment : attachments) {
+            // Out of the owners' collections first: deleting an attachment a sheet or instrumentation
+            // still holds fails at flush (TransientPropertyValueException, a 500 on delete)
+            instrumentationRepository.removeAttachment(attachment);
+            sheetRepository.removeAttachment(attachment);
             DocumentEntity document = attachment.getDocument();
             attachmentRepository.delete(attachment);
             if (document != null) {

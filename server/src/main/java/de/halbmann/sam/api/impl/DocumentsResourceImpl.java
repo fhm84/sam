@@ -238,9 +238,13 @@ public class DocumentsResourceImpl implements DocumentsResource {
                 .log(() -> "File-Upload ... filename: " + request.getFile().fileName());
 
         try (InputStream inputStream = Files.newInputStream(request.getFile().uploadedFile())) {
-            DocumentUpload upload = documentStore.save(request.getFile().fileName(), inputStream, request.getType());
+            boolean linked = sheetId != null || instrumentationId != null;
+            // With a target, linkDocument below creates the attachment; a typed save would add a
+            // second one that belongs nowhere and keeps the document's reference count above 0
+            DocumentUpload upload =
+                    documentStore.save(request.getFile().fileName(), inputStream, linked ? null : request.getType());
 
-            if (sheetId != null || instrumentationId != null) {
+            if (linked) {
                 DocumentLinkRequest documentLinkRequest = new DocumentLinkRequest();
                 if (sheetId != null) {
                     documentLinkRequest.setSheetId(UUID.fromString(sheetId));
