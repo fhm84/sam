@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Panel } from '@openng/optimus-ui/panel';
 import { Toolbar } from '@openng/optimus-ui/toolbar';
 import { ConfirmDialog } from '@openng/optimus-ui/confirmdialog';
-import { ConfirmationService } from '@openng/optimus-ui/api';
+import { ConfirmationService, PrimeTemplate } from '@openng/optimus-ui/api';
 import { Button } from '@openng/optimus-ui/button';
 import { Tooltip } from '@openng/optimus-ui/tooltip';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
@@ -15,7 +15,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-sheet-form-page',
-  imports: [SheetForm, Button, Tooltip, Panel, ConfirmDialog, TranslatePipe, Toolbar],
+  imports: [SheetForm, Button, Tooltip, Panel, PrimeTemplate, ConfirmDialog, TranslatePipe, Toolbar],
   providers: [ConfirmationService],
   templateUrl: './sheet-form-page.html',
   changeDetection: ChangeDetectionStrategy.Eager,

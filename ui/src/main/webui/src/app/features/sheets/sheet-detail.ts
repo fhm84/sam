@@ -1,6 +1,7 @@
 import { Component, computed, EventEmitter, HostBinding, inject, Input, OnChanges, Output, signal, ChangeDetectionStrategy } from '@angular/core';
 import { forkJoin } from 'rxjs';
 import { TableModule } from '@openng/optimus-ui/table';
+import { PrimeTemplate } from '@openng/optimus-ui/api';
 import { Dialog } from '@openng/optimus-ui/dialog';
 import { ConfirmDialog } from '@openng/optimus-ui/confirmdialog';
 import { ConfirmationService, MenuItem, MessageService } from '@openng/optimus-ui/api';
@@ -32,6 +33,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   selector: 'app-sheet-detail',
   imports: [
     TableModule,
+    PrimeTemplate,
     Dialog,
     ConfirmDialog,
     RowActions,
