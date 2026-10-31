@@ -561,6 +561,21 @@ body.blocked-scroll {
 
 .p-panel .p-panel-header {
   background: color-mix(in srgb, var(--p-primary-color) 4%, var(--sam-surface));
+  // On narrow screens the actions (pTemplate="icons") move below the title as one group,
+  // instead of wrapping the button label and pushing the toggler onto its own line.
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.p-panel .p-panel-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: auto;
+
+  .p-button-label {
+    white-space: nowrap;
+  }
 }
 
 .p-panel .p-panel-title {

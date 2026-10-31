@@ -54,9 +54,10 @@
 
         <!-- Documents -->
         <p-panel [header]="t.t('sheets.detail.documents')">
-          @if (isEdit) {
-            <input #fileInput type="file" hidden (change)="uploadFile($event)" />
-            <ng-template pTemplate="headeractions">
+          <!-- Outside @if: Panel collects its pTemplates once, so one inside @if never reaches the header -->
+          <input #fileInput type="file" hidden (change)="uploadFile($event)" />
+          <ng-template pTemplate="icons">
+            @if (isEdit) {
               <label class="inline-flex">
                 <p-button
                   icon="pi pi-upload"
@@ -66,7 +67,9 @@
                   (onClick)="fileInput.click()"
                 />
               </label>
-            </ng-template>
+            }
+          </ng-template>
+          @if (isEdit) {
             @if (documentsLoading()) {
               <div class="flex justify-center p-4 text-xl text-[var(--sam-text-muted)]">
                 <i class="pi pi-spinner pi-spin"></i>

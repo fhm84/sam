@@ -187,3 +187,9 @@ it at three different locations (top-level, under sheets, under instrumentations
 - **Routing:** Lazy-loaded via `loadComponent` in `app.routes.ts`
 - **Styles:** Component SCSS + global `styles.scss` for tokens and resets
 - **Types:** Always use generated types from `model/datamodels` — no `any`
+- **Panel header actions:** put buttons into `<ng-template pTemplate="icons">` (Optimus `Panel`
+  has no other header slot; an unknown type such as `headeractions` silently becomes the
+  content template and renders below the body). Import `PrimeTemplate` from
+  `@openng/optimus-ui/api` in the component, and keep the `ng-template` a direct child of
+  `p-panel` — Panel collects its templates once, so one inside `@if` never shows. Put the
+  `@if` inside the template instead.

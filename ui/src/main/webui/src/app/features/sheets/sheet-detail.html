@@ -228,7 +228,7 @@
             <!-- Documents -->
             <p-panel [header]="t.t('sheets.detail.documents')">
               <input #fileInput type="file" hidden (change)="uploadFile($event)" />
-              <ng-template pTemplate="headeractions">
+              <ng-template pTemplate="icons">
                 @if (auth.canWrite()) {
                   <label class="inline-flex">
                     <p-button
@@ -745,7 +745,7 @@
         <!-- Documents -->
         <p-panel [header]="t.t('sheets.detail.documents')">
           <input #fileInputFull type="file" hidden (change)="uploadFile($event)" />
-          <ng-template pTemplate="headeractions">
+          <ng-template pTemplate="icons">
             @if (auth.canWrite()) {
               <label class="inline-flex">
                 <p-button
@@ -830,7 +830,7 @@
 
       <!-- Instrumentations -->
       <p-panel [header]="t.t('sheets.instrumentations.title')" [toggleable]="true">
-        <ng-template pTemplate="headeractions">
+        <ng-template pTemplate="icons">
           @if (auth.canWrite()) {
             <p-button
               icon="pi pi-plus"
@@ -1045,7 +1045,7 @@
 
       <!-- Collections -->
       <p-panel [header]="t.t('sheets.collections.title')" [toggleable]="true" [collapsed]="true">
-        <ng-template pTemplate="headeractions">
+        <ng-template pTemplate="icons">
           @if (auth.canWrite()) {
             <p-button
               icon="pi pi-folder-plus"
@@ -1062,7 +1062,7 @@
       <!-- Coverage -->
       @if (coverage) {
         <p-panel [header]="'sheets.detail.tabs.coverage' | translate" [toggleable]="true">
-          <ng-template pTemplate="headeractions">
+          <ng-template pTemplate="icons">
             <span class="coverage-badge" [class]="coverage.status!.toLowerCase()">
               <i [class]="'pi ' + (coverage.status === 'COMPLETE' ? 'pi-check-circle' : coverage.status === 'PLAYABLE' ? 'pi-minus-circle' : 'pi-times-circle')"></i>
               {{ pct(coverage.coverageScore) }}
