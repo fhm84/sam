@@ -128,7 +128,7 @@ services:
     restart: unless-stopped
 
   keycloak-db:
-    image: postgres:17
+    image: postgres:18
     profiles: ["keycloak"]
     command: ["postgres", "-c", "shared_buffers=64MB", "-c", "max_connections=50"]
     mem_limit: 384m
@@ -137,7 +137,7 @@ services:
       POSTGRES_PASSWORD: ${KEYCLOAK_DB_PASS:-}
       POSTGRES_DB: keycloak
     volumes:
-      - keycloak-db-data:/var/lib/postgresql/data
+      - keycloak-db-data:/var/lib/postgresql # see the comment at the database service
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U keycloak -d keycloak"]
       interval: 10s
