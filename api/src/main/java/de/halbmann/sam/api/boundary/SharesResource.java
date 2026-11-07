@@ -12,7 +12,8 @@ import java.util.UUID;
  * REST interface for managing share links.
  *
  * <p>All endpoints require an authenticated OIDC token. The share list and revoke operations
- * are automatically scoped to the calling user — a user can only see and revoke their own shares.
+ * are scoped to the calling user — a user sees and revokes their own shares. Admins also see and
+ * revoke everyone's, so a leaked link, or one of someone who has left, can be shut down.
  *
  * <p>The public (unauthenticated) endpoints for accessing a share by token are defined in
  * {@link PublicShareResource}.
@@ -39,8 +40,17 @@ public interface SharesResource {
     PaginatedResponse<ShareResponse> list();
 
     /**
+     * Returns every share, of every creator, newest first, with {@code creatorName} filled in where
+     * the creator's login is linked to a member. Admins only.
+     */
+    @GET
+    @Path("all")
+    PaginatedResponse<ShareResponse> listAll();
+
+    /**
      * Revokes the share with the given ID.
-     * Returns 404 if the share does not exist or was not created by the calling user.
+     * Returns 404 if the share does not exist or was not created by the calling user; admins may
+     * revoke any share.
      *
      * @param id the share token UUID
      */

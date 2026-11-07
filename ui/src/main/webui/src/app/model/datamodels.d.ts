@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 4.2.1 on 2026-10-31 22:39:29.
+// Generated using typescript-generator version 4.2.1 on 2026-11-07 23:35:34.
 
 export interface SheetEnrichment {
     suggestedAdditionalNotes?: string;
@@ -494,6 +494,7 @@ export interface PublicShareInstrumentationItem {
 
 export interface ShareResponse {
     createdAt?: Date;
+    creatorName?: string;
     expiresAt?: Date;
     id?: string;
     resourceId?: string;

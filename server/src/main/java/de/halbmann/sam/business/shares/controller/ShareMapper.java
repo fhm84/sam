@@ -12,5 +12,6 @@ public interface ShareMapper {
 
     @Mapping(target = "revoked", expression = "java(entity.isRevoked())")
     @Mapping(target = "resourceLabel", ignore = true)
+    @Mapping(target = "creatorName", ignore = true)
     ShareResponse toDto(ShareEntity entity);
 }

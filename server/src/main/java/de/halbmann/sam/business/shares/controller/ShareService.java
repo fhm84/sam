@@ -8,6 +8,7 @@ import de.halbmann.sam.business.collections.entity.SheetCollectionEntity;
 import de.halbmann.sam.business.collections.entity.SheetCollectionItemEntity;
 import de.halbmann.sam.business.documents.controller.AttachmentLinkService;
 import de.halbmann.sam.business.eventlog.controller.EventLogService;
+import de.halbmann.sam.business.members.boundary.MemberRepository;
 import de.halbmann.sam.business.shared.event.ResourcesDeleted;
 import de.halbmann.sam.business.shares.boundary.ShareRepository;
 import de.halbmann.sam.business.shares.entity.ShareEntity;
@@ -26,6 +27,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -58,6 +60,9 @@ public class ShareService {
 
     @Inject
     EventLogService eventLogService;
+
+    @Inject
+    MemberRepository memberRepository;
 
     @Transactional
     public ShareResponse create(CreateShareRequest request, String creatorUserId) {
@@ -96,10 +101,14 @@ public class ShareService {
         }
     }
 
+    /**
+     * Revokes a share. Its creator may, and so may an admin ({@code anyShare}): a leaked link, or one
+     * of someone who has left, must not stay valid until its resource is deleted.
+     */
     @Transactional
-    public void revoke(UUID id, String requestingUserId) {
+    public void revoke(UUID id, String requestingUserId, boolean anyShare) {
         ShareEntity entity = shareRepository.findById(id);
-        if (entity == null || !entity.getCreatorUserId().equals(requestingUserId)) {
+        if (entity == null || !(anyShare || Objects.equals(entity.getCreatorUserId(), requestingUserId))) {
             throw new EntityNotFoundException("share", id);
         }
         entity.setRevokedAt(OffsetDateTime.now());
@@ -133,13 +142,38 @@ public class ShareService {
     }
 
     public PaginatedResponse<ShareResponse> listByCreator(String userId) {
-        List<ShareResponse> items = shareRepository.findByCreator(userId).stream()
+        return page(shareRepository.findByCreator(userId).stream()
                 .map(entity -> {
                     ShareResponse dto = shareMapper.toDto(entity);
                     dto.setResourceLabel(resolveResourceLabel(entity));
                     return dto;
                 })
-                .toList();
+                .toList());
+    }
+
+    /** Every share, with who created it (for admins). */
+    public PaginatedResponse<ShareResponse> listAll() {
+        return page(shareRepository.findAllNewestFirst().stream()
+                .map(entity -> {
+                    ShareResponse dto = shareMapper.toDto(entity);
+                    dto.setResourceLabel(resolveResourceLabel(entity));
+                    dto.setCreatorName(resolveCreatorName(entity.getCreatorUserId()));
+                    return dto;
+                })
+                .toList());
+    }
+
+    private String resolveCreatorName(String creatorUserId) {
+        if (creatorUserId == null) {
+            return null;
+        }
+        return memberRepository
+                .findByUserId(creatorUserId)
+                .map(member -> member.getPerson().getName())
+                .orElse(null);
+    }
+
+    private static PaginatedResponse<ShareResponse> page(List<ShareResponse> items) {
         PaginatedResponse<ShareResponse> response = new PaginatedResponse<>();
         response.setData(items);
         response.setPage(0);

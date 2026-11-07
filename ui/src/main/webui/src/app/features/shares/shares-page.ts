@@ -1,15 +1,18 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   inject,
   OnInit,
   signal,
   DestroyRef,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ConfirmationService, MenuItem, MessageService } from '@openng/optimus-ui/api';
 import { Button } from '@openng/optimus-ui/button';
 import { ConfirmDialog } from '@openng/optimus-ui/confirmdialog';
+import { SelectButton } from '@openng/optimus-ui/selectbutton';
 import { TableModule } from '@openng/optimus-ui/table';
 import { Tag } from '@openng/optimus-ui/tag';
 import { Tooltip } from '@openng/optimus-ui/tooltip';
@@ -18,11 +21,26 @@ import { TranslationService } from '../../core/translation.service';
 import { SharesApiService } from '../../core/api/shares-api.service';
 import { ShareResponse } from '../../model/datamodels';
 import { RowActions } from '../../shared/components/row-actions/row-actions';
+import { AuthService } from '../../core/auth/auth.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
+/** Whose links the page shows: the caller's own, or (admins) everyone's. */
+type ShareScope = 'mine' | 'all';
 
 @Component({
   selector: 'app-shares-page',
-  imports: [TableModule, Tag, Button, Tooltip, ConfirmDialog, RowActions, TranslatePipe, DatePipe],
+  imports: [
+    TableModule,
+    Tag,
+    Button,
+    Tooltip,
+    ConfirmDialog,
+    SelectButton,
+    FormsModule,
+    RowActions,
+    TranslatePipe,
+    DatePipe,
+  ],
   providers: [ConfirmationService],
   templateUrl: './shares-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -31,6 +49,7 @@ export class SharesPage implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly t = inject(TranslationService);
+  protected readonly auth = inject(AuthService);
   private readonly sharesApi = inject(SharesApiService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly messageService = inject(MessageService);
@@ -38,13 +57,26 @@ export class SharesPage implements OnInit {
   protected readonly shares = signal<ShareResponse[]>([]);
   protected readonly loading = signal(false);
 
+  protected readonly scope = signal<ShareScope>('mine');
+  protected readonly showingAll = computed(() => this.scope() === 'all');
+  protected readonly scopeOptions = computed(() => [
+    { label: this.t.t('shares.page.scope.mine'), value: 'mine' },
+    { label: this.t.t('shares.page.scope.all'), value: 'all' },
+  ]);
+
   ngOnInit(): void {
+    this.loadShares();
+  }
+
+  protected onScopeChange(scope: ShareScope): void {
+    this.scope.set(scope);
     this.loadShares();
   }
 
   private loadShares(): void {
     this.loading.set(true);
-    this.sharesApi.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    const request = this.showingAll() ? this.sharesApi.listAll() : this.sharesApi.list();
+    request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         this.shares.set(res.data ?? []);
         this.loading.set(false);
