@@ -45,7 +45,7 @@ services:
   # Pocket ID (default): passkey login, ~20 MB idle. Data (SQLite, uploaded logos) lives in
   # the pocket-id-data volume.
   pocket-id:
-    image: ghcr.io/pocket-id/pocket-id:v2.17.0
+    image: ghcr.io/pocket-id/pocket-id:v2.19.2
     profiles: ["pocket-id"]
     environment:
       APP_URL: https://${LOGIN_DOMAIN}

@@ -92,7 +92,7 @@ With Pocket ID the limits add up to about 2.8 GB (with Keycloak: about 4.2 GB), 
 - **By mail** (with `POCKET_ID_EMAIL_LOGIN_CODES=true`): the member gets a code and a sign-in link, valid for 15 minutes. Send it when they can act on it.
 - **As a link**: choose a validity, copy the link and send it by any channel (messenger, in person).
 
-The member opens it, is signed in, and adds a passkey under *My account*. After a lost or stolen phone, they also delete that phone's passkey there. Members can't request a code themselves ([#222](https://github.com/fhm84/sam/issues/222)): whoever controls a mailbox would otherwise control the account.
+The member opens it, is signed in, and is asked to set up a passkey (if they skip that, they can add one later under *My account*). After a lost or stolen phone, they also delete that phone's passkey there. Members can't request a code themselves ([#222](https://github.com/fhm84/sam/issues/222)): whoever controls a mailbox would otherwise control the account.
 
 ## 4. Go-live check
 
@@ -140,6 +140,8 @@ rsync -a --exclude='.tmp-*' -e "ssh -i ~/.ssh/sam_backup -o IdentitiesOnly=yes" 
 **Restore** — `scripts/backup/restore.sh <backup-dir> --yes` verifies the checksums, stops the app, replaces the databases in the backup, Pocket ID's data (`pocket-id import`, if the backup has it) and the files, and starts the stack again. On a fresh server, first do steps 2 and 3 (up to a running stack), copy a backup directory over from the backup machine, then run it. **Restore test:** do it once before go-live on a scratch machine, and again now and then.
 
 **Major PostgreSQL upgrade** — a new major version can't read the old data files, and the `postgres` image refuses to start on them, so the data moves through a backup. With the old version still running: run `scripts/backup/backup.sh` and keep the backup directory. Then `docker compose -f docker-compose.prod.yml down`, delete the database volume (`docker volume rm <project>_postgres-data`, with Keycloak also `<project>_keycloak-db-data`), update the checkout, pull the images and run `restore.sh` as above. Don't start the stack first: `restore.sh` starts the database and restores it before the app runs, whereas an app started on the empty database would run its migrations and leave tables behind that the backup doesn't know. Check the result before deleting the backup.
+
+**Pocket ID updates** can't be undone: an older version refuses a database that a newer one has migrated, and can't import a newer version's `pocket-id export` (seen going back from v2.19 to v2.17). Before updating, stop the container, copy the `pocket-id-data` volume, and keep the copy until a login has worked.
 
 A provider's snapshots are not a backup — they live in the same account.
 
