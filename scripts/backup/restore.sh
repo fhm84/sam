@@ -37,7 +37,8 @@ fi
 "${COMPOSE[@]}" up -d "${dbs[@]}"
 
 restore() { # <service> <dump file>
-  until "${COMPOSE[@]}" exec -T "$1" pg_isready -q; do sleep 1; done
+  # Over TCP: on a new volume, the image's temporary init server answers on the socket and then stops
+  until "${COMPOSE[@]}" exec -T "$1" pg_isready -q -h 127.0.0.1; do sleep 1; done
   "${COMPOSE[@]}" exec -T "$1" sh -c \
     'pg_restore -U "$POSTGRES_USER" -d "$POSTGRES_DB" --clean --if-exists --no-owner --exit-on-error' <"$2"
 }
