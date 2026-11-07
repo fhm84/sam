@@ -1,9 +1,13 @@
 @use "@openng/icons/openng-icons.css";
+// Served with the app, not from Google Fonts: no visitor's IP address goes to a third party.
+// The opsz files carry the weight and the optical-size axes, as the Google Fonts request did.
+@use "@fontsource-variable/dm-sans/opsz.css";
+@use "@fontsource-variable/dm-sans/opsz-italic.css";
 
 // ─── Design tokens ─────────────────────────────────────────
 :root {
-  --sam-font-display: "DM Sans", system-ui, sans-serif;
-  --sam-font-body: "DM Sans", system-ui, sans-serif;
+  --sam-font-display: "DM Sans Variable", system-ui, sans-serif;
+  --sam-font-body: "DM Sans Variable", system-ui, sans-serif;
 
   // Light palette
   --sam-bg: #f4f3f0;
