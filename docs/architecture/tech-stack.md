@@ -9,7 +9,7 @@ authoritative; the table below only pins the major lines.
 | Language | Java | 25 |
 | ORM | Hibernate ORM + Panache | (via Quarkus BOM) |
 | Audit | Hibernate Envers | (via Quarkus BOM) |
-| Database | PostgreSQL | 17 (pg_trgm, fuzzystrmatch) |
+| Database | PostgreSQL | 18 (pg_trgm, fuzzystrmatch) |
 | Migrations | Flyway | (via Quarkus BOM) |
 | REST | JAX-RS (RESTEasy) | (via Quarkus BOM) |
 | Serialization | JSON-B | (via Quarkus BOM) |

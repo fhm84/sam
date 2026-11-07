@@ -139,6 +139,8 @@ rsync -a --exclude='.tmp-*' -e "ssh -i ~/.ssh/sam_backup -o IdentitiesOnly=yes" 
 
 **Restore** — `scripts/backup/restore.sh <backup-dir> --yes` verifies the checksums, stops the app, replaces the databases in the backup, Pocket ID's data (`pocket-id import`, if the backup has it) and the files, and starts the stack again. On a fresh server, first do steps 2 and 3 (up to a running stack), copy a backup directory over from the backup machine, then run it. **Restore test:** do it once before go-live on a scratch machine, and again now and then.
 
+**Major PostgreSQL upgrade** — a new major version can't read the old data files, and the `postgres` image refuses to start on them, so the data moves through a backup. With the old version still running: run `scripts/backup/backup.sh` and keep the backup directory. Then `docker compose -f docker-compose.prod.yml down`, delete the database volume (`docker volume rm <project>_postgres-data`), update the checkout, pull the images, start the stack, and run `restore.sh` as above. Check the result before deleting the backup.
+
 A provider's snapshots are not a backup — they live in the same account.
 
 **Verified locally** (Docker Desktop, test databases and volume): backup, pruning to the newest N, wiping the data, and restoring database rows, files and Pocket ID users from the backup. The systemd timer and the backup run on a Debian 13 server. **Not verified:** the `rrsync`-restricted key and the pull task, which need a backup machine.

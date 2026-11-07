@@ -212,7 +212,7 @@ services:
     restart: unless-stopped
 
   database:
-    image: postgres:17
+    image: postgres:18
     command: ["postgres", "-c", "shared_buffers=128MB", "-c", "max_connections=50"]
     mem_limit: 768m
     environment:
@@ -220,7 +220,9 @@ services:
       POSTGRES_PASSWORD: ${DB_PASS:?DB_PASS is required}
       POSTGRES_DB: sam_music
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      # Since 18 the image keeps its data in /var/lib/postgresql/<major>/docker. A volume from an
+      # older major makes it refuse to start: see "Major PostgreSQL upgrade" in production-setup.md
+      - postgres-data:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-sam} -d sam_music"]
       interval: 10s
