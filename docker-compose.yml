@@ -1,7 +1,7 @@
 services:
 
   database:
-    image: postgres:17
+    image: postgres:18
     environment:
       POSTGRES_USER: sam
       POSTGRES_PASSWORD: s4mP@ssword

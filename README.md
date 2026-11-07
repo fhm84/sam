@@ -6,7 +6,7 @@
 [![Java](https://img.shields.io/badge/dynamic/xml?url=https://raw.githubusercontent.com/fhm84/sam/main/pom.xml&query=//%2A%5Blocal-name%28%29=%27maven.compiler.release%27%5D&label=Java&logo=openjdk&logoColor=white&color=ED8B00)](https://openjdk.org/projects/jdk/25/)
 [![Quarkus](https://img.shields.io/badge/dynamic/xml?url=https://raw.githubusercontent.com/fhm84/sam/main/pom.xml&query=//%2A%5Blocal-name%28%29=%27quarkus.platform.version%27%5D&label=Quarkus&logo=quarkus&logoColor=white&color=4695EB)](https://quarkus.io)
 [![Angular](https://img.shields.io/github/package-json/dependency-version/fhm84/sam/@angular/core?filename=ui/src/main/webui/package.json&label=Angular&logo=angular&logoColor=white&color=DD0031)](https://angular.dev)
-[![PostgreSQL 17](https://img.shields.io/badge/PostgreSQL-17-336791?logo=postgresql&logoColor=white)](https://www.postgresql.org)
+[![PostgreSQL 18](https://img.shields.io/badge/PostgreSQL-18-336791?logo=postgresql&logoColor=white)](https://www.postgresql.org)
 
 A Quarkus-based application for archiving sheet music, managing instrumentations, musicians, and collections for bands and ensembles.
 
@@ -41,7 +41,7 @@ docker compose run --rm pocket-id-seed login-link admin1
 ./mvnw spotless:apply
 ```
 
-**Prerequisites:** Java 25, Node.js (22.22.3+, 24.15+ or 26+ — Angular 22's requirement; CI and the Docker build use 26), Docker, PostgreSQL 17 (with `pg_trgm` and `fuzzystrmatch` extensions), default connection: `localhost:5432/sam_music`, user `sam` (`docker compose up -d` starts one). Keycloak instead of Pocket ID in dev: `docker compose -f docker-compose.keycloak.yml up -d` and `-Dsam.oidc.provider=keycloak`.
+**Prerequisites:** Java 25, Node.js (22.22.3+, 24.15+ or 26+ — Angular 22's requirement; CI and the Docker build use 26), Docker, PostgreSQL 18 (with `pg_trgm` and `fuzzystrmatch` extensions), default connection: `localhost:5432/sam_music`, user `sam` (`docker compose up -d` starts one). Keycloak instead of Pocket ID in dev: `docker compose -f docker-compose.keycloak.yml up -d` and `-Dsam.oidc.provider=keycloak`.
 
 ## Features
 
