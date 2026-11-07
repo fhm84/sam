@@ -168,6 +168,7 @@ it at three different locations (top-level, under sheets, under instrumentations
 - Custom design tokens via `--sam-*` CSS variables in `styles.scss`
 - Dark mode toggled by `ThemeService` (adds/removes `.dark` on `<html>`)
 - Persisted to `localStorage`, defaults to system preference
+- Fonts ship with the app (`@fontsource-variable/dm-sans`, `@openng/icons`, both `@use`d in `styles.scss`). Load nothing from third-party hosts at runtime: it would hand every visitor's IP address to them, the public share page included
 
 ## Internationalization (i18n)
 
