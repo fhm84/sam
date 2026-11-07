@@ -29,6 +29,18 @@ class OidcProviderConfigSourceFactoryTest {
         assertEquals("sam-music-librarian", config.getRawValue("sam.oidc.role-groups.music_librarian"));
     }
 
+    /**
+     * Roles come from cached userinfo. Quarkus drops expired entries only on the clean-up timer, so
+     * without it a removed role or a deleted user kept working for the token's whole lifetime.
+     */
+    @Test
+    void pocketIdRolesAreReadAgainWithinMinutes() {
+        SmallRyeConfig config = config("prod", Map.of(), Map.of());
+
+        assertEquals("1M", config.getRawValue("quarkus.oidc.token-cache.time-to-live"));
+        assertEquals("30S", config.getRawValue("quarkus.oidc.token-cache.clean-up-timer-interval"));
+    }
+
     @Test
     void pocketIdAcceptsOnlyTokensIssuedToTheUiClient() {
         assertEquals("sam-ui", config("prod", Map.of(), Map.of()).getRawValue("quarkus.oidc.token.audience"));

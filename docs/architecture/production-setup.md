@@ -94,6 +94,16 @@ With Pocket ID the limits add up to about 2.8 GB (with Keycloak: about 4.2 GB), 
 
 The member opens it, is signed in, and is asked to set up a passkey (if they skip that, they can add one later under *My account*). After a lost or stolen phone, they also delete that phone's passkey there. Members can't request a code themselves ([#222](https://github.com/fhm84/sam/issues/222)): whoever controls a mailbox would otherwise control the account.
 
+**Taking access away.** SAM checks a login's groups with Pocket ID at least every 1–1.5 minutes, so:
+
+| In Pocket ID | Effect in SAM |
+|---|---|
+| Remove a group (`sam-admin`, `sam-music-librarian`) | The role is gone within about 1.5 minutes |
+| **Delete the user** | No access within about 1.5 minutes |
+| Disable the user | Not enough on its own: an access token issued before still works until it expires, up to 60 minutes (Pocket ID keeps answering for disabled users) |
+
+Someone who leaves: delete their user, or remove them from all groups and disable them. If it can't wait 1.5 minutes (a stolen phone with an open session), also restart `sam-server`, which empties the cache. Setting a member to *former* in SAM ends their link to the login, not the login itself.
+
 ## 4. Go-live check
 
 - `https://<SAM_DOMAIN>` loads and redirects to the provider's login for sign-in.
