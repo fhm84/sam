@@ -8,11 +8,16 @@ import io.quarkus.qute.Template;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLConnection;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
+import org.xhtmlrenderer.pdf.ITextOutputDevice;
 import org.xhtmlrenderer.pdf.ITextRenderer;
+import org.xhtmlrenderer.pdf.ITextUserAgent;
 
 @ApplicationScoped
 public class CollectionTocService {
@@ -44,14 +49,44 @@ public class CollectionTocService {
                 .data("generatedAt", LocalDate.now())
                 .render();
 
+        try {
+            return render(html);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to generate collection TOC PDF", e);
+        }
+    }
+
+    /** Renders XHTML to PDF without loading anything from outside: the template brings all it needs. */
+    static byte[] render(final String html) throws IOException {
+        ITextOutputDevice device = new ITextOutputDevice(ITextRenderer.DEFAULT_DOTS_PER_POINT);
+        ITextRenderer renderer =
+                new ITextRenderer(device, new NoExternalResources(device, ITextRenderer.DEFAULT_DOTS_PER_PIXEL));
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            ITextRenderer renderer = new ITextRenderer();
             renderer.setDocumentFromString(html);
             renderer.layout();
             renderer.createPDF(out);
             return out.toByteArray();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to generate collection TOC PDF", e);
+        }
+    }
+
+    /**
+     * Refuses every URL (images, style sheets, fonts). Collection data ends up in the HTML, and the
+     * renderer would otherwise fetch whatever a crafted value points it at, from the server's network.
+     */
+    static final class NoExternalResources extends ITextUserAgent {
+
+        NoExternalResources(final ITextOutputDevice device, final int dotsPerPixel) {
+            super(device, dotsPerPixel);
+        }
+
+        @Override
+        protected InputStream openStream(final String uri) throws IOException {
+            throw new IOException("External resources are not loaded: " + uri);
+        }
+
+        @Override
+        protected URLConnection openConnection(final String uri) throws IOException {
+            throw new IOException("External resources are not loaded: " + uri);
         }
     }
 

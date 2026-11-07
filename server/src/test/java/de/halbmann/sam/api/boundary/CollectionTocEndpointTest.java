@@ -26,6 +26,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -170,6 +171,29 @@ class CollectionTocEndpointTest {
         assertContains(pdf, "Zwischentext 60 ");
         for (int page = 1; page <= pdf.pages(); page++) {
             assertContains(pdf, page + " / " + pdf.pages());
+        }
+        // In the heading once, and in the footer of every page
+        assertEquals(pdf.pages() + 1, pdf.text().split(Pattern.quote(collectionName), -1).length - 1);
+    }
+
+    /** A name that would break out of a CSS string stays plain text in the PDF. */
+    @Test
+    @TestSecurity(
+            user = LIBRARIAN,
+            roles = {"music_librarian"})
+    void toc_nameWithCssSyntax_isPrintedAsIs() throws IOException {
+        String name =
+                "x\"; } } body { background-image: url(\"http://127.0.0.1:9/x.png\"); } @page { content: \"y " + suffix;
+        SheetCollection collection = new SheetCollection();
+        collection.setName(name);
+        String id = collectionService.add(collection).getId().toString();
+        try {
+            Pdf pdf = parsePdf(given().get("/api/sheet-collections/{id}/toc", id));
+
+            // Heading and footer
+            assertEquals(2, pdf.text().split(Pattern.quote(name), -1).length - 1, () -> pdf.text());
+        } finally {
+            collectionService.delete(id);
         }
     }
 

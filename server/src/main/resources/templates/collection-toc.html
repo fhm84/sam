@@ -13,10 +13,15 @@
                 color: #888888;
             }
             @bottom-left {
-                content: "{collection.name}";
-                font-size: 9pt;
-                color: #888888;
+                content: element(footer);
             }
+        }
+
+        /* The name comes from the document, not a CSS string: data must never become CSS */
+        .footer {
+            position: running(footer);
+            font-size: 9pt;
+            color: #888888;
         }
 
         body {
@@ -154,6 +159,8 @@
     </style>
 </head>
 <body>
+
+<div class="footer">{collection.name}</div>
 
 <div class="header">
     <h1>{collection.name}</h1>
