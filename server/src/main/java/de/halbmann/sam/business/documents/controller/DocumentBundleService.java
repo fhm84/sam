@@ -11,28 +11,53 @@ import de.halbmann.sam.business.sheets.boundary.InstrumentationRepository;
 import de.halbmann.sam.business.sheets.boundary.SheetRepository;
 import de.halbmann.sam.business.sheets.entity.InstrumentationEntity;
 import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
+import de.halbmann.sam.core.exception.ConflictException;
 import de.halbmann.sam.core.exception.StorageException;
+import de.halbmann.sam.core.exception.ValidationException;
 import de.halbmann.storage.api.FileSystemWrapper;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InterruptedIOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.io.IOUtils;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageFitDestination;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
 
+@Slf4j
 @ApplicationScoped
 @Transactional
 public class DocumentBundleService {
+
+    /** Far more than any real selection (a set of parts is a few dozen files); keeps a request bounded. */
+    static final int MAX_BATCH_DOCUMENTS = 200;
+
+    /**
+     * Merged PDFs built at the same time. Each one copies its parts and the result through temp files;
+     * five large ones at once kept the CPU and disk so busy that the server stopped answering.
+     */
+    private static final Semaphore MERGE_SLOTS = new Semaphore(2, true);
+
+    /** How long a merge waits for a slot before the request is turned away. */
+    private static final Duration MERGE_WAIT = Duration.ofMinutes(2);
 
     @Inject
     FileSystemWrapper filesystem;
@@ -96,11 +121,16 @@ public class DocumentBundleService {
                 .toList();
     }
 
+    /** The attachments with the given IDs, each once. At most {@link #MAX_BATCH_DOCUMENTS}. */
     public List<MergedPdfEntry> buildMergeEntriesById(List<UUID> ids) {
         if (ids == null || ids.isEmpty()) {
             return List.of();
         }
-        return ids.stream()
+        List<UUID> distinctIds = ids.stream().distinct().toList();
+        if (distinctIds.size() > MAX_BATCH_DOCUMENTS) {
+            throw new ValidationException("A download can hold at most " + MAX_BATCH_DOCUMENTS + " documents");
+        }
+        return distinctIds.stream()
                 .map(id -> attachmentRepository.findByIdOptional(id).orElse(null))
                 .filter(Objects::nonNull)
                 .map(a -> new MergedPdfEntry(a, a.getDisplayName()))
@@ -203,6 +233,12 @@ public class DocumentBundleService {
      * @return a {@link StreamWriter} that writes the merged PDF, or {@code null} if no PDFs found
      */
     static StreamWriter doMerge(List<MergedPdfEntry> entries, Function<String, InputStream> pathReader) {
+        return doMerge(entries, pathReader, MERGE_SLOTS, MERGE_WAIT);
+    }
+
+    /** As {@link #doMerge(List, Function)}, waiting at most {@code wait} for one of {@code slots}. */
+    static StreamWriter doMerge(
+            List<MergedPdfEntry> entries, Function<String, InputStream> pathReader, Semaphore slots, Duration wait) {
         List<MergedPdfEntry> pdfEntries = entries.stream()
                 .filter(e -> e.attachment().getDocument() != null)
                 .filter(e ->
@@ -213,42 +249,80 @@ public class DocumentBundleService {
         }
 
         return outputStream -> {
-            PDFMergerUtility merger = new PDFMergerUtility();
-            List<PDDocument> sources = new ArrayList<>();
-            try (PDDocument target = new PDDocument()) {
-                PDDocumentOutline outline = new PDDocumentOutline();
-                target.getDocumentCatalog().setDocumentOutline(outline);
-
-                int pageOffset = 0;
-                for (MergedPdfEntry entry : pdfEntries) {
-                    try (InputStream in =
-                            pathReader.apply(entry.attachment().getDocument().getPath())) {
-                        PDDocument src = Loader.loadPDF(in.readAllBytes());
-                        sources.add(src);
-                        int srcPageCount = src.getNumberOfPages();
-                        merger.appendDocument(target, src);
-
-                        PDPageFitDestination dest = new PDPageFitDestination();
-                        dest.setPage(target.getPage(pageOffset));
-
-                        PDOutlineItem item = new PDOutlineItem();
-                        item.setTitle(entry.bookmarkLabel() != null ? entry.bookmarkLabel() : "");
-                        item.setDestination(dest);
-                        outline.addLast(item);
-
-                        pageOffset += srcPageCount;
-                    }
-                }
-                target.save(outputStream);
+            if (!acquire(slots, wait)) {
+                throw new ConflictException("Too many merged PDFs are being built right now; try again in a minute");
+            }
+            try {
+                writeMerged(pdfEntries, pathReader, outputStream);
             } finally {
-                for (PDDocument src : sources) {
-                    try {
-                        src.close();
-                    } catch (IOException ignored) {
-                    }
-                }
+                slots.release();
             }
         };
+    }
+
+    private static boolean acquire(Semaphore slots, Duration wait) throws InterruptedIOException {
+        try {
+            return slots.tryAcquire(wait.toMillis(), TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new InterruptedIOException("Interrupted while waiting to merge PDFs");
+        }
+    }
+
+    private static void writeMerged(
+            List<MergedPdfEntry> pdfEntries, Function<String, InputStream> pathReader, OutputStream outputStream)
+            throws IOException {
+        PDFMergerUtility merger = new PDFMergerUtility();
+        // On disk, not in the heap: a set of scanned parts easily adds up to more than the JVM has,
+        // and running out of memory stops the whole server (-XX:+ExitOnOutOfMemoryError)
+        try (PDDocument target = new PDDocument(IOUtils.createTempFileOnlyStreamCache())) {
+            PDDocumentOutline outline = new PDDocumentOutline();
+            target.getDocumentCatalog().setDocumentOutline(outline);
+
+            int pageOffset = 0;
+            for (MergedPdfEntry entry : pdfEntries) {
+                int srcPageCount = appendCopy(target, merger, pathReader, entry);
+
+                PDPageFitDestination dest = new PDPageFitDestination();
+                dest.setPage(target.getPage(pageOffset));
+
+                PDOutlineItem item = new PDOutlineItem();
+                item.setTitle(entry.bookmarkLabel() != null ? entry.bookmarkLabel() : "");
+                item.setDestination(dest);
+                outline.addLast(item);
+
+                pageOffset += srcPageCount;
+            }
+            target.save(outputStream);
+        }
+    }
+
+    /**
+     * Copies an entry's pages into {@code target} and returns how many there were. The source is closed
+     * right away: appending copies its content, and each open source keeps a read cache in the heap,
+     * which added up to hundreds of MB per merge.
+     */
+    private static int appendCopy(
+            PDDocument target, PDFMergerUtility merger, Function<String, InputStream> pathReader, MergedPdfEntry entry)
+            throws IOException {
+        Path copy = Files.createTempFile("sam-merge-", ".pdf");
+        try {
+            try (InputStream in =
+                    pathReader.apply(entry.attachment().getDocument().getPath())) {
+                Files.copy(in, copy, StandardCopyOption.REPLACE_EXISTING);
+            }
+            try (PDDocument src = Loader.loadPDF(copy.toFile(), IOUtils.createTempFileOnlyStreamCache())) {
+                int pages = src.getNumberOfPages();
+                merger.appendDocument(target, src);
+                return pages;
+            }
+        } finally {
+            try {
+                Files.deleteIfExists(copy);
+            } catch (IOException e) {
+                log.atWarn().setCause(e).log(() -> "Could not delete the temporary file " + copy);
+            }
+        }
     }
 
     private String instrumentLabel(InstrumentationEntity instr) {
