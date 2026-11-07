@@ -534,7 +534,7 @@ or collection
 1. Opens *Shares → New share*.
 2. Picks the resource type (`SHEET_INSTRUMENTATION` or `COLLECTION`) and the specific
    resource.
-3. Optionally sets an expiry date.
+3. Picks how long the link lasts: 30 days unless changed (7 days, 1 year or never).
 4. Saves. SAM generates a token and shows the public URL — *copy link* puts it on the
    clipboard for sharing via WhatsApp, email, etc.
 5. Can *revoke* the link at any time from the *Shares* list, immediately invalidating it.
@@ -542,7 +542,8 @@ or collection
 **Note:** a share link publishes the resource to anyone who has the URL, so creating one
 requires `music_librarian` or `admin` (changed 2026-10; previously any authenticated user
 could create links). The target must exist. Listing and revoking stay available to every
-authenticated user, scoped to the tokens they created. Every link is resource-scoped to
+authenticated user, scoped to the tokens they created; an admin sees and revokes everyone's
+(*Shares → All*), so a leaked link, or one of someone who has left, can be shut down. Every link is resource-scoped to
 exactly one instrumentation, sheet or collection, never the whole archive.
 
 ---
@@ -735,6 +736,7 @@ yet decided on):
 | Run the storage integrity check (Configuration page) | ✅ | ❌ | ❌ | ❌ |
 | Create share tokens | ✅ | ✅ | ❌ | ❌ |
 | List/revoke **own** share tokens | ✅ | ✅ | ✅ | ❌ |
+| List/revoke **everyone's** share tokens | ✅ | ❌ | ❌ | ❌ |
 | Mark/unmark **own** favourite sheets | ✅ | ✅ | ✅ | ❌ |
 | See members' contact details, linked login, last invite, onboarding state (also embedded in ensemble seats; sheets' composers are persons without personal data) | ✅ | ✅ | ❌ | ❌ |
 | Browse the upload inbox (`/documents/unlinked`); generate the GEMA setlist | ✅ | ✅ | ❌ | ❌ |

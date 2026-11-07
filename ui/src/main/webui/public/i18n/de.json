@@ -1325,9 +1325,16 @@
       }
     },
     "page": {
+      "scope": {
+        "mine": "Meine",
+        "all": "Alle"
+      },
+      "titleAll": "Alle Freigaben",
+      "subtitleAll": "Links aller Mitglieder. Als Admin kannst du jeden widerrufen, etwa wenn er weitergegeben wurde oder jemand gegangen ist.",
       "title": "Meine Freigaben",
       "subtitle": "Geteilte Links zu Noten, Stimmen und Sammlungen.",
       "col": {
+        "creator": "Erstellt von",
         "type": "Typ",
         "resource": "Ressource",
         "created": "Erstellt",

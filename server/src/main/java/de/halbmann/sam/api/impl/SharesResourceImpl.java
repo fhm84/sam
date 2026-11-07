@@ -19,7 +19,8 @@ import java.util.UUID;
  * Authenticated implementation of {@link SharesResource}.
  * All operations are automatically scoped to the calling user via {@link CurrentUserService}.
  * Creating a share publishes the resource to anyone holding the link, so it requires a write role;
- * listing and revoking stay open because they only ever touch the caller's own shares.
+ * listing and revoking stay open because they only ever touch the caller's own shares. Admins list
+ * and revoke everyone's.
  */
 @Authenticated
 @RequestScoped
@@ -50,7 +51,13 @@ public class SharesResourceImpl implements SharesResource {
     }
 
     @Override
+    @RolesAllowed(Roles.ADMIN)
+    public PaginatedResponse<ShareResponse> listAll() {
+        return shareService.listAll();
+    }
+
+    @Override
     public void revoke(UUID id) {
-        shareService.revoke(id, currentUserService.getUserId());
+        shareService.revoke(id, currentUserService.getUserId(), currentUserService.hasRole(Roles.ADMIN));
     }
 }

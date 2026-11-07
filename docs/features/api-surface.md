@@ -68,6 +68,7 @@ Endpoints not listed (writes) keep their `@RolesAllowed` as today.
 | `/sheet-collections`, `/{id}`, `/{id}/items`, `/{id}/toc`, `/{id}/export` | any | any, filtered by `visibility`: `WHOLE_ENSEMBLE` any, `ADMINS_ONLY` librarian + admin, `PRIVATE` creator + admin (+ librarians if no creator is recorded); a hidden one answers 404, also to writes; also filters a sheet's `/collections` | done |
 | `/sheet-collections/{id}/gema-setlist` (GEMA report) | librarian + admin | librarian + admin | done |
 | `/shares` | own shares | own shares | |
+| `/shares/all`; `DELETE /shares/{id}` of someone else's link | admin | admin | done |
 | `/me/parts` | own | own | |
 | `/me/member` | own | own | |
 | `/me/event-logs` | own | own | done |

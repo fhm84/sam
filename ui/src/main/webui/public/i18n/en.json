@@ -1325,9 +1325,16 @@
       }
     },
     "page": {
+      "scope": {
+        "mine": "Mine",
+        "all": "All"
+      },
+      "titleAll": "All Shares",
+      "subtitleAll": "Links of all members. As an admin you can revoke any of them, for example when one was passed on or someone has left.",
       "title": "My Shares",
       "subtitle": "Shared links to sheets, parts, and collections.",
       "col": {
+        "creator": "Created by",
         "type": "Type",
         "resource": "Resource",
         "created": "Created",

@@ -17,6 +17,11 @@ public class ShareRepository implements PanacheRepositoryBase<ShareEntity, UUID>
         return find("creatorUserId = ?1 order by createdAt desc", userId).list();
     }
 
+    /** Every share, newest first. */
+    public List<ShareEntity> findAllNewestFirst() {
+        return find("order by createdAt desc").list();
+    }
+
     /** Not-yet-revoked shares pointing at any of the given resources. */
     public List<ShareEntity> findUnrevokedByResourceIds(Collection<UUID> resourceIds) {
         return list("resourceId in ?1 and revokedAt is null", resourceIds);

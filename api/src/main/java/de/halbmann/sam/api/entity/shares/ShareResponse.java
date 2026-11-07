@@ -8,7 +8,7 @@ import lombok.Data;
  * Represents a share link as returned to the authenticated creator.
  *
  * <p>The {@code id} field doubles as the public share token: the shareable URL is
- * {@code /share/{id}}. Only the creator can list or revoke their own shares.
+ * {@code /share/{id}}. The creator lists and revokes their own shares; admins all of them.
  */
 @Data
 public class ShareResponse {
@@ -33,6 +33,12 @@ public class ShareResponse {
 
     private OffsetDateTime createdAt;
 
-    /** {@code true} once the share has been explicitly revoked by its creator. */
+    /** {@code true} once the share has been explicitly revoked (by its creator or an admin). */
     private boolean revoked;
+
+    /**
+     * Who created the link: the name of the member their login is linked to. Only in the admins'
+     * list of all shares, and {@code null} when the login isn't linked (e.g. the {@code cli}).
+     */
+    private String creatorName;
 }

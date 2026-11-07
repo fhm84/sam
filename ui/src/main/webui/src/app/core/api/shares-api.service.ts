@@ -23,6 +23,11 @@ export class SharesApiService {
     return this.http.get<PaginatedResponse<ShareResponse>>(this.baseUrl);
   }
 
+  /** Every member's share links, with who created them (admins only). */
+  listAll(): Observable<PaginatedResponse<ShareResponse>> {
+    return this.http.get<PaginatedResponse<ShareResponse>>(`${this.baseUrl}/all`);
+  }
+
   revoke(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }

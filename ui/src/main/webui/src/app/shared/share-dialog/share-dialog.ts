@@ -24,11 +24,14 @@ interface ExpiryOption {
 }
 
 const EXPIRY_OPTIONS: ExpiryOption[] = [
-  { labelKey: 'shares.dialog.expiry.never', days: null },
   { labelKey: 'shares.dialog.expiry.7days', days: 7 },
   { labelKey: 'shares.dialog.expiry.30days', days: 30 },
   { labelKey: 'shares.dialog.expiry.1year', days: 365 },
+  { labelKey: 'shares.dialog.expiry.never', days: null },
 ];
+
+/** A link anyone may pass on should end by itself; "never" stays a deliberate choice. */
+const DEFAULT_EXPIRY = EXPIRY_OPTIONS[1];
 
 @Component({
   selector: 'app-share-dialog',
@@ -53,7 +56,7 @@ export class ShareDialogComponent {
   protected readonly copied = signal(false);
 
   protected readonly expiryOptions = EXPIRY_OPTIONS;
-  protected selectedExpiry: ExpiryOption = EXPIRY_OPTIONS[0];
+  protected selectedExpiry: ExpiryOption = DEFAULT_EXPIRY;
 
   protected get expiryOptionLabels(): Array<{ label: string; value: ExpiryOption }> {
     return this.expiryOptions.map((o) => ({ label: this.t.t(o.labelKey), value: o }));
@@ -64,7 +67,7 @@ export class ShareDialogComponent {
       this.phase.set('setup');
       this.share.set(null);
       this.copied.set(false);
-      this.selectedExpiry = EXPIRY_OPTIONS[0];
+      this.selectedExpiry = DEFAULT_EXPIRY;
     }
     this.visibleChange.emit(visible);
   }
