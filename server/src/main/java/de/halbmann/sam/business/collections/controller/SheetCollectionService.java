@@ -274,9 +274,8 @@ public class SheetCollectionService {
             throw new ValidationException("The new order must list every item of the collection exactly once ("
                     + currentItems.size() + " items, got " + orderedIds.size() + " IDs)");
         }
-        // Update items_order directly via native SQL to avoid Envers inserting both a DEL
-        // and an ADD record for the same (rev, collection_id, item_id) within one transaction,
-        // which would violate the audit table PK.
+        // Update items_order directly via native SQL. This bypasses Envers: the audit history doesn't
+        // record a reorder.
         // Two-pass approach: first shift all rows to a high temporary offset so the final
         // 0..N values don't collide with existing ones while rows are being updated one by one
         // (the join table has a PK on (sheet_collections_id, items_order) that enforces
