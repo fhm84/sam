@@ -28,7 +28,6 @@ Conventions:
 
 | Plan | Roadmap item | Issue | Blocked on |
 |---|---|---|---|
-| [Coverage snapshot invalidation](coverage-snapshot-invalidation.md) | Automatic coverage snapshot invalidation | [#137](https://github.com/fhm84/sam/issues/137) | Open question #5 ([#138](https://github.com/fhm84/sam/issues/138)) |
 | [Storage encryption](storage-encryption.md), phase A only | Encryption of stored documents (backup encryption) | [#162](https://github.com/fhm84/sam/issues/162) | — |
 | [Pocket ID as default OIDC provider](pocket-id-provider.md) | Pocket ID as default OIDC provider | [#210](https://github.com/fhm84/sam/issues/210) | — |
 
@@ -38,6 +37,7 @@ Conventions:
 |---|---|---|
 | [Classification form enhancements](classification-enhancements.md) | Classification form enhancements | [#172](https://github.com/fhm84/sam/issues/172) |
 | [Sheets overview filters & bulk actions](sheets-overview.md) | Sheets overview filter & bulk actions | [#182](https://github.com/fhm84/sam/issues/182) |
+| [Coverage snapshot invalidation](coverage-snapshot-invalidation.md) | Automatic coverage snapshot invalidation | [#137](https://github.com/fhm84/sam/issues/137) |
 | [Home dashboard](home-dashboard.md) | Home dashboard | [#193](https://github.com/fhm84/sam/issues/193) |
 | [Coverage breakdown enhancements](coverage-breakdown.md) | Coverage breakdown enhancements | [#166](https://github.com/fhm84/sam/issues/166) |
 
