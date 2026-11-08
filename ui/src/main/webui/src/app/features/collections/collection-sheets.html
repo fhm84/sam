@@ -107,15 +107,15 @@
               <span class="block text-[0.75rem] text-[var(--sam-text-muted)]">{{ item.identifier }}</span>
             }
             @if (item.attachment) {
-              <a
-                class="inline-flex items-center gap-1 mt-1 text-[0.75rem] text-[var(--p-primary-color)] no-underline hover:underline"
-                [href]="'/api/documents/' + item.attachment.id"
-                target="_blank"
+              <button
+                type="button"
+                class="inline-flex items-center gap-1 mt-1 p-0 border-0 bg-transparent cursor-pointer font-[inherit] text-[0.75rem] text-[var(--p-primary-color)] hover:underline"
                 [attr.data-testid]="'attachment-link-' + item.id"
+                (click)="downloadAttachment(item)"
               >
                 <i class="pi pi-paperclip text-[0.7rem]"></i>
                 {{ item.attachment.displayName }}
-              </a>
+              </button>
             }
           }
         </td>

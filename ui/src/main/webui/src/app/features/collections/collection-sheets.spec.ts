@@ -2,12 +2,13 @@ import { TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
+import { HttpHeaders, HttpResponse } from '@angular/common/http';
 import { of } from 'rxjs';
 
 import { ConfirmationService, MessageService } from '@openng/optimus-ui/api';
 
 import { CollectionSheets } from './collection-sheets';
-import { CollectionsApiService, SheetsApiService } from '../../core/api';
+import { CollectionsApiService, DocumentsApiService, SheetsApiService } from '../../core/api';
 import { TranslationService } from '../../core/translation.service';
 import { CollectionItem, SheetMusicSearchResult } from '../../model/datamodels';
 import { provideAuthStub } from '../../core/auth/auth.testing';
@@ -33,6 +34,7 @@ describe('CollectionSheets', () => {
     removeItem: ReturnType<typeof vi.fn>;
   };
   let sheetsApi: { find: ReturnType<typeof vi.fn>; load: ReturnType<typeof vi.fn> };
+  let documentsApi: { download: ReturnType<typeof vi.fn>; forTopLevel: () => string };
   let confirmationService: ConfirmationService;
 
   beforeEach(async () => {
@@ -45,6 +47,17 @@ describe('CollectionSheets', () => {
     sheetsApi = {
       find: vi.fn().mockReturnValue(paginatedOf([])),
       load: vi.fn().mockReturnValue(of({ id: 's1', title: 'T', instrumentations: [] })),
+    };
+    documentsApi = {
+      download: vi.fn().mockReturnValue(
+        of(
+          new HttpResponse({
+            body: new Blob(['note']),
+            headers: new HttpHeaders({ 'Content-Disposition': "inline; filename*=utf-8''Programm.pdf" }),
+          }),
+        ),
+      ),
+      forTopLevel: () => '/api/documents',
     };
 
     await TestBed.overrideComponent(CollectionSheets, {
@@ -63,6 +76,7 @@ describe('CollectionSheets', () => {
           MessageService,
           { provide: CollectionsApiService, useValue: collectionsApi },
           { provide: SheetsApiService, useValue: sheetsApi },
+          { provide: DocumentsApiService, useValue: documentsApi },
           {
             provide: TranslationService,
             useValue: { t: (k: string) => k, version: { subscribe: () => {} } },
@@ -281,6 +295,36 @@ describe('CollectionSheets', () => {
       expect.any(Object),
       expect.any(Boolean),
     );
+  });
+
+  describe('the attachment of a TEXT item', () => {
+    let anchor: HTMLAnchorElement;
+
+    beforeEach(() => {
+      anchor = document.createElement('a');
+      vi.spyOn(anchor, 'click').mockImplementation(() => {});
+      vi.spyOn(document, 'createElement').mockReturnValue(anchor);
+      URL.createObjectURL = vi.fn().mockReturnValue('blob:x');
+      URL.revokeObjectURL = vi.fn();
+    });
+
+    afterEach(() => vi.restoreAllMocks());
+
+    it('is downloaded through the API, which sends the login token', () => {
+      const item: CollectionItem = {
+        id: 'i1',
+        identifier: 'T1',
+        type: 'TEXT',
+        textContent: 'Welcome',
+        attachment: { id: 'att-1', displayName: 'Programm' } as any,
+      };
+
+      (component as any).downloadAttachment(item);
+
+      expect(documentsApi.download).toHaveBeenCalledWith('/api/documents', 'att-1');
+      expect(anchor.download).toBe('Programm.pdf');
+      expect(anchor.click).toHaveBeenCalled();
+    });
   });
 
   describe('long TEXT items', () => {

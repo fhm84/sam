@@ -18,7 +18,8 @@ import { Checkbox } from '@openng/optimus-ui/checkbox';
 import { Tag } from '@openng/optimus-ui/tag';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../core/translation.service';
-import { CollectionsApiService, SheetsApiService } from '../../core/api';
+import { CollectionsApiService, DocumentsApiService, SheetsApiService } from '../../core/api';
+import { saveDownload } from '../../shared/utils/download.utils';
 import {
   CollectionItem,
   CollectionItemType,
@@ -63,6 +64,7 @@ export class CollectionSheets implements OnInit, OnChanges {
   protected readonly auth = inject(AuthService);
   private readonly collectionsApi = inject(CollectionsApiService);
   private readonly sheetsApi = inject(SheetsApiService);
+  private readonly documentsApi = inject(DocumentsApiService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly messageService = inject(MessageService);
   private readonly destroyRef = inject(DestroyRef);
@@ -90,6 +92,18 @@ export class CollectionSheets implements OnInit, OnChanges {
       }
       return next;
     });
+  }
+
+  /** Through the API with the login token: a plain link to the file can't send it and gets a 401. */
+  protected downloadAttachment(item: CollectionItem): void {
+    const attachment = item.attachment;
+    if (!attachment?.id) return;
+    this.documentsApi
+      .download(this.documentsApi.forTopLevel(), attachment.id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => saveDownload(response, attachment.displayName ?? 'download'),
+      });
   }
   protected rows = 1000;
   protected currentPage = 0;
