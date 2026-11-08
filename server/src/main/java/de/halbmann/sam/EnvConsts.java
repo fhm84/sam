@@ -21,7 +21,7 @@ public class EnvConsts {
     public static final String FILETYPES = "sam.files.types";
 
     /**
-     * Content types an upload may have, as detected from its content (not its name): {@code
+     * Content types an upload may have, as detected from its content's signature: {@code
      * type/subtype}, {@code type/*} for a family, {@code *}{@code /*} for all. Default in {@code
      * application.properties}; env var {@code SAM_FILES_ALLOWED_TYPES}.
      */

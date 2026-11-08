@@ -104,7 +104,7 @@ SAM-specific config keys are defined as constants in `server/.../EnvConsts.java`
 |-----|---------|-------------|
 | `sam.filesystem.base.path` | `/data/sam` (prod, env `SAM_FILESYSTEM_BASE_PATH`) | Storage root for uploaded files. See [Storage Backends](#storage-backends). |
 | `sam.files.types` | *(allow all)* | Optional file-type filter applied on upload. Whitelist: `pdf\|xml`; blacklist (prefix `^`): `^exe\|bat`. |
-| `sam.files.allowed-types` | PDF, common images, `audio/*`, MusicXML/XML, text documents (env `SAM_FILES_ALLOWED_TYPES`) | Content types an upload may have, detected from its content, not its name: `type/subtype`, `type/*`, or `*/*`. Web pages, SVG, programs and archives are refused; compressed MusicXML (`.mxl`) and MuseScore (`.mscz`) are detected as `application/zip`, add it if you need them. The full default list is in `application.properties`. |
+| `sam.files.allowed-types` | PDF, common images, `audio/*`, MusicXML/XML, text documents (env `SAM_FILES_ALLOWED_TYPES`) | Content types an upload may have, detected from its content's signature (only content without a known signature takes its type from the name): `type/subtype`, `type/*`, or `*/*`. Web pages, SVG, programs and archives are refused; compressed MusicXML (`.mxl`) and MuseScore (`.mscz`) are detected as `application/zip`, add it if you need them. The full default list is in `application.properties`. |
 | `sam.oidc.provider` | `pocket-id` | Login provider, `pocket-id` or `keycloak` (env `SAM_OIDC_PROVIDER`). |
 | `sam.coverage.base-score` | `0.7` | Minimum score (0–1) awarded to an ensemble voice with any positive instrumentation match. |
 | `sam.classification.agentic` | `false` | Enable agentic LLM entity resolution pass after AI classification. |
