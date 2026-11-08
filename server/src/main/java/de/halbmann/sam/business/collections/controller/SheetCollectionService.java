@@ -106,6 +106,15 @@ public class SheetCollectionService {
         }
     }
 
+    /**
+     * Whether the caller may read this attachment by its ID: not when it belongs to a text item of a
+     * collection they may not see. Sheet and instrumentation attachments are open to every login.
+     */
+    public boolean mayReadAttachment(final UUID attachmentId) {
+        CollectionReader reader = reader();
+        return repository.findByTextItemAttachment(attachmentId).stream().allMatch(reader::maySee);
+    }
+
     public PaginatedResponse<SheetCollection> findCollections(final SheetCollectionFilterRequest filter) {
         PaginatedEntities<SheetCollectionEntity> result =
                 repository.findCollections(filter, filter.getName(), filter.getType(), reader());

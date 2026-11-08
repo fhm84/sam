@@ -80,4 +80,16 @@ public class SheetCollectionRepository implements PanacheRepositoryBase<SheetCol
                 .getResultList();
         return new PaginatedEntities<>(page, countQuery.getSingleResult());
     }
+
+    /** The collections with a text item carrying this attachment (none for sheet attachments). */
+    public List<SheetCollectionEntity> findByTextItemAttachment(UUID attachmentId) {
+        return getEntityManager()
+                .createQuery(
+                        "SELECT DISTINCT sc FROM SheetCollectionEntity sc JOIN sc.items cs"
+                                + " WHERE TYPE(cs) = TextCollectionItemEntity"
+                                + " AND TREAT(cs AS TextCollectionItemEntity).attachment.id = :attachmentId",
+                        SheetCollectionEntity.class)
+                .setParameter("attachmentId", attachmentId)
+                .getResultList();
+    }
 }
