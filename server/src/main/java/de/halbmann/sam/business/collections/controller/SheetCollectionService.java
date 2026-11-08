@@ -228,7 +228,7 @@ public class SheetCollectionService {
     }
 
     public void updateItem(final String collectionId, final String itemId, final CollectionItem dto) {
-        CollectionItemEntity itemEntity = itemOf(findCollection(collectionId), itemId);
+        CollectionItemEntity itemEntity = itemOf(collectionId, itemId);
         if (itemEntity instanceof SheetCollectionItemEntity sheetItem) {
             collectionItemMapper.updateSheetItem(sheetItem, dto);
         } else if (itemEntity instanceof TextCollectionItemEntity textItem) {
@@ -302,12 +302,12 @@ public class SheetCollectionService {
     }
 
     public void removeItem(final String collectionId, final String itemId) {
-        SheetCollectionEntity collection = findCollection(collectionId);
-        CollectionItemEntity itemEntity = itemOf(collection, itemId);
+        CollectionItemEntity itemEntity = itemOf(collectionId, itemId);
         if (itemEntity instanceof TextCollectionItemEntity textItem && textItem.getAttachment() != null) {
             cleanUpAttachment(textItem);
         }
-        collection.getItems().remove(itemEntity);
+        // Taking it out of the ordered list loads that list: Hibernate rewrites the positions
+        repository.findById(UUID.fromString(collectionId)).getItems().remove(itemEntity);
         collectionItemRepository.delete(itemEntity);
     }
 
@@ -373,26 +373,19 @@ public class SheetCollectionService {
         cleanUpAttachment(textItem);
     }
 
-    private SheetCollectionEntity findCollection(final String collectionId) {
-        return repository
-                .findByIdOptional(UUID.fromString(collectionId))
-                .orElseThrow(() -> new EntityNotFoundException("SheetCollection", collectionId));
-    }
-
     /**
-     * The item, only if it belongs to this collection. Access is checked on the collection in the
-     * URL, so an item of any other collection, possibly one the caller may not see, answers 404 too.
+     * The item, only if it belongs to this collection (one query, the item list isn't loaded).
+     * Access is checked on the collection in the URL, so an item of any other collection, possibly
+     * one the caller may not see, answers 404 too.
      */
-    private static CollectionItemEntity itemOf(final SheetCollectionEntity collection, final String itemId) {
-        UUID id = UUID.fromString(itemId);
-        return collection.getItems().stream()
-                .filter(item -> id.equals(item.getId()))
-                .findFirst()
+    private CollectionItemEntity itemOf(final String collectionId, final String itemId) {
+        return collectionItemRepository
+                .findInCollection(UUID.fromString(collectionId), UUID.fromString(itemId))
                 .orElseThrow(() -> new EntityNotFoundException("CollectionItem", itemId));
     }
 
     private TextCollectionItemEntity loadTextItem(final String collectionId, final String itemId) {
-        CollectionItemEntity entity = itemOf(findCollection(collectionId), itemId);
+        CollectionItemEntity entity = itemOf(collectionId, itemId);
         if (!(entity instanceof TextCollectionItemEntity textItem)) {
             throw new ValidationException("Attachments are only supported for TEXT items");
         }
