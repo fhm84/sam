@@ -21,6 +21,13 @@ public class EnvConsts {
     public static final String FILETYPES = "sam.files.types";
 
     /**
+     * Content types an upload may have, as detected from its content (not its name): {@code
+     * type/subtype}, {@code type/*} for a family, {@code *}{@code /*} for all. Default in {@code
+     * application.properties}; env var {@code SAM_FILES_ALLOWED_TYPES}.
+     */
+    public static final String ALLOWED_CONTENT_TYPES = "sam.files.allowed-types";
+
+    /**
      * OIDC provider, {@code pocket-id} (default) or {@code keycloak}; selects the provider's
      * settings in {@code oidc/<provider>.properties}. Env var {@code SAM_OIDC_PROVIDER}.
      */
