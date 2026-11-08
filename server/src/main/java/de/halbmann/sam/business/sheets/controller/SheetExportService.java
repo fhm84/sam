@@ -251,14 +251,20 @@ public class SheetExportService {
     /**
      * One CSV cell. A value starting with {@code = + - @}, a tab or a carriage return gets a leading
      * {@code '}, so spreadsheet programs show it as text instead of running it as a formula (titles
-     * can come from the AI reading a PDF). Quoted when it holds a comma, quote or line break.
+     * can come from the AI reading a PDF). Quoted when it holds a comma, semicolon, quote or line
+     * break: Excel in a German locale splits a CSV at semicolons, and an unquoted one would start a
+     * new, unchecked cell.
      */
     static String csvField(String value) {
         if (value == null || value.isEmpty()) {
             return "";
         }
         String cell = "=+-@\t\r".indexOf(value.charAt(0)) >= 0 ? "'" + value : value;
-        if (cell.contains(",") || cell.contains("\"") || cell.contains("\n") || cell.contains("\r")) {
+        if (cell.contains(",")
+                || cell.contains(";")
+                || cell.contains("\"")
+                || cell.contains("\n")
+                || cell.contains("\r")) {
             return "\"" + cell.replace("\"", "\"\"") + "\"";
         }
         return cell;
