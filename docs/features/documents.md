@@ -8,6 +8,8 @@ Files are uploaded to a **staging area** (unlinked pool) or directly to a sheet 
 
 Only content types on an allow-list are accepted (`sam.files.allowed-types`, see the [README](../../README.md)): PDF, common images, audio and MIDI, MusicXML, text documents. The type is detected from the file's content (its signature), so a web page or a program renamed to `.pdf` is refused with 400. Only content without a known signature takes its type from the name; it is then stored and served under that type. Every API response carries `X-Content-Type-Options: nosniff`, so browsers keep to the declared type and never run such a file as a page.
 
+Compressed MusicXML (`.mxl`) and MuseScore (`.mscz`) files are ZIP archives to the detection and are refused by default. To accept them, add `application/zip` to the list: set `SAM_FILES_ALLOWED_TYPES` on the server, repeating the default list from `application.properties`, since the variable replaces it as a whole. `docker-compose.prod.yml` doesn't pass this variable on, so set it in an override file's `environment` for `sam-server`.
+
 ## Attachment types
 
 | Type | Description |
