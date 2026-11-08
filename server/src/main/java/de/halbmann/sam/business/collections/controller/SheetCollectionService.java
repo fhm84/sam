@@ -228,9 +228,7 @@ public class SheetCollectionService {
     }
 
     public void updateItem(final String collectionId, final String itemId, final CollectionItem dto) {
-        CollectionItemEntity itemEntity = collectionItemRepository
-                .findByIdOptional(UUID.fromString(itemId))
-                .orElseThrow(() -> new EntityNotFoundException("CollectionItem", itemId));
+        CollectionItemEntity itemEntity = itemOf(findCollection(collectionId), itemId);
         if (itemEntity instanceof SheetCollectionItemEntity sheetItem) {
             collectionItemMapper.updateSheetItem(sheetItem, dto);
         } else if (itemEntity instanceof TextCollectionItemEntity textItem) {
@@ -304,12 +302,8 @@ public class SheetCollectionService {
     }
 
     public void removeItem(final String collectionId, final String itemId) {
-        SheetCollectionEntity collection = repository
-                .findByIdOptional(UUID.fromString(collectionId))
-                .orElseThrow(() -> new EntityNotFoundException("SheetCollection", collectionId));
-        CollectionItemEntity itemEntity = collectionItemRepository
-                .findByIdOptional(UUID.fromString(itemId))
-                .orElseThrow(() -> new EntityNotFoundException("CollectionItem", itemId));
+        SheetCollectionEntity collection = findCollection(collectionId);
+        CollectionItemEntity itemEntity = itemOf(collection, itemId);
         if (itemEntity instanceof TextCollectionItemEntity textItem && textItem.getAttachment() != null) {
             cleanUpAttachment(textItem);
         }
@@ -359,7 +353,7 @@ public class SheetCollectionService {
     public Attachment attachDocument(
             final String collectionId, final String itemId, final String filename, final InputStream inputStream)
             throws IOException, NoSuchAlgorithmException {
-        TextCollectionItemEntity textItem = loadTextItem(itemId);
+        TextCollectionItemEntity textItem = loadTextItem(collectionId, itemId);
         if (textItem.getAttachment() != null) {
             cleanUpAttachment(textItem);
         }
@@ -372,17 +366,33 @@ public class SheetCollectionService {
     }
 
     public void removeAttachment(final String collectionId, final String itemId) {
-        TextCollectionItemEntity textItem = loadTextItem(itemId);
+        TextCollectionItemEntity textItem = loadTextItem(collectionId, itemId);
         if (textItem.getAttachment() == null) {
             return;
         }
         cleanUpAttachment(textItem);
     }
 
-    private TextCollectionItemEntity loadTextItem(final String itemId) {
-        CollectionItemEntity entity = collectionItemRepository
-                .findByIdOptional(UUID.fromString(itemId))
+    private SheetCollectionEntity findCollection(final String collectionId) {
+        return repository
+                .findByIdOptional(UUID.fromString(collectionId))
+                .orElseThrow(() -> new EntityNotFoundException("SheetCollection", collectionId));
+    }
+
+    /**
+     * The item, only if it belongs to this collection. Access is checked on the collection in the
+     * URL, so an item of any other collection, possibly one the caller may not see, answers 404 too.
+     */
+    private static CollectionItemEntity itemOf(final SheetCollectionEntity collection, final String itemId) {
+        UUID id = UUID.fromString(itemId);
+        return collection.getItems().stream()
+                .filter(item -> id.equals(item.getId()))
+                .findFirst()
                 .orElseThrow(() -> new EntityNotFoundException("CollectionItem", itemId));
+    }
+
+    private TextCollectionItemEntity loadTextItem(final String collectionId, final String itemId) {
+        CollectionItemEntity entity = itemOf(findCollection(collectionId), itemId);
         if (!(entity instanceof TextCollectionItemEntity textItem)) {
             throw new ValidationException("Attachments are only supported for TEXT items");
         }
