@@ -58,7 +58,7 @@ Endpoints not listed (writes) keep their `@RolesAllowed` as today.
 |---|---|---|---|
 | `/sheets`, `/sheets/{id}`, `/genres`, `/letters`, `/explore`, `/explore/surprise`, `/{id}/coverage`, `/{id}/collections`, `/{id}/export` | any | any | |
 | `/sheets/{id}/instrumentations`, `…/{iid}` | any | any | |
-| Sheet and instrumentation `…/documents`, `/documents/{id}`, `/documents/batch` (GET and POST by IDs) | any | any — musicians need their parts | |
+| Sheet and instrumentation `…/documents`, `/documents/{id}`, `/documents/batch` (GET and POST by IDs) | any | any — musicians need their parts; a collection text item's attachment only for who may see the collection (404, left out of a batch); `/documents/{id}` with a bare document ID (the upload inbox's preview) librarian + admin | done |
 | `/documents` without sheet context (always empty) | any | any | |
 | `/documents/unlinked` (upload inbox, not yet reviewed) | librarian + admin | librarian + admin | done |
 | `/members`, `/members/{id}` | any | any; `contact` (email, mobile, notes), `lastInviteSentAt`, `onboarding` and `userId` only for librarian + admin (sheets' `composer` / `arranger` are persons and carry no personal data) | done |

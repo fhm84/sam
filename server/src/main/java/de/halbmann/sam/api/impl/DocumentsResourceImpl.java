@@ -9,6 +9,7 @@ import de.halbmann.sam.api.entity.eventlog.EventType;
 import de.halbmann.sam.api.entity.shared.PaginatedResponse;
 import de.halbmann.sam.api.entity.sheets.BatchDownloadRequest;
 import de.halbmann.sam.api.entity.sheets.DownloadFormat;
+import de.halbmann.sam.business.collections.controller.SheetCollectionService;
 import de.halbmann.sam.business.documents.boundary.AttachmentRepository;
 import de.halbmann.sam.business.documents.controller.AttachmentLinkService;
 import de.halbmann.sam.business.documents.controller.DocumentBundleService;
@@ -23,6 +24,7 @@ import de.halbmann.sam.business.sheets.boundary.SheetRepository;
 import de.halbmann.sam.business.sheets.entity.InstrumentationEntity;
 import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
 import de.halbmann.sam.classification.controller.DocumentClassificationService;
+import de.halbmann.sam.security.CurrentUserService;
 import de.halbmann.sam.security.Roles;
 import io.quarkus.security.Authenticated;
 import jakarta.annotation.security.RolesAllowed;
@@ -75,6 +77,12 @@ public class DocumentsResourceImpl implements DocumentsResource {
 
     @Inject
     InstrumentationRepository instrumentationRepository;
+
+    @Inject
+    SheetCollectionService collectionService;
+
+    @Inject
+    CurrentUserService currentUserService;
 
     @Context
     HttpHeaders headers;
@@ -157,7 +165,11 @@ public class DocumentsResourceImpl implements DocumentsResource {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
-        List<MergedPdfEntry> entries = documentBundleService.buildMergeEntriesById(request.getIds());
+        // Attachments the caller may not read are left out, like unknown IDs
+        List<MergedPdfEntry> entries = documentBundleService.buildMergeEntriesById(request.getIds()).stream()
+                .filter(entry ->
+                        collectionService.mayReadAttachment(entry.attachment().getId()))
+                .toList();
         if (entries.isEmpty()) {
             return Response.noContent().build();
         }
@@ -213,10 +225,7 @@ public class DocumentsResourceImpl implements DocumentsResource {
         } else if (sheetId != null) {
             attachment = attachmentLinkService.loadAttachmentBySheet(sheetId, docIdentifier);
         } else {
-            // orElseGet, not orElse: the document lookup must only run when no attachment matched
-            // (orElse evaluated it eagerly — a 404 for every attachment ID, plus a leaked stream)
-            attachment = Optional.ofNullable(documentStore.loadAttachment(docIdentifier))
-                    .orElseGet(() -> documentStore.load(UUID.fromString(docIdentifier)));
+            attachment = loadTopLevel(UUID.fromString(docIdentifier));
         }
         if (attachment == null) {
             log.info("Document ({}) not found", docIdentifier);
@@ -348,6 +357,21 @@ public class DocumentsResourceImpl implements DocumentsResource {
         } else {
             attachmentLinkService.deleteAttachment(docIdentifier);
         }
+    }
+
+    /**
+     * {@code /documents/{id}}: an attachment by its ID if the caller may read it, else a bare
+     * document by its ID, which is the upload inbox's preview and for librarians and admins only.
+     * {@code null} (404) otherwise, as if it didn't exist.
+     */
+    private DocumentDownload loadTopLevel(UUID id) {
+        if (attachmentRepository.findByIdOptional(id).isPresent()) {
+            return collectionService.mayReadAttachment(id) ? documentStore.loadAttachment(id.toString()) : null;
+        }
+        if (!currentUserService.hasRole(Roles.MUSIC_LIBRARIAN) && !currentUserService.hasRole(Roles.ADMIN)) {
+            return null;
+        }
+        return documentStore.load(id);
     }
 
     private boolean etagMatches(String ifNoneMatch, String currentEtag) {
