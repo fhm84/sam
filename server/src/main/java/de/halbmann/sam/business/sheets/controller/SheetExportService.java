@@ -248,14 +248,20 @@ public class SheetExportService {
         return all;
     }
 
-    private static String csvField(String value) {
+    /**
+     * One CSV cell. A value starting with {@code = + - @}, a tab or a carriage return gets a leading
+     * {@code '}, so spreadsheet programs show it as text instead of running it as a formula (titles
+     * can come from the AI reading a PDF). Quoted when it holds a comma, quote or line break.
+     */
+    static String csvField(String value) {
         if (value == null || value.isEmpty()) {
             return "";
         }
-        if (value.contains(",") || value.contains("\"") || value.contains("\n")) {
-            return "\"" + value.replace("\"", "\"\"") + "\"";
+        String cell = "=+-@\t\r".indexOf(value.charAt(0)) >= 0 ? "'" + value : value;
+        if (cell.contains(",") || cell.contains("\"") || cell.contains("\n") || cell.contains("\r")) {
+            return "\"" + cell.replace("\"", "\"\"") + "\"";
         }
-        return value;
+        return cell;
     }
 
     private static String sanitizeFilename(String name) {
