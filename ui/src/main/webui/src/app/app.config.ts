@@ -13,6 +13,7 @@ import { routes } from './app.routes';
 import { TranslationService } from './core/translation.service';
 import { errorInterceptor } from './core/error.interceptor';
 import { OidcClaimsConfig, authConfigLoader } from './core/auth/auth.config';
+import { withoutTokenForPublicApi } from './core/auth/public-api-auth.interceptor';
 import { removeLegacyLocalStorageTokens } from './core/auth/legacy-token-cleanup';
 
 export const appConfig: ApplicationConfig = {
@@ -20,7 +21,10 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideAnimationsAsync(),
-    provideHttpClient(withXhr(), withInterceptors([authInterceptor(), localeInterceptor, errorInterceptor])),
+    provideHttpClient(
+      withXhr(),
+      withInterceptors([withoutTokenForPublicApi(authInterceptor()), localeInterceptor, errorInterceptor]),
+    ),
     MessageService,
     provideOptimus({
       theme: {
