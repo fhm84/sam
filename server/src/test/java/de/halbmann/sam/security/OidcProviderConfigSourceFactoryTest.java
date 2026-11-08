@@ -41,6 +41,19 @@ class OidcProviderConfigSourceFactoryTest {
         assertEquals("30S", config.getRawValue("quarkus.oidc.token-cache.clean-up-timer-interval"));
     }
 
+    /** Tokens are JWTs: a made-up token must not make SAM call the provider's introspection. */
+    @Test
+    void noTenantAsksTheProviderAboutUnknownTokens() {
+        SmallRyeConfig pocketId = config("prod", Map.of(), Map.of());
+        for (String tenant : new String[] {"quarkus.oidc.", "quarkus.oidc.m2m."}) {
+            assertEquals("false", pocketId.getRawValue(tenant + "token.allow-opaque-token-introspection"));
+            assertEquals("false", pocketId.getRawValue(tenant + "token.allow-jwt-introspection"));
+        }
+        SmallRyeConfig keycloak = config("prod", Map.of(), Map.of("sam.oidc.provider", "keycloak"));
+        assertEquals("false", keycloak.getRawValue("quarkus.oidc.token.allow-opaque-token-introspection"));
+        assertEquals("false", keycloak.getRawValue("quarkus.oidc.token.allow-jwt-introspection"));
+    }
+
     @Test
     void pocketIdAcceptsOnlyTokensIssuedToTheUiClient() {
         assertEquals("sam-ui", config("prod", Map.of(), Map.of()).getRawValue("quarkus.oidc.token.audience"));
