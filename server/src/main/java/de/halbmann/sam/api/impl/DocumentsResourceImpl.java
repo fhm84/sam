@@ -235,8 +235,10 @@ public class DocumentsResourceImpl implements DocumentsResource {
         String etagValue = "\"sha256:" + attachment.checksumSha256() + "\"";
         String downloadName = downloadName(docIdentifier, attachment.filename());
 
-        // If-None-Match handling
+        // If-None-Match handling. The file was opened already, and a 304 doesn't send it: close it
+        // here, or every revalidation leaks a file handle (with S3, a pooled connection)
         if (etagMatches(ifNoneMatch, etagValue)) {
+            closeUnsent(attachment);
             return Response.notModified().tag(etagValue).build();
         }
 
@@ -263,6 +265,7 @@ public class DocumentsResourceImpl implements DocumentsResource {
                     .tag(etagValue)
                     .build();
         } catch (final Exception ex) {
+            closeUnsent(attachment);
             log.atWarn()
                     .setCause(ex)
                     .log(() -> String.format("Failed to build response for document (%s)", docIdentifier));
@@ -355,7 +358,7 @@ public class DocumentsResourceImpl implements DocumentsResource {
         if (sheetId == null && instrumentationId == null) {
             documentStore.deleteIfUnlinked(UUID.fromString(docIdentifier));
         } else {
-            attachmentLinkService.deleteAttachment(docIdentifier);
+            attachmentLinkService.deleteAttachmentOf(sheetId, instrumentationId, docIdentifier);
         }
     }
 
@@ -372,6 +375,14 @@ public class DocumentsResourceImpl implements DocumentsResource {
             return null;
         }
         return documentStore.load(id);
+    }
+
+    private static void closeUnsent(DocumentDownload download) {
+        try {
+            download.stream().close();
+        } catch (IOException | RuntimeException e) {
+            log.debug("Closing the unsent document {} failed", download.id(), e);
+        }
     }
 
     private boolean etagMatches(String ifNoneMatch, String currentEtag) {

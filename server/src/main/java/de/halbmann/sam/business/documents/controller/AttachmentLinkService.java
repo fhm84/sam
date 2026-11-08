@@ -176,6 +176,22 @@ public class AttachmentLinkService {
         }
     }
 
+    /**
+     * Deletes the attachment only if it belongs to the instrumentation, or to the sheet or one of
+     * its instrumentations, in the URL; any other attachment, a collection item's for one, answers
+     * 404 and stays.
+     */
+    public void deleteAttachmentOf(String sheetId, String instrumentationId, String attachmentId) {
+        List<AttachmentEntity> owned = instrumentationId != null
+                ? loadAttachmentEntitiesByInstrumentation(instrumentationId, null)
+                : loadAttachmentEntitiesBySheetInstrumentations(sheetId, null);
+        UUID id = UUID.fromString(attachmentId);
+        if (owned.stream().noneMatch(attachment -> id.equals(attachment.getId()))) {
+            throw new EntityNotFoundException("Attachment", id);
+        }
+        deleteAttachment(attachmentId);
+    }
+
     public void deleteAttachment(String attachmentId) {
         AttachmentEntity attachment = attachmentRepository
                 .findByIdOptional(UUID.fromString(attachmentId))

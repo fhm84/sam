@@ -724,8 +724,8 @@ yet decided on):
 | Capability | `admin` | `music_librarian` | authenticated, no special role | unauthenticated + valid share token |
 |---|---|---|---|---|
 | Browse/search/read archive (sheets, collections, instrumentations, coverage) | ✅ | ✅ | ✅ | ➖ (only the one shared resource) |
-| See `ADMINS_ONLY` collections | ✅ | ✅ | ❌ (404) | ➖ (only through a share link to it) |
-| See someone else's `PRIVATE` collection (draft) | ✅ | ❌ (404; ✅ if no creator recorded) | ❌ (404) | ➖ (only through a share link to it) |
+| See `ADMINS_ONLY` collections (also their text items' attachments, read by ID) | ✅ | ✅ | ❌ (404) | ➖ (only through a share link to it) |
+| See someone else's `PRIVATE` collection (draft), its items and its text items' attachments (read by ID) | ✅ | ❌ (404; ✅ if no creator recorded) | ❌ (404) | ➖ (only through a share link to it) |
 | Create/edit/delete sheets, instrumentations, documents; run AI classify/apply/enrich | ✅ | ✅ | ❌ | ❌ |
 | Create/edit/delete collections & setlist items; use the AI setlist assistant (suggest items, draft text) | ✅ | ✅ | ❌ | ❌ |
 | Create/edit/delete/merge persons, members & instruments (deleting a member erases their personal data and its history) | ✅ | ✅ | ❌ | ❌ |
@@ -739,7 +739,7 @@ yet decided on):
 | List/revoke **everyone's** share tokens | ✅ | ❌ | ❌ | ❌ |
 | Mark/unmark **own** favourite sheets | ✅ | ✅ | ✅ | ❌ |
 | See members' contact details, linked login, last invite, onboarding state (also embedded in ensemble seats; sheets' composers are persons without personal data) | ✅ | ✅ | ❌ | ❌ |
-| Browse the upload inbox (`/documents/unlinked`); generate the GEMA setlist | ✅ | ✅ | ❌ | ❌ |
+| Browse the upload inbox (`/documents/unlinked`) and open its documents by document ID (`/documents/{id}`); generate the GEMA setlist | ✅ | ✅ | ❌ (404) | ❌ |
 | View My Parts (own personalised view, if linked) | ✅ | ✅ | ✅ | ❌ |
 | View event log (`GET /api/event-logs`) | ✅ | ❌ | ❌ | ❌ |
 | Access exactly the resource named by a share token | n/a | n/a | n/a | ✅ |
