@@ -13,9 +13,11 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 /**
  * Accepts only uploads whose detected content type is on the allow-list ({@link
- * EnvConsts#ALLOWED_CONTENT_TYPES}). The type comes from the content, so a web page or a program
- * renamed to {@code .pdf} is still refused: the archive shouldn't hand out such files from the
- * band's address through a share link.
+ * EnvConsts#ALLOWED_CONTENT_TYPES}). Tika detects the type from the content's signature, so a web
+ * page or a program renamed to {@code .pdf} is still refused: the archive shouldn't hand out such
+ * files from the band's address through a share link. Only content without a signature it knows
+ * takes its type from the name; it is then stored and served under that harmless type, and with
+ * {@code nosniff} browsers never run it as a page.
  */
 @Priority(25)
 @ApplicationScoped
