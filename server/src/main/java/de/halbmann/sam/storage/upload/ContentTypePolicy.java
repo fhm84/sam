@@ -51,6 +51,6 @@ public class ContentTypePolicy implements UploadPolicy {
         }
         String family = type.substring(0, slash);
         return allowed.stream()
-                .anyMatch(entry -> entry.equals(type) || entry.equals("*/*") || entry.equals(family + "/*"));
+                .anyMatch(entry -> entry.equals(type) || "*/*".equals(entry) || entry.equals(family + "/*"));
     }
 }
