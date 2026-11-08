@@ -22,6 +22,9 @@ class CsvFieldTest {
                 "Böhmischer Traum|Böhmischer Traum",
                 "Marsch - Trio|Marsch - Trio",
                 "a, b|`\"a, b\"`",
+                // Excel in a German locale splits at ';': the part after it must not become a cell
+                "`March;=HYPERLINK(\"x\")`|`\"March;=HYPERLINK(\"\"x\"\")\"`",
+                "folk;=1+2|`\"folk;=1+2\"`",
                 "say \"hi\"|`\"say \"\"hi\"\"\"`"
             })
     void formulasBecomeText_andSpecialCharactersAreQuoted(String value, String expected) {
