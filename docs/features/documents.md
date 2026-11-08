@@ -6,6 +6,8 @@ SAM manages physical files (PDFs, audio, images, etc.) separately from metadata.
 
 Files are uploaded to a **staging area** (unlinked pool) or directly to a sheet or instrumentation. Supported via drag-and-drop or file picker.
 
+Only content types on an allow-list are accepted (`sam.files.allowed-types`, see the [README](../../README.md)): PDF, common images, audio and MIDI, MusicXML, text documents. The type is detected from the file's content, not its name, so a web page or a program renamed to `.pdf` is refused with 400. Every API response carries `X-Content-Type-Options: nosniff`, so browsers keep to the declared type.
+
 ## Attachment types
 
 | Type | Description |
