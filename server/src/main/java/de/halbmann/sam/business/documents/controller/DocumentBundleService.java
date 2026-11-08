@@ -265,7 +265,9 @@ public class DocumentBundleService {
             return slots.tryAcquire(wait.toMillis(), TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new InterruptedIOException("Interrupted while waiting to merge PDFs");
+            InterruptedIOException interrupted = new InterruptedIOException("Interrupted while waiting to merge PDFs");
+            interrupted.initCause(e);
+            throw interrupted;
         }
     }
 
