@@ -1,13 +1,16 @@
 # Plan: Automatic Coverage Snapshot Invalidation
 
 Roadmap: [Automatic coverage snapshot invalidation](../roadmap.md#automatic-coverage-snapshot-invalidation--planned)
-· Tracking issue: [#137](https://github.com/fhm84/sam/issues/137) (milestone [Go-live](https://github.com/fhm84/sam/milestone/1))
+· Tracking issue: [#137](https://github.com/fhm84/sam/issues/137) (milestone [Everyday use](https://github.com/fhm84/sam/milestone/2))
 · Concept: [Coverage evaluation](../architecture/concepts/coverage.md)
 
-**Why now:** snapshots are only refreshed by an explicit
+**Why:** snapshots are only refreshed by an explicit
 `POST /ensembles/{id}/coverage/compute`. After a sheet, instrumentation or ensemble voice
 changes, filters, the Explore shelves and the setlist assistant work on stale coverage
-data, and nothing tells the user.
+data until someone recomputes. The Sheets page shows when the snapshots were computed and
+offers a one-click recompute to librarians, so this is not a go-live blocker (moved from
+Now to Next on 2026-11-08). It should land before the
+[home dashboard](home-dashboard.md), whose gap report reads the snapshots.
 
 ## Current state
 

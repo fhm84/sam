@@ -27,12 +27,9 @@ unprioritised backlog.
 
 **Now: before go-live** (real musicians will log in, and the event log will hold personal data)
 
-1. [Automatic coverage snapshot invalidation](#automatic-coverage-snapshot-invalidation--planned)
-   → [plan](plans/coverage-snapshot-invalidation.md) · [#137](https://github.com/fhm84/sam/issues/137)
-   (needs open question #5: [#138](https://github.com/fhm84/sam/issues/138))
-2. Encrypted backups (phase A of [encryption of stored documents](#encryption-of-stored-documents--planned))
+1. Encrypted backups (phase A of [encryption of stored documents](#encryption-of-stored-documents--planned))
    → [plan](plans/storage-encryption.md) · [#162](https://github.com/fhm84/sam/issues/162)
-3. [Pocket ID as default OIDC provider](#pocket-id-as-default-oidc-provider--in-progress):
+2. [Pocket ID as default OIDC provider](#pocket-id-as-default-oidc-provider--in-progress):
    lighter login stack with passkeys, Keycloak stays optional
    → [plan](plans/pocket-id-provider.md) · [#210](https://github.com/fhm84/sam/issues/210)
 
@@ -40,7 +37,12 @@ unprioritised backlog.
 
 1. [Classification form enhancements](#classification-form-enhancements--planned) → [plan](plans/classification-enhancements.md) · [#172](https://github.com/fhm84/sam/issues/172)
 2. [Sheets overview filter & bulk actions](#sheets-overview-filter--bulk-actions--planned) → [plan](plans/sheets-overview.md) · [#182](https://github.com/fhm84/sam/issues/182)
-3. [Home dashboard](#home-dashboard--planned) → [plan](plans/home-dashboard.md) · [#193](https://github.com/fhm84/sam/issues/193),
+3. [Automatic coverage snapshot invalidation](#automatic-coverage-snapshot-invalidation--planned)
+   → [plan](plans/coverage-snapshot-invalidation.md) · [#137](https://github.com/fhm84/sam/issues/137)
+   (needs open question #5: [#138](https://github.com/fhm84/sam/issues/138)); moved from Now
+   on 2026-11-08, see the plan for why. Comes before the dashboard, whose gap report reads
+   the snapshots.
+4. [Home dashboard](#home-dashboard--planned) → [plan](plans/home-dashboard.md) · [#193](https://github.com/fhm84/sam/issues/193),
    including the gap report from [coverage breakdown enhancements](#coverage-breakdown-enhancements--planned) → [plan](plans/coverage-breakdown.md) · [#166](https://github.com/fhm84/sam/issues/166)
 
 **Later**
@@ -1483,7 +1485,7 @@ answered before the relevant implementation work begins.
 | 2 | How is "selected content" for guests scoped — per-sheet flag, collection-based sharing, or ensemble-based? | Guest access, setlist public page | **Resolved:** Resource-scoped share tokens implemented (one token = one sheet instrumentation or collection). Public setlist/sheet pages live at `/share/{token}`. Open-URL anonymous access (no link) intentionally deferred. |
 | 3 | Should document-level visibility be independently configurable, or always inherited from the sheet/instrumentation? | Shared document links, guest access | Open |
 | 4 | Is anonymous guest access (no link, open public URL) ever desirable? | Guest access scope | Open |
-| 5 | Should coverage snapshots be invalidated automatically, or remain manual? | Coverage accuracy, performance | Open: **blocks a Now item.** Proposed: automatic per-sheet recompute, async full recompute on voice changes ([plan](plans/coverage-snapshot-invalidation.md)) |
+| 5 | Should coverage snapshots be invalidated automatically, or remain manual? | Coverage accuracy, performance | Open: **blocks a Next item.** Proposed: automatic per-sheet recompute, async full recompute on voice changes ([plan](plans/coverage-snapshot-invalidation.md)) |
 | 6 | Should lending / checkout be tracked per instrumentation or per physical copy? (Relevant if multiple copies per instrumentation are ever supported) | Lending, physical archive | Open |
 | 7 | Which OIDC provider? Self-hosted (Keycloak) or SaaS (Auth0, Google)? | Auth implementation | **Resolved:** Self-hosted Keycloak 26. **Revisited 2026-10-17:** self-hosted Pocket ID as the default, Keycloak stays supported ([plan](plans/pocket-id-provider.md), [ADR-0016](architecture/decisions/adr-0016-pocket-id-default-provider.md)). |
 | 8 | Should IP addresses be stored in the document access log, or omitted/anonymised? Requires GDPR/privacy policy decision. | Document access log | **Resolved: not stored.** `userId` (OIDC sub) + snapshotted `username` give unambiguous attribution; IP adds GDPR obligations without meaningful benefit in an ensemble context. |
