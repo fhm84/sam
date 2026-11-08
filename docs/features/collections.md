@@ -38,7 +38,7 @@ Order is persisted server-side (a JPA-managed position, not just array order) an
 - **Create / edit / delete** collections and individual items.
 - Paginated sheet list within each collection.
 - Sheet detail preview accessible from within the collection.
-- **Export formats:** JSON, CSV, and ZIP (metadata + attached documents)
+- **Export formats:** JSON, CSV, and ZIP (metadata + attached documents). In the CSV, a value starting with `= + - @` (or a tab or carriage return) gets a leading `'`, so spreadsheet programs show it as text rather than run it as a formula.
 - **Table of contents:** Generate a PDF TOC from a collection/setlist (via `CollectionTocService`)
 - **GEMA setlist:** Generate the GEMA reporting workbook (xlsx) for a setlist (via `GemaSetlistService`)
 - **AI assistance:** Suggest repertoire pieces for a setlist goal and draft programme text — see [AI Setlist Assistant](ai-setlist-assistant.md)
