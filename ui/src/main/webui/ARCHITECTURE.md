@@ -169,6 +169,7 @@ it at three different locations (top-level, under sheets, under instrumentations
 - Dark mode toggled by `ThemeService` (adds/removes `.dark` on `<html>`)
 - Persisted to `localStorage`, defaults to system preference
 - Fonts ship with the app (`@fontsource-variable/dm-sans`, `@openng/icons`, both `@use`d in `styles.scss`). Load nothing from third-party hosts at runtime: it would hand every visitor's IP address to them, the public share page included
+- In production the edge sends a Content-Security-Policy (`docker/Caddyfile`): scripts only from the app's own files (no inline `<script>`, no `on…=` handlers, no `eval`), styles also inline (the UI library writes its theme at runtime), images from the app, `data:` and `blob:`, frames only the app and `blob:` (document previews), and network calls only to the app and the login host. The production build therefore doesn't inline critical CSS (`angular.json`): its stylesheet loader is an inline script. The dev server sends no CSP, so check new resource types on a production build
 
 ## Internationalization (i18n)
 
