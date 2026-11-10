@@ -37,6 +37,19 @@ The optional `monitoring` profile (`COMPOSE_PROFILES=<provider>,monitoring`) add
 
 `sam-server`'s compose healthcheck calls `/q/health/ready` (database reachable, storage writable), and `sam-ui` starts only once it passes, so `docker compose up -d` waits for the server and fails if it stays unhealthy ([ADR-0013](decisions/adr-0013-readiness-gates-startup.md)). `docker inspect sam-server` (`.State.Health.Log`) shows which check is down.
 
+### Networks and container hardening
+
+The production compose file splits the stack into networks, so a compromised edge proxy reaches little else:
+
+| Network | Members | Notes |
+|---|---|---|
+| `edge` | sam-ui, sam-server, the OIDC provider, Prometheus | Has internet access (the AI provider, the provider's mail); `sam-server:9000` (health, metrics) stays reachable here |
+| `backend` | sam-server, database | Internal: no internet |
+| `keycloak-db` | Keycloak, its database | Internal; `keycloak` profile only |
+| `monitoring` | Prometheus, Grafana, node-exporter | Grafana's loopback port is published from here |
+
+The one-shot helpers (`sam-data-init`, the backup's `backup-files` and `restore-files`) run without a network. Every long-running service runs with `no-new-privileges`, drops all Linux capabilities except the few it needs (Caddy binds ports 80/443; Pocket ID's and Postgres' entrypoints switch from root to their own user; `sam-data-init` chowns), has a PID limit (a JVM's threads count) and rotates its logs (`json-file`, 3 × 10 MB). Root in a container therefore can't read other users' files: the backup exports Pocket ID's data as the owner of `/app/data`. Not done (yet): read-only root filesystems (`sam-server` writes large temp files when merging PDFs) and user namespaces (they change the ownership of every volume).
+
 ## OIDC Config Endpoint
 
 `GET /oidc-config.json` is handled by `OidcConfigResource` (a `@PermitAll` JAX-RS endpoint in the `server` module). It returns `{issuerUrl, clientId, scope, roleClaimPath, roleGroups}`; issuer and client ID are sourced from `quarkus.oidc.auth-server-url` / `quarkus.oidc.client-id` — which are supplied via `OIDC_SERVER_URL` / `OIDC_CLIENT_ID` env vars. The edge proxy rewrites this path to the resource's real location (`/api/oidc-config.json`, since the JAX-RS root is `/api`), so the Angular app always gets the deployment-correct provider URL without requiring an image rebuild.
