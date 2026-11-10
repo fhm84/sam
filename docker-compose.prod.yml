@@ -1,3 +1,17 @@
+# Hardening shared by the services: no privilege gain through setuid binaries, no Linux
+# capabilities except the few a service adds below, and rotated logs (Docker keeps container
+# logs without a size limit otherwise). Each service also caps its number of processes/threads.
+x-hardening: &hardening
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+  logging:
+    driver: json-file
+    options:
+      max-size: "10m"
+      max-file: "3"
+
 services:
 
   # Edge: Caddy + the Angular SPA (see Dockerfile, docker/Caddyfile). The only service
@@ -20,7 +34,7 @@ services:
       - caddy-data:/data
       - caddy-config:/config
     networks:
-      default:
+      edge:
         # sam-server validates tokens against the public issuer URL; the alias keeps
         # that request on the internal network instead of leaving via the public IP.
         aliases:
@@ -34,6 +48,11 @@ services:
       keycloak:
         condition: service_started
         required: false
+    <<: *hardening
+    # Caddy runs as root and binds ports 80 and 443
+    cap_add:
+      - NET_BIND_SERVICE
+    pids_limit: 200
     mem_limit: 256m
     restart: unless-stopped
 
@@ -71,7 +90,7 @@ services:
     volumes:
       - pocket-id-data:/app/data
     networks:
-      default:
+      edge:
         aliases:
           - oidc
     healthcheck:
@@ -80,6 +99,13 @@ services:
       timeout: 5s
       retries: 10
       start_period: 10s
+    <<: *hardening
+    # Its entrypoint starts as root, hands /app/data to its own user and switches to it
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
+    pids_limit: 200
     mem_limit: 256m
     restart: unless-stopped
 
@@ -110,9 +136,12 @@ services:
     volumes:
       - ./keycloak/prod:/opt/keycloak/data/import:ro
     networks:
-      default:
+      edge:
         aliases:
           - oidc
+      keycloak-db:
+    <<: *hardening
+    pids_limit: 1000
     mem_limit: 1280m
     depends_on:
       keycloak-db:
@@ -138,11 +167,16 @@ services:
       POSTGRES_DB: keycloak
     volumes:
       - keycloak-db-data:/var/lib/postgresql # see the comment at the database service
+    networks:
+      - keycloak-db
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U keycloak -d keycloak"]
       interval: 10s
       timeout: 5s
       retries: 5
+    <<: *hardening
+    cap_add: [CHOWN, DAC_OVERRIDE, FOWNER, SETUID, SETGID] # see the database service
+    pids_limit: 200
     restart: unless-stopped
 
   # One-shot: a new named volume's root belongs to root, but sam-server runs as uid 185 (the
@@ -153,6 +187,11 @@ services:
     command: ["chown", "185:0", "/data/sam"]
     volumes:
       - sam-data:/data/sam
+    network_mode: none
+    <<: *hardening
+    cap_add:
+      - CHOWN
+    pids_limit: 20
 
   # Quarkus backend: REST API + OIDC config endpoint
   sam-server:
@@ -188,6 +227,13 @@ services:
       JAVA_TOOL_OPTIONS: "-Xms128m -Xmx1g -XX:+ExitOnOutOfMemoryError"
     volumes:
       - sam-data:/data/sam
+    # edge: the proxy, the login provider and the internet (AI provider); backend: the database
+    networks:
+      - edge
+      - backend
+    <<: *hardening
+    # A JVM: one process, but every thread counts towards the limit
+    pids_limit: 1000
     depends_on:
       sam-data-init:
         condition: service_completed_successfully
@@ -223,11 +269,19 @@ services:
       # Since 18 the image keeps its data in /var/lib/postgresql/<major>/docker. A volume from an
       # older major makes it refuse to start: see "Major PostgreSQL upgrade" in production-setup.md
       - postgres-data:/var/lib/postgresql
+    networks:
+      - backend
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-sam} -d sam_music"]
       interval: 10s
       timeout: 5s
       retries: 5
+    <<: *hardening
+    # The entrypoint starts as root, fixes the data directory's owner and mode and switches to
+    # the postgres user
+    cap_add: [CHOWN, DAC_OVERRIDE, FOWNER, SETUID, SETGID]
+    # One process per connection (max_connections=50) plus the background workers
+    pids_limit: 200
     restart: unless-stopped
 
   # Monitoring (opt-in: add `monitoring` to COMPOSE_PROFILES). Prometheus collects the metrics of
@@ -246,6 +300,12 @@ services:
     volumes:
       - ./monitoring/prometheus.prod.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus-data:/prometheus
+    # edge: scrapes sam-server:9000 and Caddy's :9180; monitoring: Grafana and node-exporter
+    networks:
+      - edge
+      - monitoring
+    <<: *hardening
+    pids_limit: 200
     mem_limit: 384m
     restart: unless-stopped
 
@@ -272,8 +332,12 @@ services:
       - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
       - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
       - grafana-data:/var/lib/grafana
+    networks:
+      - monitoring
     depends_on:
       - prometheus
+    <<: *hardening
+    pids_limit: 200
     mem_limit: 256m
     restart: unless-stopped
 
@@ -291,11 +355,16 @@ services:
       - --no-collector.arp
     volumes:
       - /:/host:ro
+    networks:
+      - monitoring
+    <<: *hardening
+    pids_limit: 100
     mem_limit: 64m
     restart: unless-stopped
 
   # Helpers for scripts/backup/{backup,restore}.sh — not started with the stack (profile "backup").
-  # BACKUP_DIR is exported by those scripts.
+  # BACKUP_DIR is exported by those scripts. Short-lived, without network; they keep root's
+  # default capabilities, as tar reads and restores files of other users with their owners.
   backup-files:
     image: alpine:3
     profiles: ["backup"]
@@ -303,6 +372,9 @@ services:
     volumes:
       - sam-data:/data:ro
       - ${BACKUP_DIR:-./backups}:/out
+    network_mode: none
+    security_opt:
+      - no-new-privileges:true
 
   restore-files:
     image: alpine:3
@@ -310,6 +382,22 @@ services:
     volumes:
       - sam-data:/data
       - ${BACKUP_DIR:-./backups}:/in:ro
+    network_mode: none
+    security_opt:
+      - no-new-privileges:true
+
+# Who reaches whom. edge: the internet-facing proxy, the API and the login provider (and
+# Prometheus, which scrapes the first two). backend and keycloak-db: each database with its one
+# client only, internal (no internet). monitoring: Grafana and the host exporter meet Prometheus
+# only. The proxy thus reaches neither a database nor Grafana; sam-server's management port
+# (9000, health and metrics) stays reachable on the edge network.
+networks:
+  edge:
+  backend:
+    internal: true
+  keycloak-db:
+    internal: true
+  monitoring:
 
 volumes:
   postgres-data:
