@@ -19,6 +19,24 @@
 {$SAM_DOMAIN} {
 	encode zstd gzip
 
+	# Security headers, set once the response is ready (defer), so they replace instead of
+	# doubling what sam-server sends itself. The CSP allows what the SPA loads: its own scripts
+	# and fonts, inline styles (the UI library writes its theme as <style> at runtime), data:/blob:
+	# images and blob: frames (document previews), and the token calls to the login host. The
+	# production build doesn't inline critical CSS (angular.json), as that needs an inline script.
+	# HSTS without includeSubDomains: other hosts of the domain may not serve HTTPS.
+	header {
+		defer
+		Strict-Transport-Security "max-age=31536000"
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://{$LOGIN_DOMAIN}; frame-src 'self' blob:; media-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+		?X-Content-Type-Options nosniff
+		X-Frame-Options DENY
+		Referrer-Policy same-origin
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+		Cross-Origin-Opener-Policy same-origin
+		-Server
+	}
+
 	# Ops endpoints (ADR-0010): reachable on the internal network only.
 	# Prometheus scrapes sam-server:9000 directly.
 	handle /q/* {
@@ -48,6 +66,17 @@
 # Login host: the active OIDC provider. Pocket ID and Keycloak both answer as oidc:8080 on the
 # internal network (docker-compose.prod.yml), so this needs no provider setting.
 {$LOGIN_DOMAIN} {
+	# The provider sends its own CSP; add what it lacks without overriding its own values. The
+	# referrer policy stays the browsers' default: a stricter one makes form posts send
+	# `Origin: null`, which the provider's cross-origin checks may refuse.
+	header {
+		defer
+		Strict-Transport-Security "max-age=31536000"
+		?X-Content-Type-Options nosniff
+		?Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+
 	# Keycloak's admin console and admin REST API stay off the internet: use them through an
 	# SSH tunnel to the server. Pocket ID has no /admin path (its admin pages are /settings/admin).
 	@admin path /admin /admin/*
