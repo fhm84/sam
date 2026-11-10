@@ -18,6 +18,8 @@ import java.util.Objects;
 import org.xhtmlrenderer.pdf.ITextOutputDevice;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 import org.xhtmlrenderer.pdf.ITextUserAgent;
+import org.xhtmlrenderer.simple.extend.XhtmlCssOnlyNamespaceHandler;
+import org.xhtmlrenderer.util.Configuration;
 
 @ApplicationScoped
 public class CollectionTocService {
@@ -70,10 +72,20 @@ public class CollectionTocService {
     }
 
     /**
-     * Refuses every URL (images, style sheets, fonts). Collection data ends up in the HTML, and the
-     * renderer would otherwise fetch whatever a crafted value points it at, from the server's network.
+     * Refuses every URL (images, style sheets, fonts) except the renderer's own default style sheet.
+     * Collection data ends up in the HTML, and the renderer would otherwise fetch whatever a crafted
+     * value points it at, from the server's network.
      */
     static final class NoExternalResources extends ITextUserAgent {
+
+        /**
+         * Flying Saucer's built-in style sheet from its own jar, loaded through this user agent. It
+         * keeps head and style elements off the page, among others: without it, the template's CSS
+         * is printed as text.
+         */
+        static final String DEFAULT_STYLESHEET = Objects.requireNonNull(XhtmlCssOnlyNamespaceHandler.class.getResource(
+                        Configuration.valueFor("xr.css.user-agent-default-css") + "XhtmlNamespaceHandler.css"))
+                .toString();
 
         NoExternalResources(final ITextOutputDevice device, final int dotsPerPixel) {
             super(device, dotsPerPixel);
@@ -81,11 +93,17 @@ public class CollectionTocService {
 
         @Override
         protected InputStream openStream(final String uri) throws IOException {
+            if (DEFAULT_STYLESHEET.equals(uri)) {
+                return super.openStream(uri);
+            }
             throw new IOException("External resources are not loaded: " + uri);
         }
 
         @Override
         protected URLConnection openConnection(final String uri) throws IOException {
+            if (DEFAULT_STYLESHEET.equals(uri)) {
+                return super.openConnection(uri);
+            }
             throw new IOException("External resources are not loaded: " + uri);
         }
     }

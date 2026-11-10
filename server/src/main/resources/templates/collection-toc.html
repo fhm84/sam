@@ -13,13 +13,14 @@
                 color: #888888;
             }
             @bottom-left {
-                content: element(footer);
+                content: element(page-footer);
             }
         }
 
-        /* The name comes from the document, not a CSS string: data must never become CSS */
-        .footer {
-            position: running(footer);
+        /* The name comes from the document, not a CSS string: data must never become CSS.
+           Its own class: anything else with it would replace the name on later pages. */
+        .page-footer {
+            position: running(page-footer);
             font-size: 9pt;
             color: #888888;
         }
@@ -160,7 +161,7 @@
 </head>
 <body>
 
-<div class="footer">{collection.name}</div>
+<div class="page-footer">{collection.name}</div>
 
 <div class="header">
     <h1>{collection.name}</h1>
