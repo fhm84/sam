@@ -42,7 +42,10 @@ fi
 if grep -qx pocket-id <<<"$services"; then
   # Pocket ID's own export: a consistent ZIP of its database and uploads, taken while it runs
   echo "Exporting Pocket ID"
-  "${COMPOSE[@]}" exec -T pocket-id /app/pocket-id export -p - >"$tmp/pocket-id.zip"
+  # As the owner of its data: root in the container has no capability to read other users'
+  # files (docker-compose.prod.yml drops them), and Pocket ID keeps its uploads owner-only
+  owner="$("${COMPOSE[@]}" exec -T pocket-id stat -c %u:%g /app/data)"
+  "${COMPOSE[@]}" exec -T --user "$owner" pocket-id /app/pocket-id export -p - >"$tmp/pocket-id.zip"
   [ "$(head -c 2 "$tmp/pocket-id.zip")" = PK ] || { echo "ERROR: pocket-id.zip is not a ZIP file" >&2; exit 1; }
   files+=(pocket-id.zip)
 fi
