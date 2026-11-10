@@ -1,6 +1,7 @@
 package de.halbmann.sam.business.collections.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.sun.net.httpserver.HttpServer;
@@ -15,8 +16,29 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/** The PDF renderer must not load anything from outside, whatever the HTML asks for. */
+/**
+ * The PDF renderer must not load anything from outside, whatever the HTML asks for, but still use
+ * its own built-in default style sheet (which, among others, keeps head and style elements out of
+ * the page).
+ */
 class CollectionTocRenderingTest {
+
+    @Test
+    void styleElementsAreNotPrintedAsText() throws IOException {
+        String html = """
+                <html xmlns="http://www.w3.org/1999/xhtml"><head>
+                <title>Programme</title>
+                <style type="text/css">p.lead { margin-left: 2cm; }</style>
+                </head><body><p class="lead">Spring concert</p></body></html>
+                """;
+
+        try (PDDocument document = Loader.loadPDF(CollectionTocService.render(html))) {
+            String text = new PDFTextStripper().getText(document);
+            assertTrue(text.contains("Spring concert"));
+            assertFalse(text.contains("margin-left"), "the style sheet was printed: " + text);
+            assertFalse(text.contains("Programme"), "the head was printed: " + text);
+        }
+    }
 
     private HttpServer server;
     private final List<String> requests = new CopyOnWriteArrayList<>();

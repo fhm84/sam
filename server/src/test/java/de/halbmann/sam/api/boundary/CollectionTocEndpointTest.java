@@ -122,6 +122,15 @@ class CollectionTocEndpointTest {
         assertTrue(pdf.text().contains(expected), () -> "'" + expected + "' not in: " + pdf.text());
     }
 
+    /**
+     * How often {@code value} is printed, ignoring whitespace: text extraction may break or space
+     * out a large, wrapped heading differently from the source.
+     */
+    private static int occurrences(Pdf pdf, String value) {
+        String text = pdf.text().replaceAll("\\s+", "");
+        return text.split(Pattern.quote(value.replaceAll("\\s+", "")), -1).length - 1;
+    }
+
     @Test
     @TestSecurity(
             user = LIBRARIAN,
@@ -172,8 +181,10 @@ class CollectionTocEndpointTest {
         for (int page = 1; page <= pdf.pages(); page++) {
             assertContains(pdf, page + " / " + pdf.pages());
         }
-        // In the heading once, and in the footer of every page
-        assertEquals(pdf.pages() + 1, pdf.text().split(Pattern.quote(collectionName), -1).length - 1);
+        // In the heading once, and in the footer of every page (the document title is not printed)
+        assertEquals(pdf.pages() + 1, occurrences(pdf, collectionName), pdf::text);
+        // Below the table, not taken into the page footer
+        assertEquals(1, occurrences(pdf, "Generated on"), pdf::text);
     }
 
     /** A name that would break out of a CSS string stays plain text in the PDF. */
@@ -191,7 +202,7 @@ class CollectionTocEndpointTest {
             Pdf pdf = parsePdf(given().get("/api/sheet-collections/{id}/toc", id));
 
             // Heading and footer
-            assertEquals(2, pdf.text().split(Pattern.quote(name), -1).length - 1, () -> pdf.text());
+            assertEquals(2, occurrences(pdf, name), pdf::text);
         } finally {
             collectionService.delete(id);
         }
