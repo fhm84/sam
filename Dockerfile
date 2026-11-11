@@ -11,7 +11,8 @@ RUN npm ci
 COPY ui/src/main/webui/ .
 RUN npm run build
 
-FROM caddy:2
+# 2.11 or later: docker/Caddyfile's access log uses roll_at, which older versions reject
+FROM caddy:2.11
 COPY --from=build /app/dist/sam/browser /srv
 COPY docker/Caddyfile /etc/caddy/Caddyfile
 EXPOSE 80 443
