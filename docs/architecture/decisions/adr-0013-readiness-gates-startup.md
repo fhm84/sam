@@ -35,6 +35,6 @@ process exits.
 - The healthcheck only gates startup. A server that becomes unhealthy later is marked
   unhealthy in `docker ps` but keeps running and keeps receiving traffic. Alerts for that
   belong to outside-in monitoring (uptime check on the public URL, a dead-man's switch for the
-  backup), which this decision doesn't cover.
+  backup), which this decision doesn't cover; see [ADR-0018](adr-0018-alerts-dead-mans-switch.md).
 - The storage probe writes a small file every 10 s. On S3 storage that is about 26,000 cheap
   requests a day; cache the result if S3 is ever used in production.
