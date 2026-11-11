@@ -33,6 +33,8 @@ services:
     volumes:
       - caddy-data:/data
       - caddy-config:/config
+      # Access logs, rolled daily and kept 14 days (docker/Caddyfile); not part of the backup
+      - caddy-logs:/var/log/caddy
     networks:
       edge:
         # sam-server validates tokens against the public issuer URL; the alias keeps
@@ -406,5 +408,6 @@ volumes:
   keycloak-db-data:
   caddy-data:
   caddy-config:
+  caddy-logs:
   prometheus-data:
   grafana-data:

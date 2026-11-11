@@ -10,6 +10,47 @@
 	}
 }
 
+# Secrets that travel in URLs, masked before an access log line is written: share links (SPA
+# route and API), Pocket ID's login links, sign-up links and the login code exchange, and the
+# OIDC parameters a login passes through the address bar (`code` and `state` on the app's return
+# URL, Pocket ID's `token` for e-mail checks, Keycloak's `key` and `session_code`, the ID token on
+# logout). Parameters are also found percent-encoded inside another one (a login redirect carries
+# the original request in `redirect=`). Applied to the requested URI, the Referer (the SPA sends
+# its full address to its own origin) and redirects (the login host returns `code` in one).
+(redact_url) {
+	regexp "(/share/|/api/public/shares/|/lc/|/st/|/api/one-time-access-token/)[^/?#]+" "${1}REDACTED"
+	regexp "((?:[?&]|%3[Ff]|%26)(?:code|state|session_state|session_code|key|token|access_token|id_token_hint|login_hint)(?:=|%3[Dd]))(?:[^&#%]|%[013-9A-Fa-f][0-9A-Fa-f]|%2[0-57-9A-Fa-f])*" "${1}REDACTED"
+}
+
+# Access log of both sites, for looking into incidents. docker-compose.prod.yml keeps
+# /var/log/caddy on a volume. The file rolls at midnight (UTC; a fixed time holds across restarts,
+# an interval would start over with each one), rolled files are gzipped and deleted at the next
+# rolls once older than 12 days: no line is older than 14 days (state that period in the privacy
+# policy, see docs/architecture/production-setup.md). Caddy already blanks the Authorization and
+# Cookie headers. Client IPs stay complete: they are what an incident needs.
+(access_log) {
+	log {
+		output file /var/log/caddy/access.log {
+			roll_at 00:00
+			roll_keep_for 12d
+			# Count and size limits only cap a flood; the days apply first
+			roll_keep 30
+			roll_size 50MiB
+		}
+		format filter {
+			request>uri multi_regexp {
+				import redact_url
+			}
+			request>headers>Referer multi_regexp {
+				import redact_url
+			}
+			resp_headers>Location multi_regexp {
+				import redact_url
+			}
+		}
+	}
+}
+
 # Prometheus metrics (docker-compose.prod.yml, profile "monitoring"). Port 9180 is not
 # published, so only containers on the stack's network reach it.
 :9180 {
@@ -17,6 +58,7 @@
 }
 
 {$SAM_DOMAIN} {
+	import access_log
 	encode zstd gzip
 
 	# Security headers, set once the response is ready (defer), so they replace instead of
@@ -66,6 +108,8 @@
 # Login host: the active OIDC provider. Pocket ID and Keycloak both answer as oidc:8080 on the
 # internal network (docker-compose.prod.yml), so this needs no provider setting.
 {$LOGIN_DOMAIN} {
+	import access_log
+
 	# The provider sends its own CSP; add what it lacks without overriding its own values. The
 	# referrer policy stays the browsers' default: a stricter one makes form posts send
 	# `Origin: null`, which the provider's cross-origin checks may refuse.
