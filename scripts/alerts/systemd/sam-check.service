@@ -1,8 +1,9 @@
 [Unit]
 Description=SAM health check
-# Wants, not Requires: with Docker down the check still runs and reports it
-Wants=docker.service network-online.target
+# Ordered after Docker but without pulling it in: the check reports a stopped Docker and must not
+# start it again (it doesn't call docker then either, which would start it through its socket)
 After=docker.service network-online.target
+Wants=network-online.target
 
 [Service]
 Type=oneshot
@@ -10,4 +11,5 @@ Type=oneshot
 ExecStart=/usr/bin/bash /opt/sam/scripts/alerts/check.sh
 # "-": a failed report must not fail the run
 ExecStopPost=-/usr/bin/bash /opt/sam/scripts/alerts/report.sh SAM_ALERT_CHECK_URL
-TimeoutStartSec=3min
+# The check's own time limits add up to about 2 minutes
+TimeoutStartSec=4min
