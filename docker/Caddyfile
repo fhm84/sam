@@ -14,12 +14,18 @@
 # route and API), Pocket ID's login links, sign-up links and the login code exchange, and the
 # OIDC parameters a login passes through the address bar (`code` and `state` on the app's return
 # URL, Pocket ID's `token` for e-mail checks, Keycloak's `key` and `session_code`, the ID token on
-# logout). Parameters are also found percent-encoded inside another one (a login redirect carries
-# the original request in `redirect=`). Applied to the requested URI, the Referer (the SPA sends
-# its full address to its own origin) and redirects (the login host returns `code` in one).
+# logout). Both are also found percent-encoded, at any depth, inside another parameter (a login
+# redirect carries the original request in `redirect=`). Applied to the requested URI, the
+# Referer (the SPA sends its full address to its own origin) and redirects (the login host
+# returns `code` in one).
+#
+# How the patterns read: `%(?:25)*XX` is the character with hex code XX, encoded once or more
+# (%2F, %252F, ...). Separators: / is 2F, ? is 3F, & is 26, = is 3D. A masked value ends at the
+# next separator, plain or encoded: the character classes after the prefix allow any other
+# character or encoded character (and leave out 25, so an encoded % can't hide a separator).
 (redact_url) {
-	regexp "(/share/|/api/public/shares/|/lc/|/st/|/api/one-time-access-token/)[^/?#]+" "${1}REDACTED"
-	regexp "((?:[?&]|%3[Ff]|%26)(?:code|state|session_state|session_code|key|token|access_token|id_token_hint|login_hint)(?:=|%3[Dd]))(?:[^&#%]|%[013-9A-Fa-f][0-9A-Fa-f]|%2[0-57-9A-Fa-f])*" "${1}REDACTED"
+	regexp "((?:/|%(?:25)*2[Ff])(?:share|lc|st|api(?:/|%(?:25)*2[Ff])public(?:/|%(?:25)*2[Ff])shares|api(?:/|%(?:25)*2[Ff])one-time-access-token)(?:/|%(?:25)*2[Ff]))(?:[^/?#&%]|%(?:25)*(?:[014-9A-Fa-f][0-9A-Fa-f]|2[0-24789A-Ea-e]|3[0-9A-Ea-e]))+" "${1}REDACTED"
+	regexp "((?:[?&]|%(?:25)*(?:3[Ff]|26))(?:code|state|session_state|session_code|key|token|access_token|id_token_hint|login_hint)(?:=|%(?:25)*3[Dd]))(?:[^&#%]|%(?:25)*(?:[013-9A-Fa-f][0-9A-Fa-f]|2[0-247-9A-Fa-f]))*" "${1}REDACTED"
 }
 
 # Access log of both sites, for looking into incidents. docker-compose.prod.yml keeps

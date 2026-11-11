@@ -24,9 +24,9 @@ attribution of downloads over 12 months, not incident response.
   request URI, the Referer and the `Location` of redirects: the paths `/share/`,
   `/api/public/shares/`, `/lc/`, `/st/` (Pocket ID's sign-up links) and
   `/api/one-time-access-token/`, and the query parameters `code`, `state`, `session_state`,
-  `session_code`, `key`, `token`, `access_token`, `id_token_hint` and `login_hint`, also when
-  they are percent-encoded inside another parameter (a login redirect carries the original
-  request). Caddy blanks the `Authorization` and `Cookie` headers by default.
+  `session_code`, `key`, `token`, `access_token`, `id_token_hint` and `login_hint`. Paths and
+  parameters are also found percent-encoded, at any depth, inside another parameter (a login
+  redirect carries the original request). Caddy blanks the `Authorization` and `Cookie` headers by default.
 - The log stays on the server and is not part of the backup.
 
 ## Consequences
