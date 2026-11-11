@@ -42,4 +42,7 @@ else
   body="Result: ${SERVICE_RESULT:-unknown} (${EXIT_CODE:-} ${EXIT_STATUS:-})"$'\n'"$body"
 fi
 
-curl -fsS --max-time 10 --retry 3 --data-binary @- "$url$suffix" <<<"$body" >/dev/null
+# /fail goes into the path, before a query string (e.g. ?create=1 of a slug URL)
+path="${url%%\?*}"
+query="${url:${#path}}"
+curl -fsS --max-time 10 --retry 3 --data-binary @- "${path%/}$suffix$query" <<<"$body" >/dev/null

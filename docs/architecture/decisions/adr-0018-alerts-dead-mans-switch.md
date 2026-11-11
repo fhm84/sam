@@ -19,9 +19,11 @@ the stack, so notifications have to be few and come with the reason.
 - Two reporters, both systemd units on the host, both optional (no URL in `.env`, no report):
   - `sam-check.timer`, every 5 minutes: `scripts/alerts/check.sh` checks the containers, the
     app and the login host through Caddy, certificate trust and remaining days, disk space and
-    inodes, and clock sync. A problem (a service, a host, a disk) only counts if the next run
-    (5 minutes later) still sees it. Every step has a time limit, so a hanging Docker is
-    reported, not waited for.
+    inodes, clock sync, and that Docker runs (without starting it). It reports a failure while
+    at least 2 of the last 4 runs (20 minutes) found a problem: one bad run, such as a
+    restart, doesn't count, a service that keeps failing and coming back does, and the alert
+    clears after three good runs in a row instead of flickering. Every step has a time limit,
+    so a hanging Docker is reported, not waited for.
   - `sam-backup.service` reports each nightly run.
 - `scripts/alerts/report.sh` runs as the units' `ExecStopPost`: it sends the run's result and
   log, so the notification says what is wrong. A failed report never fails the unit, and a
