@@ -32,7 +32,7 @@ A write-once access and activity log. Captures read events (downloads, exports) 
 | `metadata` | JSONB payload (filename, count, format, etc.) |
 | `shareTokenId` | Set when the event was triggered via a share link; `userId`/`username` are null in that case |
 
-IP addresses are not stored ([ADR-0004](../architecture/decisions/adr-0004-no-ip-logging.md)). `userId` + `username` give unambiguous attribution for authenticated access; share-link access is identified by `shareTokenId`.
+IP addresses are not stored in the event log ([ADR-0004](../architecture/decisions/adr-0004-no-ip-logging.md)); the edge proxy's access log holds them for at most 14 days, for incidents ([ADR-0017](../architecture/decisions/adr-0017-edge-access-log.md)). `userId` + `username` give unambiguous attribution for authenticated access; share-link access is identified by `shareTokenId`.
 
 ## Event log UI
 

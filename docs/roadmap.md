@@ -1177,7 +1177,8 @@ every night, and every user sees their own entries on *My activity*
 (`GET /api/me/event-logs`, GDPR right of access). The production setup has a
 [privacy policy note](architecture/production-setup.md#privacy-policy-note) to adapt.
 
-IP addresses are deliberately not stored — the `userId`+`username` pair gives
+IP addresses are deliberately not stored in this log (the edge proxy's access log keeps them
+for at most 14 days, for incidents: [ADR-0017](architecture/decisions/adr-0017-edge-access-log.md)) — the `userId`+`username` pair gives
 unambiguous attribution for all authenticated users, and IP logging would add GDPR
 compliance obligations without meaningful benefit for an ensemble-management context.
 
@@ -1488,7 +1489,7 @@ answered before the relevant implementation work begins.
 | 5 | Should coverage snapshots be invalidated automatically, or remain manual? | Coverage accuracy, performance | Open: **blocks a Next item.** Proposed: automatic per-sheet recompute, async full recompute on voice changes ([plan](plans/coverage-snapshot-invalidation.md)) |
 | 6 | Should lending / checkout be tracked per instrumentation or per physical copy? (Relevant if multiple copies per instrumentation are ever supported) | Lending, physical archive | Open |
 | 7 | Which OIDC provider? Self-hosted (Keycloak) or SaaS (Auth0, Google)? | Auth implementation | **Resolved:** Self-hosted Keycloak 26. **Revisited 2026-10-17:** self-hosted Pocket ID as the default, Keycloak stays supported ([plan](plans/pocket-id-provider.md), [ADR-0016](architecture/decisions/adr-0016-pocket-id-default-provider.md)). |
-| 8 | Should IP addresses be stored in the document access log, or omitted/anonymised? Requires GDPR/privacy policy decision. | Document access log | **Resolved: not stored.** `userId` (OIDC sub) + snapshotted `username` give unambiguous attribution; IP adds GDPR obligations without meaningful benefit in an ensemble context. |
+| 8 | Should IP addresses be stored in the document access log, or omitted/anonymised? Requires GDPR/privacy policy decision. | Document access log | **Resolved: not stored** (in this log; the edge access log is separate, [ADR-0017](architecture/decisions/adr-0017-edge-access-log.md)). `userId` (OIDC sub) + snapshotted `username` give unambiguous attribution; IP adds GDPR obligations without meaningful benefit in an ensemble context. |
 | 9 | What retention period for the document access log? (e.g. 12 months) | Document access log | **Resolved:** 12 months, configurable via `SAM_EVENT_LOG_RETENTION_MONTHS` (`0` turns deletion off); share-link entries follow the same rule ([event log](features/event-log.md#retention), [#147](https://github.com/fhm84/sam/issues/147)) |
 | 10 | All Claude Design files have now been reviewed for data model gaps. Resulting plans are in [implementation plans](plans/README.md) (open ones) and the roadmap. | Multiple | **Resolved** |
 | 11 | May users request a Pocket ID login code by email themselves, or do only admins send them? | Pocket ID login recovery | **Resolved:** admin only at first; revisit if it becomes a burden ([#222](https://github.com/fhm84/sam/issues/222)) |

@@ -22,4 +22,7 @@ access is identified by `shareTokenId` instead.
 - A retention policy for the log itself is still an open question
   ([Roadmap §8](../../roadmap.md#8-open-questions), question 9).
 
+- This covers the event log only. The edge proxy's access log, kept 14 days for incidents,
+  does hold client IPs ([ADR-0017](adr-0017-edge-access-log.md)).
+
 See [Audit & Event Log concept](../concepts/audit.md).

@@ -116,7 +116,7 @@ Someone who leaves: delete their user, or remove them from all groups and disabl
 
 SAM stores personal data, so the ensemble's privacy policy should say so before real members log in. A template to adapt (periods are the defaults; change them if you set `SAM_EVENT_LOG_RETENTION_MONTHS` or `SAM_MEMBERS_RETENTION_MONTHS`):
 
-> **Sheet music archive (SAM).** To give members access to sheet music, we store your name, your login (user ID and username at the login provider), and the contact details and ensemble seats the music librarian records. When you download or export sheet music, we log who did it, what, and when; we do not log IP addresses. These log entries are deleted after 12 months. Data of former members is deleted 12 months after they leave. You can see your member data under *My data* and your logged activity under *My activity*; for corrections or deletion, contact the music librarian.
+> **Sheet music archive (SAM).** To give members access to sheet music, we store your name, your login (user ID and username at the login provider), and the contact details and ensemble seats the music librarian records. When you download or export sheet music, we log who did it, what, and when (without IP addresses); these log entries are deleted after 12 months. To detect and investigate attacks, the web server logs every request with your IP address, the time, the address requested and your browser; these entries are deleted after 14 days. Data of former members is deleted 12 months after they leave. You can see your member data under *My data* and your logged activity under *My activity*; for corrections or deletion, contact the music librarian.
 
 ## 5. Backups (a second machine pulls from the server)
 
@@ -156,6 +156,46 @@ rsync -a --exclude='.tmp-*' -e "ssh -i ~/.ssh/sam_backup -o IdentitiesOnly=yes" 
 A provider's snapshots are not a backup — they live in the same account.
 
 **Verified locally** (Docker Desktop, test databases and volume): backup, pruning to the newest N, wiping the data, and restoring database rows, files and Pocket ID users from the backup. The systemd timer and the backup run on a Debian 13 server. **Not verified:** the `rrsync`-restricted key and the pull task, which need a backup machine.
+
+## 6. Logs and alerts
+
+**Access log** — Caddy logs every request to both hosts in `/var/log/caddy/access.log` inside `sam-ui` (volume `caddy-logs`): one JSON line per request with time, client IP, host, URI, status and browser. Share tokens, login and sign-up links and the OIDC `code`/`state` are masked before a line is written ([ADR-0017](decisions/adr-0017-edge-access-log.md)). The file rolls at midnight (UTC); rolled files are gzipped (`access-<time>.log.gz`) and deleted once older than 12 days, so no line is older than 14 days. It is not backed up.
+
+```bash
+docker compose -f docker-compose.prod.yml exec sam-ui tail -f /var/log/caddy/access.log
+# Older days, e.g. on a machine with jq: the requests that failed
+docker compose -f docker-compose.prod.yml exec -T sam-ui sh -c 'zcat /var/log/caddy/*.gz 2>/dev/null; cat /var/log/caddy/access.log' \
+  | jq -c 'select(.status >= 400) | {t: (.ts | todate), ip: .request.client_ip, host: .request.host, uri: .request.uri, status}'
+```
+
+`client_ip` is the real client's address only where Docker forwards the connection with it: over IPv4 it does; over IPv6 into an IPv4-only container network, Docker's proxy connects in its place and the log shows the network's gateway. Check after the first deployment that requests from another device show that device's address.
+
+**Container logs** — `docker compose -f docker-compose.prod.yml logs <service>`; Docker keeps up to 3 × 10 MB per container (`x-hardening` in the compose file) and drops them when a container is recreated, e.g. on an update.
+
+**Alerts** — a server can't report its own outage, so alerts go through an outside service that expects regular reports and notifies you when one says *failed* or when they stop coming: a dead man's switch ([ADR-0018](decisions/adr-0018-alerts-dead-mans-switch.md)). The scripts in `scripts/alerts/` use the ping API of [Healthchecks](https://healthchecks.io) (the hosted free plan is enough; it can also be self-hosted elsewhere).
+
+- `sam-check.timer` runs `scripts/alerts/check.sh` every 5 minutes: every service of the active profiles runs and isn't unhealthy; the app (`/oidc-config.json`, through Caddy to `sam-server`) and the login host answer over HTTPS on the server; both certificates are trusted and valid for 14 more days (`SAM_ALERT_CERT_DAYS`); no filesystem is fuller than 85 % (`SAM_ALERT_DISK_PERCENT`); the clock is synchronised. A problem (a service, a host, a disk) has to show up in two runs in a row before it counts, so a restart doesn't page you; every step has a time limit, and a setting that isn't a whole number is reported rather than switching a check off. The settings are read from the environment or `.env` as plain values (no `${...}`). It reports to `SAM_ALERT_CHECK_URL`.
+- The nightly backup reports each run to `SAM_ALERT_BACKUP_URL`.
+- `scripts/alerts/report.sh` sends the run's log with each report, so a notification comes with the reason. Reports hold service and host names, disk usage and backup file sizes, no personal data.
+
+Setup:
+
+1. At Healthchecks, create two checks: `sam-check` with a period of 5 minutes and a grace time of 10 minutes; `sam-backup` with the cron schedule `0 3 * * *` in the server's time zone and a grace time of 1 hour (the timer starts up to 10 minutes late, and a backup takes a few minutes). Choose how you want to be notified (e-mail, or an app such as ntfy, Signal or Telegram) and send a test notification.
+2. Put the two ping URLs into `.env` as `SAM_ALERT_CHECK_URL` and `SAM_ALERT_BACKUP_URL`. While Caddy issues certificates from its local CA (no public DNS yet), also set `SAM_ALERT_CERT_DAYS=0`.
+3. On the server:
+
+```bash
+STATE_FILE= bash /opt/sam/scripts/alerts/check.sh   # by hand: reports at once, writes nothing
+sudo systemctl link /opt/sam/scripts/alerts/systemd/sam-check.service \
+  /opt/sam/scripts/alerts/systemd/sam-check.timer
+sudo systemctl enable --now sam-check.timer
+sudo systemctl daemon-reload                         # sam-backup.service reports from now on
+# A failure end to end: the check turns red and notifies you; its next run turns it green again.
+# It says so when it can't read .env or the URL isn't set.
+SERVICE_RESULT=test bash /opt/sam/scripts/alerts/report.sh SAM_ALERT_CHECK_URL
+```
+
+Not covered: how the internet sees the server (DNS, port forwarding, the certificate it gets served); for that, add an outside uptime check of `https://<SAM_DOMAIN>/oidc-config.json` at go-live, from any uptime monitoring service. Nothing alerts on metrics either (memory, error rates): Grafana shows them.
 
 ## Related
 

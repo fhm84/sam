@@ -33,7 +33,11 @@ docker compose -f docker-compose.monitoring.yml up
   `http://localhost:3000`. It refuses to start without `GRAFANA_ADMIN_PASSWORD`, which applies
   on its first start only. It shares provisioning and dashboard with dev; the Edge and Host
   rows only have data in production.
-- Metrics only, no alerting: nobody is notified when something breaks.
+- Metrics only, no alert rules. Alerts come from `scripts/alerts/` on the host: a health check
+  every 5 minutes and the nightly backup report to an outside dead man's switch
+  (Healthchecks), which also notices a server that went silent
+  ([ADR-0018](../docs/architecture/decisions/adr-0018-alerts-dead-mans-switch.md), setup in
+  `docs/architecture/production-setup.md`, "Logs and alerts").
 - Memory limits: Prometheus 384 MB, Grafana 256 MB, node-exporter 64 MB (idle about 30, 140
   and 10 MB).
 

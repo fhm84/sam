@@ -8,7 +8,7 @@ Every domain entity is annotated with `@Audited` (Hibernate Envers). Each table 
 
 Read events (document downloads, exports, AI classification, share-link access) are tracked separately in the `event_log` table via `EventLogService` — Envers only covers writes.
 
-Share-link access is logged with `shareTokenId` set and `userId`/`username` as `null`. IP addresses are deliberately not stored (see [ADR-0004](../decisions/adr-0004-no-ip-logging.md)).
+Share-link access is logged with `shareTokenId` set and `userId`/`username` as `null`. IP addresses are deliberately not stored here (see [ADR-0004](../decisions/adr-0004-no-ip-logging.md); the edge proxy's access log keeps them for at most 14 days, [ADR-0017](../decisions/adr-0017-edge-access-log.md)).
 
 Entries are personal data: a nightly job deletes them after the retention period (12 months by default), and each user can read their own on *My activity* ([Event Log feature](../../features/event-log.md#retention)).
 
