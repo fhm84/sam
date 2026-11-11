@@ -1,0 +1,13 @@
+[Unit]
+Description=SAM health check
+# Wants, not Requires: with Docker down the check still runs and reports it
+Wants=docker.service network-online.target
+After=docker.service network-online.target
+
+[Service]
+Type=oneshot
+# Assumes the repo is checked out at /opt/sam
+ExecStart=/usr/bin/bash /opt/sam/scripts/alerts/check.sh
+# "-": a failed report must not fail the run
+ExecStopPost=-/usr/bin/bash /opt/sam/scripts/alerts/report.sh SAM_ALERT_CHECK_URL
+TimeoutStartSec=3min

@@ -7,5 +7,8 @@ After=docker.service
 Type=oneshot
 # Assumes the repo is checked out at /opt/sam
 ExecStart=/usr/bin/bash /opt/sam/scripts/backup/backup.sh
+# Reports the run to SAM_ALERT_BACKUP_URL, if set (scripts/alerts/report.sh); "-": a failed
+# report must not fail the backup
+ExecStopPost=-/usr/bin/bash /opt/sam/scripts/alerts/report.sh SAM_ALERT_BACKUP_URL
 Environment=BACKUP_DIR=/var/backups/sam
 Environment=BACKUP_GROUP=sam-backup
