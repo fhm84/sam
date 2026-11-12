@@ -127,6 +127,20 @@ The backup machine **pulls**; the server never has credentials for it. A comprom
 - Dumps the Postgres databases (`sam_music`, and `keycloak` with the Keycloak profile), exports Pocket ID's data with its own `pocket-id export` (`pocket-id.zip`: users, passkeys, groups, clients; consistent while it runs), archives the sheet music files (`sam-data` volume) and copies `.env`, into `/var/backups/sam/<timestamp>/` with a `SHA256SUMS` file. The directory is renamed into place only when complete, so a puller never sees a half-written backup.
 - Keeps the newest 7 backups locally; the backup machine keeps its own longer history.
 - `.env` contains secrets, so the backup directory is readable only by root and the `sam-backup` group.
+- **Encryption (recommended; required for any copy outside your own machines):** with `BACKUP_AGE_RECIPIENT` set, every file of the backup is encrypted with [age](https://age-encryption.org/) to that public key and stored as `<name>.age`. `SHA256SUMS` covers the encrypted files, so a copy can be checked without the key. Without the setting the backup holds the databases, the files and `.env` in plain form, and the script says so on every run.
+
+```bash
+# On your own computer, not on the server: create the key pair
+age-keygen -o sam-backup-key.txt          # prints the public key (age1…)
+# Keep sam-backup-key.txt in a password manager and nowhere near the server.
+
+# On the server
+sudo apt install age
+echo 'BACKUP_AGE_RECIPIENT=age1…' >> /opt/sam/.env   # the public key; several: comma-separated
+sudo systemctl start sam-backup.service               # the new backup holds only *.age files
+```
+
+The server can then write backups but not read them: whoever copies them, or takes over the server later, gets nothing out of them. **Without the private key the backups are worthless**, so keep it in two places (a second recipient, for example a second person's key, is a simple way) and prove it with a restore test. Backups made before the setting stay unencrypted until they are pruned.
 
 ```bash
 # one-time setup on the server (repo checked out at /opt/sam, see step 3)
@@ -147,7 +161,7 @@ rsync -a --exclude='.tmp-*' -e "ssh -i ~/.ssh/sam_backup -o IdentitiesOnly=yes" 
 - No `--delete`: the backup machine keeps backups after the server has pruned them. Prune its copy yourself (for example keep 30 dailies and a few monthlies).
 - Put the backup user's **public** key in `/home/sam-backup/.ssh/authorized_keys` on the server, restricted to read-only rsync: `restrict,command="rrsync -ro /var/backups/sam" ssh-ed25519 AAAA… backup`. (`rrsync` ships with the `rsync` package; on Debian/Ubuntu it may need to be enabled or copied from the package docs.) In that case use `sam-backup@…:/` as the source path.
 
-**Restore** — `scripts/backup/restore.sh <backup-dir> --yes` verifies the checksums, stops the app, replaces the databases in the backup, Pocket ID's data (`pocket-id import`, if the backup has it) and the files, and starts the stack again. On a fresh server, first do steps 2 and 3 (up to a running stack), copy a backup directory over from the backup machine, then run it. **Restore test:** do it once before go-live on a scratch machine, and again now and then.
+**Restore** — `scripts/backup/restore.sh <backup-dir> --yes` (for an encrypted backup with `BACKUP_AGE_IDENTITY=/path/to/sam-backup-key.txt` in front and `age` installed; it first checks that the key opens every file) verifies the checksums, stops the app, replaces the databases in the backup, Pocket ID's data (`pocket-id import`, if the backup has it) and the files, and starts the stack again. On a fresh server, first do steps 2 and 3 (up to a running stack), copy a backup directory over from the backup machine, then run it. The server's `.env` is in the backup too (`env`, or `age -d -i sam-backup-key.txt <backup-dir>/env.age > .env`). Delete the key file from the server afterwards. **Restore test:** do it once before go-live on a scratch machine, and again now and then.
 
 **Major PostgreSQL upgrade** — a new major version can't read the old data files, and the `postgres` image refuses to start on them, so the data moves through a backup. With the old version still running: run `scripts/backup/backup.sh` and keep the backup directory. Then `docker compose -f docker-compose.prod.yml down`, delete the database volume (`docker volume rm <project>_postgres-data`, with Keycloak also `<project>_keycloak-db-data`), update the checkout, pull the images and run `restore.sh` as above. Don't start the stack first: `restore.sh` starts the database and restores it before the app runs, whereas an app started on the empty database would run its migrations and leave tables behind that the backup doesn't know. Check the result before deleting the backup.
 
@@ -155,7 +169,7 @@ rsync -a --exclude='.tmp-*' -e "ssh -i ~/.ssh/sam_backup -o IdentitiesOnly=yes" 
 
 A provider's snapshots are not a backup — they live in the same account.
 
-**Verified locally** (Docker Desktop, test databases and volume): backup, pruning to the newest N, wiping the data, and restoring database rows, files and Pocket ID users from the backup. The systemd timer and the backup run on a Debian 13 server. **Not verified:** the `rrsync`-restricted key and the pull task, which need a backup machine.
+**Verified locally** (Docker Desktop, test databases and volume): backup, pruning to the newest N, wiping the data, and restoring database rows, files and Pocket ID users from the backup. With encryption (in a Linux container, `age` 1.3): only `*.age` files in the backup, a restore that refuses a missing or wrong key before it stops anything, and the restore with the right key. The systemd timer and the backup run on a Debian 13 server. **Not verified:** the `rrsync`-restricted key and the pull task, which need a backup machine.
 
 ## 6. Logs and alerts
 
