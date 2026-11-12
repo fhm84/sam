@@ -28,6 +28,8 @@ cleanup() {
 }
 trap cleanup EXIT
 
+# Before any container mounts it: Docker would create the missing directory as root
+mkdir "$BACKUP_DIR"
 age-keygen -o "$work/key.txt" 2>/dev/null
 age-keygen -o "$work/other-key.txt" 2>/dev/null
 cat >"$ENV_FILE" <<EOF
