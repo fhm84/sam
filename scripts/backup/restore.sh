@@ -11,12 +11,16 @@
 #
 # .env is not restored: on a new machine, get it back first with
 #   age -d -i /path/to/key.txt <backup-dir>/env.age > .env
+#
+# RESTORE_START=no leaves the stack stopped at the end (the databases keep running), for
+# starting it yourself, for example with further compose files.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 SRC="${1:?usage: restore.sh <backup-dir> --yes}"
 [ "${2:-}" = "--yes" ] || { echo "Refusing to overwrite data without --yes" >&2; exit 1; }
-export BACKUP_DIR="$(cd "$SRC/.." && pwd)"
+BACKUP_DIR="$(cd "$SRC/.." && pwd)"
+export BACKUP_DIR
 ENV_FILE="${ENV_FILE:-$ROOT/.env}"
 COMPOSE=(docker compose -f "$ROOT/docker-compose.prod.yml" --env-file "$ENV_FILE")
 
@@ -81,5 +85,9 @@ echo "Restoring sheet music files"
 content sam-data.tar.gz | "${COMPOSE[@]}" run --rm -T --no-deps restore-files sh -c \
   'find /data -mindepth 1 -delete && tar xzf - -C /data'
 
-echo "Starting the stack"
-"${COMPOSE[@]}" up -d
+if [ "${RESTORE_START:-yes}" = no ]; then
+  echo "Not starting the stack (RESTORE_START=no); the databases keep running"
+else
+  echo "Starting the stack"
+  "${COMPOSE[@]}" up -d
+fi

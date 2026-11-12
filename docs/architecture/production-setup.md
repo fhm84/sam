@@ -169,7 +169,7 @@ rsync -a --exclude='.tmp-*' -e "ssh -i ~/.ssh/sam_backup -o IdentitiesOnly=yes" 
 
 A provider's snapshots are not a backup — they live in the same account.
 
-**Verified locally** (Docker Desktop, test databases and volume): backup, pruning to the newest N, wiping the data, and restoring database rows, files and Pocket ID users from the backup. With encryption (in a Linux container, `age` 1.3): only `*.age` files in the backup, a restore that refuses a missing or wrong key before it stops anything, and the restore with the right key. The systemd timer and the backup run on a Debian 13 server. **Not verified:** the `rrsync`-restricted key and the pull task, which need a backup machine.
+**Verified locally** (Docker Desktop, test databases and volume): backup, pruning to the newest N, wiping the data, and restoring database rows, files and Pocket ID users from the backup. **Tested on every change** by `scripts/backup/test.sh` (CI workflow *Scripts*; run it yourself on Linux with Docker and `age`): on a throwaway database, Pocket ID and file volume it checks the encrypted backup (only `*.age` files, checksums, group permissions), a restore that refuses a missing key, a wrong key or a damaged file before it stops anything, the restore with the right key, the unencrypted backup and restore, and pruning. The test doesn't cover starting the whole stack after a restore, or what Pocket ID holds after its import. The systemd timer and the backup run on a Debian 13 server. **Not verified:** the `rrsync`-restricted key and the pull task, which need a backup machine.
 
 ## 6. Logs and alerts
 
