@@ -38,7 +38,7 @@ docker compose -f docker-compose.monitoring.yml up
   (Healthchecks), which also notices a server that went silent
   ([ADR-0018](../docs/architecture/decisions/adr-0018-alerts-dead-mans-switch.md), setup in
   `docs/architecture/production-setup.md`, "Logs and alerts").
-- Memory limits: Prometheus 384 MB, Grafana 256 MB, node-exporter 64 MB (idle about 30, 140
+- Memory limits: Prometheus 384 MB, Grafana 512 MB, node-exporter 64 MB (idle about 30, 220
   and 10 MB).
 
 ## Management interface

@@ -291,7 +291,7 @@ services:
   # published to the network: Grafana listens on the server's loopback only, open it through an
   # SSH tunnel. See monitoring/CLAUDE.md.
   prometheus:
-    image: prom/prometheus:v3.10.0
+    image: prom/prometheus:v3.16.0
     profiles: ["monitoring"]
     command:
       - --config.file=/etc/prometheus/prometheus.yml
@@ -312,7 +312,7 @@ services:
     restart: unless-stopped
 
   grafana:
-    image: grafana/grafana:12.3
+    image: grafana/grafana:13.3.1
     profiles: ["monitoring"]
     ports:
       - "127.0.0.1:3000:3000"
@@ -339,15 +339,15 @@ services:
     depends_on:
       - prometheus
     <<: *hardening
-    pids_limit: 200
-    mem_limit: 256m
+    pids_limit: 400
+    mem_limit: 512m
     restart: unless-stopped
 
   # Host metrics (CPU, memory, disks). Reads the host's /proc and /sys through the read-only
   # root mount; it runs in its own network namespace, so the network collectors would report the
   # container's traffic, not the host's, and are off (Caddy's metrics cover the web traffic).
   node-exporter:
-    image: prom/node-exporter:v1.11.1
+    image: prom/node-exporter:v1.12.1
     profiles: ["monitoring"]
     command:
       - --path.rootfs=/host
