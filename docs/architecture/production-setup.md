@@ -120,6 +120,26 @@ SAM stores personal data, so the ensemble's privacy policy should say so before 
 
 ## 5. Backups (a second machine pulls from the server)
 
+```mermaid
+flowchart LR
+    subgraph server ["Server"]
+        data["SAM database<br/>login provider's data<br/>sheet music files<br/>.env"]
+        script["backup.sh<br/>nightly at 03:00"]
+        dir[("/var/backups/sam<br/>newest 7 backups")]
+        data --> script
+        script -->|"encrypted with the<br/>age public key"| dir
+    end
+    subgraph second ["Backup machine"]
+        copy[("its own, longer history")]
+    end
+    key(["age private key<br/>kept away from the server"])
+    restore["restore.sh<br/>on the server or a new one"]
+    dir -->|"pulled over SSH<br/>(read-only key)"| copy
+    dir --> restore
+    copy --> restore
+    key -. "opens the backup" .-> restore
+```
+
 The backup machine **pulls**; the server never has credentials for it. A compromised server therefore cannot delete or encrypt the backup history, and no VPN or open port on the backup machine's network is needed (it only makes outbound SSH connections).
 
 **On the server** — `scripts/backup/backup.sh`, run nightly at 03:00 by a systemd timer:

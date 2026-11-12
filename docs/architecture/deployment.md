@@ -52,6 +52,37 @@ The production compose file splits the stack into networks, so a compromised edg
 | `keycloak-db` | Keycloak, its database | Internal; `keycloak` profile only |
 | `monitoring` | Prometheus, Grafana, node-exporter | Grafana's loopback port is published from here |
 
+Who talks to whom (default provider, with the `monitoring` profile):
+
+```mermaid
+flowchart LR
+    client(["Browser"]) -->|":443"| caddy
+    tunnel(["SSH tunnel"]) -->|"127.0.0.1:3000"| grafana
+    subgraph edge ["edge"]
+        caddy["sam-ui (Caddy)"]
+        server["sam-server"]
+        oidc["OIDC provider<br/>(Pocket ID)"]
+    end
+    subgraph backend ["backend (no internet)"]
+        db[("database")]
+    end
+    subgraph monitoring ["monitoring"]
+        prom["Prometheus<br/>(also on edge)"]
+        grafana["Grafana"]
+        nodeexp["node-exporter"]
+    end
+    caddy --> server
+    caddy --> oidc
+    server --> db
+    server -->|"user search"| oidc
+    grafana --> prom
+    prom -->|"scrapes"| server
+    prom -->|"scrapes"| caddy
+    prom -->|"scrapes"| nodeexp
+    server -->|"AI provider"| internet(["Internet"])
+    caddy -->|"Let's Encrypt"| internet
+```
+
 The one-shot helpers (`sam-data-init`, the backup's `backup-files` and `restore-files`) run without a network. Every long-running service runs with `no-new-privileges`, drops all Linux capabilities except the few it needs (Caddy binds ports 80/443; Pocket ID's and Postgres' entrypoints switch from root to their own user; `sam-data-init` chowns), has a PID limit (a JVM's threads count) and rotates its logs (`json-file`, 3 × 10 MB). Root in a container therefore can't read other users' files: the backup exports Pocket ID's data as the owner of `/app/data`. Not done (yet): read-only root filesystems (`sam-server` writes large temp files when merging PDFs) and user namespaces (they change the ownership of every volume).
 
 ## OIDC Config Endpoint
