@@ -213,27 +213,27 @@
                             <!-- Skip test-scoped dependencies -->
                             <skipTestScope>true</skipTestScope>
                             <!-- Scan the Angular project as well -->
-                            <nodePackageSkip>false</nodePackageSkip>
-                            <nodePackageAnalyzerEnabled>true</nodePackageAnalyzerEnabled>
-                            <nodeAuditSkip>false</nodeAuditSkip>
                             <nodeAuditAnalyzerEnabled>true</nodeAuditAnalyzerEnabled>
                             <formats>
                                 <format>HTML</format>
                                 <format>JSON</format>
                             </formats>
-                            <!-- Aggregate report at root level -->
-                            <aggregate>true</aggregate>
+                            <!-- The aggregate goal only sees Maven dependencies: add the Angular project's
+                                 lock file for the Node analyzers above -->
+                            <scanSet>
+                                <fileSet>
+                                    <directory>${maven.multiModuleProjectDirectory}/ui/src/main/webui</directory>
+                                    <includes>
+                                        <include>package-lock.json</include>
+                                    </includes>
+                                </fileSet>
+                            </scanSet>
                             <outputDirectory>${maven.multiModuleProjectDirectory}/target/dependency-check-report
                             </outputDirectory>
                         </configuration>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>aggregate</goal>
-                                </goals>
-                                <phase>verify</phase>
-                            </execution>
-                        </executions>
+                        <!-- No execution bound to the build: bound to `verify`, the aggregate goal ran once
+                             per module and each run overwrote the report, leaving the last module's only.
+                             Run the goal itself: ./mvnw dependency-check:aggregate -Pdependency-check -->
                     </plugin>
                 </plugins>
             </build>
