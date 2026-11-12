@@ -55,3 +55,25 @@ updates:
     commit-message:
       prefix: "chore"
       include: "scope"
+
+  # Images in the compose files (login provider, databases, monitoring). Major versions of the
+  # databases and the login provider need a migration: upgrade those deliberately
+  # (docs/architecture/production-setup.md).
+  - package-ecosystem: "docker-compose"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    ignore:
+      - dependency-name: "postgres"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "ghcr.io/pocket-id/pocket-id"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "quay.io/keycloak/keycloak"
+        update-types: ["version-update:semver-major"]
+    groups:
+      compose-images:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+    commit-message:
+      prefix: "chore"
+      include: "scope"
