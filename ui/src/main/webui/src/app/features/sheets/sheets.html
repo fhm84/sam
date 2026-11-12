@@ -256,17 +256,27 @@
       <ng-template #body let-sheet>
         <tr class="cursor-pointer" [attr.data-testid]="'sheet-row-' + sheet.id" (click)="openDetail(sheet)">
           <td class="w-10 !pr-0">
-            <p-button
-              [icon]="sheet.favorite ? 'pi pi-star-fill' : 'pi pi-star'"
-              [severity]="sheet.favorite ? 'warn' : 'secondary'"
-              [rounded]="true"
-              [text]="true"
-              size="small"
-              [attr.data-testid]="'btn-favorite-' + sheet.id"
-              [pTooltip]="(sheet.favorite ? 'common.removeFromFavorites' : 'common.addToFavorites') | translate"
-              tooltipPosition="top"
-              (onClick)="toggleFavorite(sheet, $event)"
-            />
+            @if (auth.canWrite()) {
+              <p-button
+                [icon]="sheet.favorite ? 'pi pi-star-fill' : 'pi pi-star'"
+                [severity]="sheet.favorite ? 'warn' : 'secondary'"
+                [rounded]="true"
+                [text]="true"
+                size="small"
+                [attr.data-testid]="'btn-favorite-' + sheet.id"
+                [pTooltip]="(sheet.favorite ? 'common.removeFromFavorites' : 'common.addToFavorites') | translate"
+                tooltipPosition="top"
+                (onClick)="toggleFavorite(sheet, $event)"
+              />
+            } @else if (sheet.favorite) {
+              <i
+                class="pi pi-star-fill favorite-mark"
+                [attr.data-testid]="'favorite-' + sheet.id"
+                [pTooltip]="'common.favorite' | translate"
+                tooltipPosition="top"
+                [attr.aria-label]="'common.favorite' | translate"
+              ></i>
+            }
           </td>
           <td>
             <span class="block font-medium">{{ sheet.title }}</span>
@@ -416,17 +426,27 @@
               </div>
             }
             <div class="flex flex-row items-start gap-0.5 mb-3">
-              <p-button
-                [icon]="sheet.favorite ? 'pi pi-star-fill' : 'pi pi-star'"
-                [severity]="sheet.favorite ? 'warn' : 'secondary'"
-                [rounded]="true"
-                [text]="true"
-                size="small"
-                [attr.data-testid]="'btn-favorite-' + sheet.id"
-                [pTooltip]="(sheet.favorite ? 'common.removeFromFavorites' : 'common.addToFavorites') | translate"
-                tooltipPosition="top"
-                (onClick)="toggleFavorite(sheet, $event)"
-              />
+              @if (auth.canWrite()) {
+                <p-button
+                  [icon]="sheet.favorite ? 'pi pi-star-fill' : 'pi pi-star'"
+                  [severity]="sheet.favorite ? 'warn' : 'secondary'"
+                  [rounded]="true"
+                  [text]="true"
+                  size="small"
+                  [attr.data-testid]="'btn-favorite-' + sheet.id"
+                  [pTooltip]="(sheet.favorite ? 'common.removeFromFavorites' : 'common.addToFavorites') | translate"
+                  tooltipPosition="top"
+                  (onClick)="toggleFavorite(sheet, $event)"
+                />
+              } @else if (sheet.favorite) {
+                <i
+                  class="pi pi-star-fill favorite-mark"
+                  [attr.data-testid]="'favorite-' + sheet.id"
+                  [pTooltip]="'common.favorite' | translate"
+                  tooltipPosition="top"
+                  [attr.aria-label]="'common.favorite' | translate"
+                ></i>
+              }
               <div class="flex flex-col gap-0.5 flex-1 min-w-0">
                 <span class="font-semibold text-[1.05rem] text-[var(--sam-text)] leading-[1.3]">{{ sheet.title }}</span>
                 @if (sheet.subtitle) {

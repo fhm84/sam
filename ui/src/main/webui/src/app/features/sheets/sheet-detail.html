@@ -52,16 +52,26 @@
   </div>
 } @else if (sheet(); as s) {
   <div class="sheet-title-block">
-    <p-button
-      [icon]="s.favorite ? 'pi pi-star-fill' : 'pi pi-star'"
-      [severity]="s.favorite ? 'warn' : 'secondary'"
-      [rounded]="true"
-      [text]="true"
-      size="small"
-      [pTooltip]="(s.favorite ? 'common.removeFromFavorites' : 'common.addToFavorites') | translate"
-      tooltipPosition="top"
-      (onClick)="toggleFavorite()"
-    />
+    @if (auth.canWrite()) {
+      <p-button
+        [icon]="s.favorite ? 'pi pi-star-fill' : 'pi pi-star'"
+        [severity]="s.favorite ? 'warn' : 'secondary'"
+        [rounded]="true"
+        [text]="true"
+        size="small"
+        [pTooltip]="(s.favorite ? 'common.removeFromFavorites' : 'common.addToFavorites') | translate"
+        tooltipPosition="top"
+        (onClick)="toggleFavorite()"
+      />
+    } @else if (s.favorite) {
+      <i
+        class="pi pi-star-fill favorite-mark"
+        data-testid="favorite"
+        [pTooltip]="'common.favorite' | translate"
+        tooltipPosition="top"
+        [attr.aria-label]="'common.favorite' | translate"
+      ></i>
+    }
     <div class="sheet-title-content">
       <h2 class="m-0">{{ s.title }}</h2>
       @if (s.subtitle) {

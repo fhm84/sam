@@ -624,3 +624,15 @@ body.blocked-scroll {
   .actions-wide { display: flex; }
   .actions-narrow { display: none; }
 }
+
+// A favourite sheet for users who can't change the flag: same star, size and place as the
+// toggle button the music librarians get.
+.favorite-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+  color: var(--p-button-text-warn-color, var(--p-orange-500));
+}

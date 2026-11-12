@@ -737,7 +737,7 @@ yet decided on):
 | Create share tokens | ✅ | ✅ | ❌ | ❌ |
 | List/revoke **own** share tokens | ✅ | ✅ | ✅ | ❌ |
 | List/revoke **everyone's** share tokens | ✅ | ❌ | ❌ | ❌ |
-| Mark/unmark **own** favourite sheets | ✅ | ✅ | ✅ | ❌ |
+| Mark/unmark favourite sheets (one flag per sheet, shared by everyone; all users see it) | ✅ | ✅ | ❌ | ❌ |
 | See members' contact details, linked login, last invite, onboarding state (also embedded in ensemble seats; sheets' composers are persons without personal data) | ✅ | ✅ | ❌ | ❌ |
 | Browse the upload inbox (`/documents/unlinked`) and open its documents by document ID (`/documents/{id}`); generate the GEMA setlist | ✅ | ✅ | ❌ (404) | ❌ |
 | View My Parts (own personalised view, if linked) | ✅ | ✅ | ✅ | ❌ |

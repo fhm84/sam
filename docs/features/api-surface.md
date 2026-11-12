@@ -40,11 +40,18 @@ endpoints under `/api/public/shares/` (`@PermitAll`, token validated manually in
 `PublicShareResourceImpl`). Write operations (POST, PUT, DELETE) on archive data additionally
 require the `music_librarian` or `admin` role; exceptions are share management
 (`/api/shares`, scoped to the caller's own shares — see [Shares](shares.md) for who may create
-links) and marking a sheet as favourite. Read operations (GET) are open to any authenticated user unless the table below says
+links). Read operations (GET) are open to any authenticated user unless the table below says
 otherwise; nothing scopes reads per ensemble yet (see the
 [roadmap](../roadmap.md#full-role-based-access-control-rbac--in-progress)). Role enforcement uses
-`@RolesAllowed` on the JAX-RS implementation classes; the API interface definitions remain
+`@RolesAllowed` on the JAX-RS implementation classes (a sheet's favourite flag is one shared flag, so setting it is a write like any other); the API interface definitions remain
 role-free to stay usable as a REST client in the CLI module.
+
+### Page size
+
+List endpoints take `page` and `size` (default 10). Any login may ask for up to 500 entries per
+page. Larger pages and `size=-1` ("no paging", everything in one response) are for music
+librarians and admins only: their exports and the `cli` read whole lists in one call. Anyone else
+gets HTTP 400 (`PageSizeLimitFilter`), so one request can't make the server load an entire table.
 
 ### Read access by role
 

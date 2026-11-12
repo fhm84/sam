@@ -38,7 +38,7 @@ The central entity. Each sheet represents one piece of music in the archive.
 
 - **Create / edit / delete** via a dedicated full-page form. At create time the sheet can optionally be added to an existing [collection](collections.md) directly (`collectionId` on the create request). Deleting a sheet also removes its collection memberships.
 - **Tags** can be added and removed individually without editing the full sheet.
-- **Favorite** can be toggled directly from the list and detail views.
+- **Favorite** is one flag per sheet, shared by everyone: music librarians and admins toggle it directly from the list and detail views, other users see the star on marked sheets.
 - **Fingerprint-based deduplication** — creating a sheet with identical core metadata is rejected at the database level (see [Storage & Deduplication](../architecture/concepts/storage-and-deduplication.md)).
 
 ## Enums
