@@ -100,11 +100,13 @@ public class SheetsResourceImpl implements SheetsResource {
     }
 
     @Override
+    @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public void favorite(String sheetId) {
         sheetService.favorite(sheetId, true);
     }
 
     @Override
+    @RolesAllowed({Roles.MUSIC_LIBRARIAN, Roles.ADMIN})
     public void unfavorite(String sheetId) {
         sheetService.favorite(sheetId, false);
     }

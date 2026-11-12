@@ -1021,6 +1021,7 @@
     "delete": "Delete",
     "remove": "Remove",
     "download": "Download",
+    "favorite": "Favourite",
     "addToFavorites": "Add to favourites",
     "removeFromFavorites": "Remove from favourites",
     "addToCollection": "Manage collections",

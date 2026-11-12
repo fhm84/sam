@@ -35,6 +35,8 @@ class RoleEnforcementTest {
                 "DELETE " + SHEET,
                 "POST " + SHEET + "/tags",
                 "DELETE " + SHEET + "/tags",
+                "POST " + SHEET + "/favorite",
+                "DELETE " + SHEET + "/favorite",
                 "POST " + SHEET + "/enrich",
                 "POST " + SHEET + "/instrumentations",
                 "POST " + SHEET + "/instrumentations/bulk",
