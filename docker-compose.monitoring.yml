@@ -1,6 +1,6 @@
 services:
   prometheus:
-    image: prom/prometheus:v3.10.0
+    image: prom/prometheus:v3.16.0
     container_name: sam-prometheus
     ports:
       - "9090:9090"
@@ -17,7 +17,7 @@ services:
     restart: unless-stopped
 
   grafana:
-    image: grafana/grafana:12.3
+    image: grafana/grafana:13.3.1
     container_name: sam-grafana
     ports:
       - "3000:3000"

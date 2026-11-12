@@ -69,7 +69,7 @@ Pocket ID takes its application settings from the compose file and `.env` (`UI_C
 | Pocket ID (default provider) | 256 MB | about 20 MB |
 | Keycloak (heap up to 768 MB; `keycloak` profile only) | 1.25 GB | about 600 MB |
 | Keycloak Postgres (`keycloak` profile only) | 384 MB | about 50 MB |
-| Prometheus, Grafana, node-exporter (`monitoring` profile only) | 384 + 256 + 64 MB | about 30 + 140 + 10 MB |
+| Prometheus, Grafana, node-exporter (`monitoring` profile only) | 384 + 512 + 64 MB | about 30 + 220 + 10 MB |
 
 With Pocket ID the limits add up to about 2.8 GB (with Keycloak: about 4.2 GB), leaving the rest of an 8 GB host for the OS, page cache and the optional monitoring stack (another 0.7 GB; `monitoring` profile, see [Monitoring](../../monitoring/CLAUDE.md)). On a 4 GB host, lower the `sam-server` heap (`JAVA_TOOL_OPTIONS`) and skip the monitoring stack. `sam-server` exits on out-of-memory (`ExitOnOutOfMemoryError`) so the restart policy brings it back. Not yet load-tested: heavy PDF classification during a bulk import is the likeliest memory peak, so watch `docker stats` during the first imports.
 
