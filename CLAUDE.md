@@ -35,6 +35,10 @@ SAM (Sheet music Archiving & Management) is a Quarkus-based application for arch
 
 # Generate TypeScript types from API entities — see the /sync-datamodels skill (also shows the diff)
 
+# Test the backup and restore scripts on a throwaway stack (Linux with Docker and age; CI
+# workflow "Scripts" runs it with ShellCheck when scripts/ or docker-compose.prod.yml change)
+scripts/backup/test.sh
+
 # Build native executable
 ./mvnw package -Dnative
 

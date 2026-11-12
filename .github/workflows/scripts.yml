@@ -1,0 +1,38 @@
+name: Scripts
+
+# The operations scripts: ShellCheck over all of them, and the backup and restore test on a
+# throwaway stack (scripts/backup/test.sh). Only when something they depend on changes.
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "scripts/**"
+      - "docker-compose.prod.yml"
+      - ".github/workflows/scripts.yml"
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - "scripts/**"
+      - "docker-compose.prod.yml"
+      - ".github/workflows/scripts.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  scripts:
+    name: Scripts
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: ShellCheck
+        run: shellcheck --severity=warning --external-sources --source-path=SCRIPTDIR $(git ls-files 'scripts/*.sh' 'scripts/**/*.sh')
+
+      - name: Install age
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq age
+
+      - name: Backup and restore test
+        run: scripts/backup/test.sh
