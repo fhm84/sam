@@ -163,6 +163,19 @@ rsync -a --exclude='.tmp-*' -e "ssh -i ~/.ssh/sam_backup -o IdentitiesOnly=yes" 
 
 **Restore** — `scripts/backup/restore.sh <backup-dir> --yes` (for an encrypted backup with `BACKUP_AGE_IDENTITY=/path/to/sam-backup-key.txt` in front and `age` installed; it first checks that the key opens every file) verifies the checksums, stops the app, replaces the databases in the backup, Pocket ID's data (`pocket-id import`, if the backup has it) and the files, and starts the stack again. On a fresh server, first do steps 2 and 3 (up to a running stack), copy a backup directory over from the backup machine, then run it. The server's `.env` is in the backup too (`env`, or `age -d -i sam-backup-key.txt <backup-dir>/env.age > .env`). Delete the key file from the server afterwards. **Restore test:** do it once before go-live on a scratch machine, and again now and then.
 
+**Opening a backup by hand** — to look into an encrypted backup without restoring it, or to check that the private key works, on any computer that has the key file and `age` (Debian/Ubuntu: `apt install age`; macOS: `brew install age`; Windows: `winget install FiloSottile.age`):
+
+```bash
+age -d -i sam-backup-key.txt -o sam_music.dump sam_music.dump.age   # one file
+for f in *.age; do age -d -i sam-backup-key.txt -o "${f%.age}" "$f"; done   # all of them
+
+pg_restore --list sam_music.dump     # what the database dump holds (needs PostgreSQL's client tools)
+tar tzf sam-data.tar.gz              # the sheet music files
+unzip -l pocket-id.zip               # Pocket ID's export
+```
+
+`age` refuses a wrong key and a damaged file, so a file that decrypts is intact. The decrypted files hold everything in plain form, `env` with all secrets: work in a directory that isn't synced or backed up anywhere, and delete them afterwards.
+
 **Major PostgreSQL upgrade** — a new major version can't read the old data files, and the `postgres` image refuses to start on them, so the data moves through a backup. With the old version still running: run `scripts/backup/backup.sh` and keep the backup directory. Then `docker compose -f docker-compose.prod.yml down`, delete the database volume (`docker volume rm <project>_postgres-data`, with Keycloak also `<project>_keycloak-db-data`), update the checkout, pull the images and run `restore.sh` as above. Don't start the stack first: `restore.sh` starts the database and restores it before the app runs, whereas an app started on the empty database would run its migrations and leave tables behind that the backup doesn't know. Check the result before deleting the backup.
 
 **Pocket ID updates** can't be undone: an older version refuses a database that a newer one has migrated, and can't import a newer version's `pocket-id export` (seen going back from v2.19 to v2.17). Before updating, stop the container, copy the `pocket-id-data` volume, and keep the copy until a login has worked.
