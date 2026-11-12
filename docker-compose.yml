@@ -50,7 +50,7 @@ services:
   # Catches every mail Pocket ID sends (login codes, new-device notices); nothing leaves the
   # machine. Inbox: http://localhost:8025
   mailpit:
-    image: axllent/mailpit:v1.31.6
+    image: axllent/mailpit:v1.33.1
     ports:
       - "127.0.0.1:8025:8025"
     restart: unless-stopped
@@ -59,7 +59,7 @@ services:
   # Login link for a user without a passkey:
   #   docker compose run --rm pocket-id-seed login-link admin1
   pocket-id-seed:
-    image: curlimages/curl:8.16.0
+    image: curlimages/curl:8.23.0
     depends_on:
       pocket-id:
         condition: service_healthy
