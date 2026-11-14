@@ -115,7 +115,7 @@ services:
   # only (no dev users or dev secrets; ${...} placeholders are filled from the env below).
   # Its admin console is not reachable from outside: Caddy answers /admin with 404.
   keycloak:
-    image: quay.io/keycloak/keycloak:26.8.2-1
+    image: quay.io/keycloak/keycloak:26.8.2-2
     profiles: ["keycloak"]
     command: start --import-realm
     environment:
