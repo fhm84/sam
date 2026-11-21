@@ -17,7 +17,7 @@ services:
   # docker-compose.keycloak.yml and -Dsam.oidc.provider=keycloak.
   # Passkeys need a secure context; http://localhost counts as one, so no TLS for dev.
   pocket-id:
-    image: ghcr.io/pocket-id/pocket-id:v2.19.2
+    image: ghcr.io/pocket-id/pocket-id:v2.19.3
     environment:
       APP_URL: http://localhost:1411
       TRUST_PROXY: "false"
@@ -50,7 +50,7 @@ services:
   # Catches every mail Pocket ID sends (login codes, new-device notices); nothing leaves the
   # machine. Inbox: http://localhost:8025
   mailpit:
-    image: axllent/mailpit:v1.33.1
+    image: axllent/mailpit:v1.34.0
     ports:
       - "127.0.0.1:8025:8025"
     restart: unless-stopped
