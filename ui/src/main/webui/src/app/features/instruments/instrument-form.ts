@@ -35,7 +35,7 @@ export class InstrumentForm extends BaseForm<Instrument> {
 
   @Input() instrument: Instrument | null = null;
 
-  protected readonly transpositionOptions: string[] = ['C', 'D', 'Eb', 'F', 'G', 'A', 'Ab', 'Bb'];
+  protected readonly transpositionOptions: string[] = ['C', 'Db', 'D', 'Eb', 'F', 'G', 'A', 'Ab', 'Bb'];
 
   protected readonly familyOptions = computed(() =>
     FAMILIES.map((f) => ({ label: this.t.t(`instruments.family.${f}`), value: f })),

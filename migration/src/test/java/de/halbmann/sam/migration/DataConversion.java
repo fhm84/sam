@@ -1,8 +1,10 @@
 package de.halbmann.sam.migration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.halbmann.sam.api.entity.instruments.Instrument;
+import de.halbmann.sam.api.entity.persons.Person;
 import de.halbmann.sam.api.entity.sheets.Instrumentation;
 import de.halbmann.sam.api.entity.sheets.SheetMusic;
 import jakarta.json.JsonArray;
@@ -14,70 +16,105 @@ import jakarta.json.bind.JsonbConfig;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 
+/**
+ * One-off regeneration script (a JUnit test in name only, not picked up by the normal build) —
+ * see {@code migration/README.md}.
+ */
 public class DataConversion {
 
+    private static final Path DATA_DIR = Paths.get("", "src", "migration-data");
+
     Map<String, LegacyMapping> genreMappings;
+    Map<String, PublisherMapping> publisherMappings;
+
+    /** Legacy parts that could not be parsed, keyed by "uid title". */
+    final Map<String, List<String>> unparsedParts = new TreeMap<>();
+
+    /** Legacy publisher values without an entry in the publisher mapping. */
+    final Set<String> unmappedPublishers = new java.util.TreeSet<>();
 
     @Test
     void shouldConvert() throws Exception {
         JsonArray jsonValues;
         try (Jsonb jsonb = JsonbBuilder.create()) {
-            Path dataFile = Paths.get("", "src", "migration-data", "noten_mkn.json");
-            jsonValues = jsonb.fromJson(Files.newBufferedReader(dataFile), JsonArray.class);
+            jsonValues = jsonb.fromJson(Files.newBufferedReader(DATA_DIR.resolve("noten_mkn.json")), JsonArray.class);
 
             List<LegacyMapping> mappings = List.of(jsonb.fromJson(
                     Files.newBufferedReader(Paths.get("", "src", "main", "resources", "legacy-genre-mapping.json")),
                     LegacyMapping[].class));
             genreMappings =
                     mappings.stream().collect(Collectors.toMap(LegacyMapping::getLegacyGenre, Function.identity()));
+
+            // Real publisher data, hence next to the export (gitignored) rather than in resources/
+            List<PublisherMapping> publishers = List.of(jsonb.fromJson(
+                    Files.newBufferedReader(DATA_DIR.resolve("publisher-mapping.json")), PublisherMapping[].class));
+            publisherMappings = publishers.stream()
+                    .collect(Collectors.toMap(p -> p.getLegacy().strip(), Function.identity()));
         }
 
         List<SheetMusic> list =
                 jsonValues.stream().map(this::convertToSheetMusic).toList();
         assertEquals(718, list.size());
-        // list.forEach(this::print);
+
+        assertTrue(
+                unparsedParts.isEmpty(),
+                () -> "Unparsable parts (extend InstrumentationParser or fix noten_mkn.json):\n"
+                        + unparsedParts.entrySet().stream()
+                                .map(e -> "  " + e.getKey() + ": " + e.getValue())
+                                .collect(Collectors.joining("\n")));
+        assertTrue(
+                unmappedPublishers.isEmpty(),
+                () -> "Publishers missing in publisher-mapping.json: " + unmappedPublishers);
+
+        reportDuplicates(list);
 
         Set<Instrument> instruments = list.stream()
                 .flatMap(sheet -> sheet.getInstrumentations().stream())
                 .map(Instrumentation::getInstrument)
                 .collect(Collectors.toSet());
+        assertEquals(
+                instruments.size(),
+                instruments.stream().map(Instrument::getId).distinct().count(),
+                "Instrument IDs must be unique");
 
         // prepare directories, clearing previous output so reruns are idempotent
-        Path sheetsDir = Paths.get("", "src", "migration-data/data", "sheets");
-        Path instrumentsDir = Paths.get("", "src", "migration-data/data", "instruments");
+        Path sheetsDir = DATA_DIR.resolve("data").resolve("sheets");
+        Path instrumentsDir = DATA_DIR.resolve("data").resolve("instruments");
         deleteDirectoryContents(sheetsDir);
         deleteDirectoryContents(instrumentsDir);
         Files.createDirectories(sheetsDir);
         Files.createDirectories(instrumentsDir);
 
-        // write data
-        // write instruments json files
         try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withFormatting(true))) {
             for (Instrument i : instruments) {
                 export(i, jsonb);
             }
-        }
-
-        // write sheet music json files
-        try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withFormatting(true))) {
             for (SheetMusic s : list) {
                 export(s, jsonb);
             }
         }
+        System.out.printf(
+                "Converted %d sheets with %d parts, %d instruments%n",
+                list.size(),
+                list.stream().mapToInt(s -> s.getInstrumentations().size()).sum(),
+                instruments.size());
     }
 
     SheetMusic convertToSheetMusic(final JsonValue jsonValue) {
         JsonObject jsonObject = jsonValue.asJsonObject();
         SheetMusic sheetMusic = new SheetMusic();
-        sheetMusic.setTitle(jsonObject.getString("titel"));
+        sheetMusic.setTitle(jsonObject.getString("titel").strip());
         String art = jsonObject.getString("art");
         LegacyMapping legacyMapping = genreMappings.get(art);
         if (legacyMapping != null) {
@@ -85,48 +122,85 @@ public class DataConversion {
             sheetMusic.setStyle(legacyMapping.getTargetStyle());
             sheetMusic.setTags(legacyMapping.getTags());
         }
-        sheetMusic.setPublisher(jsonObject.getString("verlag"));
-        sheetMusic.setAdditionalNotes(jsonObject.getString("sonstiges"));
-        List<Instrumentation> stimmen = InstrumentationParser.parseInstrumentations(jsonObject.getString("stimmen"));
-        sheetMusic.setInstrumentations(stimmen);
+        applyPublisher(sheetMusic, jsonObject.getString("verlag").strip());
+        sheetMusic.setAdditionalNotes(LegacyNotes.clean(jsonObject.getString("sonstiges")));
+
+        InstrumentationParser.Result parts = InstrumentationParser.parse(jsonObject.getString("stimmen"));
+        if (!parts.unparsed().isEmpty()) {
+            unparsedParts.put(jsonObject.getInt("uid") + " " + sheetMusic.getTitle(), parts.unparsed());
+        }
+        sheetMusic.setInstrumentations(new ArrayList<>(parts.instrumentations()));
         return sheetMusic;
     }
 
-    void print(final SheetMusic sheetMusic) {
-        System.out.printf("%s - %s (%s)\n", sheetMusic.getTitle(), sheetMusic.getPublisher(), sheetMusic.getGenre());
-        sheetMusic.getInstrumentations().forEach(System.out::println);
+    private void applyPublisher(final SheetMusic sheetMusic, final String legacyPublisher) {
+        if (legacyPublisher.isEmpty()) {
+            return;
+        }
+        PublisherMapping mapping = publisherMappings.get(legacyPublisher);
+        if (mapping == null) {
+            unmappedPublishers.add(legacyPublisher);
+            return;
+        }
+        sheetMusic.setPublisher(blankToNull(mapping.getPublisher()));
+        sheetMusic.setComposer(person(mapping.getComposer()));
+        sheetMusic.setArranger(person(mapping.getArranger()));
+    }
+
+    private static Person person(final String name) {
+        if (blankToNull(name) == null) {
+            return null;
+        }
+        Person person = new Person();
+        person.setName(name.strip());
+        return person;
+    }
+
+    private static String blankToNull(final String value) {
+        return value == null || value.isBlank() ? null : value.strip();
+    }
+
+    /**
+     * {@code cli import} skips a sheet whose title and publisher already exist, so a second sheet
+     * with the same pair would silently not be imported.
+     */
+    private static void reportDuplicates(final List<SheetMusic> list) {
+        Map<String, Long> counts = list.stream()
+                .collect(Collectors.groupingBy(
+                        s -> s.getTitle().toLowerCase(Locale.GERMAN) + " | "
+                                + String.valueOf(s.getPublisher()).toLowerCase(Locale.GERMAN),
+                        TreeMap::new,
+                        Collectors.counting()));
+        counts.entrySet().stream()
+                .filter(e -> e.getValue() > 1)
+                .forEach(e -> System.out.printf(
+                        "WARNING: %dx title + publisher '%s' — cli import keeps only the first%n",
+                        e.getValue(), e.getKey()));
     }
 
     void export(final SheetMusic sheetMusic, final Jsonb jsonb) throws IOException {
-        String filename = prepareFilename(sheetMusic.getTitle());
-        OutputStream outputStream;
-        try {
-            outputStream = Files.newOutputStream(
-                    Paths.get("", "src", "migration-data/data", "sheets", filename), StandardOpenOption.CREATE_NEW);
-        } catch (final FileAlreadyExistsException e) {
-            filename = prepareFilename(sheetMusic.getTitle() + "-" + sheetMusic.getPublisher());
-            outputStream = Files.newOutputStream(
-                    Paths.get("", "src", "migration-data/data", "sheets", filename), StandardOpenOption.CREATE_NEW);
+        Path sheets = DATA_DIR.resolve("data").resolve("sheets");
+        Path file = sheets.resolve(prepareFilename(sheetMusic.getTitle()));
+        if (Files.exists(file)) {
+            file = sheets.resolve(prepareFilename(sheetMusic.getTitle() + "-" + sheetMusic.getPublisher()));
         }
-        jsonb.toJson(sheetMusic, outputStream);
+        try (OutputStream outputStream = Files.newOutputStream(file, StandardOpenOption.CREATE_NEW)) {
+            jsonb.toJson(sheetMusic, outputStream);
+        }
     }
 
     void export(final Instrument instrument, final Jsonb jsonb) throws IOException {
         String filename = prepareFilename(instrument.getId());
-        OutputStream outputStream;
-        try {
-            outputStream = Files.newOutputStream(
-                    Paths.get("", "src", "migration-data/data", "instruments", filename),
-                    StandardOpenOption.CREATE_NEW);
+        try (OutputStream outputStream = Files.newOutputStream(
+                DATA_DIR.resolve("data").resolve("instruments").resolve(filename), StandardOpenOption.CREATE_NEW)) {
             jsonb.toJson(instrument, outputStream);
-        } catch (final FileAlreadyExistsException e) {
-            System.out.println("File " + filename + " already exists");
         }
     }
 
     String prepareFilename(final String title) {
-        // First of all, "cleanup" special characters like e.g. german umlauts
-        return FilenameUtils.cleanUp(title) + ".json";
+        // First of all, "cleanup" special characters like e.g. german umlauts; no leading dots
+        // ("... einen bessern findst du nicht"), which would make the file hidden
+        return FilenameUtils.cleanUp(title).replaceFirst("^[._]+", "") + ".json";
     }
 
     private static void deleteDirectoryContents(final Path dir) throws IOException {

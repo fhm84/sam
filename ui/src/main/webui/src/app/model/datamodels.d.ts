@@ -681,7 +681,7 @@ export type Clef = "TREBLE" | "ALTO" | "TENOR" | "BASS";
 
 export type InstrumentFamily = "BRASS" | "WOODWIND" | "STRING" | "PERCUSSION" | "KEYBOARD" | "VOICE" | "OTHER";
 
-export type InstrumentTransposing = "C" | "D" | "Eb" | "F" | "G" | "A" | "Ab" | "Bb";
+export type InstrumentTransposing = "C" | "Db" | "D" | "Eb" | "F" | "G" | "A" | "Ab" | "Bb";
 
 export type VoiceOptionType = "PRIMARY" | "ALTERNATE" | "FALLBACK";
 

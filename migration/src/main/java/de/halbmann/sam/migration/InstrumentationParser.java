@@ -7,126 +7,171 @@ import de.halbmann.sam.api.entity.instruments.Instrument;
 import de.halbmann.sam.api.entity.instruments.InstrumentTransposing;
 import de.halbmann.sam.api.entity.sheets.Instrumentation;
 import de.halbmann.sam.api.entity.sheets.NotationType;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
+import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Parses the legacy {@code stimmen} string ("1. Trompete in b;2. Alt-Saxophon in es;Schlagzeug")
+ * into instrumentations. Parts that do not match are reported in {@link Result#unparsed()} instead
+ * of being dropped, so the conversion can refuse to write incomplete data.
+ */
 public class InstrumentationParser {
 
-    // Hyphen is only a segment separator (not inside the char class) to prevent ambiguity-driven backtracking (ReDoS).
+    private static final String WORD = "[A-Za-zÄÖÜäöüß]+(?:-[A-Za-zÄÖÜäöüß]+)*";
+
+    // Every segment is anchored by a literal (the part number's dot, "Solo-Stimme", an adjective,
+    // " in ") so the pattern stays unambiguous and cannot backtrack catastrophically (ReDoS).
     private static final Pattern INSTRUMENTATION_PATTERN = Pattern.compile(
-            "^\\s*(?:(?<partLabel>\\d+\\.\\s*(?:[A-Za-zÄÖÜäöüß]+(?:-[A-Za-zÄÖÜäöüß]+)*)?)\\s+)?"
-                    + "(?<name>[A-Za-zÄÖÜäöüß]+(?:-[A-Za-zÄÖÜäöüß]+)*)"
-                    + "(?:\\s+in\\s+(?<transposition>[a-z]))?\\s*$",
+            "^\\s*(?:(?<number>\\d+)\\.\\s*)?"
+                    + "(?:(?<solo>Solo-?Stimme)\\s+)?"
+                    + "(?<name>(?:(?:gro(?:ß|ss)e|kleine)\\s+)?" + WORD + ")"
+                    + "(?:\\s+in\\s+(?<transposition>[a-z]{1,3}))?\\s*$",
             Pattern.CASE_INSENSITIVE);
 
-    public static List<Instrumentation> parseInstrumentations(String input) {
-        return Arrays.stream(input.split(";"))
+    /** Legacy names that mean another instrument (lower case). */
+    private static final Map<String, String> NAME_ALIASES = Map.of(
+            "kleine flöte", "Piccolo-Flöte",
+            "große flöte", "Flöte",
+            "grosse flöte", "Flöte");
+
+    /**
+     * Whole legacy parts the pattern cannot express (lower case), mapped to a parsable part. The
+     * original wording is kept in the instrumentation's notes.
+     */
+    private static final Map<String, String> PART_FALLBACKS = Map.of(
+            "peitsche und schellenkranz", "Percussion",
+            "solo bicyle-bell", "Solo-Stimme Percussion");
+
+    /**
+     * Outcome of parsing one {@code stimmen} string.
+     *
+     * @param instrumentations the parts that were understood, in input order
+     * @param unparsed the parts that were not understood, verbatim
+     */
+    public record Result(List<Instrumentation> instrumentations, List<String> unparsed) {}
+
+    public static Result parse(String input) {
+        List<Instrumentation> instrumentations = new ArrayList<>();
+        List<String> unparsed = new ArrayList<>();
+        Arrays.stream(input.split(";"))
                 .map(String::trim)
                 .filter(not(String::isEmpty))
-                .map(InstrumentationParser::parseInstrument)
-                .filter(Objects::nonNull)
-                .toList();
+                .forEach(part -> {
+                    Instrumentation instrumentation = parseInstrument(part);
+                    if (instrumentation == null) {
+                        unparsed.add(part);
+                    } else {
+                        instrumentations.add(instrumentation);
+                    }
+                });
+        return new Result(List.copyOf(instrumentations), List.copyOf(unparsed));
     }
 
     private static Instrumentation parseInstrument(String part) {
-        Matcher matcher = INSTRUMENTATION_PATTERN.matcher(part);
+        String fallback = PART_FALLBACKS.get(part.toLowerCase(Locale.GERMAN));
+        if (fallback != null) {
+            Instrumentation instrumentation = parseInstrument(fallback);
+            instrumentation.setNotes(part);
+            return instrumentation;
+        }
 
+        Matcher matcher = INSTRUMENTATION_PATTERN.matcher(part);
         if (!matcher.matches()) {
             return null;
         }
 
-        String partLabel = matcher.group("partLabel"); // e.g., "1", "2", "3", "Solo-Stimme"
-        String instrumentName = matcher.group("name"); // e.g., "Trompete", "Flöte"
-        String key = matcher.group("transposition"); // e.g., "b", "c", "es", "f"
-
-        // Determine transposition
+        String key = matcher.group("transposition"); // e.g. "b", "c", "es", "des"
         InstrumentTransposing transposition = parseTransposition(key);
+        if (transposition == null) {
+            return null; // unknown key: report it rather than guess
+        }
 
-        // Determine clef and notation type based on instrument
+        String instrumentName = normalizeName(matcher.group("name"));
         Clef clef = determineClef(instrumentName, key);
         NotationType notationType = determineNotationType(instrumentName);
 
-        // Build the Instrument reference
-        String trimmedName = instrumentName.trim();
-        String instrumentId =
-                FilenameUtils.cleanUp(trimmedName) + "_" + (transposition != null ? transposition.name() : "C");
-
         Instrument instrument = new Instrument();
-        instrument.setId(instrumentId.toUpperCase());
-        instrument.setName(trimmedName);
+        instrument.setId((FilenameUtils.cleanUp(instrumentName) + "_" + transposition.name()).toUpperCase(Locale.ROOT));
+        instrument.setName(instrumentName);
         instrument.setTransposition(transposition);
 
         Instrumentation instrumentation = new Instrumentation();
         instrumentation.setInstrument(instrument);
         instrumentation.setNotationType(notationType);
-        instrumentation.setPartLabel(partLabel);
+        instrumentation.setPartLabel(partLabel(matcher.group("number"), matcher.group("solo") != null));
         instrumentation.setClef(clef);
         return instrumentation;
     }
 
-    private static InstrumentTransposing parseTransposition(String key) {
+    /** "1." / "1. Solo" / "Solo" / null — the number keeps its dot, as in the earlier output. */
+    private static String partLabel(String number, boolean solo) {
+        if (number == null) {
+            return solo ? "Solo" : null;
+        }
+        return solo ? number + ". Solo" : number + ".";
+    }
+
+    private static String normalizeName(String rawName) {
+        String name = rawName.trim().replaceAll("\\s+", " ");
+        String alias = NAME_ALIASES.get(name.toLowerCase(Locale.GERMAN));
+        if (alias != null) {
+            return alias;
+        }
+        return Character.toUpperCase(name.charAt(0)) + name.substring(1);
+    }
+
+    static InstrumentTransposing parseTransposition(String key) {
         if (key == null) {
             return InstrumentTransposing.C;
         }
-
-        switch (key.toLowerCase()) {
-            case "c":
-                return InstrumentTransposing.C;
-            case "b":
-                return InstrumentTransposing.Bb;
-            case "es":
-                return InstrumentTransposing.Eb;
-            case "f":
-                return InstrumentTransposing.F;
-            case "g":
-                return InstrumentTransposing.G;
-            case "d":
-                return InstrumentTransposing.D;
-            case "a":
-                return InstrumentTransposing.A;
-            case "as":
-            case "ab":
-                return InstrumentTransposing.Ab;
-            default:
-                return InstrumentTransposing.C;
-        }
+        return switch (key.toLowerCase(Locale.ROOT)) {
+            case "c" -> InstrumentTransposing.C;
+            case "des" -> InstrumentTransposing.Db;
+            case "d" -> InstrumentTransposing.D;
+            case "es" -> InstrumentTransposing.Eb;
+            case "f" -> InstrumentTransposing.F;
+            case "g" -> InstrumentTransposing.G;
+            case "a" -> InstrumentTransposing.A;
+            case "as", "ab" -> InstrumentTransposing.Ab;
+            case "b" -> InstrumentTransposing.Bb;
+            default -> null;
+        };
     }
 
     private static Clef determineClef(String instrumentName, String key) {
-        String lower = instrumentName.toLowerCase();
-
-        // Bass clef instruments
-        if (lower.contains("bass") || lower.contains("posaune") || lower.contains("bariton")) {
-            // Exception: in Bb they often use treble clef in German brass bands
-            if ("b".equalsIgnoreCase(key)) {
-                return Clef.TREBLE;
-            }
-            return Clef.BASS;
-        }
-
-        // Alto clef instruments
-        if (lower.contains("horn") && !"b".equalsIgnoreCase(key)) {
-            // F horns typically use treble clef in modern scores,
-            // but can use alto/bass. Assuming treble for simplicity.
+        // Transposed parts (in B♭, E♭, F, ...) are written in treble clef in German wind band
+        // editions — also for basses, trombones, baritones and baritone saxophones.
+        if (key != null && !"c".equalsIgnoreCase(key)) {
             return Clef.TREBLE;
         }
 
-        // Tenor clef instruments
-        if (lower.contains("tenorhorn")) {
-            return Clef.TREBLE; // Tenorhorn typically uses treble clef
+        String lower = instrumentName.toLowerCase(Locale.GERMAN);
+        if (lower.contains("bass")
+                || lower.contains("posaune")
+                || lower.contains("bariton")
+                || lower.contains("fagott")
+                || lower.contains("pauken")
+                || lower.contains("euphonium")
+                || lower.contains("tuba")) {
+            return Clef.BASS;
         }
 
-        // Everything else defaults to treble
+        // Everything else in concert pitch defaults to treble
         return Clef.TREBLE;
     }
 
     private static NotationType determineNotationType(String instrumentName) {
-        String lower = instrumentName.toLowerCase();
+        String lower = instrumentName.toLowerCase(Locale.GERMAN);
 
-        if (lower.contains("schlagzeug") || lower.contains("pauken") || lower.contains("glocken")) {
+        if (lower.contains("schlagzeug")
+                || lower.contains("pauken")
+                || lower.contains("glocken")
+                || lower.contains("trommel")) {
             return NotationType.PERCUSSION;
         }
 

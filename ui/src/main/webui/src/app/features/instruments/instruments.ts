@@ -47,7 +47,7 @@ export class Instruments extends BaseCrudList<Instrument, InstrumentFilterReques
   getItemId = (i: Instrument) => i.id!;
   getItemName = (i: Instrument) => i.name;
   protected readonly transpositionFilter = signal<InstrumentTransposing | null>(null);
-  protected readonly transpositionOptions: InstrumentTransposing[] = ['C', 'D', 'Eb', 'F', 'G', 'A', 'Ab', 'Bb'];
+  protected readonly transpositionOptions: InstrumentTransposing[] = ['C', 'Db', 'D', 'Eb', 'F', 'G', 'A', 'Ab', 'Bb'];
 
   buildFilter = (): InstrumentFilterRequest => ({
     page: this.currentPage,
