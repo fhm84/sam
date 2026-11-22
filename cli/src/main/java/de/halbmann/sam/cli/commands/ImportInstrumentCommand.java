@@ -19,7 +19,7 @@ public class ImportInstrumentCommand extends AbstractImportCommand {
     InstrumentImporter instrumentImporter;
 
     @Override
-    protected AbstractImporter<?> importer() {
+    protected AbstractImporter<?, ?> importer() {
         return instrumentImporter;
     }
 

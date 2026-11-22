@@ -110,18 +110,16 @@ Point the CLI at the target server via
 via client credentials — see "Authentication" below for how to point it at a
 production provider.
 
-Both commands accept `-d`/`--dry-run`. Note its actual scope: it only checks
-that each file **deserializes** into the expected DTO — it does not run Jakarta
-Bean Validation or any server-side rule, so a clean dry-run does not guarantee
-the server will accept the record (e.g. a blank title would still be reported
-as "would import").
+Imports are an **additive sync** (see `cli/README.md`, "Import semantics"):
+missing records are created, existing ones get the parts, tags, voices and
+options they lack, and differing fields are only reported unless `--update` is
+given; nothing is deleted. Rerunning an import after a partial failure
+completes it. Files are validated locally (Jakarta Bean Validation) before
+anything is sent, but server-side rules can still reject a record.
 
-Imports are **idempotent** — records that already exist on the target are
-skipped, not duplicated (sheets match by exact title + publisher, instruments
-by natural ID, persons/members/ensembles by name), so rerunning an import after a
-partial failure is safe. Files are also validated locally (Jakarta Bean
-Validation) before anything is sent; `--dry-run` runs exactly that validation
-and nothing else.
+All commands accept `-d`/`--dry-run`: it compares the files with the target
+read-only and prints what would be created, added or updated — run it before
+an import into production.
 
 ## Reusing this for a disposable test environment
 
@@ -183,8 +181,8 @@ step.
   acquisition are both disabled
   (`quarkus.oidc-client.discovery-enabled=false`,
   `.early-tokens-acquisition=false`), so nothing reaches out to the provider at
-  CLI startup — only when a command actually calls the API (dry-run import
-  and pure-logic tests never do, so they stay hermetic).
+  CLI startup — only when a command actually calls the API (pure-logic
+  tests never do, so they stay hermetic; a dry-run import does, read-only).
 - **Prod**: override via `OIDC_SERVER_URL` (same variable `server` uses),
   `SAM_CLI_CLIENT_ID` (default `sam-cli`), and `SAM_CLI_CLIENT_SECRET`
   (required, no default). With Pocket ID, create the `sam-cli` client as in

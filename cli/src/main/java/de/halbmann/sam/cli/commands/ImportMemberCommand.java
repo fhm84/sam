@@ -19,7 +19,7 @@ public class ImportMemberCommand extends AbstractImportCommand {
     MemberImporter memberImporter;
 
     @Override
-    protected AbstractImporter<?> importer() {
+    protected AbstractImporter<?, ?> importer() {
         return memberImporter;
     }
 

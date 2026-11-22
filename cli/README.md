@@ -44,18 +44,33 @@ the commands are scriptable.
 
 ### Import semantics
 
-- **Idempotent — reruns are safe.** Records that already exist on the target
-  are skipped, not duplicated: sheets by exact title + publisher
-  (case-insensitive; same-titled sheets from *different* publishers are
-  distinct records, as in the legacy data), instruments by natural ID,
-  musicians and ensembles by exact name. The summary reports
-  `X imported, Y skipped, Z failed`.
+- **Additive sync — reruns are safe and complete what is missing**
+  ([ADR-0019](../docs/architecture/decisions/adr-0019-cli-import-additive-sync.md)).
+  Each file is matched with the target: by its `id` when it has one and that
+  record exists (a round trip from `cli export`), otherwise by natural key —
+  sheets by exact title + publisher (case-insensitive; same-titled sheets from
+  *different* publishers are distinct records, as in the legacy data),
+  instruments by ID, persons, members and ensembles by exact name. Several
+  matches stop the import of that file.
+  - A missing record is **created**.
+  - An existing record gets the **child records it lacks**: a sheet's parts
+    (instrument + part label + clef, the database's unique key) and tags, an
+    ensemble's voices (by label) and their instrument options. An import that
+    failed half-way is completed by running it again.
+  - Its **differing fields are reported, not written** — unless
+    `-u`/`--update` is given. Only fields the file has a value for count: an
+    empty field means "unknown", never "clear", and `--update` keeps it.
+  - **Nothing is deleted**; child records only on the target stay, and the
+    fields of existing child records are not compared.
+
+  The summary reports `X created, Y updated, Z unchanged, W failed`, plus the
+  number of records whose differing fields were left alone.
 - **Validation before import.** Every file is checked against the API's
   Jakarta Bean Validation rules locally (e.g. `title` must not be blank);
   invalid files are reported per violation and counted as failures.
-- **`-d`/`--dry-run`** parses and validates only — it makes **no network
-  calls** whatsoever (no existence checks either), so it works without a
-  server or OIDC provider.
+- **`-d`/`--dry-run`** validates and compares with the target **read-only**
+  and prints what would be created, added or updated (with `--update`, which
+  fields would be written). It needs the server and credentials like an import.
 - **Ordering matters for a fresh instance:** sheets and ensemble voice options
   reference instruments by ID and the server rejects unknown IDs — always
   `importInstrument` first, then the rest in any order.
@@ -83,8 +98,8 @@ interface's class name; it would be ignored):
   `http://localhost:8080/api`).
 - **Auth**: every request carries an OIDC client-credentials Bearer token for
   the `sam-cli` service account (`music_librarian` role). Token acquisition is
-  lazy: nothing contacts the OIDC provider at startup or during dry-runs, only
-  when a real API call goes out.
+  lazy: nothing contacts the OIDC provider at startup, only when the first API
+  call goes out (a dry run reads the target, so it needs a token too).
 - **Provider**: `SAM_OIDC_PROVIDER`, `pocket-id` (default) or `keycloak` — the
   same setting the server uses. It selects the token endpoint, the dev defaults
   and, for Pocket ID, the API resource `urn:sam:api` the token is requested

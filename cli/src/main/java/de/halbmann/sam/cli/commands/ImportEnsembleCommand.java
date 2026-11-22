@@ -19,7 +19,7 @@ public class ImportEnsembleCommand extends AbstractImportCommand {
     EnsembleImporter ensembleImporter;
 
     @Override
-    protected AbstractImporter<?> importer() {
+    protected AbstractImporter<?, ?> importer() {
         return ensembleImporter;
     }
 
