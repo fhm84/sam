@@ -142,6 +142,11 @@ public class DataConversion {
         if (!parts.unparsed().isEmpty()) {
             unparsedParts.put(jsonObject.getInt("uid") + " " + sheetMusic.getTitle(), parts.unparsed());
         }
+        if (!parts.duplicates().isEmpty()) {
+            System.out.printf(
+                    "Dropped repeated parts in %d %s: %s%n",
+                    jsonObject.getInt("uid"), sheetMusic.getTitle(), parts.duplicates());
+        }
         sheetMusic.setInstrumentations(new ArrayList<>(parts.instrumentations()));
         return sheetMusic;
     }

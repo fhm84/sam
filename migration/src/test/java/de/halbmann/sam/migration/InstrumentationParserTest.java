@@ -89,6 +89,21 @@ class InstrumentationParserTest {
     }
 
     @Test
+    void dropsRepeatedPartsAndReportsThem() {
+        InstrumentationParser.Result result =
+                InstrumentationParser.parse("1. Trompete in b;2. Trompete in b;1. Trompete in b;1. Trompete in c");
+
+        assertEquals(
+                List.of("TROMPETE_BB 1.", "TROMPETE_BB 2.", "TROMPETE_C 1."),
+                result.instrumentations().stream()
+                        .map(i -> i.getInstrument().getId() + " " + i.getPartLabel())
+                        .toList(),
+                "each part once, other part number or key is another part");
+        assertEquals(List.of("1. Trompete in b"), result.duplicates());
+        assertEquals(List.of(), result.unparsed());
+    }
+
+    @Test
     void mapsUnexpressibleLegacyPartsAndKeepsTheirWording() {
         Instrumentation i = single("Solo Bicyle-Bell");
         assertEquals("Percussion", i.getInstrument().getName());
