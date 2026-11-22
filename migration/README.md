@@ -19,9 +19,20 @@ since they are data, not configuration):
 
 - `src/migration-data/noten_mkn.json` — sheet music catalogue ("Noten").
   Converted today.
-- `src/migration-data/ensemble_mkn.json` — an ensemble definition (name and voices
-  with their instrument options). **Not converted yet** — there is currently no code
-  path that reads this file; create the ensemble through the UI/API or `cli importEnsemble`.
+- `src/migration-data/ensemble_mkn.json` — an older ensemble definition (name and voices
+  with their instrument options) in a format and with instrument IDs that no longer match
+  SAM. Superseded by `ensemble-draft.json` below.
+
+Two hand-maintained files sit next to them (also gitignored, since they are derived from
+the real data):
+
+- `src/migration-data/publisher-mapping.json` — maps every legacy `verlag` value to a
+  normalized publisher, or to a composer/arranger where the legacy value names a person.
+  `confidence` and `note` only document the review. The conversion fails if a legacy value
+  has no entry.
+- `src/migration-data/ensemble-draft.json` — an ensemble in the current `Ensemble` shape
+  (`cli importEnsemble`), built from the standard part set the legacy "es fehlen" notes
+  checked against and using the instrument IDs the conversion produces.
 
 Neither export names people: the sheet catalogue has no composer or arranger, and there is
 no member roster. Persons therefore come from sheets imported with a composer or arranger
@@ -41,7 +52,10 @@ or the genre mapping changes:
 It reads `noten_mkn.json`, maps each legacy "art" (genre) value via
 [`src/main/resources/legacy-genre-mapping.json`](src/main/resources/legacy-genre-mapping.json)
 (see [`docs/genre-migration.md`](docs/genre-migration.md) for the human-readable
-mapping table these two must be kept in sync with), parses the `stimmen`
+mapping table these two must be kept in sync with), applies `publisher-mapping.json`,
+cleans the notes via `LegacyNotes` (literal `\r\n`/`<br>` become line breaks; the trailing
+"es fehlen: …" list of missing parts is dropped, because coverage evaluation against the
+ensemble derives it from the instrumentations), parses the `stimmen`
 (instrumentation) string per sheet via `InstrumentationParser`, and writes one
 JSON file per sheet/instrument to:
 
@@ -50,6 +64,11 @@ JSON file per sheet/instrument to:
 
 Rerunning the script first clears both output directories, so it always
 regenerates a clean, consistent set of files — it is safe to run repeatedly.
+
+The script refuses to write anything if a part cannot be parsed — it lists them — so no
+part is dropped silently; extend `InstrumentationParser` (or its `PART_FALLBACKS` for
+one-off wordings) or fix the export. It also warns about sheets sharing title and
+publisher: `cli import` matches on that pair and would import only the first.
 
 **Known, intentional gap:** legacy "art" values `new`, `Traditional`, and
 `Moderato` have no genre mapping on purpose (per `genre-migration.md`'s
@@ -168,8 +187,8 @@ The claim the role travels in differs per provider: `scp` on Pocket ID (read by
 
 ## Known gaps
 
-- **`ensemble_mkn.json` is still not converted** — no code reads the legacy
-  ensemble definition. However, persons, members and ensembles created in
+- **`ensemble_mkn.json` is not converted** — import `ensemble-draft.json` with
+  `cli importEnsemble` (after the instruments) instead. Persons, members and ensembles created in
   a running SAM instance round-trip via `cli exportPerson`/`importPerson`,
   `cli exportMember`/`importMember` and `cli exportEnsemble`/
   `importEnsemble` (ensembles include voices and instrument options;

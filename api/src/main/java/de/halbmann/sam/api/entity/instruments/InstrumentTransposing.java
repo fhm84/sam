@@ -15,6 +15,10 @@ public enum InstrumentTransposing {
      */
     C,
     /**
+     * D♭ (e.g. the "Des-Piccolo" of older German wind band editions)
+     */
+    Db,
+    /**
      * D
      */
     D,
