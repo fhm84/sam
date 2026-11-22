@@ -18,7 +18,6 @@ import java.io.OutputStream;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -74,9 +73,9 @@ public class DataConversion {
                     .collect(Collectors.toMap(p -> p.getLegacy().strip(), Function.identity()));
         }
 
-        List<SheetMusic> list =
+        List<SheetMusic> converted =
                 jsonValues.stream().map(this::convertToSheetMusic).toList();
-        assertEquals(718, list.size());
+        assertEquals(718, converted.size());
 
         assertTrue(
                 unparsedParts.isEmpty(),
@@ -88,7 +87,10 @@ public class DataConversion {
                 unmappedPublishers.isEmpty(),
                 () -> "Publishers missing in publisher-mapping.json: " + unmappedPublishers);
 
-        reportDuplicates(list);
+        // A piece on several double-sided sheets is one legacy entry per sheet; SAM gets one sheet
+        DuplicateSheets.Result merged = DuplicateSheets.merge(converted);
+        merged.merged().forEach(line -> System.out.println("Merged " + line));
+        List<SheetMusic> list = merged.sheets();
 
         Set<Instrument> instruments = list.stream()
                 .flatMap(sheet -> sheet.getInstrumentations().stream())
@@ -169,24 +171,6 @@ public class DataConversion {
 
     private static String blankToNull(final String value) {
         return value == null || value.isBlank() ? null : value.strip();
-    }
-
-    /**
-     * {@code cli import} skips a sheet whose title and publisher already exist, so a second sheet
-     * with the same pair would silently not be imported.
-     */
-    private static void reportDuplicates(final List<SheetMusic> list) {
-        Map<String, Long> counts = list.stream()
-                .collect(Collectors.groupingBy(
-                        s -> s.getTitle().toLowerCase(Locale.GERMAN) + " | "
-                                + String.valueOf(s.getPublisher()).toLowerCase(Locale.GERMAN),
-                        TreeMap::new,
-                        Collectors.counting()));
-        counts.entrySet().stream()
-                .filter(e -> e.getValue() > 1)
-                .forEach(e -> System.out.printf(
-                        "WARNING: %dx title + publisher '%s' — cli import keeps only the first%n",
-                        e.getValue(), e.getKey()));
     }
 
     void export(final SheetMusic sheetMusic, final Jsonb jsonb) throws IOException {
