@@ -7,7 +7,7 @@ configuration nothing changes; no logo is part of the repository or the images.
 
 | Place | What |
 |---|---|
-| Top bar | Logo and name after the SAM logo, separated by a line; on narrow screens the logo alone |
+| Top bar | Logo and name after the SAM logo, separated by a line; below 640 px the logo alone; on phones (below 480 px) the logo takes the place of the "SAM" text (SAM's icon stays) and the user menu shows its icon only |
 | Public share page (`/share/{token}`) | Name and logo in the header, so guests see whose sheets they were sent |
 | Collection TOC PDF | Name above the title, logo at the top right (scaled into 5 cm × 1.6 cm) |
 
