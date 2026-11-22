@@ -22,7 +22,10 @@ The login page belongs to the OIDC provider; Pocket ID has its own logo setting.
 | `sam.branding.print-logo` | `SAM_BRANDING_PRINT_LOGO` | PNG, JPEG or GIF for PDFs; defaults to the logo when that is one of these |
 
 The PDF renderer (Flying Saucer) can't draw SVG: with an SVG logo, set a PNG as
-`print-logo`, or the TOC goes without a logo. The type is detected from the file's content,
+`print-logo`, or the TOC goes without a logo. Export one with transparent background from
+the SVG (Inkscape, or any browser via a canvas); about 600 px on the long side is plenty for
+the 1.6 cm it's printed at. Portrait logos such as a crest work well: the top bar and the
+share page size the logo by height. The type is detected from the file's content,
 not its name. Files are read once at startup; after replacing one, restart `sam-server`. A
 file that can't be used (missing, too large, not an image) is left out with a warning in the
 log, and SAM starts anyway.

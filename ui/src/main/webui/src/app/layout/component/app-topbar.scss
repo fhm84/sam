@@ -35,8 +35,9 @@
   border-left: 1px solid var(--sam-border);
 }
 
+// Tall enough for a crest (portrait logos), capped in width for wide ones
 .brand-logo {
-  height: 1.75rem;
+  height: 2.25rem;
   max-width: 8rem;
   object-fit: contain;
 }
