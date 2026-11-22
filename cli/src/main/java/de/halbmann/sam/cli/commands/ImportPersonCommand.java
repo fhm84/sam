@@ -19,7 +19,7 @@ public class ImportPersonCommand extends AbstractImportCommand {
     PersonImporter personImporter;
 
     @Override
-    protected AbstractImporter<?> importer() {
+    protected AbstractImporter<?, ?> importer() {
         return personImporter;
     }
 

@@ -14,8 +14,8 @@ import picocli.CommandLine;
 
 /**
  * Shared skeleton for all import commands: walks the given files/directories (one level deep),
- * delegates each file to the importer, and prints an imported/skipped/failed summary. Exit code is
- * 1 as soon as any file failed.
+ * delegates each file to the importer, and prints a created/updated/unchanged/failed summary
+ * (ADR-0019). Exit code is 1 as soon as any file failed.
  */
 public abstract class AbstractImportCommand implements Callable<Integer> {
 
@@ -24,11 +24,18 @@ public abstract class AbstractImportCommand implements Callable<Integer> {
 
     @CommandLine.Option(
             names = {"-d", "--dry-run"},
-            description = "Parse and validate the JSON locally without importing (no network calls)")
+            description = "Validate the files and compare them with the target (read-only): print what would be"
+                    + " created, added or updated, write nothing")
     boolean dryRun;
 
+    @CommandLine.Option(
+            names = {"-u", "--update"},
+            description = "Also write fields of existing records that differ from the file (default: report them)."
+                    + " Fields the file leaves empty are kept")
+    boolean update;
+
     /** The importer handling a single file. */
-    protected abstract AbstractImporter<?> importer();
+    protected abstract AbstractImporter<?, ?> importer();
 
     /** Plural noun for summary messages, e.g. "sheets". */
     protected abstract String noun();
@@ -42,25 +49,31 @@ public abstract class AbstractImportCommand implements Callable<Integer> {
                     fileStream
                             .map(Path::toFile)
                             .filter(File::isFile)
-                            .forEach(f -> results.add(importer().importFile(f, dryRun)));
+                            .forEach(f -> results.add(importer().importFile(f, dryRun, update)));
                 } catch (IOException e) {
                     System.err.println("Error reading directory " + file.getPath() + ": " + e.getMessage());
                     return 1;
                 }
             } else {
-                results.add(importer().importFile(file, dryRun));
+                results.add(importer().importFile(file, dryRun, update));
             }
         }
 
-        long imported = count(results, ImportResult.Status.IMPORTED);
-        long skipped = count(results, ImportResult.Status.SKIPPED);
+        long created = count(results, ImportResult.Status.CREATED);
+        long updated = count(results, ImportResult.Status.UPDATED);
+        long unchanged = count(results, ImportResult.Status.UNCHANGED);
         long failed = count(results, ImportResult.Status.FAILED);
-        if (dryRun) {
-            System.out.println("Dry run completed (" + imported + " valid, " + failed + " invalid). No " + noun()
-                    + " were imported.");
-        } else {
-            System.out.println(
-                    "Import completed: " + imported + " imported, " + skipped + " skipped, " + failed + " failed.");
+        long differing =
+                results.stream().filter(ImportResult::unappliedDifferences).count();
+        String summary =
+                created + " created, " + updated + " updated, " + unchanged + " unchanged, " + failed + " failed";
+        System.out.println(
+                dryRun
+                        ? "Dry run completed (would be: " + summary + "). No " + noun() + " were written."
+                        : "Import completed: " + summary + ".");
+        if (differing > 0) {
+            System.out.println(differing + " existing record(s) differ from their file and were left as they are"
+                    + " — rerun with --update to write the file's values.");
         }
 
         return failed > 0L ? 1 : 0;

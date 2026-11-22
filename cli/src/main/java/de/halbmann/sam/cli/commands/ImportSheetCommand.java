@@ -19,7 +19,7 @@ public class ImportSheetCommand extends AbstractImportCommand {
     SheetImporter sheetImporter;
 
     @Override
-    protected AbstractImporter<?> importer() {
+    protected AbstractImporter<?, ?> importer() {
         return sheetImporter;
     }
 

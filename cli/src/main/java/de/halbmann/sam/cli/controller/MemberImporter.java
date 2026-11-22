@@ -17,7 +17,7 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
  * imported with the sheets) becomes that person's profile instead of a second person.
  */
 @Singleton
-public class MemberImporter extends AbstractImporter<Member> {
+public class MemberImporter extends AbstractImporter<Member, Member> {
 
     @Inject
     @RestClient
@@ -42,14 +42,38 @@ public class MemberImporter extends AbstractImporter<Member> {
     }
 
     @Override
-    protected boolean exists(final Member member) {
+    protected Optional<Member> findExisting(final Member member) {
+        if (member.getId() != null) {
+            Optional<Member> byId =
+                    loadIfExists(() -> client.members().load(member.getId().toString()));
+            if (byId.isPresent()) {
+                return byId;
+            }
+        }
         // The server stores names trimmed, so compare them trimmed too
         String name = member.getName().trim();
         MemberFilterRequest filter = new MemberFilterRequest();
         filter.setName(name);
         filter.setSize(-1);
-        return client.members().findMembers(filter).getData().stream()
-                .anyMatch(existing -> name.equalsIgnoreCase(existing.getName()));
+        return single(
+                client.members().findMembers(filter).getData().stream()
+                        .filter(existing -> name.equalsIgnoreCase(existing.getName()))
+                        .toList(),
+                "the name " + name);
+    }
+
+    /**
+     * The profile's own fields. Not the login link, invite and onboarding state: they belong to
+     * one environment (see {@link #create}).
+     */
+    @Override
+    protected List<String> comparedFields() {
+        return List.of("name", "instruments", "contact", "status", "leftAt");
+    }
+
+    @Override
+    protected void update(final Member existing) {
+        client.members().update(existing.getId().toString(), existing);
     }
 
     @Override
@@ -61,7 +85,7 @@ public class MemberImporter extends AbstractImporter<Member> {
         member.setOnboarding(null);
         member.setId(existingPersonId(member.getName().trim()).orElse(null));
         Member created = client.members().add(member);
-        System.out.println("  ✓ Imported: " + created.getName() + " (ID: " + created.getId() + ")");
+        System.out.println("  ✓ Created: " + created.getName() + " (ID: " + created.getId() + ")");
     }
 
     /**
