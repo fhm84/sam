@@ -8,29 +8,29 @@ and disposable test environments from the same source data — see
 
 ## Inputs
 
-`migration/src/migration-data/` (both the raw exports and the converted
-`data/` output) is gitignored — it holds real archive/publisher data, not
-sample fixtures, so it never leaves this machine via git. A fresh clone starts
-without it; get a copy of the directory from wherever you keep it before
-running anything below.
+The legacy data is real archive/publisher data, not sample fixtures, so it is not in this
+repo. Keep it in a private place of your own (a private repository, say) and point the
+conversion at that folder — called `<data-dir>` below:
 
-Two raw legacy exports live directly in this module (not under `resources/`,
-since they are data, not configuration):
+```bash
+-Dsam.migration.dataDir=<data-dir>   # relative paths resolve against the migration module
+```
 
-- `src/migration-data/noten_mkn.json` — sheet music catalogue ("Noten").
-  Converted today.
-- `src/migration-data/ensemble_mkn.json` — an older ensemble definition (name and voices
-  with their instrument options) in a format and with instrument IDs that no longer match
-  SAM. Superseded by `ensemble-draft.json` below.
+Without the property the script looks in `migration/src/migration-data/` (gitignored, for a
+local copy). It expects:
 
-Two hand-maintained files sit next to them (also gitignored, since they are derived from
-the real data):
-
-- `src/migration-data/publisher-mapping.json` — maps every legacy `verlag` value to a
+- `noten_mkn.json` — sheet music catalogue ("Noten"), converted by the script. It is the
+  legacy table exported as JSON, **with hand corrections** to part names the parser could
+  not read (spelling variants, typos); keep the untouched original export next to it, so
+  the corrections can be told apart from the source.
+- `ensemble_mkn.json` — an older ensemble definition (name and voices with their
+  instrument options) in a format and with instrument IDs that no longer match SAM.
+  Superseded by `ensemble-draft.json`.
+- `publisher-mapping.json` (hand-maintained) — maps every legacy `verlag` value to a
   normalized publisher, or to a composer/arranger where the legacy value names a person.
   `confidence` and `note` only document the review. The conversion fails if a legacy value
   has no entry.
-- `src/migration-data/ensemble-draft.json` — an ensemble in the current `Ensemble` shape
+- `ensemble-draft.json` (hand-maintained) — an ensemble in the current `Ensemble` shape
   (`cli importEnsemble`), built from the standard part set the legacy "es fehlen" notes
   checked against and using the instrument IDs the conversion produces.
 
@@ -46,7 +46,8 @@ really a one-off regeneration script, run manually whenever the source data
 or the genre mapping changes:
 
 ```bash
-./mvnw test -pl migration -am -Dtest=DataConversion -Dsurefire.failIfNoSpecifiedTests=false
+./mvnw test -pl migration -am -Dtest=DataConversion -Dsurefire.failIfNoSpecifiedTests=false \
+    -Dsam.migration.dataDir=<data-dir>
 ```
 
 It reads `noten_mkn.json`, maps each legacy "art" (genre) value via
@@ -59,8 +60,8 @@ ensemble derives it from the instrumentations), parses the `stimmen`
 (instrumentation) string per sheet via `InstrumentationParser`, and writes one
 JSON file per sheet/instrument to:
 
-- `src/migration-data/data/sheets/*.json` — deserializes as `SheetMusic`
-- `src/migration-data/data/instruments/*.json` — deserializes as `Instrument`
+- `<data-dir>/data/sheets/*.json` — deserializes as `SheetMusic`
+- `<data-dir>/data/instruments/*.json` — deserializes as `Instrument`
 
 Rerunning the script first clears both output directories, so it always
 regenerates a clean, consistent set of files — it is safe to run repeatedly.
@@ -85,10 +86,13 @@ instruments first:
 ```bash
 # 1. instruments
 ./mvnw package -pl cli -am
-java -jar cli/target/quarkus-app/quarkus-run.jar importInstrument migration/src/migration-data/data/instruments
+java -jar cli/target/quarkus-app/quarkus-run.jar importInstrument <data-dir>/data/instruments
 
-# 2. sheets (creates the sheet, then its instrumentations, per file)
-java -jar cli/target/quarkus-app/quarkus-run.jar import migration/src/migration-data/data/sheets
+# 2. ensemble (its voice options reference the instruments)
+java -jar cli/target/quarkus-app/quarkus-run.jar importEnsemble <data-dir>/ensemble-draft.json
+
+# 3. sheets (creates the sheet, then its instrumentations, per file)
+java -jar cli/target/quarkus-app/quarkus-run.jar import <data-dir>/data/sheets
 ```
 
 Point the CLI at the target server via
