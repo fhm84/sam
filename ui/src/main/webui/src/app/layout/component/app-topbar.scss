@@ -24,6 +24,47 @@
   flex-shrink: 0;
 }
 
+// The band's logo and name, next to SAM's (BrandingService); SAM stays first
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  margin-left: 0.25rem;
+  padding-left: 0.75rem;
+  border-left: 1px solid var(--sam-border);
+}
+
+.brand-logo {
+  height: 1.75rem;
+  max-width: 8rem;
+  object-fit: contain;
+}
+
+.brand-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--sam-text);
+  max-width: 14rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Narrow screens: the logo alone (or the name, if there is no logo)
+@media (max-width: 640px) {
+  .brand-logo + .brand-name {
+    display: none;
+  }
+}
+
+// Phones: the top bar is full without it (the user menu would be pushed off-screen)
+@media (max-width: 480px) {
+  .brand {
+    display: none;
+  }
+}
+
 .layout-topbar-breadcrumb {
   flex: 1;
   overflow: hidden;

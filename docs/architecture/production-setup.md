@@ -45,6 +45,7 @@ stay untouched. If the zone has CAA records, they must allow `letsencrypt.org`.
 3. `docker compose -f docker-compose.prod.yml pull` fetches the published images (no registry login needed; optionally pin `SAM_IMAGE_TAG`, see [Deployment](deployment.md)). Then `docker compose -f docker-compose.prod.yml up -d`. To update later: `pull`, then `up -d` again. The `sam-ui` service (Caddy, `docker/Caddyfile`) is the only published service; it fetches the certificates once DNS resolves and ports 80/443 are open. It proxies the login host to the active provider (both answer as `oidc:8080` on the internal network) and answers `/admin` there with 404, so Keycloak's admin console and admin API are reachable only through an SSH tunnel to the server.
 4. On the very first start `sam-server` may fail to reach the provider's issuer before Caddy has its certificate; the restart policy retries automatically, so give it a minute or two before investigating.
 5. Set up the provider (below).
+6. Optional: the band's logo and name. Put the files into `branding/` next to the compose file (readable by everyone, `chmod a+r`), set `SAM_BRANDING_NAME` / `SAM_BRANDING_LOGO=/branding/<file>` (and `SAM_BRANDING_PRINT_LOGO` for an SVG logo) in `.env`, and run `up -d`. See [Band Branding](../features/branding.md).
 
 **Pocket ID first setup.** Do step 1 right after the first start: until an admin exists, whoever opens the setup page first becomes admin.
 

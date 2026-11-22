@@ -10,7 +10,26 @@
           <span class="text-xs leading-none text-[var(--sam-text-muted)]">Sheet music Archiving &amp; Management</span>
         </div>
       </div>
-      <!-- tenant name goes here once available -->
+      <!-- Whose sheets these are: the band's logo and name (server config sam.branding.*) -->
+      @if (branding.active()) {
+        <div class="flex items-center gap-3 min-w-0">
+          <!-- Narrow screens: the logo alone (or the name, if there is no logo) -->
+          @if (branding.name(); as name) {
+            <span
+              class="text-sm font-semibold text-[var(--sam-text)] text-right truncate max-w-[14rem] sm:inline"
+              [class.hidden]="!!branding.logoUrl()"
+              >{{ name }}</span
+            >
+          }
+          @if (branding.logoUrl(); as logoUrl) {
+            <img
+              [src]="logoUrl"
+              [alt]="branding.name() || ('aria.bandLogo' | translate)"
+              class="h-10 max-w-[9rem] object-contain"
+            />
+          }
+        </div>
+      }
     </div>
 
     @if (phase() === 'loading') {

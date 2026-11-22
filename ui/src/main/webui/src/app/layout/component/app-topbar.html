@@ -12,6 +12,17 @@
       <span class="app-logo-img" role="img" [attr.aria-label]="'aria.samLogo' | translate"></span>
       <span class="app-title">SAM</span>
     </a>
+
+    @if (branding.active()) {
+      <span class="brand" [attr.title]="branding.name()">
+        @if (branding.logoUrl(); as logoUrl) {
+          <img class="brand-logo" [src]="logoUrl" [alt]="branding.name() || ('aria.bandLogo' | translate)" />
+        }
+        @if (branding.name(); as name) {
+          <span class="brand-name">{{ name }}</span>
+        }
+      </span>
+    }
   </div>
 
   <div class="layout-topbar-breadcrumb">

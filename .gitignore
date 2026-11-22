@@ -77,3 +77,6 @@ hs_err_pid*.log
 
 # Deployment-specific notes for our own band (hostnames, provider, backup machine) — local only
 /docs/private/
+
+# Band branding files for docker-compose.prod.yml (each installation has its own, never committed)
+/branding/

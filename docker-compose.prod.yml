@@ -224,11 +224,17 @@ services:
       SAM_MEMBERS_RETENTION_MONTHS: ${SAM_MEMBERS_RETENTION_MONTHS:-12}
       # Storage: local filesystem path inside the container
       SAM_FILESYSTEM_BASE_PATH: /data/sam
+      # Band branding (optional): name, and logo files from ./branding (paths inside the container)
+      SAM_BRANDING_NAME: ${SAM_BRANDING_NAME:-}
+      SAM_BRANDING_LOGO: ${SAM_BRANDING_LOGO:-}
+      SAM_BRANDING_PRINT_LOGO: ${SAM_BRANDING_PRINT_LOGO:-}
       # Heap 1 GB inside a 1.5 GB container (rest: metaspace, threads, PDF rendering buffers).
       # Exit on OOM so the restart policy brings it back instead of leaving it half-alive.
       JAVA_TOOL_OPTIONS: "-Xms128m -Xmx1g -XX:+ExitOnOutOfMemoryError"
     volumes:
       - sam-data:/data/sam
+      # The band's logo files (SAM_BRANDING_LOGO=/branding/…); may stay empty
+      - ./branding:/branding:ro
     # edge: the proxy, the login provider and the internet (AI provider); backend: the database
     networks:
       - edge

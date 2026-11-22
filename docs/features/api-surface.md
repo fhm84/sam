@@ -23,6 +23,7 @@ Business endpoints are under the `/api` base path. Ops/diagnostic endpoints
 | Ensemble members | `/api/ensembles/{id}/members` | Sub-resource |
 | Shares | `/api/shares` | Authenticated share management (create, list, revoke) |
 | Public share | `/api/public/shares/{token}` | Unauthenticated; token-validated (`/download`, `/toc`, `/download/{instrumentationId}`, `/sheet/{attachmentId}`) — see [Shares](shares.md) |
+| Branding | `/api/public/branding`, `/api/public/branding/logo` | Unauthenticated; the band's name and logo version, and the logo file — see [Band Branding](branding.md) |
 | Admin storage | `/api/admin/storage/integrity-check` | `admin` only; `POST` re-hashes every stored file and reports damaged, missing, orphaned and leftover temp files (read-only) |
 | Admin users | `/api/admin/users` | `admin` only; user search for member–account linking through the OIDC provider (Pocket ID or Keycloak); `/directory` tells whether search is available (501 without a Pocket ID API key) |
 | Event log | `/api/event-logs` | Read-only; `admin` only |
@@ -37,7 +38,8 @@ Business endpoints are under the `/api` base path. Ops/diagnostic endpoints
 
 All `/api/*` endpoints require authentication (valid OIDC bearer token), except the public share
 endpoints under `/api/public/shares/` (`@PermitAll`, token validated manually in
-`PublicShareResourceImpl`). Write operations (POST, PUT, DELETE) on archive data additionally
+`PublicShareResourceImpl`), the band's branding under `/api/public/branding` and
+`/api/oidc-config.json`. Write operations (POST, PUT, DELETE) on archive data additionally
 require the `music_librarian` or `admin` role; exceptions are share management
 (`/api/shares`, scoped to the caller's own shares — see [Shares](shares.md) for who may create
 links). Read operations (GET) are open to any authenticated user unless the table below says
@@ -82,7 +84,7 @@ Endpoints not listed (writes) keep their `@RolesAllowed` as today.
 | `/event-logs` | admin | admin | done |
 | `/admin/users` | admin | admin | |
 | `/admin/storage/integrity-check` | admin | admin | |
-| `/oidc-config.json`, `/public/shares/{token}/…` | public | public | |
+| `/oidc-config.json`, `/public/shares/{token}/…`, `/public/branding` | public | public | |
 
 UI routes, enforced by `roleGuard` and the menu's `roles` (sheet create/edit forms count as librarian + admin):
 
