@@ -68,8 +68,16 @@ regenerates a clean, consistent set of files — it is safe to run repeatedly.
 
 The script refuses to write anything if a part cannot be parsed — it lists them — so no
 part is dropped silently; extend `InstrumentationParser` (or its `PART_FALLBACKS` for
-one-off wordings) or fix the export. It also warns about sheets sharing title and
-publisher: `cli import` matches on that pair and would import only the first.
+one-off wordings) or fix the export.
+
+Sheets sharing title and publisher are merged into one (`DuplicateSheets`): most legacy
+entries are one side of a double-sided sheet, so a piece a band owns on two such sheets
+appears twice, once per copy. The merged sheet carries the parts of all copies and their
+notes (each naming its back side); the script prints every merge. Copies that differ in
+genre, style, tags, composer or arranger stop the conversion instead. Without the merge,
+`cli import` — which matches on title and publisher — would keep only the first copy. A
+proper link between the two sides of a sheet is a
+[roadmap idea](../docs/roadmap.md#double-sided-sheets-printed-together-with--idea).
 
 **Known, intentional gap:** legacy "art" values `new`, `Traditional`, and
 `Moderato` have no genre mapping on purpose (per `genre-migration.md`'s

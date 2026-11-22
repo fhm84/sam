@@ -138,6 +138,31 @@ No new data model needed — just a QR generation endpoint (e.g.
 
 ---
 
+### Double-sided sheets ("printed together with") — `idea`
+
+Many wind band editions print two pieces on one sheet, one per side (march-book format);
+in a legacy catalogue this is often the norm, not the exception. SAM has no way to say so:
+the legacy migration keeps the back side only as free text in the notes ("Rückseite: …"),
+and a piece a band owns on two different double-sided sheets is merged into one sheet
+with the parts of both copies (`DuplicateSheets` in the `migration` module) — which part is
+on which copy is lost.
+
+Idea: a symmetric link between two sheets, shown on both sheet details ("Back side: …").
+To decide first: whether the link belongs to the sheet or to the physical copy (the same
+piece can sit on the back of different pieces, with different part sets — that points to
+physical copies as their own concept, next to [physical location & condition](#physical-location--condition-on-instrumentations--done)).
+What it would enable:
+
+- **Lending:** borrowing one piece takes the other along ([checkout / lending tracking](#checkout--lending-tracking--idea)).
+- **Coverage:** whether a piece is playable from one copy, not only from all copies together.
+- **Migration:** most "Rückseite: …" notes name a sheet whose own note points back, so the
+  links can be created from the legacy notes, and the merged duplicates split up again.
+
+**Stakeholders:** S1 (music librarian), S3 (Musiker)
+**Effort:** Medium (data model decision, migration, sheet detail UI)
+
+---
+
 ### Mobile part capture — `idea`
 
 Turn a phone into a scanner at the archive cabinet: a mobile-friendly capture page (PWA,
