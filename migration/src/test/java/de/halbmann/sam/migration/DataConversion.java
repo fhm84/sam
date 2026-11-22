@@ -33,7 +33,14 @@ import org.junit.jupiter.api.Test;
  */
 public class DataConversion {
 
-    private static final Path DATA_DIR = Paths.get("", "src", "migration-data");
+    /**
+     * Folder with the legacy exports and the hand-maintained mapping files; the converted files
+     * go to its {@code data/} subfolder. Real data, so it lives outside this repo: set {@code
+     * -Dsam.migration.dataDir=…} (relative paths resolve against the {@code migration} module).
+     */
+    private static final Path DATA_DIR = Paths.get(System.getProperty("sam.migration.dataDir", "src/migration-data"))
+            .toAbsolutePath()
+            .normalize();
 
     Map<String, LegacyMapping> genreMappings;
     Map<String, PublisherMapping> publisherMappings;
@@ -46,6 +53,10 @@ public class DataConversion {
 
     @Test
     void shouldConvert() throws Exception {
+        assertTrue(
+                Files.isRegularFile(DATA_DIR.resolve("noten_mkn.json")),
+                () -> "No noten_mkn.json in " + DATA_DIR + " — set -Dsam.migration.dataDir (see migration/README.md)");
+        System.out.println("Reading legacy data from " + DATA_DIR);
         JsonArray jsonValues;
         try (Jsonb jsonb = JsonbBuilder.create()) {
             jsonValues = jsonb.fromJson(Files.newBufferedReader(DATA_DIR.resolve("noten_mkn.json")), JsonArray.class);
