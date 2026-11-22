@@ -41,7 +41,8 @@ serves them at `GET /api/public/branding` (`{ name, logoVersion }`) and
 `GET /api/public/branding/logo?v=<logoVersion>`. Both are public: the share page needs them
 without a login. `logoVersion` is a hash of the file, so the browser may cache the logo for
 good (`immutable`) and still gets a new one after a change; the logo response carries a
-restrictive `Content-Security-Policy`, so an SVG opened directly can't run scripts. The UI
+restrictive `Content-Security-Policy` (`sandbox`), so an SVG opened directly can't run
+scripts; Caddy keeps it and adds its own CSP only to responses without one. The UI
 reads both once (`BrandingService` in `ui/.../core/`). The TOC gets the print logo as a data
 URI, which the renderer decodes without fetching anything.
 
