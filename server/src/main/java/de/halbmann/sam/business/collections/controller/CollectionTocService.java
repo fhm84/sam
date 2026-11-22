@@ -3,6 +3,7 @@ package de.halbmann.sam.business.collections.controller;
 import de.halbmann.sam.api.entity.collections.CollectionItem;
 import de.halbmann.sam.api.entity.collections.CollectionItemType;
 import de.halbmann.sam.api.entity.collections.SheetCollection;
+import de.halbmann.sam.branding.BrandingService;
 import io.quarkus.qute.Location;
 import io.quarkus.qute.Template;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -31,9 +32,19 @@ public class CollectionTocService {
     @Location("collection-toc")
     Template tocTemplate;
 
-    public byte[] generateToc(final String collectionId, final boolean includeTextItems) {
-        SheetCollection collection = collectionService.load(collectionId);
+    @Inject
+    BrandingService branding;
 
+    public byte[] generateToc(final String collectionId, final boolean includeTextItems) {
+        String html = renderHtml(collectionService.load(collectionId), includeTextItems);
+        try {
+            return render(html);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to generate collection TOC PDF", e);
+        }
+    }
+
+    String renderHtml(final SheetCollection collection, final boolean includeTextItems) {
         List<CollectionItem> items = includeTextItems
                 ? collection.getItems()
                 : collection.getItems().stream()
@@ -44,21 +55,20 @@ public class CollectionTocService {
 
         String totalDuration = computeTotalDuration(items);
 
-        String html = tocTemplate
+        return tocTemplate
                 .data("collection", collection)
                 .data("rows", rows)
                 .data("totalDuration", totalDuration)
                 .data("generatedAt", LocalDate.now())
+                .data("brandName", branding.name().orElse(null))
+                .data("brandLogo", branding.printLogo().orElse(null))
                 .render();
-
-        try {
-            return render(html);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to generate collection TOC PDF", e);
-        }
     }
 
-    /** Renders XHTML to PDF without loading anything from outside: the template brings all it needs. */
+    /**
+     * Renders XHTML to PDF without loading anything from outside: the template brings all it needs
+     * (the band's logo comes as a data URI, which the renderer decodes without fetching).
+     */
     static byte[] render(final String html) throws IOException {
         ITextOutputDevice device = new ITextOutputDevice(ITextRenderer.DEFAULT_DOTS_PER_POINT);
         ITextRenderer renderer =

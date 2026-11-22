@@ -12,6 +12,7 @@ import { Tag } from '@openng/optimus-ui/tag';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../core/translation.service';
 import { SharesApiService } from '../../core/api/shares-api.service';
+import { BrandingService } from '../../core/branding.service';
 import { PublicShareInfo } from '../../model/datamodels';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -27,6 +28,7 @@ export class PublicSharePage implements OnInit {
   protected readonly t = inject(TranslationService);
   private readonly route = inject(ActivatedRoute);
   private readonly sharesApi = inject(SharesApiService);
+  protected readonly branding = inject(BrandingService);
 
   protected readonly phase = signal<'loading' | 'ready' | 'error' | 'expired'>('loading');
   protected readonly info = signal<PublicShareInfo | null>(null);

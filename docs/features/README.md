@@ -31,6 +31,7 @@ for planned work see the [roadmap](../roadmap.md).
 
 - [Search & Discovery](search-discovery.md) — full-text search, filters, browse views
 - [UI & Personalisation](ui-personalisation.md) — layout modes, theme, language
+- [Band Branding](branding.md) — the band's logo and name in the top bar, share page and TOC
 
 ## API
 

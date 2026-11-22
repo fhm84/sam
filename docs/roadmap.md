@@ -815,9 +815,25 @@ distribution of licensed material.
 Implementation: PDF watermarking via Apache PDFBox (already a dependency for text
 extraction).
 
+**Small and traceable rather than a large logo.** A big logo across scanned notes hurts
+legibility, and a faint one doesn't stop copying. What helps with licensed material is a
+small stamp in the page margin: the band's logo (from [band branding](#band-branding-logo-and-name--in-progress),
+optional) plus a line such as "Musikverein X · for rehearsal use only · share '<label>' ·
+2026-11-22". If a part turns up where it shouldn't, the stamp names the share link it
+came from. PDFBox can lay the stamp over each page as an extra content stream, without
+re-encoding the scanned images, so stamping on every download stays cheap. The stored
+master and its [fingerprint](architecture/concepts/storage-and-deduplication.md) never
+change.
+
+Open questions:
+- Which downloads get it: share links only, or also members' own downloads
+  ([My parts](features/my-parts.md))? With members' downloads, the stamp names the member.
+- Image attachments (JPG/PNG): skip at first and stamp PDFs only, or stamp images too.
+- On by default, or per share (a checkbox when creating the link)?
+
 **Stakeholders:** S1 (music librarian), S4 (Administrator)
 **Effort:** Medium
-**Depends on:** Shared document links or guest access
+**Depends on:** Shared document links (done); [band branding](#band-branding-logo-and-name--in-progress) for the logo
 
 ---
 
@@ -1497,6 +1513,28 @@ could use it as an extra retrieval tool.
 
 **Stakeholders:** S2 (Dirigent), S1 (music librarian)
 **Effort:** Medium (pgvector extension, embedding job, search endpoint, UI)
+
+---
+
+### Band branding (logo and name) — `in progress`
+
+Show the band's logo and name wherever SAM presents the band to someone: next to the SAM
+logo in the top bar, on the public share page (guests see whose sheets they were sent),
+and in the header of the collection TOC PDF. SAM stays the app's identity; the band's
+logo stands next to it, not in its place.
+
+One setting for the whole installation (`sam.branding.name`, `sam.branding.logo` as a
+file path; env vars `SAM_BRANDING_NAME` / `SAM_BRANDING_LOGO`), no logo in the repository.
+Without it, everything looks as before. The UI reads it from a public endpoint, since the
+share page needs it without a login. Flying Saucer can't draw SVG, so the PDF takes a PNG
+or JPEG: the logo itself, or `sam.branding.print-logo` next to an SVG one.
+
+**Later:** upload from an admin screen instead of a file on the server; a logo per
+ensemble (main band, youth band), should a club ever need two; the logo on the
+[watermark](#watermarking-on-shared--downloaded-documents--idea).
+
+**Stakeholders:** S4 (Administrator), S3b (Guest musician), S1 (music librarian)
+**Effort:** Low
 
 ---
 

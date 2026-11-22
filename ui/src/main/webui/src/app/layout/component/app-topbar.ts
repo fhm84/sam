@@ -9,6 +9,7 @@ import { ThemeService } from '../../core/theme.service';
 import { TranslationService } from '../../core/translation.service';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { AuthService } from '../../core/auth/auth.service';
+import { BrandingService } from '../../core/branding.service';
 
 @Component({
   selector: 'app-topbar',
@@ -22,6 +23,7 @@ export class AppTopbar {
   protected readonly theme = inject(ThemeService);
   protected readonly i18n = inject(TranslationService);
   protected readonly auth = inject(AuthService);
+  protected readonly branding = inject(BrandingService);
   private readonly router = inject(Router);
 
   private readonly routeMap: Record<string, string[]> = {

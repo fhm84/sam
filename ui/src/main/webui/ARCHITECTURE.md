@@ -30,6 +30,7 @@ src/app/
 │   │   ├── ensembles-api.service.ts
 │   │   ├── collections-api.service.ts
 │   │   └── booklets-api.service.ts
+│   ├── branding.service.ts      # The band's name + logo (public, fetched once)
 │   ├── theme.service.ts         # Dark mode toggle + persistence
 │   └── translation.service.ts   # Runtime i18n (EN/DE)
 │
@@ -87,6 +88,11 @@ with the server's `message` as detail for a 400 or 409 (e.g. why a delete was re
 request whose error the page explains itself (an expected 404) sets
 `new HttpContext().set(SKIP_ERROR_TOAST, true)`. Components use the app-wide
 `MessageService` (shown by `<p-toast>` in the layout); don't provide a local one.
+
+**Band branding** (`core/branding.service.ts`): signals `name()`, `logoUrl()` and `active()`,
+read once from `/api/public/branding` (no token, so the share page can use it). Show the band
+next to SAM's own logo, never in its place; when nothing is configured, `active()` is false
+and the page looks as before. See [Band Branding](../../../../docs/features/branding.md).
 
 **Roles in the UI** (`core/auth/`): the server enforces every role; the UI only hides
 what a user can't use. `AuthService` re-reads the roles whenever the OIDC library stores new
