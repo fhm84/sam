@@ -59,10 +59,27 @@
   }
 }
 
-// Phones: the top bar is full without it (the user menu would be pushed off-screen)
+// Phones: the top bar is full, so the band's logo takes the place of the "SAM" text (SAM's icon
+// stays) and the user menu shows its icon only; otherwise the user menu is pushed off-screen.
+// Unbranded, the top bar stays as it was.
 @media (max-width: 480px) {
-  .brand {
+  .branded .app-title,
+  .branded .user-display-name {
     display: none;
+  }
+
+  .brand {
+    margin-left: 0;
+    padding-left: 0.5rem;
+  }
+
+  .brand-logo {
+    height: 2rem;
+    max-width: 5rem;
+  }
+
+  .brand-name {
+    max-width: 7rem;
   }
 }
 
