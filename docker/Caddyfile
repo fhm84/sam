@@ -72,11 +72,13 @@
 	# and fonts, inline styles (the UI library writes its theme as <style> at runtime), data:/blob:
 	# images and blob: frames (document previews), and the token calls to the login host. The
 	# production build doesn't inline critical CSS (angular.json), as that needs an inline script.
+	# The CSP is a default (?): a response that brings a stricter one of its own keeps it (the
+	# band logo, an SVG, is sandboxed by sam-server's BrandingResource).
 	# HSTS without includeSubDomains: other hosts of the domain may not serve HTTPS.
 	header {
 		defer
 		Strict-Transport-Security "max-age=31536000"
-		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://{$LOGIN_DOMAIN}; frame-src 'self' blob:; media-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+		?Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://{$LOGIN_DOMAIN}; frame-src 'self' blob:; media-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
 		?X-Content-Type-Options nosniff
 		X-Frame-Options DENY
 		Referrer-Policy same-origin
