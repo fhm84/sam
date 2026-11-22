@@ -9,9 +9,11 @@ import de.halbmann.sam.api.entity.sheets.Instrumentation;
 import de.halbmann.sam.api.entity.sheets.NotationType;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,14 +52,18 @@ public class InstrumentationParser {
     /**
      * Outcome of parsing one {@code stimmen} string.
      *
-     * @param instrumentations the parts that were understood, in input order
+     * @param instrumentations the parts that were understood, in input order, each part once
      * @param unparsed the parts that were not understood, verbatim
+     * @param duplicates parts dropped because an earlier one is the same part (same instrument,
+     *     part label and clef — SAM's unique key for a sheet's instrumentations), verbatim
      */
-    public record Result(List<Instrumentation> instrumentations, List<String> unparsed) {}
+    public record Result(List<Instrumentation> instrumentations, List<String> unparsed, List<String> duplicates) {}
 
     public static Result parse(String input) {
         List<Instrumentation> instrumentations = new ArrayList<>();
         List<String> unparsed = new ArrayList<>();
+        List<String> duplicates = new ArrayList<>();
+        Set<String> seen = new HashSet<>();
         Arrays.stream(input.split(";"))
                 .map(String::trim)
                 .filter(not(String::isEmpty))
@@ -65,11 +71,14 @@ public class InstrumentationParser {
                     Instrumentation instrumentation = parseInstrument(part);
                     if (instrumentation == null) {
                         unparsed.add(part);
+                    } else if (!seen.add(instrumentation.getInstrument().getId() + "\u0000"
+                            + instrumentation.getPartLabel() + "\u0000" + instrumentation.getClef())) {
+                        duplicates.add(part);
                     } else {
                         instrumentations.add(instrumentation);
                     }
                 });
-        return new Result(List.copyOf(instrumentations), List.copyOf(unparsed));
+        return new Result(List.copyOf(instrumentations), List.copyOf(unparsed), List.copyOf(duplicates));
     }
 
     private static Instrumentation parseInstrument(String part) {
