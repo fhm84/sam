@@ -12,9 +12,6 @@ import org.mapstruct.*;
         unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface EnsembleVoiceMapper {
 
-    /** Default relative importance for a voice whose weight wasn't specified. */
-    double DEFAULT_WEIGHT = 1.0;
-
     EnsembleVoice toDto(EnsembleVoiceEntity entity);
 
     @Mapping(target = "id", ignore = true)
@@ -23,7 +20,7 @@ public interface EnsembleVoiceMapper {
     @Mapping(target = "lastUpdate", ignore = true)
     @Mapping(target = "ensemble", ignore = true)
     @Mapping(target = "options", ignore = true)
-    @Mapping(target = "weight", expression = "java(dto.getWeight() != null ? dto.getWeight() : DEFAULT_WEIGHT)")
+    @Mapping(target = "weight", defaultValue = "1.0") // the UI lets the weight field be left empty
     EnsembleVoiceEntity fromDto(CreateEnsembleVoice dto);
 
     @Mapping(target = "id", ignore = true)
@@ -32,6 +29,6 @@ public interface EnsembleVoiceMapper {
     @Mapping(target = "lastUpdate", ignore = true)
     @Mapping(target = "ensemble", ignore = true)
     @Mapping(target = "options", ignore = true)
-    @Mapping(target = "weight", expression = "java(dto.getWeight() != null ? dto.getWeight() : DEFAULT_WEIGHT)")
+    @Mapping(target = "weight", defaultValue = "1.0")
     void update(@MappingTarget EnsembleVoiceEntity entity, EnsembleVoice dto);
 }

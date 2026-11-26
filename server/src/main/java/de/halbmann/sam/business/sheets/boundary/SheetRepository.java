@@ -7,7 +7,7 @@ import de.halbmann.sam.api.entity.shared.SortOrder;
 import de.halbmann.sam.api.entity.sheets.Genre;
 import de.halbmann.sam.api.entity.sheets.TagCount;
 import de.halbmann.sam.business.documents.entity.AttachmentEntity;
-import de.halbmann.sam.business.sheets.entity.InstrumentationCountCriterion;
+import de.halbmann.sam.business.sheets.entity.PartCountFilter;
 import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
 import de.halbmann.sam.core.controller.LikePatterns;
 import de.halbmann.sam.core.controller.SortFieldValidator;
@@ -65,12 +65,23 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
             String tag,
             Boolean favorite,
             String composer,
-            List<InstrumentationCountCriterion> instrumentCriteria) {
+            List<PartCountFilter> partCounts) {
 
         public SearchFilters {
-            instrumentCriteria = instrumentCriteria == null ? List.of() : instrumentCriteria;
+            partCounts = partCounts == null ? List.of() : partCounts;
         }
     }
+
+    /**
+     * Number of parts the sheet {@code s} has for the instrument in the named parameter, in JPQL.
+     * {@code COUNT(*)}, not {@code COUNT(p)}: counting the id column would rule out an index-only scan.
+     */
+    private static final String PART_COUNT_JPQL =
+            "(SELECT COUNT(*) FROM InstrumentationEntity p WHERE p.sheet = s AND p.instrument.id = :%s)";
+
+    /** {@link #PART_COUNT_JPQL} as native SQL, for the full-text search query. */
+    private static final String PART_COUNT_SQL =
+            "(SELECT count(*) FROM instrumentations p WHERE p.sheet_id = s.id AND p.instrument_id = :%s)";
 
     private static final String SEARCH_CTE = """
             WITH q AS (
@@ -165,32 +176,29 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
             conditions.add("s.composer_name = :composer");
             params.put("composer", filters.composer());
         }
-        addInstrumentCriteria(
-                filters.instrumentCriteria(),
-                "SELECT count(*) FROM instrumentations i WHERE i.sheet_id = s.id AND i.instrument_id = ",
-                conditions,
-                params);
+        conditions.addAll(partCountConditions(filters.partCounts(), PART_COUNT_SQL, params));
         return "WHERE " + String.join("\n  AND ", conditions);
     }
 
     /**
-     * Adds one condition per criterion, comparing a correlated count of the sheet {@code s}'s parts
-     * for the criterion's instrument with its count. {@code countQueryPrefix} is that count query
-     * (JPQL or native SQL) up to the instrument parameter; every value is bound as a parameter.
+     * One condition per filter: the correlated subquery {@code countTemplate} (with {@code %s} for
+     * the instrument parameter's name) compared with the filter's number of parts. Instrument and
+     * number go into {@code params}; only the operator, a fixed string, ends up in the query text.
      */
-    private static void addInstrumentCriteria(
-            final List<InstrumentationCountCriterion> criteria,
-            final String countQueryPrefix,
-            final List<String> conditions,
-            final Map<String, Object> params) {
-        for (int idx = 0; idx < criteria.size(); idx++) {
-            InstrumentationCountCriterion criterion = criteria.get(idx);
-            String instrumentParam = "instrId" + idx;
-            String countParam = "instrCount" + idx;
-            conditions.add(criterion.toCondition("(" + countQueryPrefix + ":" + instrumentParam + ")", countParam));
-            params.put(instrumentParam, criterion.instrumentId());
-            params.put(countParam, criterion.count());
+    private static List<String> partCountConditions(
+            final List<PartCountFilter> filters, final String countTemplate, final Map<String, Object> params) {
+        List<String> conditions = new ArrayList<>(filters.size());
+        int n = 0;
+        for (PartCountFilter filter : filters) {
+            String instrument = "partInstrument" + n;
+            String parts = "partNumber" + n;
+            n++;
+            params.put(instrument, filter.instrumentId());
+            params.put(parts, filter.parts());
+            conditions.add(countTemplate.formatted(instrument) + " "
+                    + filter.comparison().operator() + " :" + parts);
         }
+        return conditions;
     }
 
     public Optional<SheetMusicEntity> findByTitle(String title) {
@@ -230,56 +238,47 @@ public class SheetRepository implements PanacheRepositoryBase<SheetMusicEntity, 
     }
 
     /**
-     * Sheets matching the given field filters (each ANDed together), optionally combined with a
-     * set of instrumentation-count criteria (e.g. "exactly 4 horns", "no oboes"), also ANDed in.
-     * Each instrument criterion is a correlated {@code COUNT} subquery against
-     * {@code InstrumentationEntity}, which is why the query names its root alias {@code s}.
+     * One page of sheets that match every given restriction: the non-null entries of
+     * {@code fieldValues} (entity path → required value), a title prefix, a tag and the part counts.
+     * The query's root alias is {@code s}, which the part count subqueries refer to.
      */
     public PaginatedEntities<SheetMusicEntity> findSheetEntities(
             final PaginationRequest paginationRequest,
-            final Map<String, Object> parameters,
+            final Map<String, Object> fieldValues,
             final String titleStartsWith,
             final String tag,
-            final List<InstrumentationCountCriterion> instrumentCriteria) {
-        final Map<String, Object> nonNullParams = parameters.entrySet().stream()
-                .filter(entry -> entry.getValue() != null)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            final List<PartCountFilter> partCounts) {
+        List<String> where = new ArrayList<>();
+        Map<String, Object> params = new HashMap<>();
 
-        final List<String> conditions = new ArrayList<>();
-        final Map<String, Object> queryParams = new HashMap<>();
-
-        nonNullParams.forEach((field, value) -> {
-            final String paramName = field.replace('.', '_');
-            conditions.add("s." + field + " = :" + paramName);
-            queryParams.put(paramName, value);
-        });
-
+        for (Map.Entry<String, Object> field : fieldValues.entrySet()) {
+            if (field.getValue() == null) {
+                continue;
+            }
+            // Paths such as composer.name aren't valid parameter names
+            String param = "field_" + field.getKey().replace('.', '_');
+            where.add("s." + field.getKey() + " = :" + param);
+            params.put(param, field.getValue());
+        }
         if (titleStartsWith != null && !titleStartsWith.isBlank()) {
-            conditions.add("lower(s.title) like :titlePrefix" + LikePatterns.ESCAPE_CLAUSE);
-            queryParams.put("titlePrefix", LikePatterns.startsWith(titleStartsWith.toLowerCase(Locale.ROOT)));
+            where.add("lower(s.title) like :titlePrefix" + LikePatterns.ESCAPE_CLAUSE);
+            params.put("titlePrefix", LikePatterns.startsWith(titleStartsWith.toLowerCase(Locale.ROOT)));
         }
-
         if (tag != null && !tag.isBlank()) {
-            conditions.add(":tag member of s.tags");
-            queryParams.put("tag", tag);
+            where.add(":tag member of s.tags");
+            params.put("tag", tag);
+        }
+        if (partCounts != null) {
+            where.addAll(partCountConditions(partCounts, PART_COUNT_JPQL, params));
         }
 
-        // COUNT(*), not COUNT(ic): counting the id column would rule out an index-only scan
-        addInstrumentCriteria(
-                instrumentCriteria == null ? List.of() : instrumentCriteria,
-                "SELECT COUNT(*) FROM InstrumentationEntity ic WHERE ic.sheet = s AND ic.instrument.id = ",
-                conditions,
-                queryParams);
-
-        final String query =
-                "FROM SheetMusicEntity s" + (conditions.isEmpty() ? "" : " WHERE " + String.join(" AND ", conditions));
-        final PanacheQuery<SheetMusicEntity> sheetQuery = find(query, prepareSort(paginationRequest), queryParams);
-        final long totalItems = sheetQuery.count();
-        final List<SheetMusicEntity> sheets = sheetQuery
-                .page(paginationRequest.getPage(), paginationRequest.getSize())
+        String jpql = where.isEmpty()
+                ? "FROM SheetMusicEntity s"
+                : "FROM SheetMusicEntity s WHERE " + String.join(" AND ", where);
+        PanacheQuery<SheetMusicEntity> query = find(jpql, prepareSort(paginationRequest), params);
+        List<SheetMusicEntity> page = query.page(paginationRequest.getPage(), paginationRequest.getSize())
                 .list();
-
-        return new PaginatedEntities<>(sheets, totalItems);
+        return new PaginatedEntities<>(page, query.count());
     }
 
     private Sort prepareSort(PaginationRequest paginationRequest) {

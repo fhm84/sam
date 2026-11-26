@@ -6,7 +6,8 @@ import { of, throwError } from 'rxjs';
 import { ConfirmationService, MessageService } from '@openng/optimus-ui/api';
 
 import { Sheets } from './sheets';
-import { SheetsApiService, EnsemblesApiService, InstrumentsApiService } from '../../core/api';
+import { PartCountRow } from './part-count-filter';
+import { EnsemblesApiService, InstrumentsApiService, SheetsApiService } from '../../core/api';
 import { TranslationService } from '../../core/translation.service';
 import { LayoutPreferenceService } from '../../core/layout-preference.service';
 import { SheetMusic, SheetMusicSearchResult } from '../../model/datamodels';
@@ -20,7 +21,8 @@ describe('Sheets', () => {
   let component: Sheets;
   let sheetsApi: { find: ReturnType<typeof vi.fn>; getAvailableLetters: ReturnType<typeof vi.fn> };
   let ensemblesApi: { find: ReturnType<typeof vi.fn>; getCoverageStatus: ReturnType<typeof vi.fn>; computeCoverage: ReturnType<typeof vi.fn> };
-  let instrumentsApi: { find: ReturnType<typeof vi.fn> };
+  /** InstrumentsApiService.find, which only the part count filter needs. */
+  let findInstruments: ReturnType<typeof vi.fn>;
 
   beforeEach(async () => {
     sheetsApi = {
@@ -32,9 +34,7 @@ describe('Sheets', () => {
       getCoverageStatus: vi.fn().mockReturnValue(of({})),
       computeCoverage: vi.fn().mockReturnValue(of({})),
     };
-    instrumentsApi = {
-      find: vi.fn().mockReturnValue(paginatedOf([])),
-    };
+    findInstruments = vi.fn(() => paginatedOf([]));
 
     await TestBed.overrideComponent(Sheets, {
       set: {
@@ -52,7 +52,7 @@ describe('Sheets', () => {
           MessageService,
           { provide: SheetsApiService, useValue: sheetsApi },
           { provide: EnsemblesApiService, useValue: ensemblesApi },
-          { provide: InstrumentsApiService, useValue: instrumentsApi },
+          { provide: InstrumentsApiService, useValue: { find: findInstruments } },
           {
             provide: TranslationService,
             useValue: { t: (k: string) => k, version: { subscribe: () => {} } },
@@ -249,9 +249,14 @@ describe('Sheets', () => {
     expect((component as any).currentPage).toBe(0);
   });
 
-  // ── instrument criteria ────────────────────────────────
+  // ── part count filter ──────────────────────────────
 
-  describe('instrument criteria', () => {
+  describe('part count filter', () => {
+    const horns = (parts: number | null): PartCountRow => ({ instrument: 'HORN', comparison: 'EQ', parts });
+    const edit = (...rows: PartCountRow[]) => (component as any).onPartCountRowsChange(rows);
+    const openOrClosePanel = () => (component as any).toggleFilterPanel();
+    const requestedPartCounts = () => sheetsApi.find.mock.lastCall?.[0].partCounts;
+
     beforeEach(() => {
       vi.useFakeTimers();
       sheetsApi.find.mockClear();
@@ -259,75 +264,78 @@ describe('Sheets', () => {
 
     afterEach(() => vi.useRealTimers());
 
-    const lastRequestedCriteria = () => sheetsApi.find.mock.lastCall?.[0].instrumentCriteria;
+    it('fetches the instruments once, on the first opening of the panel', () => {
+      expect(findInstruments).not.toHaveBeenCalled();
 
-    it('loads instruments only when the filter panel is first opened', () => {
-      expect(instrumentsApi.find).not.toHaveBeenCalled();
+      openOrClosePanel();
+      openOrClosePanel();
+      openOrClosePanel();
 
-      (component as any).toggleFilterPanel();
-      (component as any).toggleFilterPanel();
-      (component as any).toggleFilterPanel();
-
-      expect(instrumentsApi.find).toHaveBeenCalledTimes(1);
+      expect(findInstruments).toHaveBeenCalledTimes(1);
     });
 
-    it('debounces edits into a single reload', () => {
-      (component as any).addInstrumentCriterionRow();
-      (component as any).updateInstrumentCriterionRow(0, { instrumentId: 'HORN' });
-      (component as any).updateInstrumentCriterionRow(0, { count: 2 });
-      (component as any).updateInstrumentCriterionRow(0, { count: 3 });
+    it('fetches the instruments again on the next opening after a failure', () => {
+      findInstruments.mockReturnValueOnce(throwError(() => new Error('offline')));
+
+      openOrClosePanel();
+      openOrClosePanel();
+      openOrClosePanel();
+
+      expect(findInstruments).toHaveBeenCalledTimes(2);
+    });
+
+    it('reloads once for a burst of edits, with the last state', () => {
+      edit(horns(1));
+      edit(horns(2));
+      edit(horns(5));
       expect(sheetsApi.find).not.toHaveBeenCalled();
 
       vi.advanceTimersByTime(300);
 
       expect(sheetsApi.find).toHaveBeenCalledTimes(1);
-      expect(lastRequestedCriteria()).toEqual(['HORN:EQ:3']);
+      expect(requestedPartCounts()).toEqual(['HORN:EQ:5']);
+      expect((component as any).activeFilterCount()).toBe(1);
     });
 
-    it('skips incomplete rows and edits that leave the criteria unchanged', () => {
-      (component as any).addInstrumentCriterionRow();
-      (component as any).updateInstrumentCriterionRow(0, { operator: 'GTE' });
+    it('does not reload for rows that are not filled in', () => {
+      edit({ instrument: null, comparison: 'LT', parts: 2 });
       vi.advanceTimersByTime(300);
-      expect(sheetsApi.find).not.toHaveBeenCalled();
+      edit(horns(null));
+      vi.advanceTimersByTime(300);
 
-      (component as any).updateInstrumentCriterionRow(0, { instrumentId: 'HORN', count: null });
-      vi.advanceTimersByTime(300);
       expect(sheetsApi.find).not.toHaveBeenCalled();
       expect((component as any).activeFilterCount()).toBe(0);
     });
 
-    it('reloads with the criteria once a row is complete', () => {
-      (component as any).addInstrumentCriterionRow();
-      (component as any).updateInstrumentCriterionRow(0, { instrumentId: 'OBOE', operator: 'LT' });
+    it('does not reload when the filled-in rows end up as before', () => {
+      edit(horns(2));
+      vi.advanceTimersByTime(300);
+      edit(horns(2), { instrument: null, comparison: 'EQ', parts: 1 });
       vi.advanceTimersByTime(300);
 
-      expect(lastRequestedCriteria()).toEqual(['OBOE:LT:1']);
-      expect((component as any).activeFilterCount()).toBe(1);
+      expect(sheetsApi.find).toHaveBeenCalledTimes(1);
     });
 
-    it('reloads unchanged criteria again after a failed request', () => {
+    it('sends the same filter again after a failed request', () => {
       sheetsApi.find.mockReturnValueOnce(throwError(() => new Error('offline')));
-      (component as any).addInstrumentCriterionRow();
-      (component as any).updateInstrumentCriterionRow(0, { instrumentId: 'HORN' });
+      edit(horns(3));
       vi.advanceTimersByTime(300);
-      expect(sheetsApi.find).toHaveBeenCalledTimes(1);
 
-      // Re-applying the same value must retry instead of being skipped as "already requested"
-      (component as any).updateInstrumentCriterionRow(0, { count: 1 });
+      edit(horns(3));
       vi.advanceTimersByTime(300);
 
       expect(sheetsApi.find).toHaveBeenCalledTimes(2);
-      expect(lastRequestedCriteria()).toEqual(['HORN:EQ:1']);
+      expect(requestedPartCounts()).toEqual(['HORN:EQ:3']);
     });
 
-    it('retries loading instruments on the next panel open after a failure', () => {
-      instrumentsApi.find.mockReturnValueOnce(throwError(() => new Error('offline')));
+    it('clears the rows with the other filters', () => {
+      edit(horns(2));
+      vi.advanceTimersByTime(300);
 
-      (component as any).toggleFilterPanel();
-      (component as any).toggleFilterPanel();
-      (component as any).toggleFilterPanel();
+      (component as any).clearFilters();
 
-      expect(instrumentsApi.find).toHaveBeenCalledTimes(2);
+      expect((component as any).partCountRows()).toEqual([]);
+      expect(requestedPartCounts()).toBeUndefined();
     });
   });
 });

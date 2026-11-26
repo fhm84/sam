@@ -597,7 +597,7 @@ export interface SheetFilterRequest extends PaginationRequest {
     ensemble?: string;
     favorite?: boolean;
     genre?: string;
-    instrumentCriteria?: string[];
+    partCounts?: string[];
     query?: string;
     tag?: string;
     title?: string;

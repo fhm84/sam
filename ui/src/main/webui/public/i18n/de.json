@@ -380,14 +380,16 @@
       "toggle": "Filter",
       "genre": "Genre",
       "genrePlaceholder": "Alle Genres",
-      "clear": "Filter zurücksetzen",
-      "instrumentation": "Besetzung",
-      "instrumentPlaceholder": "Instrument wählen",
-      "addInstrumentCriterion": "Instrumentenfilter hinzufügen",
-      "removeInstrumentCriterion": "Instrumentenfilter entfernen",
-      "instrumentAria": "Instrument",
-      "operatorAria": "Vergleich",
-      "countAria": "Anzahl Stimmen"
+      "clear": "Filter zurücksetzen"
+    },
+    "partCountFilter": {
+      "title": "Stimmen je Instrument",
+      "instrument": "Instrument",
+      "instrumentPlaceholder": "Wähle ein Instrument",
+      "comparison": "Vergleich",
+      "parts": "Stimmen",
+      "add": "Instrument hinzufügen",
+      "remove": "Diese Zeile entfernen"
     },
     "collections": {
       "title": "Sammlungen",

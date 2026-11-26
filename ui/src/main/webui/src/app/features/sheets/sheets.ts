@@ -17,7 +17,6 @@ import { Drawer } from '@openng/optimus-ui/drawer';
 import { Toolbar } from '@openng/optimus-ui/toolbar';
 import { Tag } from '@openng/optimus-ui/tag';
 import { Tooltip } from '@openng/optimus-ui/tooltip';
-import { InputNumber } from '@openng/optimus-ui/inputnumber';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../core/translation.service';
@@ -34,21 +33,13 @@ import {
   SheetMusicSearchResult,
 } from '../../model/datamodels';
 import { FETCH_ALL_SIZE, GENRES, STYLES } from '../../shared/constants';
-import { instrumentLabel } from '../../shared/utils/format.utils';
 import { Dialog } from '@openng/optimus-ui/dialog';
 import { SheetDetail } from './sheet-detail';
 import { SheetCollections } from './sheet-collections';
 import { ExploreView } from './explore/explore-view';
 import { RowActions } from '../../shared/components/row-actions/row-actions';
 import { AuthService } from '../../core/auth/auth.service';
-
-type InstrumentCriterionOperator = 'EQ' | 'NEQ' | 'LT' | 'LTE' | 'GT' | 'GTE';
-
-interface InstrumentCriterionRow {
-  instrumentId: string | null;
-  operator: InstrumentCriterionOperator;
-  count: number | null;
-}
+import { PartCountFilter, PartCountRow, partCountParams } from './part-count-filter';
 
 @Component({
   selector: 'app-sheets',
@@ -74,7 +65,7 @@ interface InstrumentCriterionRow {
     Toolbar,
     Tag,
     Tooltip,
-    InputNumber,
+    PartCountFilter,
   ],
   providers: [ConfirmationService],
   templateUrl: './sheets.html',
@@ -119,27 +110,14 @@ export class Sheets implements OnInit {
   protected readonly tagFilter = signal<string | null>(null);
   protected readonly debugMode = signal(false);
 
-  // ── Instrumentation filter ────────────────────────────
-  protected readonly instrumentOptions = signal<{ label: string; value: string }[]>([]);
-  protected readonly operatorOptions: { label: string; value: InstrumentCriterionOperator }[] = [
-    { label: '=', value: 'EQ' },
-    { label: '≠', value: 'NEQ' },
-    { label: '<', value: 'LT' },
-    { label: '≤', value: 'LTE' },
-    { label: '>', value: 'GT' },
-    { label: '≥', value: 'GTE' },
-  ];
-  protected readonly instrumentCriteriaRows = signal<InstrumentCriterionRow[]>([]);
-  /** Wire format of the complete rows; rows still missing an instrument or count are ignored. */
-  private readonly instrumentCriteria = computed(() =>
-    this.instrumentCriteriaRows()
-      .filter((r) => r.instrumentId && r.count != null)
-      .map((r) => `${r.instrumentId}:${r.operator}:${r.count}`),
-  );
+  // ── Part count filter ─────────────────────────────────
+  protected readonly instruments = signal<Instrument[]>([]);
+  protected readonly partCountRows = signal<PartCountRow[]>([]);
+  private readonly partCounts = computed(() => partCountParams(this.partCountRows()));
+  private instrumentsFetch: 'none' | 'pending' | 'done' = 'none';
 
   protected readonly activeFilterCount = computed(
-    () =>
-      (this.selectedGenre() ? 1 : 0) + (this.selectedLetter() ? 1 : 0) + this.instrumentCriteria().length,
+    () => [this.selectedGenre(), this.selectedLetter()].filter(Boolean).length + this.partCounts().length,
   );
   protected rows = 20;
 
@@ -164,14 +142,13 @@ export class Sheets implements OnInit {
   protected currentPage = 0;
   private searchFilter = '';
   private readonly filterSubject = new Subject<string>();
-  private readonly instrumentCriteriaChanged = new Subject<void>();
+  private readonly partCountsEdited = new Subject<void>();
   private readonly loadRequests = new Subject<void>();
   /**
    * Criteria of the latest data request, to skip reloads for edits that don't change them.
    * null after a failed request, so the next edit always reloads.
    */
-  private requestedInstrumentCriteria: string | null = '';
-  private instrumentOptionsRequested = false;
+  private requestedPartCounts: string | null = '';
 
   ngOnInit(): void {
     this.filterSubject
@@ -186,10 +163,10 @@ export class Sheets implements OnInit {
         this.loadData();
       });
 
-    this.instrumentCriteriaChanged
+    this.partCountsEdited
       .pipe(debounceTime(300), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
-        if (this.instrumentCriteria().join('|') !== this.requestedInstrumentCriteria) {
+        if (this.partCounts().join('|') !== this.requestedPartCounts) {
           this.currentPage = 0;
           this.loadData();
         }
@@ -201,7 +178,7 @@ export class Sheets implements OnInit {
         switchMap(() =>
           this.fetchSheets().pipe(
             catchError(() => {
-              this.requestedInstrumentCriteria = null;
+              this.requestedPartCounts = null;
               return of(null);
             }),
           ),
@@ -224,20 +201,20 @@ export class Sheets implements OnInit {
     this.loadEnsembles();
   }
 
-  /** Instruments are only needed for the filter panel, so they load when it is first opened. */
-  private loadInstrumentOptions(): void {
-    if (this.instrumentOptionsRequested) return;
-    this.instrumentOptionsRequested = true;
+  /** Only the part count filter needs the instruments, so they are fetched on the panel's first opening. */
+  private loadInstruments(): void {
+    if (this.instrumentsFetch !== 'none') return;
+    this.instrumentsFetch = 'pending';
     this.instrumentsApi
       .find({ size: FETCH_ALL_SIZE })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (res) =>
-          this.instrumentOptions.set(
-            (res.data ?? []).map((i: Instrument) => ({ label: instrumentLabel(i), value: i.id! })),
-          ),
-        // Allow a retry on the next panel open
-        error: () => (this.instrumentOptionsRequested = false),
+        next: (page) => {
+          this.instruments.set(page.data ?? []);
+          this.instrumentsFetch = 'done';
+        },
+        // The next opening of the panel tries again
+        error: () => (this.instrumentsFetch = 'none'),
       });
   }
 
@@ -344,7 +321,7 @@ export class Sheets implements OnInit {
   protected toggleFilterPanel(): void {
     this.filterPanelOpen.update((v) => !v);
     if (this.filterPanelOpen()) {
-      this.loadInstrumentOptions();
+      this.loadInstruments();
     }
   }
 
@@ -359,31 +336,16 @@ export class Sheets implements OnInit {
   protected clearFilters(): void {
     this.selectedGenre.set(null);
     this.selectedLetter.set(null);
-    this.instrumentCriteriaRows.set([]);
+    this.partCountRows.set([]);
     this.currentPage = 0;
     this.loadAvailableLetters();
     this.loadData();
   }
 
-  protected addInstrumentCriterionRow(): void {
-    this.instrumentCriteriaRows.update((rows) => [
-      ...rows,
-      { instrumentId: null, operator: 'EQ', count: 1 },
-    ]);
-  }
-
-  protected removeInstrumentCriterionRow(index: number): void {
-    this.instrumentCriteriaRows.update((rows) => rows.filter((_, i) => i !== index));
-    this.onInstrumentCriteriaChange();
-  }
-
-  protected updateInstrumentCriterionRow(index: number, patch: Partial<InstrumentCriterionRow>): void {
-    this.instrumentCriteriaRows.update((rows) => rows.map((r, i) => (i === index ? { ...r, ...patch } : r)));
-    this.onInstrumentCriteriaChange();
-  }
-
-  private onInstrumentCriteriaChange(): void {
-    this.instrumentCriteriaChanged.next();
+  /** Edits reload the list debounced; rows that aren't filled in yet don't change the request. */
+  protected onPartCountRowsChange(rows: PartCountRow[]): void {
+    this.partCountRows.set(rows);
+    this.partCountsEdited.next();
   }
 
   protected onLetterSelect(letter: string): void {
@@ -552,8 +514,8 @@ export class Sheets implements OnInit {
   }
 
   private fetchSheets() {
-    const instrumentCriteria = this.instrumentCriteria();
-    this.requestedInstrumentCriteria = instrumentCriteria.join('|');
+    const partCounts = this.partCounts();
+    this.requestedPartCounts = partCounts.join('|');
     return this.api.find({
       page: this.currentPage,
       size: this.rows,
@@ -562,7 +524,7 @@ export class Sheets implements OnInit {
       titleStartsWith: this.selectedLetter() || undefined,
       ensemble: this.selectedEnsemble()?.id || undefined,
       tag: this.tagFilter() || undefined,
-      instrumentCriteria: instrumentCriteria.length ? instrumentCriteria : undefined,
+      partCounts: partCounts.length ? partCounts : undefined,
     });
   }
 }
