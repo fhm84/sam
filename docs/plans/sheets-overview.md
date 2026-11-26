@@ -5,7 +5,7 @@ Roadmap: [Sheets overview filter & bulk actions](../roadmap.md#sheets-overview-f
 · Feature: [Search & discovery](../features/search-discovery.md)
 
 **Why:** the design's filter toolbar and bulk actions go beyond what `SheetFilterRequest`
-and the API support today. Related: the [instrumentation-count filter](../features/search-discovery.md#instrumentation-count-filter)
+and the API support today. Related: the [part count filter](../features/search-discovery.md#part-count-filter)
 ("exactly 4 horns, no oboes") already goes through the same filter request.
 
 ## Tasks

@@ -5,7 +5,6 @@ import de.halbmann.sam.api.entity.collections.CreateCollectionItem;
 import de.halbmann.sam.api.entity.ensembles.CoverageSnapshotSummary;
 import de.halbmann.sam.api.entity.persons.Person;
 import de.halbmann.sam.api.entity.shared.PaginatedResponse;
-import de.halbmann.sam.api.entity.shared.PaginationRequest;
 import de.halbmann.sam.api.entity.shared.SearchResultMetrics;
 import de.halbmann.sam.api.entity.sheets.CreateSheetMusic;
 import de.halbmann.sam.api.entity.sheets.ExploreShelves;
@@ -22,7 +21,7 @@ import de.halbmann.sam.business.persons.controller.PersonService;
 import de.halbmann.sam.business.persons.entity.PersonEntity;
 import de.halbmann.sam.business.shared.event.ResourcesDeleted;
 import de.halbmann.sam.business.sheets.boundary.SheetRepository;
-import de.halbmann.sam.business.sheets.entity.InstrumentationCountCriterion;
+import de.halbmann.sam.business.sheets.entity.PartCountFilter;
 import de.halbmann.sam.business.sheets.entity.SheetMusicEntity;
 import de.halbmann.sam.core.entity.PaginatedEntities;
 import de.halbmann.sam.core.exception.EntityNotFoundException;
@@ -32,7 +31,6 @@ import jakarta.enterprise.event.Event;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @ApplicationScoped
 @Transactional
@@ -62,13 +60,15 @@ public class SheetService {
     @Inject
     Event<ResourcesDeleted> resourcesDeleted;
 
-    /** Upper bound for instrument criteria per request; each one adds a correlated subquery. */
-    public static final int MAX_INSTRUMENT_CRITERIA = 20;
+    /**
+     * Most part count filters one request may carry. Each is a correlated subquery, run by both the
+     * page and the count query.
+     */
+    public static final int MAX_PART_COUNT_FILTERS = 20;
 
     public PaginatedResponse<SheetMusicSearchResult> findSheets(final SheetFilterRequest filterRequest) {
         PaginatedResponse<SheetMusicSearchResult> response;
-        List<InstrumentationCountCriterion> instrumentCriteria =
-                parseInstrumentCriteria(filterRequest.getInstrumentCriteria());
+        final List<PartCountFilter> partCounts = toPartCountFilters(filterRequest.getPartCounts());
 
         if (filterRequest.getQuery() != null) {
             // Same narrowing filters as the list path below, so search + genre/letter/tag/composer combine
@@ -78,7 +78,7 @@ public class SheetService {
                     filterRequest.getTag(),
                     filterRequest.getFavorite(),
                     filterRequest.getComposer(),
-                    instrumentCriteria);
+                    partCounts);
             List<Object[]> results = sheetRepository.searchSheets(
                     filterRequest.getQuery(), filters, filterRequest.getPage(), filterRequest.getSize());
 
@@ -119,12 +119,7 @@ public class SheetService {
                 parameters.put("favorite", filterRequest.getFavorite());
             }
 
-            PaginatedResponse<SheetMusic> sheets = getAllSheets(
-                    filterRequest,
-                    parameters,
-                    filterRequest.getTitleStartsWith(),
-                    filterRequest.getTag(),
-                    instrumentCriteria);
+            PaginatedResponse<SheetMusic> sheets = listSheets(filterRequest, parameters, partCounts);
             response = new PaginatedResponse<>();
             response.setPage(filterRequest.getPage());
             response.setSize(sheets.getSize());
@@ -216,47 +211,46 @@ public class SheetService {
                 .toList();
     }
 
-    private PaginatedResponse<SheetMusic> getAllSheets(
-            final PaginationRequest paginationRequest,
-            final Map<String, Object> parameters,
-            final String titleStartsWith,
-            final String tag,
-            final List<InstrumentationCountCriterion> instrumentCriteria) {
+    private PaginatedResponse<SheetMusic> listSheets(
+            final SheetFilterRequest filterRequest,
+            final Map<String, Object> fieldValues,
+            final List<PartCountFilter> partCounts) {
         PaginatedEntities<SheetMusicEntity> result = sheetRepository.findSheetEntities(
-                paginationRequest, parameters, titleStartsWith, tag, instrumentCriteria);
+                filterRequest, fieldValues, filterRequest.getTitleStartsWith(), filterRequest.getTag(), partCounts);
 
         PaginatedResponse<SheetMusic> response = new PaginatedResponse<>();
         response.setData(result.data().stream().map(sheetMusicMapper::toDto).toList());
-        response.setPage(paginationRequest.getPage());
+        response.setPage(filterRequest.getPage());
         response.setSize(response.getData().size());
         response.setTotalCount(result.totalCount());
         return response;
     }
 
-    private List<InstrumentationCountCriterion> parseInstrumentCriteria(List<String> rawCriteria) {
-        if (rawCriteria == null || rawCriteria.isEmpty()) {
+    /**
+     * Parses and checks the {@code partCount} query values: at most {@link #MAX_PART_COUNT_FILTERS},
+     * each well-formed and naming an existing instrument.
+     */
+    private List<PartCountFilter> toPartCountFilters(final List<String> values) {
+        if (values == null) {
             return List.of();
         }
-        // Each criterion is a correlated subquery, evaluated in both the count and the page query
-        if (rawCriteria.size() > MAX_INSTRUMENT_CRITERIA) {
-            throw new ValidationException("At most " + MAX_INSTRUMENT_CRITERIA
-                    + " instrument criteria are allowed, got " + rawCriteria.size());
+        if (values.size() > MAX_PART_COUNT_FILTERS) {
+            throw new ValidationException(
+                    "Too many partCount filters: " + values.size() + ", the limit is " + MAX_PART_COUNT_FILTERS);
         }
-        List<InstrumentationCountCriterion> criteria =
-                rawCriteria.stream().map(InstrumentationCountCriterion::parse).toList();
-        // An unknown ID would count as 0 parts and silently match (e.g. every sheet for "X:LT:1")
-        Set<String> requestedIds = criteria.stream()
-                .map(InstrumentationCountCriterion::instrumentId)
-                .collect(Collectors.toSet());
-        Set<String> knownIds = instrumentRepository.findExistingIds(requestedIds);
-        List<String> unknownIds = requestedIds.stream()
-                .filter(id -> !knownIds.contains(id))
-                .sorted()
-                .toList();
-        if (!unknownIds.isEmpty()) {
-            throw new ValidationException("Unknown instrument(s) in instrument criteria: " + unknownIds);
+        List<PartCountFilter> filters = new ArrayList<>(values.size());
+        for (String value : values) {
+            filters.add(PartCountFilter.fromParam(value));
         }
-        return criteria;
+        // An instrument nobody plays has 0 parts on every sheet, so a typo like "HRON:LT:1" would
+        // silently match everything instead of failing
+        Set<String> instrumentIds = new TreeSet<>();
+        filters.forEach(filter -> instrumentIds.add(filter.instrumentId()));
+        instrumentIds.removeAll(instrumentRepository.findExistingIds(instrumentIds));
+        if (!instrumentIds.isEmpty()) {
+            throw new ValidationException("partCount names unknown instrument(s): " + instrumentIds);
+        }
+        return filters;
     }
 
     public SheetMusic getSheet(final String sheetId) {

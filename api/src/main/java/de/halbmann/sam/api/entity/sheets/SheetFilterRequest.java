@@ -65,12 +65,11 @@ public class SheetFilterRequest extends PaginationRequest {
     private String tag;
 
     /**
-     * Filter by instrumentation counts. Each entry has the form
-     * {@code <instrumentId>:<operator>:<count>}, e.g. {@code "HORN_F:EQ:4"} (exactly 4 horns) or
-     * {@code "OBOE:EQ:0"} (no oboes). {@code operator} is one of {@code EQ}, {@code NEQ},
-     * {@code LT}, {@code LTE}, {@code GT}, {@code GTE}. All entries are combined with AND; an
-     * unknown instrument ID is rejected.
+     * Number of parts a sheet must have for an instrument, repeatable and all ANDed together. Format
+     * {@code <instrumentId>:<comparison>:<parts>} with comparison {@code EQ}, {@code NEQ}, {@code LT},
+     * {@code LTE}, {@code GT} or {@code GTE}: {@code HORN_F:EQ:4} is "exactly 4 horn parts",
+     * {@code OBOE:EQ:0} "no oboe". Values that don't parse or name an unknown instrument fail with 400.
      */
-    @QueryParam("instrumentCriterion")
-    private List<String> instrumentCriteria;
+    @QueryParam("partCount")
+    private List<String> partCounts;
 }

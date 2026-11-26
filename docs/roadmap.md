@@ -1382,15 +1382,13 @@ features needed zero boilerplate beyond wrapping their existing buttons.
 
 ---
 
-### Instrumentation count filter — `done`
+### Part count filter — `done`
 
-Added a search filter for concrete instrumentations (e.g. "exactly 4 horns", "no
-oboes", "4 horns and 2 clarinets but no oboes"). Since instrumentation is already
-modeled as one row per part with no count column, each criterion is a correlated
-`COUNT` subquery against `InstrumentationEntity` per instrument, compared with
-`=`/`≠`/`<`/`≤`/`>`/`≥`; multiple criteria are ANDed. UI: a dynamic,
-add/remove list of `<instrument> <operator> <count>` rows in the sheets
-filter panel. See [Search & Discovery](features/search-discovery.md#instrumentation-count-filter).
+The sheets filter panel can narrow the list by the number of parts per instrument: rows
+like "Horn = 4" or "Oboe = 0", all of which must hold, also within a full-text search.
+Each row counts the sheet's instrumentation rows for that instrument in a subquery; the
+data model needed no change. API (`partCount` query parameter) and details:
+[Search & Discovery](features/search-discovery.md#part-count-filter).
 
 **Stakeholders:** S1 (music librarian), S2 (Dirigent)
 

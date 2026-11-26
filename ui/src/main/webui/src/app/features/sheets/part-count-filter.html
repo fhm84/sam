@@ -1,0 +1,65 @@
+<fieldset class="flex flex-col gap-2 mt-4 border-0 p-0 m-0" data-testid="part-count-filter">
+  <legend class="text-[0.85rem] font-medium text-[var(--sam-text-secondary)] mb-2 p-0">
+    {{ 'sheets.partCountFilter.title' | translate }}
+  </legend>
+
+  @for (row of rows(); track $index; let i = $index) {
+    <div class="flex flex-wrap items-center gap-2" [attr.data-testid]="'part-count-row-' + i">
+      <p-select
+        [attr.data-testid]="'part-count-instrument-' + i"
+        [options]="instrumentOptions()"
+        optionLabel="label"
+        optionValue="value"
+        [filter]="true"
+        [ngModel]="row.instrument"
+        (ngModelChange)="changeRow(i, { instrument: $event })"
+        [placeholder]="t.t('sheets.partCountFilter.instrumentPlaceholder')"
+        [ariaLabel]="t.t('sheets.partCountFilter.instrument')"
+        [style]="{ minWidth: '180px' }"
+      />
+      <p-select
+        [attr.data-testid]="'part-count-comparison-' + i"
+        [options]="comparisonOptions"
+        optionLabel="label"
+        optionValue="value"
+        [ngModel]="row.comparison"
+        (ngModelChange)="changeRow(i, { comparison: $event })"
+        [ariaLabel]="t.t('sheets.partCountFilter.comparison')"
+        [style]="{ minWidth: '80px' }"
+      />
+      <p-inputnumber
+        [attr.data-testid]="'part-count-parts-' + i"
+        [ngModel]="row.parts"
+        (ngModelChange)="changeRow(i, { parts: $event })"
+        [ariaLabel]="t.t('sheets.partCountFilter.parts')"
+        [min]="0"
+        [maxFractionDigits]="0"
+        [useGrouping]="false"
+        [showButtons]="true"
+        [style]="{ width: '110px' }"
+        inputStyleClass="w-full"
+      />
+      <p-button
+        [attr.data-testid]="'btn-remove-part-count-' + i"
+        icon="pi pi-times"
+        severity="secondary"
+        size="small"
+        [text]="true"
+        [rounded]="true"
+        [pTooltip]="'sheets.partCountFilter.remove' | translate"
+        [ariaLabel]="t.t('sheets.partCountFilter.remove')"
+        (onClick)="removeRow(i)"
+      />
+    </div>
+  }
+
+  <p-button
+    data-testid="btn-add-part-count"
+    icon="pi pi-plus"
+    size="small"
+    styleClass="self-start"
+    [text]="true"
+    [label]="'sheets.partCountFilter.add' | translate"
+    (onClick)="addRow()"
+  />
+</fieldset>

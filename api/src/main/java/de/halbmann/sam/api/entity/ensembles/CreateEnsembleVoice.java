@@ -18,10 +18,7 @@ public class CreateEnsembleVoice {
     @NotBlank
     String label;
 
-    /**
-     * Relative importance of this voice in coverage scoring. Optional — defaults to {@code 1.0}
-     * when not given (the UI's weight field has no required validator).
-     */
+    /** How much this voice counts in the coverage score; {@code null} (left empty) means 1.0. */
     Double weight;
 
     /**

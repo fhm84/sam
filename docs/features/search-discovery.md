@@ -21,34 +21,30 @@ Results are ranked by combined score. The UI debounces input and paginates resul
 | Genre | Dropdown (all distinct genres in the database) |
 | Letter | A–Z browser by title first letter (optionally pre-filtered by genre) |
 | Ensemble coverage | Filter by coverage status for a selected ensemble |
-| Instrumentation count | Dynamic list of `<instrument> <operator> <count>` rows, ANDed together (see below) |
+| Parts per instrument | Rows of `<instrument> <comparison> <number>`, all of which must hold (see below) |
 
-### Instrumentation count filter
+### Part count filter
 
-Finds sheets by their concrete instrumentation, e.g. "exactly 4 horns", "no oboes", or
-"4 horns and 2 clarinets but no oboes". Since a sheet's instrumentation is just one
-`Instrumentation` row per part (no count column — "4 horns" is 4 rows sharing the same
-instrument), each criterion counts a sheet's instrumentation rows for one instrument and
-compares that count with `=`, `≠`, `<`, `≤`, `>` or `≥`. No separate NOT is needed: the
-operator set is closed under negation ("no oboes" is `= 0`, "not at least 2" is `< 2`).
+A sheet's instrumentation has one row per part, so "4 horns" means four rows for the horn
+and there is no count column to filter on. The part count filter counts those rows instead:
+each row in the filter panel picks an instrument, a comparison (`=`, `≠`, `<`, `≤`, `>`,
+`≥`) and a number, and a sheet matches if all rows hold. That covers "exactly 4 horns"
+(`= 4`), "no oboe" (`= 0`) and combinations like "4 horns, 2 clarinets, no oboe". A NOT
+isn't needed, because each comparison's opposite is in the list too.
 
-`GET /sheets` accepts the filter as one or more repeated `instrumentCriterion` query
-parameters, each encoded as:
+The API takes one repeatable `partCount` query parameter per row:
 
 ```
-<instrumentId>:<operator>:<count>
+GET /sheets?partCount=HORN_F:EQ:4&partCount=OBOE:EQ:0
 ```
 
-- `<operator>` is one of `EQ`, `NEQ`, `LT`, `LTE`, `GT`, `GTE`.
-- Operator and count are split off from the right, so an instrument ID may contain `:`.
-- Example: `?instrumentCriterion=HORN_F:EQ:4&instrumentCriterion=OBOE:EQ:0` — exactly 4
-  horns AND no oboes.
-
-All criteria are combined with AND, and they also narrow a free-text `q` search (like the
-other filters). Malformed criteria, unknown instrument IDs and more than 20 criteria are
-rejected with `400` — an unknown ID would otherwise count as 0 parts and silently match.
-Each criterion is a correlated count subquery per sheet, served by the
-`(sheet_id, instrument_id, …)` unique index on `instrumentations`.
+The value is `<instrumentId>:<comparison>:<parts>`, with comparison `EQ`, `NEQ`, `LT`,
+`LTE`, `GT` or `GTE`. The instrument ID is everything before the last two colons, so it may
+contain colons itself. The filter also applies to a full-text `q` search and to the
+`totalCount`. A request fails with `400` for a malformed value, for more than 20 values, or
+for an instrument ID that doesn't exist (it would have 0 parts everywhere, so `= 0` would
+match every sheet). Each value becomes a correlated count subquery, which the
+`(sheet_id, instrument_id, …)` unique index on `instrumentations` answers.
 
 ## Browse
 

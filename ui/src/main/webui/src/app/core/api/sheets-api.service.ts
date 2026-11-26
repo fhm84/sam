@@ -29,9 +29,7 @@ export class SheetsApiService {
     if (filter.titleStartsWith) params = params.set('titleStartsWith', filter.titleStartsWith);
     if (filter.ensemble) params = params.set('ensemble', filter.ensemble);
     if (filter.tag) params = params.set('tag', filter.tag);
-    for (const criterion of filter.instrumentCriteria ?? []) {
-      params = params.append('instrumentCriterion', criterion);
-    }
+    filter.partCounts?.forEach((value) => (params = params.append('partCount', value)));
     return this.http.get<PaginatedResponse<SheetMusicSearchResult>>(this.baseUrl, { params });
   }
 

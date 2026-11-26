@@ -380,14 +380,16 @@
       "toggle": "Filters",
       "genre": "Genre",
       "genrePlaceholder": "All genres",
-      "clear": "Clear filters",
-      "instrumentation": "Instrumentation",
-      "instrumentPlaceholder": "Select instrument",
-      "addInstrumentCriterion": "Add instrument filter",
-      "removeInstrumentCriterion": "Remove instrument filter",
-      "instrumentAria": "Instrument",
-      "operatorAria": "Comparison",
-      "countAria": "Number of parts"
+      "clear": "Clear filters"
+    },
+    "partCountFilter": {
+      "title": "Parts per instrument",
+      "instrument": "Instrument",
+      "instrumentPlaceholder": "Pick an instrument",
+      "comparison": "Comparison",
+      "parts": "Parts",
+      "add": "Add instrument",
+      "remove": "Remove this row"
     },
     "collections": {
       "title": "Collections",
