@@ -193,8 +193,7 @@ public class SheetMusic {
     /**
      * Individual instrument parts for a piece of sheet music.
      */
-    @Valid
-    List<Instrumentation> instrumentations = new ArrayList<>();
+    List<@Valid Instrumentation> instrumentations = new ArrayList<>();
 
     /**
      * Metadata of the sheet music files (including location, mime-type, fileSize, ...)

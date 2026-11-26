@@ -126,7 +126,7 @@ Set `quarkus.langchain4j.chat-model.provider` and enable exactly one provider:
 | Provider value | Required additional config |
 |----------------|---------------------------|
 | `openai` (default) | `quarkus.langchain4j.openai.api-key=<key>` (prod: env `OPENAI_API_KEY`); model defaults to `gpt-4o` |
-| `ollama` | `quarkus.langchain4j.ollama.base-url=http://localhost:11434`; `quarkus.langchain4j.ollama.chat-model.model-id=llava` |
+| `ollama` | Not built by default: uncomment the `quarkus-langchain4j-ollama` dependency in `server/pom.xml`, then set `quarkus.langchain4j.ollama.base-url=http://localhost:11434`, `quarkus.langchain4j.ollama.chat-model.model-id=llava` (vision model) and `quarkus.langchain4j.ollama.timeout=120s` |
 | `vertexai` (Gemini) | Not built by default: uncomment the `quarkus-langchain4j-vertex-ai-gemini` dependency in `server/pom.xml`, then set `quarkus.langchain4j.vertexai.gemini.project-id=<id>` and `.location=<region>` |
 
 ## Copyright and Licensing
