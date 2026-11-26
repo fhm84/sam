@@ -36,6 +36,5 @@ public class Booklet {
      * The list of sheets (wrapped in a collection sheet adding an identifier in context of the
      * collection/booklet)
      */
-    @Valid
-    List<CollectionSheet> sheets = new ArrayList<>();
+    List<@Valid CollectionSheet> sheets = new ArrayList<>();
 }

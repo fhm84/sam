@@ -50,6 +50,5 @@ public class SheetCollection {
     /**
      * The ordered list of items in the collection (sheet references and/or free-text blocks).
      */
-    @Valid
-    List<CollectionItem> items = new ArrayList<>();
+    List<@Valid CollectionItem> items = new ArrayList<>();
 }
