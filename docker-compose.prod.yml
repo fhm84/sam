@@ -318,7 +318,7 @@ services:
     restart: unless-stopped
 
   grafana:
-    image: grafana/grafana:13.3.1
+    image: grafana/grafana:13.3.2
     profiles: ["monitoring"]
     ports:
       - "127.0.0.1:3000:3000"
@@ -353,7 +353,7 @@ services:
   # root mount; it runs in its own network namespace, so the network collectors would report the
   # container's traffic, not the host's, and are off (Caddy's metrics cover the web traffic).
   node-exporter:
-    image: prom/node-exporter:v1.12.1
+    image: prom/node-exporter:v1.13.1
     profiles: ["monitoring"]
     command:
       - --path.rootfs=/host
