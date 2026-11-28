@@ -17,7 +17,7 @@ services:
     restart: unless-stopped
 
   grafana:
-    image: grafana/grafana:13.3.1
+    image: grafana/grafana:13.3.2
     container_name: sam-grafana
     ports:
       - "3000:3000"
